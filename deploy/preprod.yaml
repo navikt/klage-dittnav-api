@@ -1,0 +1,72 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: klage-dittnav-api
+  namespace: default
+  labels:
+    team: klage
+spec:
+  image: {{ image }}
+  port: 7070
+  liveness:
+    path: isAlive
+    initialDelay: 20
+    timeout: 1
+    periodSeconds: 5
+    failureThreshold: 10
+  readiness:
+    path: isReady
+    initialDelay: 20
+    timeout: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  ingresses:
+    - https://klage-dittnav-api.nais.preprod.local
+  replicas:
+    min: 1
+    max: 2
+    cpuThresholdPercentage: 90
+  prometheus:
+    enabled: true
+    path: /metrics
+#  vault:
+#    enabled: true
+#    paths:
+#      - mountPath: /var/run/secrets/nais.io/vault
+#        kvPath: /kv/preprod/fss/medlemskap-oppslag/default
+#      - mountPath: /var/run/secrets/nais.io/azure
+#        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
+  secureLogs:
+    enabled: true
+  webproxy: true
+
+#  env:
+#    - name: AZURE_TENANT
+#      value: 966ac572-f5b7-4bbe-aa88-c76419c0f851
+#    - name: AZURE_AUTHORITY_ENDPOINT
+#      value: https://login.microsoftonline.com
+#    - name: SECURITY_TOKEN_SERVICE_URL
+#      value: https://sts-q1.preprod.local/SecurityTokenServiceProvider/
+#    - name: SECURITY_TOKEN_SERVICE_REST_URL
+#      value: http://security-token-service.default.svc.nais.local
+#    - name: TPSWS_URL
+#      value: https://wasapp-q2.adeo.no/tpsws/ws/Person/v3
+#    - name: INNTEKT_BASE_URL
+#      value: https://app-q2.adeo.no/inntektskomponenten-ws
+#    - name: MEDL2_BASE_URL
+#      value: https://app-q2.adeo.no/medl2
+#    - name: AAREG_BASE_URL
+#      value: https://modapp-q2.adeo.no/aareg-services/api
+#    - name: SAF_BASE_URL
+#      value: http://saf.q1.svc.nais.local/graphql
+#    - name: OPPGAVE_BASE_URL
+#      value: http://oppgave.default.svc.nais.local
+#    - name: PDL_BASE_URL
+#      value: http://pdl-api.default.svc.nais.local/graphql
+#    - name: EREG_BASE_URL
+#      value: https://modapp-q0.adeo.no/ereg/api
