@@ -26,7 +26,7 @@ spec:
       cpu: 50m
       memory: 128Mi
   ingresses:
-    - https://klage-dittnav-api.nais.preprod.local
+    - https://klage-dittnav-api.dev-gcp.nais.io
   replicas:
     min: 1
     max: 2
