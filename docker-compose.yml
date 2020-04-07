@@ -2,6 +2,28 @@ version: '3'
 
 services:
   klage-dittnav-api:
+    depends_on:
+      - klage-dittnav-db
     build: .
+    command: ./gradlew clean build shadowJar
     ports:
       - "7070:7070"
+    environment:
+      KLAGE_DITTNAV_API_DATASOURCE_URL: jdbc:postgresql://klage-dittnav-db/klage
+      KLAGE_DITTNAV_API_DATASOURCE_USERNAME: klage
+      KLAGE_DITTNAV_API_DATASOURCE_PASSWORD: klage
+  klage-dittnav-db:
+    container_name: klage-dittnav-db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: klage
+      POSTGRES_PASSWORD: klage
+      POSTGRES_DB: klage
+    ports:
+      - "5432:5432"
+#  util:
+#    image: busybox:latest
+#    volumes:
+#      - /data
+#    command: top

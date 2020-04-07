@@ -19,6 +19,9 @@ val assertkVersion = "0.21"
 val restAssuredVersion = "4.2.0"
 val resilience4jVersion = "1.2.0"
 val threetenVersion = "1.5.0"
+val flywayVersion = "4.2.0"
+val hikariCpVersion = "3.2.0"
+val exposedVersion = "0.17.7"
 
 val mainClass = "no.nav.klage.ApplicationKt"
 
@@ -37,6 +40,7 @@ repositories {
     mavenCentral()
     maven("https://dl.bintray.com/kotlin/ktor")
     maven("https://kotlin.bintray.com/kotlinx")
+    maven("https://dl.bintray.com/kotlin/exposed")
     maven("https://jitpack.io")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/tjenestespesifikasjoner")
@@ -51,6 +55,11 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.zaxxer:HikariCP:$hikariCpVersion")
+    implementation("org.jetbrains.exposed:exposed:$exposedVersion")
+    runtime(group = "org.postgresql", name = "postgresql", version = "42.1.4")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
