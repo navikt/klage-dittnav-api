@@ -9,7 +9,6 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import no.nav.ApplicationState
 import no.nav.klage.common.exceptionHandler
 import no.nav.klage.common.objectMapper
 import no.nav.klage.routes.naisRoutes

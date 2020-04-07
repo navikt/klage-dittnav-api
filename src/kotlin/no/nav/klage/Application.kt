@@ -1,6 +1,4 @@
-package no.nav
-
-import no.nav.klage.createHttpServer
+package no.nav.klage
 
 data class ApplicationState(var running: Boolean = true, var initialized: Boolean = false)
 
