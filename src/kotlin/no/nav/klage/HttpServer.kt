@@ -11,14 +11,11 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import no.nav.klage.common.exceptionHandler
 import no.nav.klage.common.objectMapper
+import no.nav.klage.routes.klageRoutes
 import no.nav.klage.routes.naisRoutes
 
 fun createHttpServer(
-    applicationState: ApplicationState,
-    useAuthentication: Boolean = true
-//    configuration: Configuration = Configuration(),
-//    azureAdOpenIdConfiguration: AzureAdOpenIdConfiguration = getAadConfig(configuration.azureAd),
-//    services: Services = Services(configuration),
+        applicationState: ApplicationState
 ): ApplicationEngine = embeddedServer(Netty, 7070) {
 
     install(StatusPages) {
@@ -30,9 +27,10 @@ fun createHttpServer(
     }
 
     routing {
+        klageRoutes()
         naisRoutes(
-            readinessCheck = { applicationState.initialized },
-            livenessCheck = { applicationState.running }
+                readinessCheck = { applicationState.initialized },
+                livenessCheck = { applicationState.running }
         )
     }
 
