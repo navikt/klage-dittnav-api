@@ -5,7 +5,6 @@ services:
     depends_on:
       - klage-dittnav-db
     build: .
-    command: ./gradlew clean build shadowJar
     ports:
       - "7070:7070"
     environment:
