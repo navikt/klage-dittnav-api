@@ -34,13 +34,13 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-#  vault:
-#    enabled: true
-#    paths:
-#      - mountPath: /var/run/secrets/nais.io/vault
-#        kvPath: /kv/preprod/fss/medlemskap-oppslag/default
-#      - mountPath: /var/run/secrets/nais.io/azure
-#        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
+  #  vault:
+  #    enabled: true
+  #    paths:
+  #      - mountPath: /var/run/secrets/nais.io/vault
+  #        kvPath: /kv/preprod/fss/medlemskap-oppslag/default
+  #      - mountPath: /var/run/secrets/nais.io/azure
+  #        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
   secureLogs:
     enabled: true
   webproxy: true
