@@ -2,25 +2,39 @@ package no.nav.klage.repository
 
 import no.nav.klage.domain.Klage
 import no.nav.klage.domain.Klager
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class KlageRepository {
 
     fun getKlager(): List<Klage> {
-        val klager = mutableListOf<Klage>()
-        transaction {
-            klager.addAll(Klager.selectAll().map {
-                Klage(
-                        id = it[Klager.id].toString().toInt(),
-                        klageId = it[Klager.klageId],
-                        foedselsnummer = it[Klager.foedselsnummer],
-                        fritekst = it[Klager.fritekst]
-                )
-            })
+        return transaction {
+            Klager.selectAll().map {
+                it.toKlage()
+            }
         }
-        return klager
+    }
+
+    fun getKlageById(id: Int): Klage {
+        return transaction {
+            Klager.select(Klager.id eq id).single().toKlage()
+        }
+    }
+
+    fun getKlagerByKlageId(klageId: Int): List<Klage> {
+        return transaction {
+            Klager.select(Klager.klageId eq klageId).map { it.toKlage() }
+        }
+    }
+
+    fun getKlagerByFnr(fnr: String): List<Klage> {
+        return transaction {
+            Klager.select(Klager.foedselsnummer eq fnr).map { it.toKlage() }
+        }
     }
 
     fun addKlage(klage: Klage): Klage {
@@ -33,4 +47,11 @@ class KlageRepository {
         }
         return klage
     }
+
+    private fun ResultRow.toKlage() = Klage(
+        id = this[Klager.id].toString().toInt(),
+        klageId = this[Klager.klageId],
+        foedselsnummer = this[Klager.foedselsnummer],
+        fritekst = this[Klager.fritekst]
+    )
 }
