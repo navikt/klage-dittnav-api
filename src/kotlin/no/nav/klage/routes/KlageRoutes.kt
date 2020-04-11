@@ -15,6 +15,18 @@ fun Routing.klageRoutes() {
     get("/klager") {
         call.respond(klageRepository.getKlager())
     }
+    get("/klager/{id}") {
+        val id = call.parameters["id"]!!.toInt()
+        call.respond(klageRepository.getKlageById(id))
+    }
+    get("/klager/klageid/{id}") {
+        val id = call.parameters["id"]!!.toInt()
+        call.respond(klageRepository.getKlagerByKlageId(id))
+    }
+    get("/klager/fnr/{fnr}") {
+        val fnr = call.parameters["fnr"]!!
+        call.respond(klageRepository.getKlagerByFnr(fnr))
+    }
     post("/klager") {
         call.respond(HttpStatusCode.Created, klageRepository.addKlage(call.receive()))
     }
