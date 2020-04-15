@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: klage-dittnav-api
-  namespace: klage
+  namespace: default
   labels:
     team: klage
 spec:
@@ -26,7 +26,7 @@ spec:
       cpu: 50m
       memory: 128Mi
   ingresses:
-    - https://klage-dittnav-api.dev-gcp.nais.io
+    - https://klage-dittnav-api.nais.oera-q.local
   replicas:
     min: 1
     max: 2
