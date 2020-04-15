@@ -1,9 +1,10 @@
-version: '3'
+version: '2.4'
 
 services:
   klage-dittnav-api:
     depends_on:
-      - klage-dittnav-db
+      klage-dittnav-db:
+        condition: service_healthy
     build: .
     ports:
       - "7070:7070"
@@ -11,18 +12,30 @@ services:
       KLAGE_DITTNAV_API_DATASOURCE_URL: jdbc:postgresql://klage-dittnav-db/klage
       KLAGE_DITTNAV_API_DATASOURCE_USERNAME: klage
       KLAGE_DITTNAV_API_DATASOURCE_PASSWORD: klage
+      VAULT_DEV_ROOT_TOKEN_ID: 123456789
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: 123456789
   klage-dittnav-db:
     container_name: klage-dittnav-db
     image: postgres
-    restart: always
     environment:
       POSTGRES_USER: klage
       POSTGRES_PASSWORD: klage
       POSTGRES_DB: klage
     ports:
       - "5432:5432"
-#  util:
-#    image: busybox:latest
-#    volumes:
-#      - /data
-#    command: top
+    volumes:
+      - ./create_users_in_db.sql:/docker-entrypoint-initdb.d/create_users_in_db.sql
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U klage"
+      interval: 3s
+      timeout: 5s
+      retries: 5
+  vault:
+    image: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: 123456789
+      VAULT_ADDR: http://localhost:8200
+      VAULT_TOKEN: 123456789

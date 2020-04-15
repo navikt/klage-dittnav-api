@@ -1,25 +1,30 @@
 package no.nav.klage.db
 
 import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import no.nav.klage.ApplicationProperties
-import no.nav.klage.SingletonHolder
+import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil
+import javax.sql.DataSource
 
 class ConnectionPool private constructor(application: ApplicationProperties) {
-    var dataSource: HikariDataSource
+    private val config = HikariConfig()
 
     init {
-        val config = HikariConfig()
         config.jdbcUrl = application.dbUrl
         config.username = application.dbUsername
         config.password = application.dbPassword
-        config.schema = "klage"
-        config.maximumPoolSize = 10
-        config.minimumIdle = 2
+        config.schema = "public"
+        config.maximumPoolSize = 4
+        config.minimumIdle = 0
         config.connectionTimeout = 1000
-
-        dataSource = HikariDataSource(config)
     }
 
-    companion object : SingletonHolder<ConnectionPool, ApplicationProperties>(::ConnectionPool)
+    companion object {
+        fun getDataSourceForUser(): DataSource {
+            return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(
+                ConnectionPool(ApplicationProperties()).config,
+                "dev",
+                "klage-user"
+            );
+        }
+    }
 }

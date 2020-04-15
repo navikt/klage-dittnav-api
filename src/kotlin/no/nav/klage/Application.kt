@@ -11,7 +11,7 @@ private val log = LoggerFactory.getLogger("klage-dittnav-api.Application")
 
 fun main() {
     //Connect to db
-    Database.connect(ConnectionPool.getInstance(ApplicationProperties()).dataSource)
+    Database.connect(ConnectionPool.getDataSourceForUser())
 
     runDatabaseMigrationOnStartup()
 
@@ -30,8 +30,15 @@ fun main() {
 private fun runDatabaseMigrationOnStartup() {
     log.debug("Trying to run database migration")
     val flyway = Flyway()
-    flyway.dataSource = ConnectionPool.getInstance(ApplicationProperties()).dataSource
-    log.debug(flyway.dataSource.toString())
+
+    val applicationProperties = ApplicationProperties()
+    //note that "klage-admin" is hardcoded
+    flyway.setDataSource(
+        applicationProperties.dbUrl,
+        applicationProperties.dbUsername,
+        applicationProperties.dbPassword,
+        "SET ROLE \"klage-admin\""
+    )
     flyway.migrate()
     log.debug("Database migration complete")
 }
