@@ -9,32 +9,20 @@ services:
     ports:
       - "7070:7070"
     environment:
-      KLAGE_DITTNAV_API_DATASOURCE_URL: jdbc:postgresql://klage-dittnav-db/klage
-      KLAGE_DITTNAV_API_VAULT_MOUNT_PATH: postgresql/preprod-fss
-      VAULT_DEV_ROOT_TOKEN_ID: 123456789
-      VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: 123456789
+      DB_HOST: klage-dittnav-db
+      DB_USERNAME: klage
+      DB_PASSWORD: klage
   klage-dittnav-db:
     container_name: klage-dittnav-db
-    image: postgres
+    image: library/postgres:11
     environment:
       POSTGRES_USER: klage
       POSTGRES_PASSWORD: klage
       POSTGRES_DB: klage
     ports:
       - "5432:5432"
-    volumes:
-      - ./create_users_in_db.sql:/docker-entrypoint-initdb.d/create_users_in_db.sql
     healthcheck:
       test: "pg_isready -h localhost -p 5432 -q -U klage"
       interval: 3s
       timeout: 5s
       retries: 5
-  vault:
-    image: vault
-    ports:
-      - "8200:8200"
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: 123456789
-      VAULT_ADDR: http://localhost:8200
-      VAULT_TOKEN: 123456789

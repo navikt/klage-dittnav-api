@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: klage-dittnav-api
-  namespace: default
+  namespace: klage
   labels:
     team: klage
 spec:
@@ -26,29 +26,34 @@ spec:
       cpu: 50m
       memory: 128Mi
   ingresses:
-    - https://klage-dittnav-api.nais.oera-q.local
+    - https://klage-dittnav-api.dev-gcp.nais.io
   replicas:
     max: 1
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
     path: /metrics
-  vault:
-    enabled: true
-    paths:
-      - mountPath: /var/run/secrets/nais.io/vault
-        kvPath: /kv/preprod/sbs/klage-dittnav-api/default
+#  vault:
+#    enabled: true
+#    paths:
+#      - mountPath: /var/run/secrets/nais.io/vault
+#        kvPath: /kv/preprod/sbs/klage-dittnav-api/default
 #      - mountPath: /var/run/secrets/nais.io/azure
 #        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
+
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_11
+        databases:
+          - name: klage
+          envVarPrefix: DB
   secureLogs:
     enabled: true
   webproxy: true
 
-  env:
-    - name: KLAGE_DITTNAV_API_DATASOURCE_URL
-      value: jdbc:postgresql://b27dbvl013.preprod.local:5432/klage
-    - name: KLAGE_DITTNAV_API_VAULT_MOUNT_PATH
-      value: postgresql/preprod-fss
+#      value: jdbc:postgresql://b27dbvl013.preprod.local:5432/klage
+#    - name: KLAGE_DITTNAV_API_VAULT_MOUNT_PATH
+#      value: postgresql/preprod-fss
 #    - name: AZURE_TENANT
 #      value: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 #    - name: AZURE_AUTHORITY_ENDPOINT

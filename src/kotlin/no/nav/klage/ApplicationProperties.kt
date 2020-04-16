@@ -1,15 +1,11 @@
 package no.nav.klage
 
 class ApplicationProperties {
-    val dbUrl: String = getProperty(PropertyNames.KLAGE_DITTNAV_API_DATASOURCE_URL)
-    val vaultMountPath: String = getProperty(PropertyNames.KLAGE_DITTNAV_API_VAULT_MOUNT_PATH)
+    val dbUrl: String = "jdbc:postgresql://".plus(getProperty("DB_HOST")).plus("/klage")
+    val dbUsername: String = getProperty("DB_USERNAME")
+    val dbPassword: String = getProperty("DB_PASSWORD")
 }
 
-enum class PropertyNames {
-    KLAGE_DITTNAV_API_DATASOURCE_URL,
-    KLAGE_DITTNAV_API_VAULT_MOUNT_PATH
-}
-
-fun getProperty(property: PropertyNames, default: String? = null): String =
-        System.getenv(property.name) ?: System.getProperty(property.name) ?: default
-        ?: throw RuntimeException("Missing variable $property")
+fun getProperty(property: String, default: String? = null): String =
+    System.getenv(property) ?: System.getProperty(property) ?: default
+    ?: throw RuntimeException("Missing variable $property")
