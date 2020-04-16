@@ -41,12 +41,13 @@ spec:
 #      - mountPath: /var/run/secrets/nais.io/azure
 #        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
 
+#.spec.gcp.sqlInstances[].databases[].envVarPrefix
   gcp:
     sqlInstances:
       - type: POSTGRES_11
         databases:
           - name: klage
-          envVarPrefix: DB
+            envVarPrefix: DB
   secureLogs:
     enabled: true
   webproxy: true
