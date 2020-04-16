@@ -34,11 +34,11 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-#  vault:
-#    enabled: true
-#    paths:
-#      - mountPath: /var/run/secrets/nais.io/vault
-#        kvPath: /kv/preprod/fss/medlemskap-oppslag/default
+  vault:
+    enabled: true
+    paths:
+      - mountPath: /var/run/secrets/nais.io/vault
+        kvPath: /kv/preprod/sbs/klage-dittnav-api/default
 #      - mountPath: /var/run/secrets/nais.io/azure
 #        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
   secureLogs:
