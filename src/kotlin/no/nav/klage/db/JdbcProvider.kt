@@ -10,7 +10,6 @@ class ConnectionPool private constructor(application: ApplicationProperties) {
 
     init {
         config.jdbcUrl = application.dbUrl
-        config.schema = "public"
         config.maximumPoolSize = 4
         config.minimumIdle = 0
         config.connectionTimeout = 1000
