@@ -17,9 +17,9 @@ sleep 3
 export VAULT_ADDR=http://localhost:8200
 
 vault login 123456789
-vault secrets enable -path=dev/creds kv
-vault write dev/creds/klage-user username="klage-user" password="klage-user"
-vault write dev/creds/klage-admin username="klage-admin" password="klage-admin"
+vault secrets enable -path=postgresql/preprod-fss/creds kv
+vault write postgresql/preprod-fss/creds/klage-user username="klage-user" password="klage-user"
+vault write postgresql/preprod-fss/creds/klage-admin username="klage-admin" password="klage-admin"
 echo "secrets created"
 
 #start db and api

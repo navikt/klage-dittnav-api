@@ -18,17 +18,19 @@ class ConnectionPool private constructor(application: ApplicationProperties) {
 
     companion object {
         fun getDataSourceForUser(): DataSource {
+            val applicationProperties = ApplicationProperties()
             return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(
-                ConnectionPool(ApplicationProperties()).config,
-                "dev",
+                ConnectionPool(applicationProperties).config,
+                applicationProperties.vaultMountPath,
                 "klage-user"
             );
         }
 
         fun getDataSourceForAdmin(): DataSource {
+            val applicationProperties = ApplicationProperties()
             return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(
-                ConnectionPool(ApplicationProperties()).config,
-                "dev",
+                ConnectionPool(applicationProperties).config,
+                applicationProperties.vaultMountPath,
                 "klage-admin"
             );
         }

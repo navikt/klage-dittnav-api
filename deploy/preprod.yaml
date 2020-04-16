@@ -34,18 +34,22 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  #  vault:
-  #    enabled: true
-  #    paths:
-  #      - mountPath: /var/run/secrets/nais.io/vault
-  #        kvPath: /kv/preprod/fss/medlemskap-oppslag/default
-  #      - mountPath: /var/run/secrets/nais.io/azure
-  #        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
+#  vault:
+#    enabled: true
+#    paths:
+#      - mountPath: /var/run/secrets/nais.io/vault
+#        kvPath: /kv/preprod/fss/medlemskap-oppslag/default
+#      - mountPath: /var/run/secrets/nais.io/azure
+#        kvPath: /azuread/data/dev/creds/medlemskap-oppslag
   secureLogs:
     enabled: true
   webproxy: true
 
-#  env:
+  env:
+    - name: KLAGE_DITTNAV_API_DATASOURCE_URL
+      value: jdbc:postgresql://b27dbvl013.preprod.local:5432/klage
+    - name: KLAGE_DITTNAV_API_VAULT_MOUNT_PATH
+      value: postgresql/preprod-fss
 #    - name: AZURE_TENANT
 #      value: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 #    - name: AZURE_AUTHORITY_ENDPOINT

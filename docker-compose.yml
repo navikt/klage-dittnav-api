@@ -10,8 +10,7 @@ services:
       - "7070:7070"
     environment:
       KLAGE_DITTNAV_API_DATASOURCE_URL: jdbc:postgresql://klage-dittnav-db/klage
-      KLAGE_DITTNAV_API_DATASOURCE_USERNAME: klage
-      KLAGE_DITTNAV_API_DATASOURCE_PASSWORD: klage
+      KLAGE_DITTNAV_API_VAULT_MOUNT_PATH: postgresql/preprod-fss
       VAULT_DEV_ROOT_TOKEN_ID: 123456789
       VAULT_ADDR: http://vault:8200
       VAULT_TOKEN: 123456789
