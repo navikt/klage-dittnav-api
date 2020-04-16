@@ -28,8 +28,7 @@ spec:
   ingresses:
     - https://klage-dittnav-api.nais.oera-q.local
   replicas:
-    min: 1
-    max: 2
+    max: 1
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
