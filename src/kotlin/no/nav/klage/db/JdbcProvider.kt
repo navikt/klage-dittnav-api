@@ -10,8 +10,6 @@ class ConnectionPool private constructor(application: ApplicationProperties) {
 
     init {
         config.jdbcUrl = application.dbUrl
-        config.username = application.dbUsername
-        config.password = application.dbPassword
         config.schema = "public"
         config.maximumPoolSize = 4
         config.minimumIdle = 0
@@ -24,6 +22,14 @@ class ConnectionPool private constructor(application: ApplicationProperties) {
                 ConnectionPool(ApplicationProperties()).config,
                 "dev",
                 "klage-user"
+            );
+        }
+
+        fun getDataSourceForAdmin(): DataSource {
+            return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(
+                ConnectionPool(ApplicationProperties()).config,
+                "dev",
+                "klage-admin"
             );
         }
     }

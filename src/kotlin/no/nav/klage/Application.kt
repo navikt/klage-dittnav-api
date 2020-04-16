@@ -1,5 +1,6 @@
 package no.nav.klage
 
+import com.zaxxer.hikari.HikariDataSource
 import no.nav.klage.db.ConnectionPool
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
@@ -30,13 +31,12 @@ fun main() {
 private fun runDatabaseMigrationOnStartup() {
     log.debug("Trying to run database migration")
     val flyway = Flyway()
-
-    val applicationProperties = ApplicationProperties()
     //note that "klage-admin" is hardcoded
+    val dataSourceForAdmin = ConnectionPool.getDataSourceForAdmin() as HikariDataSource
     flyway.setDataSource(
-        applicationProperties.dbUrl,
-        applicationProperties.dbUsername,
-        applicationProperties.dbPassword,
+        dataSourceForAdmin.jdbcUrl,
+        dataSourceForAdmin.username,
+        dataSourceForAdmin.password,
         "SET ROLE \"klage-admin\""
     )
     flyway.migrate()
