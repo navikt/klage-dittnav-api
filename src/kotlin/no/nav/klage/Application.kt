@@ -1,5 +1,6 @@
 package no.nav.klage
 
+import no.nav.klage.common.configurePrometheusMeterRegistry
 import no.nav.klage.db.ConnectionPool
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
@@ -15,9 +16,11 @@ fun main() {
 
     runDatabaseMigrationOnStartup()
 
+    val prometheusRegistry = configurePrometheusMeterRegistry()
+
     val applicationState = ApplicationState()
 
-    val applicationServer = createHttpServer(applicationState = applicationState)
+    val applicationServer = createHttpServer(applicationState = applicationState, prometheusRegistry = prometheusRegistry)
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false

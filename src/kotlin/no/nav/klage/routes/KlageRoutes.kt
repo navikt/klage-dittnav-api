@@ -7,12 +7,14 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
+import no.nav.klage.common.apiCounter
 import no.nav.klage.repository.KlageRepository
 
 fun Routing.klageRoutes() {
     val klageRepository = KlageRepository()
 
     get("/klager") {
+        apiCounter().increment()
         call.respond(klageRepository.getKlager())
     }
     get("/klager/{id}") {
