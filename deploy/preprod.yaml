@@ -43,3 +43,7 @@ spec:
   secureLogs:
     enabled: true
   webproxy: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: klage-dittnav
