@@ -2,27 +2,24 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "1.3.0"
+val ktorVersion = "1.3.2"
 val jacksonVersion = "2.10.1"
 val prometheusVersion = "0.7.0"
 val logbackVersion = "1.2.3"
 val logstashVersion = "5.1"
-val konfigVersion = "1.6.10.0"
 val kotlinLoggerVersion = "1.7.6"
 //val tjenestespesifikasjonerVersion = "1.2019.12.18-12.22-ce897c4eb2c1"
 val cxfVersion = "3.3.1"
-val coroutinesVersion = "1.3.3"
+val coroutinesVersion = "1.3.5"
 val wireMockVersion = "2.19.0"
-val mockkVersion = "1.9"
+val mockkVersion = "1.10.0"
 val junitJupiterVersion = "5.4.0"
 val assertkVersion = "0.21"
 val restAssuredVersion = "4.2.0"
 val resilience4jVersion = "1.2.0"
-val threetenVersion = "1.5.0"
-val flywayVersion = "4.2.0"
-val hikariCpVersion = "3.2.0"
+val flywayVersion = "6.3.3"
+val hikariCpVersion = "3.4.2"
 val exposedVersion = "0.17.7"
-val vaultJdbcVersion = "1.3.7"
 
 val mainClass = "no.nav.klage.ApplicationKt"
 
@@ -65,7 +62,6 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.zaxxer:HikariCP:$hikariCpVersion")
-    implementation("no.nav:vault-jdbc:$vaultJdbcVersion")
     implementation("org.jetbrains.exposed:exposed:$exposedVersion")
     runtime(group = "org.postgresql", name = "postgresql", version = "42.1.4")
 
@@ -83,18 +79,15 @@ dependencies {
     implementation("io.ktor:ktor-metrics-micrometer:$ktorVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:latest.release")
-    implementation("io.micrometer:micrometer-registry-influx:latest.release")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
-    implementation("com.natpryce:konfig:$konfigVersion")
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggerVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-    implementation("org.threeten:threeten-extra:$threetenVersion")
 
     implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
