@@ -31,6 +31,13 @@ val mainClass = "no.nav.klage.ApplicationKt"
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.3.61"
     id("com.github.johnrengelman.shadow") version "5.1.0"
+    idea
+}
+
+idea {
+    module {
+        isDownloadJavadoc = true
+    }
 }
 
 val githubUser: String by project
