@@ -14,4 +14,4 @@ class CorrelationId(private val id: String) {
 }
 
 internal fun getCorrelationId(): CorrelationId =
-        CorrelationId(MDC.get(MDC_CALL_ID))
+    CorrelationId(MDC.get(MDC_CALL_ID))

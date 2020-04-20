@@ -11,9 +11,9 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
 
 fun Routing.naisRoutes(
-        readinessCheck: () -> Boolean,
-        livenessCheck: () -> Boolean = { true },
-        collectorRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry
+    readinessCheck: () -> Boolean,
+    livenessCheck: () -> Boolean = { true },
+    collectorRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry
 ) {
 
     get("/isAlive") {

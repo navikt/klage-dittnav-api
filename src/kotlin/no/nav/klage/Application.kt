@@ -3,6 +3,7 @@ package no.nav.klage
 import no.nav.klage.common.configurePrometheusMeterRegistry
 import no.nav.klage.db.ConnectionPool
 import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.jetbrains.exposed.sql.Database
 import org.slf4j.LoggerFactory
 
@@ -20,7 +21,8 @@ fun main() {
 
     val applicationState = ApplicationState()
 
-    val applicationServer = createHttpServer(applicationState = applicationState, prometheusRegistry = prometheusRegistry)
+    val applicationServer =
+        createHttpServer(applicationState = applicationState, prometheusRegistry = prometheusRegistry)
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false
@@ -32,8 +34,9 @@ fun main() {
 
 private fun runDatabaseMigrationOnStartup() {
     log.debug("Trying to run database migration")
-    val flyway = Flyway()
-    flyway.dataSource = ConnectionPool.getDataSource()
+    val configuration = ClassicConfiguration()
+    configuration.dataSource = ConnectionPool.getDataSource()
+    val flyway = Flyway(configuration)
     flyway.migrate()
     log.debug("Database migration complete")
 }
