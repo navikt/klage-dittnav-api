@@ -23,13 +23,13 @@ class KlageRepository {
 
     fun getKlagerByKlageId(klageId: Int): List<Klage> {
         return transaction {
-            KlageDAO.find{ Klager.klageId eq klageId}.map { it.toKlage() }
+            KlageDAO.find { Klager.klageId eq klageId }.map { it.toKlage() }
         }
     }
 
     fun getKlagerByFnr(fnr: String): List<Klage> {
         return transaction {
-            KlageDAO.find{ Klager.foedselsnummer eq fnr}.map { it.toKlage() }
+            KlageDAO.find { Klager.foedselsnummer eq fnr }.map { it.toKlage() }
         }
     }
 

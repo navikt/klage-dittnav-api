@@ -20,7 +20,8 @@ fun main() {
 
     val applicationState = ApplicationState()
 
-    val applicationServer = createHttpServer(applicationState = applicationState, prometheusRegistry = prometheusRegistry)
+    val applicationServer =
+        createHttpServer(applicationState = applicationState, prometheusRegistry = prometheusRegistry)
 
     Runtime.getRuntime().addShutdownHook(Thread {
         applicationState.initialized = false

@@ -7,14 +7,15 @@ import org.jetbrains.exposed.dao.IntIdTable
 
 
 data class Klage(
-        var id: Int?,
-        val klageId: Int,
-        val foedselsnummer: String,
-        val fritekst: String
+    var id: Int?,
+    val klageId: Int,
+    val foedselsnummer: String,
+    val fritekst: String
 )
 
 class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<KlageDAO>(Klager)
+
     var klageId by Klager.klageId
     var foedselsnummer by Klager.foedselsnummer
     var fritekst by Klager.fritekst

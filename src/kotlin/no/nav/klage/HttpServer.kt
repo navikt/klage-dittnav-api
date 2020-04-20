@@ -50,9 +50,9 @@ fun createHttpServer(
     routing {
         klageRoutes()
         naisRoutes(
-                readinessCheck = { applicationState.initialized },
-                livenessCheck = { applicationState.running },
-                collectorRegistry = prometheusRegistry.prometheusRegistry
+            readinessCheck = { applicationState.initialized },
+            livenessCheck = { applicationState.running },
+            collectorRegistry = prometheusRegistry.prometheusRegistry
         )
     }
 
