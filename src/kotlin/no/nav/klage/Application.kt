@@ -36,6 +36,7 @@ private fun runDatabaseMigrationOnStartup() {
     log.debug("Trying to run database migration")
     val configuration = ClassicConfiguration()
     configuration.dataSource = ConnectionPool.getDataSource()
+    configuration.table = "schema_version"
     val flyway = Flyway(configuration)
     flyway.migrate()
     log.debug("Database migration complete")
