@@ -17,12 +17,16 @@ fun Routing.klageRoutes() {
         apiCounter().increment()
         val klageId = call.request.queryParameters["klageid"]
         val fnr = call.request.queryParameters["fnr"]
-        if (klageId != null) {
-            call.respond(klageRepository.getKlagerByKlageId(klageId.toInt()))
-        } else if (fnr != null) {
-            call.respond(klageRepository.getKlagerByFnr(fnr))
-        } else {
-            call.respond(klageRepository.getKlager())
+        when {
+            klageId != null -> {
+                call.respond(klageRepository.getKlagerByKlageId(klageId.toInt()))
+            }
+            fnr != null -> {
+                call.respond(klageRepository.getKlagerByFnr(fnr))
+            }
+            else -> {
+                call.respond(klageRepository.getKlager())
+            }
         }
     }
     get("/klager/{id}") {
