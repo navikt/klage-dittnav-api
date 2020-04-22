@@ -17,12 +17,12 @@ Lager en kjørbar jar-fil.
 
 ### Kun DB
 ```
-sudo docker-compose up -d klage-dittnav-db
+docker-compose up -d klage-dittnav-db
 ```
 
 Stop/delete:
 ```
-sudo docker-compose down
+docker-compose down
 ```
 
 ### DB + API
@@ -30,11 +30,11 @@ Husk å bygge jar først.
 
 Legg til -d hvis du ikke vil se loggene fra API-et, d.v.s. at applikasjonen kjører i bakgrunnen.
 ```
-sudo docker-compose up --build
+docker-compose up --build
 ```
 Stop/delete:
 ```
-sudo docker-compose down
+docker-compose down
 ```
 
 ## Endepunkter
