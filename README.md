@@ -56,7 +56,7 @@ http://localhost:7070/internal/prometheus
 ```
 Vi eksponerer (til Prometheus):
 
-* klager.created - hvor mange ganger GET /klager har blitt kalt.
+* klager.created - hvor mange ganger POST /klager har blitt kalt vellykket.
 
 Dette bruker vi til å vise stats i Grafana.
 
