@@ -22,7 +22,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: test and build
-        run: ./gradlew test shadowJar
+        run: ./gradlew test bootJar
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
