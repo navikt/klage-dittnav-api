@@ -1,7 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val konfigVersion = "1.6.10.0"
-
 repositories {
     mavenCentral()
     jcenter()
@@ -31,7 +29,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("com.natpryce:konfig:$konfigVersion")
+    implementation("org.springframework.kafka:spring-kafka")
 }
 
 idea {

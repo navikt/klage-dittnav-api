@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-class KlageController(private val klageRepository: KlageRepository, private val metrics: KlageMetrics) {
+class KlageController(
+    private val klageRepository: KlageRepository, private val metrics: KlageMetrics
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
