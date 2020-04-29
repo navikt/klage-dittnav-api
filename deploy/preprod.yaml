@@ -47,3 +47,10 @@ spec:
     inbound:
       rules:
         - application: klage-dittnav
+  env:
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
+    - name: KAFKA_CLIENTID
+      value: klage-dittnav-api
+    - name: KAFKA_TOPIC
+      value: aapen-klager-klageOpprettet

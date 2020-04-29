@@ -29,3 +29,16 @@ management:
     export:
       prometheus:
         enabled: true
+
+# Local environment settings. Will be overridden in dev and prod.
+
+KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+KAFKA_CLIENTID: klage-dittnav-api
+KAFKA_TOPIC: aapen-klager-klageOpprettet
+
+SERVICE_USER_USERNAME: igroup
+SERVICE_USER_PASSWORD: itest
+
+DB_HOST: localhost
+DB_USERNAME: klage
+DB_PASSWORD: klage
