@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:5432/klage
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 1
+  main:
+    banner-mode: OFF
+  flyway:
+    table: "schema_version"
+
+server:
+  port: 7070
+  error:
+    whitelabel:
+      enabled: false
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints.web:
+    exposure:
+      include: info, health, metrics, prometheus
+    base-path: "/internal"
+  metrics:
+    export:
+      prometheus:
+        enabled: true

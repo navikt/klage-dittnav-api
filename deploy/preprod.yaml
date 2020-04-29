@@ -9,13 +9,13 @@ spec:
   image: {{ image }}
   port: 7070
   liveness:
-    path: isAlive
+    path: /internal/health
     initialDelay: 20
     timeout: 1
     periodSeconds: 5
     failureThreshold: 10
   readiness:
-    path: isReady
+    path: /internal/health
     initialDelay: 20
     timeout: 1
   resources:
@@ -33,7 +33,7 @@ spec:
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
-    path: /metrics
+    path: /internal/prometheus
   gcp:
     sqlInstances:
       - type: POSTGRES_11

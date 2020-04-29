@@ -2,14 +2,14 @@
 API for moderniserte klager.
 
 Kotlin-app bygget med bl.a.:
-* Ktor (Kotlin async server) 
+* Spring 
 * Exposed (Kotlin ORM)
 
 Flyway kjører ved hver oppstart av applikasjonen og oppdaterer databasen ved ev. endringer.
 
 ## Bygge
 ```
-./gradlew shadowJar
+./gradlew bootJar
 ```
 Lager en kjørbar jar-fil.
 
@@ -47,19 +47,16 @@ http://localhost:7070/klager
 ### NAIS
 Endepunkter som NAIS bruker:
 ```
-http://localhost:7070/isAlive
-```
-```
-http://localhost:7070/isReady
+http://localhost:7070/internal/health
 ```
 
 ## Metrics
 ```
-http://localhost:7070/metrics
+http://localhost:7070/internal/prometheus
 ```
 Vi eksponerer (til Prometheus):
 
-* api_hit_counter - hvor mange ganger GET /klager har blitt kalt.
+* klager.created - hvor mange ganger POST /klager har blitt kalt vellykket.
 
 Dette bruker vi til å vise stats i Grafana.
 
