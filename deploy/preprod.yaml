@@ -47,6 +47,8 @@ spec:
     inbound:
       rules:
         - application: klage-dittnav
+  envFrom:
+    - secret: srvklage-dittnav
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS
       value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
@@ -54,3 +56,9 @@ spec:
       value: klage-dittnav-api
     - name: KAFKA_TOPIC
       value: aapen-klager-klageOpprettet
+    - name: PDL_BASE_URL
+      value: http://pdl-api.default.svc.nais.local/graphql
+    - name: SECURITY_TOKEN_SERVICE_REST_URL
+      value: http://security-token-service.default.svc.nais.local
+    - name: SERVICE_USER_USERNAME
+      value: srvklage-dittnav

@@ -1,0 +1,34 @@
+package no.nav.klage.config
+
+import no.nav.klage.services.sts.StsClient
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.web.reactive.function.client.WebClient
+
+@Configuration
+class PdlClientConfiguration {
+
+    @Value("\${PDL_BASE_URL}")
+    lateinit var pdlUrl: String
+
+    @Value("\${SERVICE_USER_USERNAME}")
+    lateinit var username: String
+
+    @Bean
+    fun pdlWebClient(stsClient: StsClient): WebClient {
+        return WebClient
+            .builder()
+            .baseUrl(pdlUrl)
+            //TODO() Neste linje skal erstattes med token fra innlogget bruker.
+            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${stsClient.oidcToken()}")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
+            .defaultHeader("Nav-Consumer-Id", username)
+            .defaultHeader("TEMA", "KLA")
+            .build()
+    }
+}

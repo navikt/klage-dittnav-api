@@ -4,13 +4,17 @@ import no.nav.klage.common.KlageMetrics
 import no.nav.klage.domain.Klage
 import no.nav.klage.getLogger
 import no.nav.klage.repository.KlageRepository
+import no.nav.klage.services.pdl.HentPdlPersonResponse
+import no.nav.klage.services.pdl.PdlClient
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
 
 @RestController
 class KlageController(
-    private val klageRepository: KlageRepository, private val metrics: KlageMetrics
+    private val klageRepository: KlageRepository,
+    private val metrics: KlageMetrics,
+    private val pdlClient: PdlClient
 ) {
 
     companion object {
@@ -21,9 +25,10 @@ class KlageController(
     //Security: verify user token for all
 
     @GetMapping("/bruker")
-    fun getBruker() {
-        //return user based on token
+    fun getBruker(@RequestParam fnr: String): HentPdlPersonResponse {
+        return pdlClient.getPersonInfo(fnr)
         TODO()
+        //return user based on token
     }
 
     @GetMapping("/klager")
