@@ -9,17 +9,16 @@ import org.springframework.web.reactive.function.client.WebClient
 import java.util.*
 
 @Configuration
-@ConfigurationProperties(prefix = "sts")
 class StsClientConfiguration {
 
     @Value("\${SECURITY_TOKEN_SERVICE_REST_URL}")
-    lateinit var stsUrl: String
+    private lateinit var stsUrl: String
 
     @Value("\${SERVICE_USER_USERNAME}")
-    lateinit var username: String
+    private lateinit var username: String
 
     @Value("\${SERVICE_USER_PASSWORD}")
-    lateinit var password: String
+    private lateinit var password: String
 
     @Bean
     fun stsWebClient(): WebClient {
