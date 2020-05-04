@@ -36,8 +36,8 @@ KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_CLIENTID: klage-dittnav-api
 KAFKA_TOPIC: aapen-klager-klageOpprettet
 
-SERVICE_USER_USERNAME: igroup
-SERVICE_USER_PASSWORD: itest
+SERVICE_USER_USERNAME: srvklage-dittnav
+SERVICE_USER_PASSWORD: HArIK1smGkprHiUnsgCnQe
 
 DB_HOST: localhost
 DB_USERNAME: klage

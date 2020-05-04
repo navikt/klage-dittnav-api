@@ -12,10 +12,10 @@ import org.springframework.web.reactive.function.client.WebClient
 class PdlClientConfiguration {
 
     @Value("\${PDL_BASE_URL}")
-    lateinit var pdlUrl: String
+    private lateinit var pdlUrl: String
 
     @Value("\${SERVICE_USER_USERNAME}")
-    lateinit var username: String
+    private lateinit var username: String
 
     @Bean
     fun pdlWebClient(stsClient: StsClient): WebClient {

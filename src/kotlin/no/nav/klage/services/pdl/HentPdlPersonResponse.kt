@@ -8,32 +8,12 @@ data class HentPdlPersonResponse (val data: HentPerson?, val errors: List<PdlErr
 data class HentPerson(val hentPerson: Person)
 data class Person(
         val adressebeskyttelse: List<Adressebeskyttelse>,
-        val kjoenn: List<Kjoenn>,
         val navn: List<Navn>,
-        val statsborgerskap: List<Statsborgerskap>,
         val bostedsadresse: List<Bostedsadresse>)
-
-data class Statsborgerskap(
-        val land: String,
-        val gyldigFraOgMed: LocalDate?,
-        val gyldigTilOgMed: LocalDate?
-)
 
 data class Adressebeskyttelse(
         val gradering: AdressebeskyttelseGradering
 )
-
-
-data class Kjoenn(
-        val kjoenn: KjoennType
-)
-
-enum class KjoennType{
-    MANN,
-    KVINNE,
-    UKJENT,
-}
-
 
 enum class AdressebeskyttelseGradering {
     STRENGT_FORTROLIG,

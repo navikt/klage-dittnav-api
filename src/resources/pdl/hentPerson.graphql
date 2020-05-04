@@ -3,8 +3,6 @@ query($ident: ID!, $bostedHistorikk: Boolean!){
         adressebeskyttelse{
             gradering
         },
-        kjoenn{kjoenn},
-        statsborgerskap{land, gyldigFraOgMed, gyldigTilOgMed},
         navn{fornavn,mellomnavn,etternavn},
         bostedsadresse(historikk: $bostedHistorikk) {
             angittFlyttedato,
@@ -13,9 +11,13 @@ query($ident: ID!, $bostedHistorikk: Boolean!){
                 bostedskommune
             },
             vegadresse {
-                postnummer
-            },
-            matrikkeladresse {
+                matrikkelId
+                husnummer
+                husbokstav
+                bruksenhetsnummer
+                adressenavn
+                kommunenummer
+                tilleggsnavn
                 postnummer
             }
         }
