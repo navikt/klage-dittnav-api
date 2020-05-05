@@ -37,7 +37,7 @@ KAFKA_CLIENTID: klage-dittnav-api
 KAFKA_TOPIC: aapen-klager-klageOpprettet
 
 SERVICE_USER_USERNAME: srvklage-dittnav
-SERVICE_USER_PASSWORD: ***REMOVED***
+SERVICE_USER_PASSWORD: test
 
 DB_HOST: localhost
 DB_USERNAME: klage
