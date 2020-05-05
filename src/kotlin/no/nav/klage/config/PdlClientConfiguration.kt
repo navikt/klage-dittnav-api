@@ -17,6 +17,9 @@ class PdlClientConfiguration {
     @Value("\${SERVICE_USER_USERNAME}")
     private lateinit var username: String
 
+    @Value("\${PDL_APIKEY}")
+    private lateinit var apiKey: String
+
     @Bean
     fun pdlWebClient(stsClient: StsClient): WebClient {
         return WebClient
@@ -29,6 +32,7 @@ class PdlClientConfiguration {
             .defaultHeader("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
             .defaultHeader("Nav-Consumer-Id", username)
             .defaultHeader("TEMA", "KLA")
+            .defaultHeader("x-nav-apiKey", apiKey)
             .build()
     }
 }

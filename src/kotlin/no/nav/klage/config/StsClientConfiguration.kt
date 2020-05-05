@@ -20,12 +20,16 @@ class StsClientConfiguration {
     @Value("\${SERVICE_USER_PASSWORD}")
     private lateinit var password: String
 
+    @Value("\${STS_APIKEY}")
+    private lateinit var apiKey: String
+
     @Bean
     fun stsWebClient(): WebClient {
         return WebClient
             .builder()
             .baseUrl("$stsUrl/rest/v1/sts/token")
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic ${credentials()}")
+            .defaultHeader("x-nav-apiKey", apiKey)
             .build()
     }
 

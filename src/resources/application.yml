@@ -48,3 +48,6 @@ NAIS_APP_NAME: klage-dittnav-api
 SECURITY_TOKEN_SERVICE_REST_URL: http://localhost:8088
 
 PDL_BASE_URL: http://localhost:7000/graphql
+
+STS_APIKEY: test
+PDL_APIKEY: test
