@@ -51,6 +51,7 @@ spec:
     - secret: srvklage-dittnav
     - secret: sts-apikey
     - secret: pdl-apikey
+    - secret: saf-apikey
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS
       value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
@@ -60,6 +61,8 @@ spec:
       value: aapen-klager-klageOpprettet
     - name: PDL_BASE_URL
       value: https://api-gw-q1.oera.no/pdl-api/graphql
+    - name: PDL_BASE_URL
+      value: https://api-gw-q1.oera.no/saf/graphql
     - name: SECURITY_TOKEN_SERVICE_REST_URL
       value: https://api-gw-q1.oera.no/security-token-service/
     - name: SERVICE_USER_USERNAME

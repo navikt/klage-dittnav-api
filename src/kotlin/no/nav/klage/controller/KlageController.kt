@@ -2,10 +2,12 @@ package no.nav.klage.controller
 
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.domain.Klage
+import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.services.pdl.HentPdlPersonResponse
 import no.nav.klage.services.pdl.PdlClient
+import no.nav.klage.services.saf.SafClient
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
@@ -14,7 +16,8 @@ import javax.servlet.http.HttpServletResponse
 class KlageController(
     private val klageRepository: KlageRepository,
     private val metrics: KlageMetrics,
-    private val pdlClient: PdlClient
+    private val pdlClient: PdlClient,
+    private val safClient: SafClient
 ) {
 
     companion object {
@@ -57,5 +60,11 @@ class KlageController(
     fun deleteKlage(@PathVariable id: String) {
         //mark as deleted in DB. Only possible for status = draft
         TODO()
+    }
+
+    @GetMapping("/vedtak")
+    fun getVedtak(): List<Vedtak> {
+        val fnr = "TODO from token?"
+        return safClient.getVedtak(fnr)
     }
 }

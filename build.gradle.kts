@@ -32,6 +32,10 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("org.springframework.kafka:spring-kafka")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.4.0")
 }
 
 idea {
