@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val jupiterVersion = "5.4.0"
+
 repositories {
     mavenCentral()
     jcenter()
@@ -33,9 +35,9 @@ dependencies {
 
     implementation("org.springframework.kafka:spring-kafka")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$jupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
 }
 
 idea {
