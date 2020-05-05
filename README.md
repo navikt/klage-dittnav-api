@@ -127,3 +127,40 @@ I "Github workflow".yml:
 https://doc.nais.io/gcp/postgres
 
 Vi opplevde at det tok litt tid før DB var opprettet og svarte på anrop.
+
+### API
+`GET /klager`: Hent alle klager
+
+`POST /klager`: Opprett klage
+
+Eksempel:
+```
+{
+  "foedselsnummer": "012345678910",
+  "fritekst": "Tekst her"
+}
+```
+
+`PUT /klager/{id}`: Endre klage
+
+Eksempel:
+```
+{
+  "id": 1,
+  "foedselsnummer": "012345678910",
+  "fritekst": "Endret tekst her"
+}
+```
+
+`DELETE /klager/{id}`: Marker klage som slettet
+
+Eksempel på Klageobjektet:
+```
+{
+  "id": 2,
+  "foedselsnummer": "02345678911",
+  "fritekst": "Mye tekst her",
+  "status": "DRAFT",
+  "modifiedByUser": "2020-05-05T15:18:12.686588Z"
+}
+```
