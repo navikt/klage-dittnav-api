@@ -17,16 +17,16 @@ import java.util.*
 class KafkaConfiguration {
 
     @Value("\${KAFKA_BOOTSTRAP_SERVERS}")
-    lateinit var bootstrapServers: String
+    private lateinit var bootstrapServers: String
 
     @Value("\${KAFKA_CLIENTID}")
-    lateinit var clientId: String
+    private lateinit var clientId: String
 
     @Value("\${SERVICE_USER_USERNAME}")
-    lateinit var username: String
+    private lateinit var username: String
 
     @Value("\${SERVICE_USER_PASSWORD}")
-    lateinit var password: String
+    private lateinit var password: String
 
     @Bean
     fun producerFactory(): ProducerFactory<String, String> {

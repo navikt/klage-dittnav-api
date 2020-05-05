@@ -1,0 +1,25 @@
+query($ident: ID!, $bostedHistorikk: Boolean!){
+    hentPerson(ident: $ident) {
+        adressebeskyttelse{
+            gradering
+        },
+        navn{fornavn,mellomnavn,etternavn},
+        bostedsadresse(historikk: $bostedHistorikk) {
+            angittFlyttedato,
+            coAdressenavn,
+            ukjentBosted {
+                bostedskommune
+            },
+            vegadresse {
+                matrikkelId
+                husnummer
+                husbokstav
+                bruksenhetsnummer
+                adressenavn
+                kommunenummer
+                tilleggsnavn
+                postnummer
+            }
+        }
+    }
+}
