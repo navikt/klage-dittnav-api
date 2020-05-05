@@ -1,0 +1,13 @@
+query($brukerId: BrukerIdInput!, $journalposttyper: [String!]) {
+    dokumentoversiktBruker(
+        brukerId: $brukerId,
+        journalposttyper: $journalposttyper) {
+        journalposter {
+            journalpostId
+            tittel
+            journalfoerendeEnhet
+            tema
+            datoOpprettet
+        }
+    }
+}
