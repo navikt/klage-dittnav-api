@@ -5,8 +5,6 @@ import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
 import no.nav.klage.services.pdl.HentPdlPersonResponse
-import no.nav.klage.services.pdl.PdlClient
-import no.nav.klage.services.saf.SafClient
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -60,6 +58,6 @@ class KlageController(private val klageService: KlageService) {
     @GetMapping("/vedtak")
     fun getVedtak(): List<Vedtak> {
         val fnr = "TODO from token?"
-        return safClient.getVedtak(fnr)
+        return klageService.getVedtak(fnr)
     }
 }
