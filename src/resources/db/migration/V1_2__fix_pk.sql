@@ -1,0 +1,1 @@
+ALTER TABLE klage ADD PRIMARY KEY (id);
