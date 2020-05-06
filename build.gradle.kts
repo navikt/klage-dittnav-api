@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val jupiterVersion = "5.4.0"
 
+val exposedVersion = "0.21.1"
+
 repositories {
     mavenCentral()
     jcenter()
@@ -26,7 +28,8 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
-    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:0.21.1")
+    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.postgresql:postgresql")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
