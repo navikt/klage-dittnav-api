@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Klage
+import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
 import no.nav.klage.services.pdl.HentPdlPersonResponse
@@ -53,4 +54,7 @@ class KlageController(private val klageService: KlageService) {
     fun deleteKlage(@PathVariable id: Int) {
         klageService.deleteKlage(id)
     }
+
+    @GetMapping("/vedtak")
+    fun getVedtak(): List<Vedtak> = listOf()
 }
