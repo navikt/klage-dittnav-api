@@ -1,4 +1,4 @@
-package no.nav.klage.services.sts
+package no.nav.klage.clients.sts
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.klage.getLogger
