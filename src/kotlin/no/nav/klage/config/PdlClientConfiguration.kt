@@ -1,6 +1,6 @@
 package no.nav.klage.config
 
-import no.nav.klage.services.sts.StsClient
+import no.nav.klage.clients.sts.StsClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

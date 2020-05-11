@@ -1,4 +1,4 @@
-package no.nav.klage.services.pdl
+package no.nav.klage.clients.pdl
 
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
