@@ -1,4 +1,4 @@
-package no.nav.klage.services.pdl
+package no.nav.klage.clients.pdl
 import java.time.LocalDate
 import java.time.LocalDateTime
 
