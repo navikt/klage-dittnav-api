@@ -7,13 +7,15 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import org.postgresql.util.PGobject
 import java.time.Instant
+import java.util.*
 
 data class Klage(
     val id: Int?,
     val foedselsnummer: String,
     val fritekst: String,
     val status: KlageStatus = KlageStatus.DRAFT,
-    val modifiedByUser: Instant? = Instant.now()
+    val modifiedByUser: Instant? = Instant.now(),
+    val vedlegg: List<UUID>? = listOf()
 )
 
 enum class KlageStatus {

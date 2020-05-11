@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Klage
+import no.nav.klage.domain.Vedlegg
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
 import no.nav.klage.services.pdl.HentPdlPersonResponse
@@ -47,6 +48,15 @@ class KlageController(private val klageService: KlageService) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "id in klage does not match resource id")
         }
         return klageService.updateKlage(klage)
+    }
+
+    @PutMapping("/klager/{id}/vedlegg")
+    fun putVedlegg(
+        @PathVariable id: Int,
+        @ModelAttribute vedlegg: Vedlegg
+    ): Klage {
+
+        return klageService.getKlage(id).copy(vedlegg = listOf(vedlegg.id))
     }
 
     @DeleteMapping("/klager/{id}")
