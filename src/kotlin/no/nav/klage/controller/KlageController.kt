@@ -3,7 +3,7 @@ package no.nav.klage.controller
 import no.nav.klage.domain.Klage
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
-import no.nav.klage.services.pdl.HentPdlPersonResponse
+import no.nav.klage.clients.pdl.HentPdlPersonResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
