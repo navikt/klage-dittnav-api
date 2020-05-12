@@ -6,6 +6,7 @@ import java.util.*
 data class Vedlegg(
     val content: MultipartFile,
     val title: String,
+    val filename: String,
     val id: UUID
 ) {
     fun contentAsBytes(): ByteArray = content.bytes

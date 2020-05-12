@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.21.1"
+val gcsVersion = "1.108.0"
 
 repositories {
     mavenCentral()
@@ -35,6 +36,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("org.springframework.kafka:spring-kafka")
+
+    implementation("com.google.cloud:google-cloud-storage:$gcsVersion")
 }
 
 idea {
