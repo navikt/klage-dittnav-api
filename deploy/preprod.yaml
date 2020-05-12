@@ -66,3 +66,5 @@ spec:
       value: https://api-gw-q1.oera.no/security-token-service/
     - name: SERVICE_USER_USERNAME
       value: srvklage-dittnav
+    - name: CLAM_AV_URL
+      value: https://todo
