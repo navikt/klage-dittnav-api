@@ -1,64 +1,29 @@
 package no.nav.klage.clients.clamav
 
+import no.nav.klage.clients.createShortCircuitWebClient
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.springframework.http.HttpStatus
-import org.springframework.web.reactive.function.client.ClientResponse
-import org.springframework.web.reactive.function.client.ExchangeFunction
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
 
 class ClamAvClientTest {
-
     @Test
     fun `ok response returns true`() {
-        val clientResponse: ClientResponse = ClientResponse
-            .create(HttpStatus.OK)
-            .header("Content-Type","application/json")
-            .body(okResponse).build()
-
-        val shortCircuitingExchangeFunction = ExchangeFunction {
-            Mono.just(clientResponse)
-        }
-
-        val webClient = WebClient.builder().exchangeFunction(shortCircuitingExchangeFunction).build()
-        val clamClient = ClamAvClient(webClient)
+        val clamClient = ClamAvClient(createShortCircuitWebClient(okResponse))
 
         assertTrue(clamClient.scan(ByteArray(0)))
     }
 
     @Test
     fun `found response returns false`() {
-        val clientResponse: ClientResponse = ClientResponse
-            .create(HttpStatus.OK)
-            .header("Content-Type","application/json")
-            .body(foundResponse).build()
-
-        val shortCircuitingExchangeFunction = ExchangeFunction {
-            Mono.just(clientResponse)
-        }
-
-        val webClient = WebClient.builder().exchangeFunction(shortCircuitingExchangeFunction).build()
-        val clamClient = ClamAvClient(webClient)
+        val clamClient = ClamAvClient(createShortCircuitWebClient(foundResponse))
 
         assertFalse(clamClient.scan(ByteArray(0)))
     }
 
     @Test
     fun `response with multiple entries returns false`() {
-        val clientResponse: ClientResponse = ClientResponse
-            .create(HttpStatus.OK)
-            .header("Content-Type","application/json")
-            .body(multipleResponse).build()
-
-        val shortCircuitingExchangeFunction = ExchangeFunction {
-            Mono.just(clientResponse)
-        }
-
-        val webClient = WebClient.builder().exchangeFunction(shortCircuitingExchangeFunction).build()
-        val clamClient = ClamAvClient(webClient)
+        val clamClient = ClamAvClient(createShortCircuitWebClient(multipleResponse))
 
         assertFalse(clamClient.scan(ByteArray(0)))
     }
