@@ -5,7 +5,9 @@ import no.nav.klage.domain.KlageDAO
 import no.nav.klage.domain.KlageStatus.DELETED
 import no.nav.klage.domain.KlageStatus.DRAFT
 import no.nav.klage.domain.Klager
+import no.nav.klage.domain.Tema
 import org.springframework.stereotype.Repository
+import java.lang.IllegalArgumentException
 import java.time.Instant
 
 @Repository
@@ -65,6 +67,13 @@ class KlageRepository {
         foedselsnummer = this.foedselsnummer,
         fritekst = this.fritekst,
         status = this.status,
-        modifiedByUser = this.modifiedByUser
+        modifiedByUser = this.modifiedByUser,
+        tema = this.tema.toTema()
     )
+
+    private fun String.toTema() = try {
+        Tema.valueOf(this)
+    } catch(e: IllegalArgumentException) {
+        Tema.UKJ
+    }
 }
