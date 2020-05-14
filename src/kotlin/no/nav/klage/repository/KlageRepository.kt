@@ -68,7 +68,8 @@ class KlageRepository {
         fritekst = this.fritekst,
         status = this.status,
         modifiedByUser = this.modifiedByUser,
-        tema = this.tema.toTema()
+        tema = this.tema.toTema(),
+        enhetId = this.enhetId
     )
 
     private fun String.toTema() = try {

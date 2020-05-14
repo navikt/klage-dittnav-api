@@ -16,6 +16,7 @@ data class Klage(
     val status: KlageStatus = KlageStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
+    val enhetId: String?,
     val vedlegg: List<UUID>? = listOf()
 )
 
@@ -31,6 +32,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var status by Klager.status
     var modifiedByUser by Klager.modifiedByUser
     var tema by Klager.tema
+    var enhetId by Klager.enhetId
 }
 
 object Klager : IntIdTable("klage") {
@@ -42,6 +44,7 @@ object Klager : IntIdTable("klage") {
         toDb = { PGEnum("KlageStatusType", it) })
     var modifiedByUser = timestamp("modifiedbyuser").default(Instant.now())
     var tema = varchar("tema", 3)
+    var enhetId = varchar("enhet_id", 4).nullable()
 }
 
 class PGEnum<T : Enum<T>>(enumTypeName: String, enumValue: T?) : PGobject() {
