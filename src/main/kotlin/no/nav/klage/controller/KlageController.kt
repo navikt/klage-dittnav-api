@@ -1,17 +1,22 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Klage
+import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
 import no.nav.klage.clients.pdl.HentPdlPersonResponse
+import no.nav.klage.service.VedleggService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-class KlageController(private val klageService: KlageService) {
+class KlageController(
+    private val klageService: KlageService,
+    private val vedleggService: VedleggService
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -53,6 +58,25 @@ class KlageController(private val klageService: KlageService) {
     @DeleteMapping("/klager/{id}")
     fun deleteKlage(@PathVariable id: Int) {
         klageService.deleteKlage(id)
+    }
+
+    @PutMapping("/klager/{id}/vedlegg")
+    fun putVedlegg(
+        @PathVariable id: Int,
+        @ModelAttribute vedlegg: VedleggWrapper
+    ): Klage {
+        val fnr = "From token"
+        vedleggService.putVedlegg(fnr, id, vedlegg)
+        return klageService.getKlage(id)
+    }
+
+    @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
+    fun deleteVedlegg(
+        @PathVariable klageId: Int,
+        @PathVariable vedleggId: Int
+    ) {
+        val fnr = "From token"
+        vedleggService.deleteVedlegg(fnr, klageId, vedleggId)
     }
 
     @GetMapping("/vedtak")

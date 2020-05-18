@@ -24,6 +24,8 @@ class KlageService(
         return klageRepository.getKlager()
     }
 
+    fun getKlage(id: Int): Klage = klageRepository.getKlageById(id)
+
     fun createKlage(klage: Klage): Klage {
         return klageRepository.createKlage(klage).also { klageMetrics.incrementKlagerCreated() }
     }

@@ -1,7 +1,7 @@
 package no.nav.klage.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.klage.domain.Klage
+import no.nav.klage.domain.AggregatedKlage
 import no.nav.klage.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
@@ -19,7 +19,7 @@ class KafkaProducer(private val kafkaTemplate: KafkaTemplate<String, String>) {
         private val objectMapper = ObjectMapper()
     }
 
-    fun sendToKafka(klage: Klage) {
+    fun sendToKafka(klage: AggregatedKlage) {
         kafkaTemplate.send(topic, klage.toJson())
     }
 
