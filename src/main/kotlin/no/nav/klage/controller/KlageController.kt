@@ -2,6 +2,7 @@ package no.nav.klage.controller
 
 import no.nav.klage.domain.Klage
 import no.nav.klage.domain.VedleggWrapper
+import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
 import no.nav.klage.clients.pdl.HentPdlPersonResponse
@@ -77,4 +78,7 @@ class KlageController(
         val fnr = "From token"
         vedleggService.deleteVedlegg(fnr, klageId, vedleggId)
     }
+
+    @GetMapping("/vedtak")
+    fun getVedtak(): List<Vedtak> = listOf()
 }
