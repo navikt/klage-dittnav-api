@@ -73,7 +73,7 @@ class KlageController(
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
     fun deleteVedlegg(
         @PathVariable klageId: Int,
-        @PathVariable vedleggId: String
+        @PathVariable vedleggId: Int
     ) {
         val fnr = "From token"
         vedleggService.deleteVedlegg(fnr, klageId, vedleggId)

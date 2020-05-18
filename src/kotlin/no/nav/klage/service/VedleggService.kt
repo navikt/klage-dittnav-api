@@ -19,7 +19,7 @@ class VedleggService(
         vedleggRepository.putVedlegg(fnr, klageId, vedlegg)
     }
 
-    fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: String) {
+    fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: Int) {
         vedleggRepository.deleteVedlegg(fnr, klageId, vedleggId)
     }
 
