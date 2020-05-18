@@ -1,7 +1,7 @@
 package no.nav.klage.service
 
 import no.nav.klage.clients.clamav.ClamAvClient
-import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.repository.VedleggRepository
 import org.springframework.stereotype.Service
 import java.lang.RuntimeException
@@ -12,7 +12,7 @@ class VedleggService(
     private val vedleggRepository: VedleggRepository
 ) {
 
-    fun putVedlegg(fnr: String, klageId: Int, vedlegg: Vedlegg) {
+    fun putVedlegg(fnr: String, klageId: Int, vedlegg: VedleggWrapper) {
         if (vedlegg.hasVirus()) {
             throw RuntimeException("Vedlegg har virus")
         }
@@ -23,5 +23,5 @@ class VedleggService(
         vedleggRepository.deleteVedlegg(fnr, klageId, vedleggId)
     }
 
-    private fun Vedlegg.hasVirus() = !clamAvClient.scan(this.contentAsBytes())
+    private fun VedleggWrapper.hasVirus() = !clamAvClient.scan(this.contentAsBytes())
 }

@@ -1,7 +1,7 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Klage
-import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.getLogger
 import no.nav.klage.service.KlageService
 import no.nav.klage.clients.pdl.HentPdlPersonResponse
@@ -62,11 +62,11 @@ class KlageController(
     @PutMapping("/klager/{id}/vedlegg")
     fun putVedlegg(
         @PathVariable id: Int,
-        @ModelAttribute vedlegg: Vedlegg
+        @ModelAttribute vedlegg: VedleggWrapper
     ): Klage {
         val fnr = "From token"
         vedleggService.putVedlegg(fnr, id, vedlegg)
-        return klageService.getKlage(id).copy(vedlegg = listOf(vedlegg.id))
+        return klageService.getKlage(id).copy(vedlegg = listOf())
     }
 
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
