@@ -25,11 +25,19 @@ class VedleggDAO(id: EntityID<Int>) : IntEntity(id) {
 
     var tittel by Vedleggene.tittel
     var gcsRef by Vedleggene.gcsRef
-    var klageId by Vedleggene.klageId
+    var klageId by KlageDAO referencedOn Vedleggene.klageId
+
+    fun toVedlegg(): Vedlegg =
+        Vedlegg(
+            tittel = tittel,
+            gcsRef = gcsRef,
+            klageId = klageId.id.value,
+            id = id.value
+        )
 }
 
 object Vedleggene : IntIdTable("vedlegg") {
-    var tittel = varchar("tittel", 250)
-    var gcsRef = varchar("gcs_ref", 500)
-    var klageId = integer("klageId")
+    val tittel = varchar("tittel", 250)
+    val gcsRef = varchar("gcs_ref", 500)
+    val klageId = reference("klageId", Klager)
 }

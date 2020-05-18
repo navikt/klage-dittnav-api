@@ -32,6 +32,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var modifiedByUser by Klager.modifiedByUser
     var tema by Klager.tema
     var enhetId by Klager.enhetId
+    val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
 }
 
 object Klager : IntIdTable("klage") {

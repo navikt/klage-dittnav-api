@@ -1,11 +1,8 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.Klage
-import no.nav.klage.domain.KlageDAO
+import no.nav.klage.domain.*
 import no.nav.klage.domain.KlageStatus.DELETED
 import no.nav.klage.domain.KlageStatus.DRAFT
-import no.nav.klage.domain.Klager
-import no.nav.klage.domain.Tema
 import org.springframework.stereotype.Repository
 import java.lang.IllegalArgumentException
 import java.time.Instant
@@ -69,7 +66,8 @@ class KlageRepository {
         status = this.status,
         modifiedByUser = this.modifiedByUser,
         tema = this.tema.toTema(),
-        enhetId = this.enhetId
+        enhetId = this.enhetId,
+        vedlegg = this.vedlegg.map { it.toVedlegg() }
     )
 
     private fun String.toTema() = try {
