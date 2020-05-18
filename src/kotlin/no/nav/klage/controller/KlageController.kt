@@ -66,7 +66,7 @@ class KlageController(
     ): Klage {
         val fnr = "From token"
         vedleggService.putVedlegg(fnr, id, vedlegg)
-        return klageService.getKlage(id).copy(vedlegg = listOf())
+        return klageService.getKlage(id)
     }
 
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
