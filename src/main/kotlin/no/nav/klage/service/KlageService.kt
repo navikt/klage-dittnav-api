@@ -3,7 +3,6 @@ package no.nav.klage.service
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.domain.Klage
 import no.nav.klage.repository.KlageRepository
-import no.nav.klage.clients.pdl.HentPdlPersonResponse
 import no.nav.klage.clients.pdl.PdlClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -15,10 +14,6 @@ class KlageService(
     private val klageMetrics: KlageMetrics,
     private val pdlClient: PdlClient
 ) {
-
-    fun getPersonInfo(fnr: String): HentPdlPersonResponse {
-        return pdlClient.getPersonInfo(fnr)
-    }
 
     fun getKlager(): List<Klage> {
         return klageRepository.getKlager()

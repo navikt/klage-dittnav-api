@@ -1,9 +1,11 @@
 package no.nav.klage.controller
 
+import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Klage
 import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
+import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
 import no.nav.klage.clients.pdl.HentPdlPersonResponse
 import no.nav.klage.service.VedleggService
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 class KlageController(
+    private val brukerService: BrukerService,
     private val klageService: KlageService,
     private val vedleggService: VedleggService
 ) {
@@ -26,8 +29,8 @@ class KlageController(
     //TODO: Security: verify user token for all
 
     @GetMapping("/bruker")
-    fun getBruker(@RequestParam fnr: String): HentPdlPersonResponse {
-        return klageService.getPersonInfo(fnr)
+    fun getBruker(@RequestParam fnr: String): Bruker {
+        return brukerService.getBruker(fnr)
     }
 
     @GetMapping("/klager")

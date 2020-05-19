@@ -5,11 +5,12 @@ import java.time.LocalDateTime
 
 data class HentPdlPersonResponse (val data: HentPerson?, val errors: List<PdlError>?)
 
-data class HentPerson(val hentPerson: Person)
+data class HentPerson(val hentPerson: Person?)
 data class Person(
         val adressebeskyttelse: List<Adressebeskyttelse>,
         val navn: List<Navn>,
-        val bostedsadresse: List<Bostedsadresse>)
+        val bostedsadresse: List<Bostedsadresse>,
+        val telefonnummer: List<Telefonnummer>)
 
 data class Adressebeskyttelse(
         val gradering: AdressebeskyttelseGradering
@@ -30,13 +31,14 @@ data class Navn (
 data class Bostedsadresse(
         val angittFlyttedato: LocalDate?,
         val coAdressenavn: String?,
-        val vegAdresse: VegAdresse?,
+        val vegadresse: VegAdresse?,
         val adresse: String?,
-        val matrikkeladresse: Matrikkeladresse?,
-        val ukjentBosted: UkjentBosted?,
-        val folkeregisterMetadata: Folkeregistermetadata,
-        val metadata: Metadata)
+        val ukjentBosted: UkjentBosted?)
 
+data class Telefonnummer(
+        val landskode: String?,
+        val nummer: String?,
+        val prioritet: String?)
 
 data class Metadata(
         val opplysningsId: String?,
@@ -77,9 +79,9 @@ data class Matrikkeladresse(
 
 data class VegAdresse(
         val matrikkelId: Int?,
-        val husNummer: String?,
-        val husBokstav: String?,
-        val bruksenhetnummer: String?,
+        val husnummer: String?,
+        val husbokstav: String?,
+        val bruksenhetsnummer: String?,
         val adressenavn: String?,
         val kommunenummer: String?,
         val tilleggsnavn: String?,
