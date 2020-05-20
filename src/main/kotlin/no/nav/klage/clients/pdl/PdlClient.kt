@@ -12,7 +12,6 @@ class PdlClient(private val pdlWebClient: WebClient) {
             .bodyValue(hentPersonQuery(fnr))
             .retrieve()
             .bodyToMono<HentPdlPersonResponse>()
-//            .onErrorReturn("Å nei")
             .block()
     }
 }

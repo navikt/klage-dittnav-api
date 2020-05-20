@@ -8,7 +8,7 @@ val pamGeographyVersion = "2.4"
 
 repositories {
     mavenCentral()
-    maven("https://repo.adeo.no/repository/maven-releases")
+    maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     jcenter()
 }
 
