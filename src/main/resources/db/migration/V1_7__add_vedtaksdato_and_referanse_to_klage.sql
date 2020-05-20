@@ -1,5 +1,5 @@
 alter table klage
-        add column vedtaksdato timestamp not null;
+        add column vedtaksdato date not null;
 
 alter table klage
         add column referanse varchar(25) null;
