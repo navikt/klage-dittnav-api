@@ -23,20 +23,21 @@ data class AggregatedKlage(
 )
 
 fun createAggregatedKlage(
+    bruker: Bruker,
     klage: Klage
 ): AggregatedKlage =
     AggregatedKlage(
         id = klage.id!!,
         klageInstans = false, // TODO: False for MVP
         trygderetten = false, // TODO: False for MVP
-        navn = "Get from bruker",
-        adresse = "Get from bruker",
-        telefon = "Get from bruker",
+        navn = bruker.navn.toKlageskjemaString(),
+        adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
+        telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
         navenhet = klage.enhetId ?: "Ukjent enhet", // TODO: How to handle?
-        vedtaksdato = LocalDate.now(), // TODO: Get from frontend
-        navReferanse = "Get from front end?",
+        vedtaksdato = klage.vedtaksdato,
+        navReferanse = klage.referanse ?: "Ikke angitt",
         kortRedegjoerelse = klage.fritekst,
-        sted = "Get from front end",
+        sted = "Sendt inn digitalt",
         dato = LocalDate.from(klage.modifiedByUser),
         oversiktVedlegg = "???",
         begrunnelse = klage.fritekst,
