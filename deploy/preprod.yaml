@@ -67,4 +67,4 @@ spec:
     - name: SERVICE_USER_USERNAME
       value: srvklage-dittnav
     - name: CLAM_AV_URL
-      value: https://todo
+      value: http://clamav.nais.svc.nais.local/scan
