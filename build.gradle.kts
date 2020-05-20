@@ -2,10 +2,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.21.1"
 val gcsVersion = "1.108.0"
-val junitJupiterVersion = "5.4.0"
+val mockkVersion = "1.9.3"
+val junitJupiterVersion = "5.6.0"
+val pamGeographyVersion = "2.4"
 
 repositories {
     mavenCentral()
+    maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     jcenter()
 }
 
@@ -35,14 +38,13 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
-
     implementation("com.google.cloud:google-cloud-storage:$gcsVersion")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
 }
 
 idea {

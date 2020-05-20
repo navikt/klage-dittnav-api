@@ -13,6 +13,5 @@ class PdlClient(private val pdlWebClient: WebClient) {
             .retrieve()
             .bodyToMono<HentPdlPersonResponse>()
             .block()
-
     }
 }
