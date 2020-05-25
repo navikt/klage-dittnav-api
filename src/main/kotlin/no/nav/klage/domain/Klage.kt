@@ -4,9 +4,11 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.`java-time`.date
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import org.postgresql.util.PGobject
 import java.time.Instant
+import java.time.LocalDate
 
 data class Klage(
     val id: Int?,
@@ -16,6 +18,8 @@ data class Klage(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val enhetId: String?,
+    val vedtaksdato: LocalDate,
+    val referanse: String?,
     val vedlegg: List<Vedlegg>? = listOf()
 )
 
@@ -32,6 +36,8 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var modifiedByUser by Klager.modifiedByUser
     var tema by Klager.tema
     var enhetId by Klager.enhetId
+    var vedtaksdato by Klager.vedtaksdato
+    var referanse by Klager.referanse
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
 }
 
@@ -45,6 +51,8 @@ object Klager : IntIdTable("klage") {
     var modifiedByUser = timestamp("modifiedbyuser").default(Instant.now())
     var tema = varchar("tema", 3)
     var enhetId = varchar("enhet_id", 4).nullable()
+    var vedtaksdato = date("vedtaksdato")
+    var referanse = varchar("referanse", 25).nullable()
 }
 
 class PGEnum<T : Enum<T>>(enumTypeName: String, enumValue: T?) : PGobject() {

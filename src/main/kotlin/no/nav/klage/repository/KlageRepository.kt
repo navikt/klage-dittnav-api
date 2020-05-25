@@ -6,6 +6,7 @@ import no.nav.klage.domain.KlageStatus.DRAFT
 import org.springframework.stereotype.Repository
 import java.lang.IllegalArgumentException
 import java.time.Instant
+import java.time.LocalDate
 
 @Repository
 class KlageRepository {
@@ -29,6 +30,8 @@ class KlageRepository {
             foedselsnummer = klage.foedselsnummer
             fritekst = klage.fritekst
             status = klage.status
+            tema = klage.tema.name
+            vedtaksdato = klage.vedtaksdato
         }.toKlage()
     }
 
@@ -67,6 +70,8 @@ class KlageRepository {
         modifiedByUser = this.modifiedByUser,
         tema = this.tema.toTema(),
         enhetId = this.enhetId,
+        vedtaksdato = LocalDate.from(this.vedtaksdato),
+        referanse = this.referanse,
         vedlegg = this.vedlegg.map { it.toVedlegg() }
     )
 
