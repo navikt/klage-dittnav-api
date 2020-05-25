@@ -25,8 +25,6 @@ class PdlClientConfiguration {
         return WebClient
             .builder()
             .baseUrl(pdlUrl)
-            //TODO() Neste linje skal erstattes med token fra innlogget bruker.
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${stsClient.oidcToken()}")
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")

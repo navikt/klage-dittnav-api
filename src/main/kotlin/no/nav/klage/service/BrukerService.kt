@@ -13,8 +13,8 @@ class BrukerService(private val pdlClient: PdlClient) {
 
     private val postDataDAO = PostDataDAO()
 
-    fun getBruker(fnr: String): Bruker {
-        val personinfo = pdlClient.getPersonInfo(fnr)
+    fun getBruker(): Bruker {
+        val personinfo = pdlClient.getPersonInfo()
         return mapToBruker(personinfo)
     }
 
