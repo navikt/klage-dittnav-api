@@ -4,6 +4,7 @@ val exposedVersion = "0.21.1"
 val gcsVersion = "1.108.0"
 val mockkVersion = "1.9.3"
 val junitJupiterVersion = "5.6.0"
+val h2Version = "1.4.200"
 val pamGeographyVersion = "2.4"
 
 repositories {
@@ -45,6 +46,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("com.h2database:h2:$h2Version")
 }
 
 idea {

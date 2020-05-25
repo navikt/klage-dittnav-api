@@ -11,15 +11,15 @@ import java.time.Instant
 import java.time.LocalDate
 
 data class Klage(
-    val id: Int?,
+    val id: Int? = null,
     val foedselsnummer: String,
     val fritekst: String,
     val status: KlageStatus = KlageStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
-    val enhetId: String?,
+    val enhetId: String? = null,
     val vedtaksdato: LocalDate,
-    val referanse: String?,
+    val referanse: String? = null,
     val vedlegg: List<Vedlegg>? = listOf()
 )
 
