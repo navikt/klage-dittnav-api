@@ -30,6 +30,8 @@ class KlageRepository {
             foedselsnummer = klage.foedselsnummer
             fritekst = klage.fritekst
             status = klage.status
+            tema = klage.tema.name
+            vedtaksdato = klage.vedtaksdato
         }.toKlage()
     }
 

@@ -38,6 +38,6 @@ class VedleggDAO(id: EntityID<Int>) : IntEntity(id) {
 
 object Vedleggene : IntIdTable("vedlegg") {
     val tittel = varchar("tittel", 250)
-    val gcsRef = varchar("gcsRef", 500)
-    val klageId = reference("klageId", Klager)
+    val gcsRef = varchar("gcs_ref", 500)
+    val klageId = reference("klage_id", Klager)
 }
