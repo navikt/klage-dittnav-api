@@ -84,14 +84,14 @@ internal class BrukerServiceTest {
 
     @Test
     fun `should convert from pdl format to Bruker object`() {
-        every { pdlClient.getPersonInfo(any()) } returns hentPdlPersonResponse
+        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponse
         every { postDataDAO.findPostData(any()).get().city } returns poststed
         val expectedOutput = Bruker(
             Navn(fornavn, mellomnavn, etternavn),
             Adresse(adressenavn, postnummer, poststed, husnummer, husbokstav),
             Kontaktinformasjon("$landskode $nummer", null)
         )
-        val output: Bruker = brukerService.getBruker(fnr)
+        val output: Bruker = brukerService.getBruker()
         assertEquals(expectedOutput, output)
     }
 }

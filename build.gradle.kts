@@ -5,6 +5,8 @@ val gcsVersion = "1.108.0"
 val mockkVersion = "1.9.3"
 val junitJupiterVersion = "5.6.0"
 val pamGeographyVersion = "2.4"
+val tokenValidationVersion = "1.1.4"
+val oidcSupportVersion = "0.2.18"
 
 repositories {
     mavenCentral()
@@ -42,7 +44,8 @@ dependencies {
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("com.google.cloud:google-cloud-storage:$gcsVersion")
-
+    implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
+    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
 }
