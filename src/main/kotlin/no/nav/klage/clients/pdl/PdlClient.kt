@@ -15,7 +15,7 @@ class PdlClient(
     fun getPersonInfo(): HentPdlPersonResponse {
         return pdlWebClient.post()
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken()}")
-            .bodyValue(hentPersonQuery(tokenUtil.getSubject()!!))
+            .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
             .retrieve()
             .bodyToMono<HentPdlPersonResponse>()
             .block()

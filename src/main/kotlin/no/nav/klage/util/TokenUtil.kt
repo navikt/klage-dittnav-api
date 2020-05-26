@@ -8,12 +8,14 @@ class TokenUtil(private val ctxHolder: TokenValidationContextHolder) {
 
     private val issuer = "selvbetjening"
 
-    fun getSubject(): String? {
-        return ctxHolder.tokenValidationContext?.getClaims(issuer)?.subject
+    fun getSubject(): String {
+        val subject = ctxHolder.tokenValidationContext?.getClaims(issuer)?.subject
+        return checkNotNull(subject) { "Subject not found in token" }
     }
 
-    fun getToken(): String? {
-        return ctxHolder.tokenValidationContext?.getJwtToken(issuer)?.tokenAsString
+    fun getToken(): String {
+        val token = ctxHolder.tokenValidationContext?.getJwtToken(issuer)?.tokenAsString
+        return checkNotNull(token) { "Token must be present" }
     }
 }
 
