@@ -6,7 +6,6 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.`java-time`.date
 import org.jetbrains.exposed.sql.`java-time`.timestamp
-import org.postgresql.util.PGobject
 import java.time.Instant
 import java.time.LocalDate
 
@@ -44,20 +43,10 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
 object Klager : IntIdTable("klage") {
     var foedselsnummer = varchar("foedselsnummer", 11)
     var fritekst = varchar("fritekst", 255)
-    var status = customEnumeration(
-        name = "status",
-        fromDb = { value -> KlageStatus.valueOf(value as String) },
-        toDb = { PGEnum("KlageStatusType", it) })
-    var modifiedByUser = timestamp("modifiedbyuser").default(Instant.now())
+    var status = varchar("status", 15)
+    var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
     var enhetId = varchar("enhet_id", 4).nullable()
     var vedtaksdato = date("vedtaksdato")
     var referanse = varchar("referanse", 25).nullable()
-}
-
-class PGEnum<T : Enum<T>>(enumTypeName: String, enumValue: T?) : PGobject() {
-    init {
-        value = enumValue?.name
-        type = enumTypeName
-    }
 }
