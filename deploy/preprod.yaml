@@ -40,8 +40,6 @@ spec:
         databases:
           - name: klage
             envVarPrefix: DB
-    buckets:
-      - name: klagevedlegg
   secureLogs:
     enabled: true
   webproxy: true
