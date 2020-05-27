@@ -27,10 +27,12 @@ class BrukerService(private val pdlClient: PdlClient) {
         val bostedsadresse = personInfo.data?.hentPerson?.bostedsadresse?.firstOrNull()
         val pdlAdresse = bostedsadresse?.vegadresse
         val pdlTelefonnummer = personInfo.data?.hentPerson?.telefonnummer?.firstOrNull()
+        val pdlFolkeregisteridentifikator = personInfo.data?.hentPerson?.folkeregisteridentifikator?.firstOrNull()
         return Bruker(
             navn = pdlNavn!!.toBrukerNavn(),
             adresse = pdlAdresse?.toBrukerAdresse(),
-            kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon()
+            kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
+            folkeregisteridentifikator = pdlFolkeregisteridentifikator?.identifikasjonsnummer
         )
     }
 

@@ -4,7 +4,8 @@ data class Bruker
     (
     val navn: Navn,
     val adresse: Adresse?,
-    val kontaktinformasjon: Kontaktinformasjon?
+    val kontaktinformasjon: Kontaktinformasjon?,
+    val folkeregisteridentifikator: String?
 )
 
 data class Navn(
