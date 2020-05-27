@@ -10,7 +10,9 @@ data class Person(
         val adressebeskyttelse: List<Adressebeskyttelse>,
         val navn: List<Navn>,
         val bostedsadresse: List<Bostedsadresse>,
-        val telefonnummer: List<Telefonnummer>)
+        val telefonnummer: List<Telefonnummer>,
+        val folkeregisteridentifikator: List<Folkeregisteridentifikator>
+)
 
 data class Adressebeskyttelse(
         val gradering: AdressebeskyttelseGradering
@@ -98,4 +100,9 @@ data class Koordinater(
         val y: Float?,
         val z: Float?,
         val kvalitet: Int?
+)
+
+data class Folkeregisteridentifikator(
+        val identifikasjonsnummer: String,
+        val status: String
 )

@@ -18,7 +18,6 @@ internal class BrukerServiceTest {
     private val pdlClient: PdlClient = mockk()
     private val postDataDAO: PostDataDAO = mockk()
     private val brukerService = BrukerService(pdlClient)
-    private val fnr = "12345678910"
     private val fornavn = "Fornavn"
     private val mellomnavn = "Mellomnavn"
     private val etternavn = "Etternavn"
@@ -29,6 +28,8 @@ internal class BrukerServiceTest {
     private val poststed = "OSLO"
     private val landskode = "Landskode"
     private val nummer = "Nummer"
+    private val folkeregisteridentifikator = "12345678910"
+    private val status = "I_BRUK"
 
 
     private val hentPdlPersonResponse: HentPdlPersonResponse = createFullPdlPersonResponse()
@@ -70,6 +71,12 @@ internal class BrukerServiceTest {
                             nummer,
                             null
                         )
+                    ),
+                    listOf(
+                        Folkeregisteridentifikator(
+                            folkeregisteridentifikator,
+                            status
+                        )
                     )
                 )
             ),
@@ -89,7 +96,8 @@ internal class BrukerServiceTest {
         val expectedOutput = Bruker(
             Navn(fornavn, mellomnavn, etternavn),
             Adresse(adressenavn, postnummer, poststed, husnummer, husbokstav),
-            Kontaktinformasjon("$landskode $nummer", null)
+            Kontaktinformasjon("$landskode $nummer", null),
+            folkeregisteridentifikator
         )
         val output: Bruker = brukerService.getBruker()
         assertEquals(expectedOutput, output)

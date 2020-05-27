@@ -1,4 +1,4 @@
-query($ident: ID!, $bostedHistorikk: Boolean!){
+query($ident: ID!, $bostedHistorikk: Boolean!, $folkeregisteridentifikatorHistorikk: Boolean!){
     hentPerson(ident: $ident) {
         adressebeskyttelse{
             gradering
@@ -24,6 +24,10 @@ query($ident: ID!, $bostedHistorikk: Boolean!){
             landskode
             nummer
             prioritet
+        },
+        folkeregisteridentifikator(historikk: $folkeregisteridentifikatorHistorikk){
+            identifikasjonsnummer
+            status
         }
     }
 }
