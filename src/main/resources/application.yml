@@ -10,6 +10,7 @@ spring:
     banner-mode: OFF
   flyway:
     table: "schema_version"
+    clean-on-validation-error: true
 
 server:
   port: 7070
