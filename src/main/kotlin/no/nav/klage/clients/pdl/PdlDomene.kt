@@ -16,7 +16,8 @@ data class PersonGraphqlQuery(
 
 data class BostedVariabler(
     val ident: String,
-    val bostedHistorikk: Boolean
+    val bostedHistorikk: Boolean,
+    val folkeregisteridentifikatorHistorikk: Boolean
 )
 
 data class Variables(
@@ -42,7 +43,7 @@ data class PdlErrorExtension(
     val classification: String
 )
 
-fun hentPersonQuery(fnr: String): PersonGraphqlQuery{
+fun hentPersonQuery(fnr: String): PersonGraphqlQuery {
     val query = GraphqlQuery::class.java.getResource("/pdl/hentPerson.graphql").readText().replace("[\n\r]", "")
-    return PersonGraphqlQuery(query, BostedVariabler(fnr, false))
+    return PersonGraphqlQuery(query, BostedVariabler(fnr, false, false))
 }

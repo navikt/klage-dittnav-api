@@ -7,14 +7,16 @@ import no.nav.klage.domain.Vedtak
 import no.nav.klage.getLogger
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
-import no.nav.klage.clients.pdl.HentPdlPersonResponse
 import no.nav.klage.service.VedleggService
+import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletResponse
 
 @RestController
+@Unprotected
 class KlageController(
     private val brukerService: BrukerService,
     private val klageService: KlageService,
@@ -26,11 +28,10 @@ class KlageController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    //TODO: Security: verify user token for all
-
+    @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
     @GetMapping("/bruker")
-    fun getBruker(@RequestParam fnr: String): Bruker {
-        return brukerService.getBruker(fnr)
+    fun getBruker(): Bruker {
+        return brukerService.getBruker()
     }
 
     @GetMapping("/klager")
