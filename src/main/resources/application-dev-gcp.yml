@@ -1,0 +1,24 @@
+#Token validation
+no.nav.security.jwt:
+  issuer.selvbetjening:
+    discoveryurl: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
+    accepted_audience: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
+    cookiename: selvbetjening-idtoken
+
+KAFKA_BOOTSTRAP_SERVERS: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
+KAFKA_CLIENTID: klage-dittnav-api
+KAFKA_TOPIC: aapen-klager-klageOpprettet
+
+PDL_BASE_URL: https://api-gw-q1.oera.no/pdl-api/graphql
+SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
+SERVICE_USER_USERNAME: srvklage-dittnav
+
+CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan
+
+#These are read from the environment:
+#DB_HOST
+#DB_USERNAME
+#DB_PASSWORD
+#SERVICE_USER_PASSWORD
+#STS_APIKEY
+#PDL_APIKEY
