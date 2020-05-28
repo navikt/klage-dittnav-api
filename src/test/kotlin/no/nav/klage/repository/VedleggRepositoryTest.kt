@@ -54,7 +54,7 @@ class VedleggRepositoryTest {
         Assertions.assertFalse(nyKlage.vedlegg.isNullOrEmpty())
         val vedlegg = nyKlage.vedlegg!![0]
 
-        Assertions.assertEquals("0000-0000-0000-0000", vedlegg.gcsRef)
+        Assertions.assertEquals("0000-0000-0000-0000", vedlegg.ref)
     }
 
     @Language("json")

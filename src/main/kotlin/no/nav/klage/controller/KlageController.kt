@@ -64,8 +64,8 @@ class KlageController(
         klageService.deleteKlage(id)
     }
 
-    @PutMapping("/klager/{id}/vedlegg")
-    fun putVedlegg(
+    @PostMapping("/klager/{id}/vedlegg")
+    fun addVedleggToKlage(
         @PathVariable id: Int,
         @ModelAttribute vedlegg: VedleggWrapper
     ): Klage {

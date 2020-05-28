@@ -13,11 +13,11 @@ import org.springframework.web.reactive.function.client.bodyToMono
 class VedleggRepository(private val vedleggWebClient: WebClient) {
 
     fun putVedlegg(klageId: Int, vedlegg: VedleggWrapper) {
-        val vedleggId = vedlegg.saveInGcs()
+        val vedleggId = vedlegg.store()
         VedleggDAO.new {
             this.tittel = vedlegg.tittel
             this.klageId = KlageDAO.findById(klageId)!!
-            this.gcsRef = vedleggId
+            this.ref = vedleggId
             this.type = vedlegg.type
         }
     }
@@ -26,14 +26,14 @@ class VedleggRepository(private val vedleggWebClient: WebClient) {
         VedleggDAO.findById(vedleggId)?.let {
             vedleggWebClient
                 .delete()
-                .attribute("id", it.gcsRef)
+                .attribute("id", it.ref)
             it.delete()
         }
     }
 
-    private fun VedleggWrapper.saveInGcs(): String {
+    private fun VedleggWrapper.store(): String {
         val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("vedlegg", this.contentAsBytes())
+        bodyBuilder.part("file", this.contentAsBytes())
         val response = vedleggWebClient
             .post()
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
