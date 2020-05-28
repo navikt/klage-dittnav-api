@@ -64,13 +64,12 @@ class KlageController(
         klageService.deleteKlage(id)
     }
 
-    @PutMapping("/klager/{id}/vedlegg")
-    fun putVedlegg(
+    @PostMapping("/klager/{id}/vedlegg")
+    fun addVedleggToKlage(
         @PathVariable id: Int,
         @ModelAttribute vedlegg: VedleggWrapper
     ): Klage {
-        val fnr = "From token"
-        vedleggService.putVedlegg(fnr, id, vedlegg)
+        vedleggService.putVedlegg(id, vedlegg)
         return klageService.getKlage(id)
     }
 

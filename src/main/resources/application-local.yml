@@ -20,5 +20,7 @@ SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
 
 CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan
 
+ATTACHMENT_BASE_URL: https://klage-vedlegg-api
+
 STS_APIKEY: test
 PDL_APIKEY: test

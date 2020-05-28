@@ -12,11 +12,11 @@ class VedleggService(
     private val vedleggRepository: VedleggRepository
 ) {
 
-    fun putVedlegg(fnr: String, klageId: Int, vedlegg: VedleggWrapper) {
+    fun putVedlegg(klageId: Int, vedlegg: VedleggWrapper) {
         if (vedlegg.hasVirus()) {
             throw RuntimeException("Vedlegg har virus")
         }
-        vedleggRepository.putVedlegg(fnr, klageId, vedlegg)
+        vedleggRepository.putVedlegg(klageId, vedlegg)
     }
 
     fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: Int) {

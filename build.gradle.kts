@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.21.1"
-val gcsVersion = "1.108.0"
 val mockkVersion = "1.9.3"
 val junitJupiterVersion = "5.6.0"
 val h2Version = "1.4.200"
@@ -44,12 +43,13 @@ dependencies {
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("com.google.cloud:google-cloud-storage:$gcsVersion")
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
+
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
+    testImplementation("org.springframework:spring-mock:2.0.8")
 }
 
 idea {
