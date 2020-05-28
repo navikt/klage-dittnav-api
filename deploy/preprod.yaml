@@ -52,17 +52,5 @@ spec:
     - secret: sts-apikey
     - secret: pdl-apikey
   env:
-    - name: KAFKA_BOOTSTRAP_SERVERS
-      value: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
-    - name: KAFKA_CLIENTID
-      value: klage-dittnav-api
-    - name: KAFKA_TOPIC
-      value: aapen-klager-klageOpprettet
-    - name: PDL_BASE_URL
-      value: https://api-gw-q1.oera.no/pdl-api/graphql
-    - name: SECURITY_TOKEN_SERVICE_REST_URL
-      value: https://api-gw-q1.oera.no/security-token-service/
-    - name: SERVICE_USER_USERNAME
-      value: srvklage-dittnav
-    - name: CLAM_AV_URL
-      value: http://clamav.nais.svc.nais.local/scan
+  - name: SPRING_PROFILES_ACTIVE
+    value: dev-gcp
