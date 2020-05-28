@@ -7,19 +7,22 @@ import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import java.time.LocalDate
+import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KlageRepositoryTest {
     private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"
 
+    private lateinit var klageRepository: KlageRepository
+    private lateinit var datasource: DataSource
+
     @BeforeAll
     fun initDb() {
-        val datasource = JdbcConnectionPool.create(jdbcUrl, "sa", "")
+        klageRepository = KlageRepository()
+
+        datasource = JdbcConnectionPool.create(jdbcUrl, "sa", "")
         val statement = datasource.connection.createStatement()
         statement.execute("CREATE DOMAIN IF NOT EXISTS TIMESTAMPTZ AS TIMESTAMP;")
         val config = ClassicConfiguration()
@@ -31,18 +34,19 @@ class KlageRepositoryTest {
     }
 
     @Test
-    fun `klage inserted`() {
-        val klageRepository = KlageRepository()
+    fun `get inserted klage from db`() {
         transaction {
-            val klage = Klage(
-                foedselsnummer = "123455667",
-                fritekst = "lkdfjals",
-                tema = Tema.AAP,
-                vedtaksdato = LocalDate.now()
-            )
+            klageRepository.createKlage(klage1)
 
-            val nyKlage = klageRepository.createKlage(klage)
-            Assertions.assertEquals(1, nyKlage.id)
+            val hentetKlage = klageRepository.getKlageById(1)
+            Assertions.assertEquals("lkdfjals", hentetKlage.fritekst)
         }
     }
+
+    private val klage1 = Klage(
+        foedselsnummer = "123455667",
+        fritekst = "lkdfjals",
+        tema = Tema.AAP,
+        vedtaksdato = LocalDate.now()
+    )
 }

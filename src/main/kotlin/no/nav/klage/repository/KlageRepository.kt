@@ -26,21 +26,14 @@ class KlageRepository {
 
     fun createKlage(klage: Klage): Klage {
         return KlageDAO.new {
-            foedselsnummer = klage.foedselsnummer
-            fritekst = klage.fritekst
-            status = klage.status.name
-            tema = klage.tema.name
-            vedtaksdato = klage.vedtaksdato
+            fromKlage(klage)
         }.toKlage()
     }
 
     fun updateKlage(klage: Klage): Klage {
         val klageFromDB = getKlageToModify(klage.id)
         klageFromDB.apply {
-            foedselsnummer = klage.foedselsnummer
-            fritekst = klage.fritekst
-            status = klage.status.name
-            modifiedByUser = Instant.now()
+            fromKlage(klage)
         }
         return klageFromDB.toKlage()
     }
@@ -74,6 +67,17 @@ class KlageRepository {
         vedlegg = this.vedlegg.map { it.toVedlegg() }
     )
 
+    private fun KlageDAO.fromKlage(klage: Klage) {
+        foedselsnummer = klage.foedselsnummer
+        fritekst = klage.fritekst
+        status = klage.status.name
+        modifiedByUser = Instant.now()
+        tema = klage.tema.name
+        klage.enhetId?.let { enhetId = it }
+        vedtaksdato = klage.vedtaksdato
+        klage.referanse?.let { referanse = it }
+    }
+
     private fun String.toTema() = try {
         Tema.valueOf(this)
     } catch (e: IllegalArgumentException) {
@@ -83,6 +87,6 @@ class KlageRepository {
     private fun String.toStatus() = try {
         KlageStatus.valueOf(this)
     } catch (e: IllegalArgumentException) {
-        KlageStatus.DRAFT
+        DRAFT
     }
 }
