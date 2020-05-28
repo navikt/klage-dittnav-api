@@ -69,8 +69,7 @@ class KlageController(
         @PathVariable id: Int,
         @ModelAttribute vedlegg: VedleggWrapper
     ): Klage {
-        val fnr = "From token"
-        vedleggService.putVedlegg(fnr, id, vedlegg)
+        vedleggService.putVedlegg(id, vedlegg)
         return klageService.getKlage(id)
     }
 

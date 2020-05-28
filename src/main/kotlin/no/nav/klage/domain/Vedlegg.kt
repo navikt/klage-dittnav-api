@@ -8,7 +8,8 @@ import org.springframework.web.multipart.MultipartFile
 
 data class VedleggWrapper(
     val content: MultipartFile,
-    val tittel: String
+    val tittel: String,
+    val type: String
 ) {
     fun contentAsBytes(): ByteArray = content.bytes
 }
@@ -17,6 +18,7 @@ data class Vedlegg(
     val tittel: String,
     val gcsRef: String,
     val klageId: Int,
+    val type: String = "Ukjent",
     val id: Int?
 )
 
@@ -25,6 +27,7 @@ class VedleggDAO(id: EntityID<Int>) : IntEntity(id) {
 
     var tittel by Vedleggene.tittel
     var gcsRef by Vedleggene.gcsRef
+    var type by Vedleggene.type
     var klageId by KlageDAO referencedOn Vedleggene.klageId
 
     fun toVedlegg(): Vedlegg =
@@ -32,7 +35,8 @@ class VedleggDAO(id: EntityID<Int>) : IntEntity(id) {
             tittel = tittel,
             gcsRef = gcsRef,
             klageId = klageId.id.value,
-            id = id.value
+            id = id.value,
+            type = type
         )
 }
 
@@ -40,4 +44,5 @@ object Vedleggene : IntIdTable("vedlegg") {
     val tittel = varchar("tittel", 250)
     val gcsRef = varchar("gcs_ref", 500)
     val klageId = reference("klage_id", Klager)
+    val type = varchar("type", 10)
 }

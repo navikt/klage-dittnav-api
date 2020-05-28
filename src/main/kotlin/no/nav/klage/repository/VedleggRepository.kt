@@ -1,37 +1,51 @@
 package no.nav.klage.repository
 
-import com.google.cloud.storage.BlobId
-import com.google.cloud.storage.BlobInfo
-import com.google.cloud.storage.Storage
 import no.nav.klage.domain.KlageDAO
 import no.nav.klage.domain.VedleggDAO
 import no.nav.klage.domain.VedleggWrapper
+import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Repository
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 
 @Repository
-class VedleggRepository(private val gcsStorage: Storage) {
+class VedleggRepository(private val vedleggWebClient: WebClient) {
 
-    private val bucketName = "klagevedlegg"
-
-    fun putVedlegg(fnr: String, klageId: Int, vedlegg: VedleggWrapper) {
-        val vedleggCreated = VedleggDAO.new {
+    fun putVedlegg(klageId: Int, vedlegg: VedleggWrapper) {
+        val vedleggId = vedlegg.saveInGcs()
+        VedleggDAO.new {
             this.tittel = vedlegg.tittel
             this.klageId = KlageDAO.findById(klageId)!!
-        }
-
-        val objectName = "$fnr/$klageId/${vedleggCreated.id.value}"
-        val blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName)).build()
-        gcsStorage.create(blobInfo, vedlegg.contentAsBytes())
-
-        vedleggCreated.apply {
-            gcsRef = objectName
+            this.gcsRef = vedleggId
+            this.type = vedlegg.type
         }
     }
 
     fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: Int) {
-        val objectName = "$fnr/$klageId/$vedleggId"
-        gcsStorage.delete(BlobId.of(bucketName, objectName))
-        VedleggDAO.findById(vedleggId)?.delete()
+        VedleggDAO.findById(vedleggId)?.let {
+            vedleggWebClient
+                .delete()
+                .attribute("id", it.gcsRef)
+            it.delete()
+        }
+    }
+
+    private fun VedleggWrapper.saveInGcs(): String {
+        val bodyBuilder = MultipartBodyBuilder()
+        bodyBuilder.part("vedlegg", this.contentAsBytes())
+        val response = vedleggWebClient
+            .post()
+            .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+            .retrieve()
+            .bodyToMono<VedleggResponse>()
+            .block()
+
+        requireNotNull(response)
+
+        return response.id
     }
 
 }
+
+data class VedleggResponse(val id: String)
