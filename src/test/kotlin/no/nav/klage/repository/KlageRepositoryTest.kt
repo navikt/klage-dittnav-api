@@ -39,13 +39,15 @@ class KlageRepositoryTest {
             klageRepository.createKlage(klage1)
 
             val hentetKlage = klageRepository.getKlageById(1)
-            Assertions.assertEquals("lkdfjals", hentetKlage.fritekst)
+            Assertions.assertEquals(fritekst, hentetKlage.fritekst)
         }
     }
 
+    private val fritekst = "fritekst"
+
     private val klage1 = Klage(
         foedselsnummer = "123455667",
-        fritekst = "lkdfjals",
+        fritekst = fritekst,
         tema = Tema.AAP,
         vedtaksdato = LocalDate.now()
     )
