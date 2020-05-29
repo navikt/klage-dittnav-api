@@ -1,3 +1,6 @@
+allowed.origins:
+  http://localhost:3000
+
 #Token validation
 no.nav.security.jwt:
   issuer.selvbetjening:
