@@ -47,6 +47,9 @@ spec:
     inbound:
       rules:
         - application: klage-dittnav
+    outbound:
+      external:
+        - host: api-gw-q1.oera.no
   envFrom:
     - secret: srvklage-dittnav
     - secret: sts-apikey
