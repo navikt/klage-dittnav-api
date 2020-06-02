@@ -50,7 +50,6 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation("org.springframework:spring-mock:2.0.8")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 idea {
