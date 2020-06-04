@@ -1,6 +1,5 @@
 package no.nav.klage.config
 
-import no.nav.klage.clients.sts.StsClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,13 +20,12 @@ class PdlClientConfiguration {
     private lateinit var apiKey: String
 
     @Bean
-    fun pdlWebClient(stsClient: StsClient): WebClient {
+    fun pdlWebClient(): WebClient {
         return WebClient
             .builder()
             .baseUrl(pdlUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
             .defaultHeader("Nav-Consumer-Id", username)
             .defaultHeader("TEMA", "KLA")
             .defaultHeader("x-nav-apiKey", apiKey)
