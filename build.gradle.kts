@@ -7,6 +7,7 @@ val h2Version = "1.4.200"
 val pamGeographyVersion = "2.4"
 val tokenValidationVersion = "1.1.4"
 val oidcSupportVersion = "0.2.18"
+val logstashVersion = "5.1"
 
 repositories {
     mavenCentral()
@@ -39,6 +40,7 @@ dependencies {
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
 
