@@ -27,6 +27,7 @@ spec:
       memory: 128Mi
   ingresses:
     - https://klage-dittnav-api.dev-gcp.nais.io
+    - https://klage-dittnav-api.dev-nav.no
   replicas:
     min: 1
     max: 1
