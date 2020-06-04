@@ -3,6 +3,7 @@ package no.nav.klage.config
 import org.apache.kafka.clients.CommonClientConfigs.SECURITY_PROTOCOL_CONFIG
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SaslConfigs
+import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
+import java.io.File
 import java.util.*
 
 
@@ -39,7 +41,11 @@ class KafkaConfiguration {
         configProps[SaslConfigs.SASL_JAAS_CONFIG] =
             "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";"
         configProps[SaslConfigs.SASL_MECHANISM] = "PLAIN"
-        configProps[SECURITY_PROTOCOL_CONFIG] = "SASL_PLAINTEXT"
+        System.getenv("NAV_TRUSTSTORE_PATH")?.let {
+            configProps[SECURITY_PROTOCOL_CONFIG] = "SASL_SSL"
+            configProps[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = File(it).absolutePath
+            configProps[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = System.getenv("NAV_TRUSTSTORE_PASSWORD")
+        }
         return DefaultKafkaProducerFactory(configProps)
     }
 
