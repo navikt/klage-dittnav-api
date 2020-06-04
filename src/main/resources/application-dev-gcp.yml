@@ -5,6 +5,10 @@ allowed.origins:
     https://klage-dittnav.dev-gcp.navlabs.no,
     https://klage-dittnav.labs.nais.io
 
+logging:
+  level:
+    root: DEBUG
+
 #Token validation
 no.nav.security.jwt:
   issuer.selvbetjening:
