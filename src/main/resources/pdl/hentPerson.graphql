@@ -27,6 +27,7 @@ query($ident: ID!, $bostedHistorikk: Boolean!, $folkeregisteridentifikatorHistor
         },
         folkeregisteridentifikator(historikk: $folkeregisteridentifikatorHistorikk){
             identifikasjonsnummer
+            type
             status
         }
     }

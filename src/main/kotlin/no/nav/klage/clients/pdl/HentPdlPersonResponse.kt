@@ -104,5 +104,6 @@ data class Koordinater(
 
 data class Folkeregisteridentifikator(
         val identifikasjonsnummer: String,
+        val type: String,
         val status: String
 )

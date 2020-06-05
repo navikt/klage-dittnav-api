@@ -4,9 +4,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.clients.pdl.*
-import no.nav.klage.domain.Adresse
-import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.Kontaktinformasjon
+import no.nav.klage.domain.*
 import no.nav.klage.domain.Navn
 import no.nav.pam.geography.PostDataDAO
 
@@ -30,6 +28,7 @@ internal class BrukerServiceTest {
     private val nummer = "Nummer"
     private val folkeregisteridentifikator = "12345678910"
     private val status = "I_BRUK"
+    private val idType = "FNR"
 
 
     private val hentPdlPersonResponse: HentPdlPersonResponse = createFullPdlPersonResponse()
@@ -75,6 +74,7 @@ internal class BrukerServiceTest {
                     listOf(
                         Folkeregisteridentifikator(
                             folkeregisteridentifikator,
+                            idType,
                             status
                         )
                     )
@@ -97,7 +97,7 @@ internal class BrukerServiceTest {
             Navn(fornavn, mellomnavn, etternavn),
             Adresse(adressenavn, postnummer, poststed, husnummer, husbokstav),
             Kontaktinformasjon("$landskode $nummer", null),
-            folkeregisteridentifikator
+            Identifikator(idType, folkeregisteridentifikator)
         )
         val output: Bruker = brukerService.getBruker()
         assertEquals(expectedOutput, output)

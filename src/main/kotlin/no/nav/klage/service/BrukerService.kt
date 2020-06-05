@@ -3,6 +3,7 @@ package no.nav.klage.service
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.Identifikator
 import no.nav.pam.geography.PostDataDAO
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -32,9 +33,14 @@ class BrukerService(private val pdlClient: PdlClient) {
             navn = pdlNavn!!.toBrukerNavn(),
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
-            folkeregisteridentifikator = pdlFolkeregisteridentifikator?.identifikasjonsnummer
+            folkeregisteridentifikator = pdlFolkeregisteridentifikator?.toIdentifikator()
         )
     }
+
+    private fun Folkeregisteridentifikator.toIdentifikator() = Identifikator(
+        type = this.type,
+        identifikasjonsnummer = this.identifikasjonsnummer
+    )
 
     private fun Navn.toBrukerNavn() = no.nav.klage.domain.Navn(
         fornavn = fornavn,
