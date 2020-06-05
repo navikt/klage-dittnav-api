@@ -5,7 +5,12 @@ data class Bruker
     val navn: Navn,
     val adresse: Adresse?,
     val kontaktinformasjon: Kontaktinformasjon?,
-    val folkeregisteridentifikator: String?
+    val folkeregisteridentifikator: Identifikator?
+)
+
+data class Identifikator(
+    val type: String,
+    val identifikasjonsnummer: String
 )
 
 data class Navn(
