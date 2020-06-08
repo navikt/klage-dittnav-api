@@ -1,9 +1,5 @@
 allowed.origins:
-    https://klage-dittnav.dev-gcp.nais.io,
-    https://klage-dittnav.dev-adeo.no,
-    https://klage-dittnav.dev-nav.no,
-    https://klage-dittnav.dev-gcp.navlabs.no,
-    https://klage-dittnav.labs.nais.io
+  '*'
 
 logging:
   level:
