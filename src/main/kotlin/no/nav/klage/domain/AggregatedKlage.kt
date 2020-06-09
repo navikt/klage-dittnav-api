@@ -1,8 +1,6 @@
 package no.nav.klage.domain
 
 import java.time.LocalDate
-import java.time.ZoneOffset.UTC
-import java.time.ZonedDateTime
 
 data class AggregatedKlage(
     val id: Int,
@@ -38,7 +36,8 @@ fun createAggregatedKlage(
         vedtaksdato = klage.vedtaksdato,
         navReferanse = klage.referanse ?: "Ikke angitt",
         kortRedegjoerelse = klage.fritekst,
-        dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
+        //FIXME:
+        dato = LocalDate.now(),
         oversiktVedlegg = "???",
         begrunnelse = klage.fritekst,
         foedselsnummer = "From token or bruker",

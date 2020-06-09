@@ -17,6 +17,7 @@ class TriggerTestKlageController(private val klageService: KlageService) {
             foedselsnummer = "12345678910",
             fritekst = "Fritekst",
             tema = Tema.SYK,
+            status = KlageStatus.DONE,
             vedtaksdato = LocalDate.now(),
             enhetId = "123",
             referanse = "En referanse"
