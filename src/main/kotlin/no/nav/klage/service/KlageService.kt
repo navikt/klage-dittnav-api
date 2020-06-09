@@ -3,6 +3,7 @@ package no.nav.klage.service
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Klage
+import no.nav.klage.domain.KlageStatus.DONE
 import no.nav.klage.domain.createAggregatedKlage
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
@@ -25,8 +26,12 @@ class KlageService(
 
     fun createKlage(klage: Klage, bruker: Bruker): Klage {
         val createdKlage = klageRepository.createKlage(klage)
-        kafkaProducer.sendToKafka(createAggregatedKlage(bruker, createdKlage))
-        return createdKlage.also { klageMetrics.incrementKlagerCreated() }
+
+        if (klage.status == DONE) {
+            kafkaProducer.sendToKafka(createAggregatedKlage(bruker, createdKlage))
+            klageMetrics.incrementKlagerCreated()
+        }
+        return createdKlage
     }
 
     fun updateKlage(klage: Klage): Klage {
