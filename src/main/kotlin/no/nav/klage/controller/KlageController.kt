@@ -39,12 +39,13 @@ class KlageController(
         return klageService.getKlager()
     }
 
+    @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
     @PostMapping("/klager")
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlage(
         @RequestBody klage: Klage, response: HttpServletResponse
     ): Klage {
-        return klageService.createKlage(klage)
+        return klageService.createKlage(klage, brukerService.getBruker())
     }
 
     @PutMapping("/klager/{id}")

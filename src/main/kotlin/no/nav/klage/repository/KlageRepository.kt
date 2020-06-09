@@ -3,12 +3,18 @@ package no.nav.klage.repository
 import no.nav.klage.domain.*
 import no.nav.klage.domain.KlageStatus.DELETED
 import no.nav.klage.domain.KlageStatus.DRAFT
+import no.nav.klage.getLogger
 import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.time.LocalDate
 
 @Repository
 class KlageRepository {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
 
     fun getKlager(): List<Klage> {
         return KlageDAO.find { Klager.status neq DELETED.name }.map {
@@ -25,9 +31,13 @@ class KlageRepository {
     }
 
     fun createKlage(klage: Klage): Klage {
+        logger.debug("Creating klage in db.")
+
         return KlageDAO.new {
             fromKlage(klage)
-        }.toKlage()
+        }.toKlage().also {
+            logger.debug("Klage successfully created in db. Id: {}", it.id)
+        }
     }
 
     fun updateKlage(klage: Klage): Klage {
