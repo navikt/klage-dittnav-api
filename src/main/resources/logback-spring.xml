@@ -5,6 +5,8 @@
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
+
+    <logger name="no.nav.klage" level="DEBUG"/>
     ​
     <root level="INFO">
         <appender-ref ref="console"/>
