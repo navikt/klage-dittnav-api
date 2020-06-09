@@ -14,7 +14,7 @@ class TriggerTestKlageController(private val klageService: KlageService) {
     @GetMapping("triggerKlage")
     fun triggerKlage(): String {
         val klage = Klage(
-            foedselsnummer = "12345678910",
+            foedselsnummer = "10108000398",
             fritekst = "Fritekst",
             tema = Tema.SYK,
             status = KlageStatus.DONE,
@@ -27,7 +27,7 @@ class TriggerTestKlageController(private val klageService: KlageService) {
             Navn(fornavn = "Kalle", mellomnavn = null, etternavn = "Anka"),
             Adresse(adressenavn = "Veien", poststed = "Oslo", postnummer = "1234", husnummer = "6", husbokstav = "B"),
             Kontaktinformasjon(telefonnummer = "12345678", epost = "fake@fake.no"),
-            Identifikator("FNR", "12345678910")
+            Identifikator("FNR", "10108000398")
         )
 
         klageService.createKlage(klage, bruker)
