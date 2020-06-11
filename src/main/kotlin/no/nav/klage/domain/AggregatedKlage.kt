@@ -18,7 +18,8 @@ data class AggregatedKlage(
     val dato: LocalDate,
     val oversiktVedlegg: String,
     val begrunnelse: String,
-    val foedselsnummer: String,
+    val identifikasjonstype: String,
+    val identifikasjonsnummer: String,
     val tema: String,
     val vedlegg: List<Vedlegg>
 )
@@ -41,7 +42,8 @@ fun createAggregatedKlage(
         dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
         oversiktVedlegg = "???",
         begrunnelse = klage.fritekst,
-        foedselsnummer = "From token or bruker",
+        identifikasjonstype = bruker.folkeregisteridentifikator?.type ?: "Ukjent type",
+        identifikasjonsnummer = bruker.folkeregisteridentifikator?.identifikasjonsnummer ?: "Ukjent identifikasjonsnummer",
         tema = klage.tema.name,
         vedlegg = klage.vedlegg ?: listOf()
     )

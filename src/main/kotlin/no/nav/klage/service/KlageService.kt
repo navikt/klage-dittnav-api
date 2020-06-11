@@ -7,8 +7,10 @@ import no.nav.klage.domain.KlageStatus.DONE
 import no.nav.klage.domain.createAggregatedKlage
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 @Transactional
@@ -25,13 +27,8 @@ class KlageService(
     fun getKlage(id: Int): Klage = klageRepository.getKlageById(id)
 
     fun createKlage(klage: Klage, bruker: Bruker): Klage {
-        val createdKlage = klageRepository.createKlage(klage)
-
-        if (klage.status == DONE) {
-            kafkaProducer.sendToKafka(createAggregatedKlage(bruker, createdKlage))
-            klageMetrics.incrementKlagerCreated()
-        }
-        return createdKlage
+        klage.foedselsnummer = bruker.folkeregisteridentifikator?.identifikasjonsnummer!!
+        return klageRepository.createKlage(klage)
     }
 
     fun updateKlage(klage: Klage): Klage {
@@ -42,4 +39,17 @@ class KlageService(
         klageRepository.deleteKlage(id)
     }
 
+    fun finalizeKlage(klageId: Int, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        if (existingKlage.foedselsnummer != bruker.folkeregisteridentifikator!!.identifikasjonsnummer) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Folkeregisteridentifikator in klage does not match current user")
+        }
+        if (existingKlage.status === DONE) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Klage is already finalized.")
+        }
+        existingKlage.status = DONE
+        klageRepository.updateKlage(existingKlage)
+        kafkaProducer.sendToKafka(createAggregatedKlage(bruker, existingKlage))
+        klageMetrics.incrementKlagerCreated()
+    }
 }
