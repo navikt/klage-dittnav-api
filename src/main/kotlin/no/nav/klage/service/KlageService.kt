@@ -25,13 +25,8 @@ class KlageService(
     fun getKlage(id: Int): Klage = klageRepository.getKlageById(id)
 
     fun createKlage(klage: Klage, bruker: Bruker): Klage {
-        val createdKlage = klageRepository.createKlage(klage)
-
-        if (klage.status == DONE) {
-            kafkaProducer.sendToKafka(createAggregatedKlage(bruker, createdKlage))
-            klageMetrics.incrementKlagerCreated()
-        }
-        return createdKlage
+        klage.foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+        return klageRepository.createKlage(klage)
     }
 
     fun updateKlage(klage: Klage): Klage {
@@ -42,4 +37,17 @@ class KlageService(
         klageRepository.deleteKlage(id)
     }
 
+    fun finalizeKlage(klageId: Int, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        if (existingKlage.foedselsnummer != bruker.folkeregisteridentifikator.identifikasjonsnummer) {
+            throw RuntimeException("Folkeregisteridentifikator in klage does not match current user.")
+        }
+        if (existingKlage.status === DONE) {
+            throw RuntimeException("Klage is already finalized.")
+        }
+        existingKlage.status = DONE
+        klageRepository.updateKlage(existingKlage)
+        kafkaProducer.sendToKafka(createAggregatedKlage(bruker, existingKlage))
+        klageMetrics.incrementKlagerCreated()
+    }
 }

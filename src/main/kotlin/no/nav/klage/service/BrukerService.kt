@@ -5,9 +5,7 @@ import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.pam.geography.PostDataDAO
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 class BrukerService(private val pdlClient: PdlClient) {
@@ -21,19 +19,24 @@ class BrukerService(private val pdlClient: PdlClient) {
 
     private fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
         if (personInfo.errors != null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, personInfo.errors[0].message)
+            throw RuntimeException(personInfo.errors[0].message)
         }
 
         val pdlNavn = personInfo.data?.hentPerson?.navn?.firstOrNull()
-        val bostedsadresse = personInfo.data?.hentPerson?.bostedsadresse?.firstOrNull()
+        checkNotNull(pdlNavn) { "Navn missing" }
+
+        val bostedsadresse = personInfo.data.hentPerson.bostedsadresse.firstOrNull()
         val pdlAdresse = bostedsadresse?.vegadresse
-        val pdlTelefonnummer = personInfo.data?.hentPerson?.telefonnummer?.firstOrNull()
-        val pdlFolkeregisteridentifikator = personInfo.data?.hentPerson?.folkeregisteridentifikator?.firstOrNull()
+        val pdlTelefonnummer = personInfo.data.hentPerson.telefonnummer.firstOrNull()
+
+        val pdlFolkeregisteridentifikator = personInfo.data.hentPerson.folkeregisteridentifikator.firstOrNull()
+        checkNotNull(pdlFolkeregisteridentifikator) { "Folkeregisteridentifikator missing" }
+
         return Bruker(
-            navn = pdlNavn!!.toBrukerNavn(),
+            navn = pdlNavn.toBrukerNavn(),
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
-            folkeregisteridentifikator = pdlFolkeregisteridentifikator?.toIdentifikator()
+            folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator()
         )
     }
 

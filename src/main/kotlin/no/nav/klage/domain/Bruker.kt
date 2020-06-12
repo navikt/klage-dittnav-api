@@ -5,7 +5,7 @@ data class Bruker
     val navn: Navn,
     val adresse: Adresse?,
     val kontaktinformasjon: Kontaktinformasjon?,
-    val folkeregisteridentifikator: Identifikator?
+    val folkeregisteridentifikator: Identifikator
 )
 
 data class Identifikator(
@@ -14,9 +14,9 @@ data class Identifikator(
 )
 
 data class Navn(
-    val fornavn: String?,
+    val fornavn: String,
     val mellomnavn: String?,
-    val etternavn: String?
+    val etternavn: String
 ) {
     fun toKlageskjemaString(): String =
         "${fornavn.orEmpty()} ${mellomnavn.orEmpty()} ${etternavn.orEmpty()}"
