@@ -9,8 +9,8 @@ data class Bruker
 )
 
 data class Identifikator(
-    val type: String,
-    val identifikasjonsnummer: String
+    val type: String?,
+    val identifikasjonsnummer: String?
 )
 
 data class Navn(

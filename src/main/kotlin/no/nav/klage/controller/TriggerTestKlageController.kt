@@ -30,8 +30,9 @@ class TriggerTestKlageController(private val klageService: KlageService) {
             Identifikator("FNR", "10108000398")
         )
 
-        klageService.createKlage(klage, bruker)
-        return "Test klage created"
+        val startedKlage = klageService.createKlage(klage, bruker)
+        klageService.finalizeKlage(startedKlage.id!!, bruker)
+        return "Test klage created and finalized"
     }
 
 }

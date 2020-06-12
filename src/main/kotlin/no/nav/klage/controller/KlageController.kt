@@ -74,6 +74,15 @@ class KlageController(
         return klageService.getKlage(id)
     }
 
+    @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+    @PostMapping("/klager/{id}/finalize")
+    @ResponseStatus(HttpStatus.OK)
+    fun finalizeKlage(
+        @PathVariable id: Int
+    )  {
+        klageService.finalizeKlage(id, brukerService.getBruker())
+    }
+
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
     fun deleteVedlegg(
         @PathVariable klageId: Int,

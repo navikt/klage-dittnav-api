@@ -5,9 +5,7 @@ import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.pam.geography.PostDataDAO
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 class BrukerService(private val pdlClient: PdlClient) {
@@ -21,7 +19,7 @@ class BrukerService(private val pdlClient: PdlClient) {
 
     private fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
         if (personInfo.errors != null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, personInfo.errors[0].message)
+            throw RuntimeException(personInfo.errors[0].message)
         }
 
         val pdlNavn = personInfo.data?.hentPerson?.navn?.firstOrNull()
