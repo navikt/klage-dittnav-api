@@ -1,6 +1,5 @@
 package no.nav.klage.domain
 
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime

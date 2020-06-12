@@ -7,10 +7,8 @@ import no.nav.klage.domain.KlageStatus.DONE
 import no.nav.klage.domain.createAggregatedKlage
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 @Transactional
