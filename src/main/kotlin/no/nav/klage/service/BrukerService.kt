@@ -21,7 +21,7 @@ class BrukerService(private val pdlClient: PdlClient) {
 
     private fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
         if (personInfo.errors != null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, personInfo.errors[0].message)
+            throw RuntimeException(personInfo.errors[0].message)
         }
 
         val pdlNavn = personInfo.data?.hentPerson?.navn?.firstOrNull()

@@ -1,5 +1,6 @@
 package no.nav.klage.domain
 
+import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
@@ -27,8 +28,12 @@ data class AggregatedKlage(
 fun createAggregatedKlage(
     bruker: Bruker,
     klage: Klage
-): AggregatedKlage =
-    AggregatedKlage(
+): AggregatedKlage {
+    if (bruker.folkeregisteridentifikator?.type == null || bruker.folkeregisteridentifikator.identifikasjonsnummer == null) {
+        throw RuntimeException("Missing id info from current user")
+    }
+
+    return AggregatedKlage(
         id = klage.id!!,
         klageInstans = false, // TODO: False for MVP
         trygderetten = false, // TODO: False for MVP
@@ -42,8 +47,9 @@ fun createAggregatedKlage(
         dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
         oversiktVedlegg = "???",
         begrunnelse = klage.fritekst,
-        identifikasjonstype = bruker.folkeregisteridentifikator?.type ?: "Ukjent type",
-        identifikasjonsnummer = bruker.folkeregisteridentifikator?.identifikasjonsnummer ?: "Ukjent identifikasjonsnummer",
+        identifikasjonstype = bruker.folkeregisteridentifikator.type,
+        identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
         tema = klage.tema.name,
         vedlegg = klage.vedlegg ?: listOf()
     )
+}

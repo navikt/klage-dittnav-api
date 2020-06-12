@@ -42,10 +42,10 @@ class KlageService(
     fun finalizeKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
         if (existingKlage.foedselsnummer != bruker.folkeregisteridentifikator!!.identifikasjonsnummer) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Folkeregisteridentifikator in klage does not match current user")
+            throw RuntimeException("Folkeregisteridentifikator in klage does not match current user.")
         }
         if (existingKlage.status === DONE) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Klage is already finalized.")
+            throw RuntimeException("Klage is already finalized.")
         }
         existingKlage.status = DONE
         klageRepository.updateKlage(existingKlage)
