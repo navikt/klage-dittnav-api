@@ -13,6 +13,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: log java version
+        run: java -version      
       - name: test and build
         run: ./gradlew test build
         env:
