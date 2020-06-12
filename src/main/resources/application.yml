@@ -30,3 +30,6 @@ management:
     export:
       prometheus:
         enabled: true
+
+maxAttachmentSize: 8MB
+maxTotalSize: 32MB

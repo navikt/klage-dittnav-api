@@ -2,12 +2,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.21.1"
 val mockkVersion = "1.9.3"
-val junitJupiterVersion = "5.6.0"
 val h2Version = "1.4.200"
 val pamGeographyVersion = "2.4"
 val tokenValidationVersion = "1.1.4"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
+val pdfboxVersion = "2.0.19"
+val tikaVersion = "1.24.1"
 
 repositories {
     mavenCentral()
@@ -43,15 +44,20 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
+    implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
+    implementation("org.apache.tika:tika-core:$tikaVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation("org.springframework:spring-mock:2.0.8")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage")
+        exclude(group = "org.mockito")
+    }
 }
 
 idea {

@@ -1,7 +1,7 @@
 package no.nav.klage.clients.sts
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.klage.getLogger
+import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono

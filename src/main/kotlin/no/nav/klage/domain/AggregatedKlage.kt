@@ -43,5 +43,5 @@ fun createAggregatedKlage(
         begrunnelse = klage.fritekst,
         foedselsnummer = "From token or bruker",
         tema = klage.tema.name,
-        vedlegg = klage.vedlegg ?: listOf()
+        vedlegg = klage.vedlegg
     )

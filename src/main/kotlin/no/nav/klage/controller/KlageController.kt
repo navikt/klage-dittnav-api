@@ -1,13 +1,10 @@
 package no.nav.klage.controller
 
-import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.Klage
-import no.nav.klage.domain.VedleggWrapper
-import no.nav.klage.domain.Vedtak
-import no.nav.klage.getLogger
+import no.nav.klage.domain.*
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
 import no.nav.klage.service.VedleggService
+import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
@@ -69,9 +66,8 @@ class KlageController(
     fun addVedleggToKlage(
         @PathVariable id: Int,
         @ModelAttribute vedlegg: VedleggWrapper
-    ): Klage {
-        vedleggService.putVedlegg(id, vedlegg)
-        return klageService.getKlage(id)
+    ): Vedlegg {
+        return vedleggService.addVedlegg(id, vedlegg)
     }
 
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")

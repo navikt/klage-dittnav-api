@@ -19,7 +19,7 @@ data class Klage(
     val enhetId: String? = null,
     val vedtaksdato: LocalDate,
     val referanse: String? = null,
-    val vedlegg: List<Vedlegg>? = listOf()
+    val vedlegg: List<Vedlegg> = listOf()
 )
 
 enum class KlageStatus {

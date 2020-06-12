@@ -3,7 +3,7 @@ package no.nav.klage.repository
 import no.nav.klage.domain.*
 import no.nav.klage.domain.KlageStatus.DELETED
 import no.nav.klage.domain.KlageStatus.DRAFT
-import no.nav.klage.getLogger
+import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.time.LocalDate
