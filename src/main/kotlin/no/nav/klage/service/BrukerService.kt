@@ -23,15 +23,20 @@ class BrukerService(private val pdlClient: PdlClient) {
         }
 
         val pdlNavn = personInfo.data?.hentPerson?.navn?.firstOrNull()
-        val bostedsadresse = personInfo.data?.hentPerson?.bostedsadresse?.firstOrNull()
+        checkNotNull(pdlNavn) { "Navn missing" }
+
+        val bostedsadresse = personInfo.data.hentPerson.bostedsadresse.firstOrNull()
         val pdlAdresse = bostedsadresse?.vegadresse
-        val pdlTelefonnummer = personInfo.data?.hentPerson?.telefonnummer?.firstOrNull()
-        val pdlFolkeregisteridentifikator = personInfo.data?.hentPerson?.folkeregisteridentifikator?.firstOrNull()
+        val pdlTelefonnummer = personInfo.data.hentPerson.telefonnummer.firstOrNull()
+
+        val pdlFolkeregisteridentifikator = personInfo.data.hentPerson.folkeregisteridentifikator.firstOrNull()
+        checkNotNull(pdlFolkeregisteridentifikator) { "Folkeregisteridentifikator missing" }
+
         return Bruker(
-            navn = pdlNavn!!.toBrukerNavn(),
+            navn = pdlNavn.toBrukerNavn(),
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
-            folkeregisteridentifikator = pdlFolkeregisteridentifikator?.toIdentifikator()
+            folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator()
         )
     }
 

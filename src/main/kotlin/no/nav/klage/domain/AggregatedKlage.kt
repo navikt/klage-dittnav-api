@@ -28,9 +28,6 @@ fun createAggregatedKlage(
     bruker: Bruker,
     klage: Klage
 ): AggregatedKlage {
-    if (bruker.folkeregisteridentifikator?.type == null || bruker.folkeregisteridentifikator.identifikasjonsnummer == null) {
-        throw RuntimeException("Missing id info from current user")
-    }
 
     return AggregatedKlage(
         id = klage.id!!,

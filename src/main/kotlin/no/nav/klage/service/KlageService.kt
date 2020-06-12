@@ -25,7 +25,7 @@ class KlageService(
     fun getKlage(id: Int): Klage = klageRepository.getKlageById(id)
 
     fun createKlage(klage: Klage, bruker: Bruker): Klage {
-        klage.foedselsnummer = bruker.folkeregisteridentifikator?.identifikasjonsnummer!!
+        klage.foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
         return klageRepository.createKlage(klage)
     }
 
@@ -39,7 +39,7 @@ class KlageService(
 
     fun finalizeKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
-        if (existingKlage.foedselsnummer != bruker.folkeregisteridentifikator!!.identifikasjonsnummer) {
+        if (existingKlage.foedselsnummer != bruker.folkeregisteridentifikator.identifikasjonsnummer) {
             throw RuntimeException("Folkeregisteridentifikator in klage does not match current user.")
         }
         if (existingKlage.status === DONE) {
