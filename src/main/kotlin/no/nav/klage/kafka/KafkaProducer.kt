@@ -1,6 +1,7 @@
 package no.nav.klage.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.domain.AggregatedKlage
 import no.nav.klage.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -16,7 +17,7 @@ class KafkaProducer(private val kafkaTemplate: KafkaTemplate<String, String>) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val objectMapper = ObjectMapper()
+        private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
     }
 
     fun sendToKafka(klage: AggregatedKlage) {
