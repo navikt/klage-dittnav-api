@@ -1,5 +1,7 @@
 package no.nav.klage.domain
 
+import no.nav.klage.domain.klage.KlageDAO
+import no.nav.klage.domain.klage.Klager
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.*
+import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.service.KlageService
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,11 +14,9 @@ class TriggerTestKlageController(private val klageService: KlageService) {
 
     @GetMapping("triggerKlage")
     fun triggerKlage(): String {
-        val klage = Klage(
-            foedselsnummer = "10108000398",
+        val klage = KlageView(
             fritekst = "Fritekst",
             tema = Tema.SYK,
-            status = KlageStatus.DONE,
             vedtaksdato = LocalDate.now(),
             enhetId = "123",
             referanse = "En referanse"

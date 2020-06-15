@@ -2,9 +2,13 @@ package no.nav.klage.service
 
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.Klage
-import no.nav.klage.domain.KlageStatus.DONE
 import no.nav.klage.domain.createAggregatedKlage
+import no.nav.klage.domain.klage.KlageStatus.DONE
+import no.nav.klage.domain.klage.KlageStatus.DRAFT
+import no.nav.klage.domain.klage.KlageView
+import no.nav.klage.domain.klage.toKlage
+import no.nav.klage.domain.klage.toKlageView
+import no.nav.klage.domain.klage.validateUpdate
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import org.springframework.stereotype.Service
@@ -18,33 +22,38 @@ class KlageService(
     private val kafkaProducer: KafkaProducer
 ) {
 
-    fun getKlager(): List<Klage> {
-        return klageRepository.getKlager()
+    fun getKlager(): List<KlageView> {
+        return klageRepository.getKlager().map {
+            it.toKlageView()
+        }
     }
 
-    fun getKlage(id: Int): Klage = klageRepository.getKlageById(id)
+    fun getKlage(klageId: Int): KlageView = klageRepository.getKlageById(klageId).toKlageView()
 
-    fun createKlage(klage: Klage, bruker: Bruker): Klage {
-        klage.foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
-        return klageRepository.createKlage(klage)
+    fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
+        return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView()
     }
 
-    fun updateKlage(klage: Klage): Klage {
-        return klageRepository.updateKlage(klage)
+    fun updateKlage(klage: KlageView, bruker: Bruker): KlageView {
+        val klageId = klage.id
+        checkNotNull(klageId) { "Klage is missing id" }
+        val existingKlage = klageRepository.getKlageById(klageId)
+        existingKlage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+
+        return klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView()
     }
 
-    fun deleteKlage(id: Int) {
-        klageRepository.deleteKlage(id)
+    fun deleteKlage(klageId: Int, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        existingKlage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+
+        klageRepository.deleteKlage(klageId)
     }
 
     fun finalizeKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
-        if (existingKlage.foedselsnummer != bruker.folkeregisteridentifikator.identifikasjonsnummer) {
-            throw RuntimeException("Folkeregisteridentifikator in klage does not match current user.")
-        }
-        if (existingKlage.status === DONE) {
-            throw RuntimeException("Klage is already finalized.")
-        }
+        existingKlage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+
         existingKlage.status = DONE
         klageRepository.updateKlage(existingKlage)
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, existingKlage))

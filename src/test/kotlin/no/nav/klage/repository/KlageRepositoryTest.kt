@@ -1,6 +1,6 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.Klage
+import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.Tema
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration

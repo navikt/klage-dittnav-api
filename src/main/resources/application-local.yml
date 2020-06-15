@@ -4,7 +4,7 @@ allowed.origins:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
 
 #Token validation
 no.nav.security.jwt:

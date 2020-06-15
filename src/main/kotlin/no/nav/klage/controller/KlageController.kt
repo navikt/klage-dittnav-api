@@ -1,19 +1,21 @@
 package no.nav.klage.controller
 
-import no.nav.klage.domain.*
+import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.VedleggWrapper
+import no.nav.klage.domain.Vedtak
+import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-@Unprotected
+@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 class KlageController(
     private val brukerService: BrukerService,
     private val klageService: KlageService,
@@ -25,58 +27,50 @@ class KlageController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
-    @GetMapping("/bruker")
-    fun getBruker(): Bruker {
-        return brukerService.getBruker()
-    }
-
     @GetMapping("/klager")
-    fun getKlager(): List<Klage> {
+    fun getKlager(): List<KlageView> {
         return klageService.getKlager()
     }
 
-    @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
     @PostMapping("/klager")
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlage(
-        @RequestBody klage: Klage, response: HttpServletResponse
-    ): Klage {
+        @RequestBody klage: KlageView, response: HttpServletResponse
+    ): KlageView {
         return klageService.createKlage(klage, brukerService.getBruker())
     }
 
-    @PutMapping("/klager/{id}")
+    @PutMapping("/klager/{klageId}")
     fun updateKlage(
-        @PathVariable id: Int,
-        @RequestBody klage: Klage,
+        @PathVariable klageId: Int,
+        @RequestBody klage: KlageView,
         response: HttpServletResponse
-    ): Klage {
-        if (klage.id != id) {
+    ): KlageView {
+        if (klage.id != klageId) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "id in klage does not match resource id")
         }
-        return klageService.updateKlage(klage)
+        return klageService.updateKlage(klage, brukerService.getBruker())
     }
 
-    @DeleteMapping("/klager/{id}")
-    fun deleteKlage(@PathVariable id: Int) {
-        klageService.deleteKlage(id)
+    @DeleteMapping("/klager/{klageId}")
+    fun deleteKlage(@PathVariable klageId: Int) {
+        klageService.deleteKlage(klageId, brukerService.getBruker())
     }
 
-    @PostMapping("/klager/{id}/vedlegg")
+    @PostMapping("/klager/{klageId}/vedlegg")
     fun addVedleggToKlage(
-        @PathVariable id: Int,
+        @PathVariable klageId: Int,
         @ModelAttribute vedlegg: VedleggWrapper
     ): Vedlegg {
-        return vedleggService.addVedlegg(id, vedlegg)
+        return vedleggService.addVedlegg(klageId, vedlegg)
     }
 
-    @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
-    @PostMapping("/klager/{id}/finalize")
+    @PostMapping("/klager/{klageId}/finalize")
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlage(
-        @PathVariable id: Int
-    )  {
-        klageService.finalizeKlage(id, brukerService.getBruker())
+        @PathVariable klageId: Int
+    ) {
+        klageService.finalizeKlage(klageId, brukerService.getBruker())
     }
 
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
