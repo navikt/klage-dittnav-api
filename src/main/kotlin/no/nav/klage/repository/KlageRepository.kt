@@ -1,12 +1,14 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.*
-import no.nav.klage.domain.KlageStatus.DELETED
-import no.nav.klage.domain.KlageStatus.DRAFT
+import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.klage.KlageDAO
+import no.nav.klage.domain.klage.KlageStatus.DELETED
+import no.nav.klage.domain.klage.KlageStatus.DRAFT
+import no.nav.klage.domain.klage.Klager
+import no.nav.klage.domain.klage.toKlage
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Repository
 import java.time.Instant
-import java.time.LocalDate
 
 @Repository
 class KlageRepository {
@@ -64,21 +66,8 @@ class KlageRepository {
         return klageFromDB
     }
 
-    private fun KlageDAO.toKlage() = Klage(
-        id = this.id.toString().toInt(),
-        foedselsnummer = this.foedselsnummer,
-        fritekst = this.fritekst,
-        status = this.status.toStatus(),
-        modifiedByUser = this.modifiedByUser,
-        tema = this.tema.toTema(),
-        enhetId = this.enhetId,
-        vedtaksdato = LocalDate.from(this.vedtaksdato),
-        referanse = this.referanse,
-        vedlegg = this.vedlegg.map { it.toVedlegg() }
-    )
-
     private fun KlageDAO.fromKlage(klage: Klage) {
-        klage.foedselsnummer?.let { foedselsnummer = it }
+        foedselsnummer = klage.foedselsnummer
         fritekst = klage.fritekst
         status = klage.status.name
         modifiedByUser = Instant.now()
@@ -88,15 +77,5 @@ class KlageRepository {
         klage.referanse?.let { referanse = it }
     }
 
-    private fun String.toTema() = try {
-        Tema.valueOf(this)
-    } catch (e: IllegalArgumentException) {
-        Tema.UKJ
-    }
 
-    private fun String.toStatus() = try {
-        KlageStatus.valueOf(this)
-    } catch (e: IllegalArgumentException) {
-        DRAFT
-    }
 }

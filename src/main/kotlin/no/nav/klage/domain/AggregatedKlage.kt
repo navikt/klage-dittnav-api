@@ -1,5 +1,6 @@
 package no.nav.klage.domain
 
+import no.nav.klage.domain.klage.Klage
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime

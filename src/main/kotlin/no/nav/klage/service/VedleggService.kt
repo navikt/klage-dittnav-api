@@ -1,8 +1,8 @@
 package no.nav.klage.service
 
-import no.nav.klage.domain.Klage
 import no.nav.klage.domain.Vedlegg
 import no.nav.klage.domain.VedleggWrapper
+import no.nav.klage.domain.klage.Klage
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.repository.VedleggResponse
