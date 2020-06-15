@@ -78,7 +78,7 @@ class KlageRepository {
     )
 
     private fun KlageDAO.fromKlage(klage: Klage) {
-        foedselsnummer = klage.foedselsnummer
+        klage.foedselsnummer?.let { foedselsnummer = it }
         fritekst = klage.fritekst
         status = klage.status.name
         modifiedByUser = Instant.now()
