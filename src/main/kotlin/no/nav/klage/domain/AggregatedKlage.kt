@@ -46,6 +46,6 @@ fun createAggregatedKlage(
         identifikasjonstype = bruker.folkeregisteridentifikator.type,
         identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
         tema = klage.tema.name,
-        vedlegg = klage.vedlegg ?: listOf()
+        vedlegg = klage.vedlegg
     )
 }

@@ -2,7 +2,7 @@ package no.nav.klage.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.klage.domain.AggregatedKlage
-import no.nav.klage.getLogger
+import no.nav.klage.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service

@@ -1,13 +1,11 @@
 package no.nav.klage.repository
 
-import no.nav.klage.clients.createShortCircuitWebClient
 import no.nav.klage.domain.Klage
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.VedleggWrapper
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
-import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Assertions
@@ -29,7 +27,7 @@ class VedleggRepositoryTest {
 
     @BeforeAll
     fun initDb() {
-        vedleggRepository = VedleggRepository(createShortCircuitWebClient(okJsonResponse))
+        vedleggRepository = VedleggRepository()
         klageRepository = KlageRepository()
 
         datasource = JdbcConnectionPool.create(jdbcUrl, "sa", "")
@@ -45,24 +43,18 @@ class VedleggRepositoryTest {
 
     @Test
     fun `stores klage with vedlegg`() {
+        val vedleggExternalRef = "externalRef"
         val nyKlage = transaction {
             val klage = klageRepository.createKlage(klage1)
-            vedleggRepository.putVedlegg(klage.id!!, vedlegg1)
+            vedleggRepository.storeVedlegg(klage.id!!, vedlegg1, vedleggExternalRef)
             klageRepository.getKlageById(klage.id!!)
         }
 
-        Assertions.assertFalse(nyKlage.vedlegg.isNullOrEmpty())
-        val vedlegg = nyKlage.vedlegg!![0]
+        Assertions.assertFalse(nyKlage.vedlegg.isEmpty())
+        val vedlegg = nyKlage.vedlegg[0]
 
-        Assertions.assertEquals("0000-0000-0000-0000", vedlegg.ref)
+        Assertions.assertEquals(vedleggExternalRef, vedlegg.ref)
     }
-
-    @Language("json")
-    private val okJsonResponse = """
-        {
-          "id": "0000-0000-0000-0000"
-        }
-    """.trimIndent()
 
     private val klage1 = Klage(
         foedselsnummer = "123455667",
