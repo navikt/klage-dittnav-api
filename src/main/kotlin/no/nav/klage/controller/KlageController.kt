@@ -1,7 +1,6 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Vedlegg
-import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.service.BrukerService
@@ -11,6 +10,7 @@ import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletResponse
 
@@ -57,10 +57,10 @@ class KlageController(
         klageService.deleteKlage(klageId, brukerService.getBruker())
     }
 
-    @PostMapping("/klager/{klageId}/vedlegg")
+    @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
     fun addVedleggToKlage(
         @PathVariable klageId: Int,
-        @ModelAttribute vedlegg: VedleggWrapper
+        @RequestParam vedlegg: MultipartFile
     ): Vedlegg {
         return vedleggService.addVedlegg(klageId, vedlegg)
     }

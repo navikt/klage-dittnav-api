@@ -1,7 +1,6 @@
 package no.nav.klage.repository
 
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.domain.klage.Klage
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
@@ -63,9 +62,5 @@ class VedleggRepositoryTest {
         vedtaksdato = LocalDate.now()
     )
 
-    private val vedlegg1 = VedleggWrapper(
-        tittel = "tittel",
-        type = "type",
-        content = MockMultipartFile("vedlegg.txt", "file".toByteArray(Charset.defaultCharset()))
-    )
+    private val vedlegg1 = MockMultipartFile("vedlegg.txt", "vedlegg.txt", "txt", "file".toByteArray(Charset.defaultCharset()))
 }
