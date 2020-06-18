@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class ClamAvClientConfiguration {
 
-    @Value("CLAM_AV_URL")
+    @Value("\$CLAM_AV_URL")
     private lateinit var url: String
 
     @Bean
