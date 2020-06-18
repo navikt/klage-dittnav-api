@@ -20,7 +20,7 @@ PDL_BASE_URL: https://api-gw-q1.oera.no/pdl-api/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
 SERVICE_USER_USERNAME: srvklage-dittnav
 
-CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan
+CLAM_AV_URL: http://clamav.nais
 
 ATTACHMENT_BASE_URL: https://klage-vedlegg-api
 
