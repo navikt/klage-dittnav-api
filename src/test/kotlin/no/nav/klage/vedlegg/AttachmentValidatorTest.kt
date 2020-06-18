@@ -3,7 +3,6 @@ package no.nav.klage.vedlegg
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.clients.clamav.ClamAvClient
-import no.nav.klage.domain.VedleggWrapper
 import no.nav.klage.domain.exception.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,8 +27,9 @@ internal class AttachmentValidatorTest {
     fun `empty file throws AttachmentIsEmptyException`() {
         val multipartFileMock = mockk<MultipartFile>()
         every { multipartFileMock.bytes } returns byteArrayOf()
+        every { multipartFileMock.isEmpty } returns true
         assertThrows<AttachmentIsEmptyException> {
-            val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+            val vedlegg = multipartFileMock
             validator.validateAttachment(vedlegg, 0)
         }
     }
@@ -39,8 +39,9 @@ internal class AttachmentValidatorTest {
         validator = AttachmentValidator(clamAvClient, DataSize.ofBytes(1), DataSize.ofBytes(2))
         val multipartFileMock = mockk<MultipartFile>()
         every { multipartFileMock.bytes } returns byteArrayOf(1, 1)
+        every { multipartFileMock.isEmpty } returns false
         assertThrows<AttachmentTooLargeException> {
-            val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+            val vedlegg = multipartFileMock
             validator.validateAttachment(vedlegg, 0)
         }
     }
@@ -50,8 +51,9 @@ internal class AttachmentValidatorTest {
         validator = AttachmentValidator(clamAvClient, DataSize.ofBytes(1), DataSize.ofBytes(2))
         val multipartFileMock = mockk<MultipartFile>()
         every { multipartFileMock.bytes } returns byteArrayOf(1)
+        every { multipartFileMock.isEmpty } returns false
         assertThrows<AttachmentTotalTooLargeException> {
-            val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+            val vedlegg = multipartFileMock
             validator.validateAttachment(vedlegg, 2)
         }
     }
@@ -61,8 +63,9 @@ internal class AttachmentValidatorTest {
         val multipartFileMock = mockk<MultipartFile>()
         every { multipartFileMock.bytes } returns byteArrayOf(1)
         every { clamAvClient.scan(any()) } returns false
+        every { multipartFileMock.isEmpty } returns false
         assertThrows<AttachmentHasVirusException> {
-            val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+            val vedlegg = multipartFileMock
             validator.validateAttachment(vedlegg, 0)
         }
     }
@@ -74,8 +77,9 @@ internal class AttachmentValidatorTest {
             Path.of("src/test/resources/pdf/pdf-with-user-password.pdf")
         )
         every { clamAvClient.scan(any()) } returns true
+        every { multipartFileMock.isEmpty } returns false
         assertThrows<AttachmentEncryptedException> {
-            val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+            val vedlegg = multipartFileMock
             validator.validateAttachment(vedlegg, 0)
         }
     }
@@ -87,7 +91,8 @@ internal class AttachmentValidatorTest {
             Path.of("src/test/resources/pdf/pdf-with-empty-user-password.pdf")
         )
         every { clamAvClient.scan(any()) } returns true
-        val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+        every { multipartFileMock.isEmpty } returns false
+        val vedlegg = multipartFileMock
         validator.validateAttachment(vedlegg, 0)
     }
 
@@ -98,7 +103,8 @@ internal class AttachmentValidatorTest {
             Path.of("src/test/resources/pdf/test123.pdf")
         )
         every { clamAvClient.scan(any()) } returns true
-        val vedlegg = VedleggWrapper(multipartFileMock, "tittel", "someType")
+        every { multipartFileMock.isEmpty } returns false
+        val vedlegg = multipartFileMock
         validator.validateAttachment(vedlegg, 0)
     }
 
