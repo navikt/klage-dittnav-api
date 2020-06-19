@@ -57,7 +57,7 @@ internal class AttachmentValidatorTest {
             validator.validateAttachment(vedlegg, 2)
         }
     }
-/* TODO 
+
     @Test
     fun `file with virus throws AttachmentHasVirusException`() {
         val multipartFileMock = mockk<MultipartFile>()
@@ -68,7 +68,7 @@ internal class AttachmentValidatorTest {
             val vedlegg = multipartFileMock
             validator.validateAttachment(vedlegg, 0)
         }
-    }*/
+    }
 
     @Test
     fun `pdf with password throws AttachmentEncryptedException`() {

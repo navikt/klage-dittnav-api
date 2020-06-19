@@ -53,6 +53,8 @@ spec:
         - host: api-gw-q1.oera.no
       rules:
         - application: klage-vedlegg-api
+        - application: clamav
+          namespace: nais
   envFrom:
     - secret: srvklage-dittnav
     - secret: sts-apikey
