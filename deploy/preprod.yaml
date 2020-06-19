@@ -51,6 +51,8 @@ spec:
     outbound:
       external:
         - host: api-gw-q1.oera.no
+      rules:
+        - application: klage-vedlegg-api
   envFrom:
     - secret: srvklage-dittnav
     - secret: sts-apikey
