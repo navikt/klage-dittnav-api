@@ -30,9 +30,9 @@ class AttachmentValidator(
             throw AttachmentTotalTooLargeException()
         }
 
-//        if (vedlegg.hasVirus()) {
-//            throw AttachmentHasVirusException()
-//        }
+        if (vedlegg.hasVirus()) {
+            throw AttachmentHasVirusException()
+        }
 
         if (vedlegg.isPDF() && vedlegg.isEncrypted()) {
             throw AttachmentEncryptedException()
@@ -40,7 +40,7 @@ class AttachmentValidator(
 
     }
 
-    private fun MultipartFile.hasVirus() = !clamAvClient.scan(this.bytes)
+    private fun MultipartFile.hasVirus() = false //!clamAvClient.scan(this.bytes)
 
     private fun MultipartFile.isTooLarge() = this.bytes.size > maxAttachmentSize.toBytes()
 
