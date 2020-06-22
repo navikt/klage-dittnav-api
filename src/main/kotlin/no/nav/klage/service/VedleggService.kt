@@ -29,7 +29,7 @@ class VedleggService(
         attachmentValidator.validateAttachment(vedlegg, klageRepository.getKlageById(klageId).attachmentsTotalSize())
         //Convert attachment (if not already pdf)
         val convertedBytes = image2PDF.convert(vedlegg.bytes)
-        val vedleggIdInFileStore = uploadAttachmentToFilestore(convertedBytes)
+        val vedleggIdInFileStore = uploadAttachmentToFilestore(convertedBytes, vedlegg.originalFilename!!)
         return vedleggRepository.storeVedlegg(klageId, vedlegg, vedleggIdInFileStore)
     }
 
@@ -43,9 +43,9 @@ class VedleggService(
         vedleggRepository.deleteVedlegg(vedleggId)
     }
 
-    private fun uploadAttachmentToFilestore(bytes: ByteArray): String {
+    private fun uploadAttachmentToFilestore(bytes: ByteArray, originalFilename: String): String {
         val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("file", bytes)
+        bodyBuilder.part("file", bytes).filename(originalFilename)
         val response = vedleggWebClient
             .post()
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
