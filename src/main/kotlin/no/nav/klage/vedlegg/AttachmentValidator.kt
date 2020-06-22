@@ -30,9 +30,9 @@ class AttachmentValidator(
             throw AttachmentTotalTooLargeException()
         }
 
-        if (vedlegg.hasVirus()) {
-            throw AttachmentHasVirusException()
-        }
+//        if (vedlegg.hasVirus()) {
+//            throw AttachmentHasVirusException()
+//        }
 
         if (vedlegg.isPDF() && vedlegg.isEncrypted()) {
             throw AttachmentEncryptedException()
