@@ -1,5 +1,6 @@
 package no.nav.klage.service
 
+import no.nav.klage.clients.norg2.Norg2Client
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
@@ -8,13 +9,21 @@ import no.nav.pam.geography.PostDataDAO
 import org.springframework.stereotype.Service
 
 @Service
-class BrukerService(private val pdlClient: PdlClient) {
+class BrukerService(
+    private val pdlClient: PdlClient,
+    private val norg2Client: Norg2Client
+) {
 
     private val postDataDAO = PostDataDAO()
 
     fun getBruker(): Bruker {
         val personinfo = pdlClient.getPersonInfo()
         return mapToBruker(personinfo)
+    }
+
+    fun getEnhetsnavn(enhetId: Int): String {
+        val norg2Response = norg2Client.getEnhetsinfo(enhetId)
+        return norg2Response.navn
     }
 
     private fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
