@@ -33,7 +33,7 @@ class VedleggService(
         return vedleggRepository.storeVedlegg(klageId, vedlegg, vedleggIdInFileStore)
     }
 
-    fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: Int) {
+    fun deleteVedlegg(klageId: Int, vedleggId: Int): Boolean {
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
 
         val deletedInGCS = vedleggWebClient
@@ -43,8 +43,8 @@ class VedleggService(
             .bodyToMono<Boolean>()
             .block()
 
-        check(deletedInGCS!!) { "Unable to delete attachment in GCS" }
         vedleggRepository.deleteVedlegg(vedleggId)
+        return deletedInGCS!!
     }
 
     private fun uploadAttachmentToFilestore(bytes: ByteArray, originalFilename: String): String {

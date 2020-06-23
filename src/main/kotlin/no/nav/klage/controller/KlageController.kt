@@ -57,14 +57,6 @@ class KlageController(
         klageService.deleteKlage(klageId, brukerService.getBruker())
     }
 
-    @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
-    fun addVedleggToKlage(
-        @PathVariable klageId: Int,
-        @RequestParam vedlegg: MultipartFile
-    ): Vedlegg {
-        return vedleggService.addVedlegg(klageId, vedlegg)
-    }
-
     @PostMapping("/klager/{klageId}/finalize")
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlage(
@@ -73,13 +65,22 @@ class KlageController(
         klageService.finalizeKlage(klageId, brukerService.getBruker())
     }
 
+    @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
+    fun addVedleggToKlage(
+        @PathVariable klageId: Int,
+        @RequestParam vedlegg: MultipartFile
+    ): Vedlegg {
+        return vedleggService.addVedlegg(klageId, vedlegg)
+    }
+
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")
     fun deleteVedlegg(
         @PathVariable klageId: Int,
         @PathVariable vedleggId: Int
     ) {
-        val fnr = "From token"
-        vedleggService.deleteVedlegg(fnr, klageId, vedleggId)
+        if (!vedleggService.deleteVedlegg(klageId, vedleggId)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment not found.")
+        }
     }
 
     @GetMapping("/vedtak")
