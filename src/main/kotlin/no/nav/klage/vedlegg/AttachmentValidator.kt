@@ -2,6 +2,7 @@ package no.nav.klage.vedlegg
 
 import no.nav.klage.clients.clamav.ClamAvClient
 import no.nav.klage.domain.exception.*
+import no.nav.klage.util.getLogger
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException
 import org.apache.tika.Tika
@@ -15,7 +16,13 @@ class AttachmentValidator(
     private val maxTotalSize: DataSize
 ) {
 
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
+
     fun validateAttachment(vedlegg: MultipartFile, totalSizeExistingAttachments: Int) {
+        logger.debug("Validating attachment.")
         //Can this happen?
         if (vedlegg.isEmpty) {
             throw AttachmentIsEmptyException()
@@ -38,6 +45,7 @@ class AttachmentValidator(
             throw AttachmentEncryptedException()
         }
 
+        logger.debug("Validation successful.")
     }
 
     private fun MultipartFile.hasVirus() = !clamAvClient.scan(this.bytes)

@@ -2,9 +2,10 @@ allowed.origins:
   http://localhost:3000,
   http://localhost:8080
 
-logging:
-  level:
-    root: DEBUG
+# If you want it all
+#logging:
+#  level:
+#    root: DEBUG
 
 #Token validation
 no.nav.security.jwt:

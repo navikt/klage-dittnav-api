@@ -5,6 +5,7 @@ import no.nav.klage.domain.klage.Klage
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.repository.VedleggResponse
+import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
 import no.nav.klage.vedlegg.Image2PDF
 import org.springframework.http.client.MultipartBodyBuilder
@@ -25,6 +26,11 @@ class VedleggService(
     private val attachmentValidator: AttachmentValidator
 ) {
 
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
+
     fun addVedlegg(klageId: Int, vedlegg: MultipartFile): Vedlegg {
         attachmentValidator.validateAttachment(vedlegg, klageRepository.getKlageById(klageId).attachmentsTotalSize())
         //Convert attachment (if not already pdf)
@@ -36,18 +42,24 @@ class VedleggService(
     fun deleteVedlegg(klageId: Int, vedleggId: Int): Boolean {
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
 
+        logger.debug("Deleting attachment in file store. VedleggId: {}", vedleggId)
         val deletedInGCS = vedleggWebClient
             .delete()
-            .uri("/" + vedlegg.id.toString())
+            .uri("/" + vedlegg.ref)
             .retrieve()
             .bodyToMono<Boolean>()
             .block()
+
+        if (deletedInGCS == true) {
+            logger.debug("Attachment successfully deleted in file store.")
+        }
 
         vedleggRepository.deleteVedlegg(vedleggId)
         return deletedInGCS!!
     }
 
     private fun uploadAttachmentToFilestore(bytes: ByteArray, originalFilename: String): String {
+        logger.debug("Uploading attachment to file store.")
         val bodyBuilder = MultipartBodyBuilder()
         bodyBuilder.part("file", bytes).filename(originalFilename)
         val response = vedleggWebClient
@@ -59,6 +71,7 @@ class VedleggService(
 
         requireNotNull(response)
 
+        logger.debug("Attachment uploaded to file store with id: {}", response.id)
         return response.id
     }
 

@@ -11,6 +11,15 @@ spring:
   flyway:
     table: "schema_version"
     clean-on-validation-error: true
+  sleuth:
+    propagation-keys:
+      - Nav-Callid
+      - Nav-Consumer-Id
+    log:
+      slf4j:
+        whitelisted-mdc-keys:
+          - Nav-Callid
+          - Nav-Consumer-Id
 
 server:
   port: 7070
@@ -33,3 +42,6 @@ management:
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
+
+navCallId: Nav-Callid
+navConsumerId: Nav-Consumer-Id
