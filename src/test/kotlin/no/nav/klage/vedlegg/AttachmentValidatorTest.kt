@@ -58,17 +58,17 @@ internal class AttachmentValidatorTest {
         }
     }
 
-//    @Test
-//    fun `file with virus throws AttachmentHasVirusException`() {
-//        val multipartFileMock = mockk<MultipartFile>()
-//        every { multipartFileMock.bytes } returns byteArrayOf(1)
-//        every { clamAvClient.scan(any()) } returns false
-//        every { multipartFileMock.isEmpty } returns false
-//        assertThrows<AttachmentHasVirusException> {
-//            val vedlegg = multipartFileMock
-//            validator.validateAttachment(vedlegg, 0)
-//        }
-//    }
+    @Test
+    fun `file with virus throws AttachmentHasVirusException`() {
+        val multipartFileMock = mockk<MultipartFile>()
+        every { multipartFileMock.bytes } returns byteArrayOf(1)
+        every { clamAvClient.scan(any()) } returns false
+        every { multipartFileMock.isEmpty } returns false
+        assertThrows<AttachmentHasVirusException> {
+            val vedlegg = multipartFileMock
+            validator.validateAttachment(vedlegg, 0)
+        }
+    }
 
     @Test
     fun `pdf with password throws AttachmentEncryptedException`() {
