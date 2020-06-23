@@ -24,11 +24,15 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
 
         val (filename, result) = response[0]
         return when(result) {
-            ClamAvResult.OK -> {
+            ClamAvResult.OK -> true
+            ClamAvResult.FOUND -> {
                 logger.warn("$filename has virus")
-                true
+                false
             }
-            ClamAvResult.FOUND -> false
+            ClamAvResult.ERROR -> {
+                logger.warn("Error from virus scan on file $filename")
+                false
+            }
         }
     }
 }

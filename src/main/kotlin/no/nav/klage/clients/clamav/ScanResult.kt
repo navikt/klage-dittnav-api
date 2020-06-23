@@ -10,5 +10,5 @@ data class ScanResult(
 )
 
 enum class ClamAvResult {
-    FOUND, OK
+    FOUND, OK, ERROR
 }
