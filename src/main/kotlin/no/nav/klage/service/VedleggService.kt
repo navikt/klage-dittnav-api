@@ -38,7 +38,7 @@ class VedleggService(
 
         val deletedInGCS = vedleggWebClient
             .delete()
-            .uri("/" + vedlegg.id.toString())
+            .uri("/" + vedlegg.ref)
             .retrieve()
             .bodyToMono<Boolean>()
             .block()
