@@ -17,7 +17,6 @@ class VedleggClientConfiguration {
         WebClient
             .builder()
             .baseUrl(url)
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .build()
 }

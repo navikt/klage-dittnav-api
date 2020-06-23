@@ -33,14 +33,18 @@ class VedleggService(
         return vedleggRepository.storeVedlegg(klageId, vedlegg, vedleggIdInFileStore)
     }
 
-    fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: Int) {
+    fun deleteVedlegg(klageId: Int, vedleggId: Int): Boolean {
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
 
-        vedleggWebClient
+        val deletedInGCS = vedleggWebClient
             .delete()
-            .attribute("id", vedlegg.ref)
+            .uri("/" + vedlegg.id.toString())
+            .retrieve()
+            .bodyToMono<Boolean>()
+            .block()
 
         vedleggRepository.deleteVedlegg(vedleggId)
+        return deletedInGCS!!
     }
 
     private fun uploadAttachmentToFilestore(bytes: ByteArray, originalFilename: String): String {
