@@ -11,7 +11,7 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
     private val logger = LoggerFactory.getLogger(ClamAvClient::class.java)
 
     fun scan(file: ByteArray): Boolean {
-        val response = clamAvWebClient.post()
+        val response = clamAvWebClient.put()
             .bodyValue(file)
             .retrieve()
             .bodyToMono<List<ScanResult>>()
