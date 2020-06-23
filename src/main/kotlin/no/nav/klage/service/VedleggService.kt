@@ -36,10 +36,14 @@ class VedleggService(
     fun deleteVedlegg(fnr: String, klageId: Int, vedleggId: Int) {
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
 
-        vedleggWebClient
+        val deletedInGCS = vedleggWebClient
             .delete()
-            .attribute("id", vedlegg.ref)
+            .uri("/" + vedlegg.id.toString())
+            .retrieve()
+            .bodyToMono<Boolean>()
+            .block()
 
+        check(deletedInGCS!!) { "Unable to delete attachment in GCS" }
         vedleggRepository.deleteVedlegg(vedleggId)
     }
 
