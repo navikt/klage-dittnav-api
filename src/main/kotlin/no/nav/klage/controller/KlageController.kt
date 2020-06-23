@@ -37,6 +37,7 @@ class KlageController(
     fun createKlage(
         @RequestBody klage: KlageView, response: HttpServletResponse
     ): KlageView {
+        logger.debug("Create klage is requested.")
         return klageService.createKlage(klage, brukerService.getBruker())
     }
 
@@ -46,6 +47,7 @@ class KlageController(
         @RequestBody klage: KlageView,
         response: HttpServletResponse
     ): KlageView {
+        logger.debug("Update klage is requested. Id: {}", klageId)
         if (klage.id != klageId) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "id in klage does not match resource id")
         }
@@ -54,6 +56,7 @@ class KlageController(
 
     @DeleteMapping("/klager/{klageId}")
     fun deleteKlage(@PathVariable klageId: Int) {
+        logger.debug("Delete klage is requested. Id: ", { klageId })
         klageService.deleteKlage(klageId, brukerService.getBruker())
     }
 
@@ -62,6 +65,7 @@ class KlageController(
     fun finalizeKlage(
         @PathVariable klageId: Int
     ) {
+        logger.debug("Finalize klage is requested. Id: {}", klageId)
         klageService.finalizeKlage(klageId, brukerService.getBruker())
     }
 
@@ -70,6 +74,7 @@ class KlageController(
         @PathVariable klageId: Int,
         @RequestParam vedlegg: MultipartFile
     ): Vedlegg {
+        logger.debug("Add vedlegg to klage is requested. KlageId: {}", klageId)
         return vedleggService.addVedlegg(klageId, vedlegg)
     }
 
@@ -78,11 +83,15 @@ class KlageController(
         @PathVariable klageId: Int,
         @PathVariable vedleggId: Int
     ) {
+        logger.debug("Delete vedlegg from klage is requested. KlageId: {}, VedleggId: {}", klageId, vedleggId)
         if (!vedleggService.deleteVedlegg(klageId, vedleggId)) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment not found.")
         }
     }
 
     @GetMapping("/vedtak")
-    fun getVedtak(): List<Vedtak> = listOf()
+    fun getVedtak(): List<Vedtak> {
+        logger.debug("Get vedtak is requested.")
+        return listOf()
+    }
 }

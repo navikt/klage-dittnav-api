@@ -8,7 +8,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class PdlClientConfiguration {
+class PdlClientConfiguration(private val webClientBuilder: WebClient.Builder) {
 
     @Value("\${PDL_BASE_URL}")
     private lateinit var pdlUrl: String
@@ -21,8 +21,7 @@ class PdlClientConfiguration {
 
     @Bean
     fun pdlWebClient(): WebClient {
-        return WebClient
-            .builder()
+        return webClientBuilder
             .baseUrl(pdlUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

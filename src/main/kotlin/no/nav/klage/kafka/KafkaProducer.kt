@@ -25,7 +25,7 @@ class KafkaProducer(private val kafkaTemplate: KafkaTemplate<String, String>) {
 
         kafkaTemplate.send(topic, klage.toJson())
 
-        logger.debug("Klage sent to kafka")
+        logger.debug("Klage sent to kafka.")
     }
 
     fun Any.toJson(): String = objectMapper.writeValueAsString(this)
