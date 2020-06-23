@@ -3,6 +3,7 @@ package no.nav.klage.service
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.klage.clients.norg2.Norg2Client
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.*
 import no.nav.klage.domain.Navn
@@ -14,8 +15,9 @@ import org.junit.jupiter.api.Test
 
 internal class BrukerServiceTest {
     private val pdlClient: PdlClient = mockk()
+    private val norg2Client: Norg2Client = mockk()
     private val postDataDAO: PostDataDAO = mockk()
-    private val brukerService = BrukerService(pdlClient)
+    private val brukerService = BrukerService(pdlClient, norg2Client)
     private val fornavn = "Fornavn"
     private val mellomnavn = "Mellomnavn"
     private val etternavn = "Etternavn"
