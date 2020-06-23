@@ -9,6 +9,7 @@ val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
 val pdfboxVersion = "2.0.19"
 val tikaVersion = "1.24.1"
+val springSleuthVersion = "2.2.3.RELEASE"
 
 repositories {
     mavenCentral()
@@ -31,6 +32,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
+
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
 
     implementation("org.flywaydb:flyway-core")

@@ -34,7 +34,6 @@ class KlageRepository {
 
     fun createKlage(klage: Klage): Klage {
         logger.debug("Creating klage in db.")
-
         return KlageDAO.new {
             fromKlage(klage)
         }.toKlage().also {
@@ -43,19 +42,23 @@ class KlageRepository {
     }
 
     fun updateKlage(klage: Klage): Klage {
+        logger.debug("Updating klage in db. Id: {}", klage.id)
         val klageFromDB = getKlageToModify(klage.id)
         klageFromDB.apply {
             fromKlage(klage)
         }
+        logger.debug("Klage successfully updated in db.")
         return klageFromDB.toKlage()
     }
 
     fun deleteKlage(id: Int) {
+        logger.debug("Deleting klage in db. Id: {}", id)
         val klageFromDB = getKlageToModify(id)
         klageFromDB.apply {
             status = DELETED.name
             modifiedByUser = Instant.now()
         }
+        logger.debug("Klage successfully marked as deleted in db.")
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
