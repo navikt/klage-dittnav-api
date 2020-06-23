@@ -54,7 +54,7 @@ spec:
       rules:
         - application: klage-vedlegg-api
         - application: clamav
-          namespace: nais
+          namespace: clamav
   envFrom:
     - secret: srvklage-dittnav
     - secret: sts-apikey
