@@ -12,11 +12,16 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
 
     fun scan(file: ByteArray): Boolean {
         logger.debug("Scanning document")
-        val response = clamAvWebClient.put()
-            .bodyValue(file)
-            .retrieve()
-            .bodyToMono<List<ScanResult>>()
-            .block() ?: listOf()
+        val response = try {
+            clamAvWebClient.put()
+                .bodyValue(file)
+                .retrieve()
+                .bodyToMono<List<ScanResult>>()
+                .block()
+        } catch(ex: Throwable) {
+            logger.warn("Error from clamAV", ex)
+            listOf(ScanResult("Unknown", ClamAvResult.ERROR))
+        }
 
         if(response.size != 1) {
             logger.warn("Wrong size response from virus scan.")
