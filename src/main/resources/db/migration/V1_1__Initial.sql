@@ -14,9 +14,11 @@ create table klage
 
 create table vedlegg
 (
-    id       serial primary key,
-    klage_id integer      not null references klage (id),
-    tittel   varchar(250),
-    gcs_ref   varchar(500) null
+    id              serial primary key,
+    klage_id        integer         not null references klage (id),
+    tittel          varchar(250),
+    ref             varchar(500)    null,
+    content_type    varchar(50)     not null default 'Ukjent',
+    size_in_bytes   integer         not null default 0
 );
 

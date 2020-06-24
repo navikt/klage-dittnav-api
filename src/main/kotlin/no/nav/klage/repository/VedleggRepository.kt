@@ -21,7 +21,7 @@ class VedleggRepository {
             this.tittel = vedlegg.originalFilename
             this.klageId = KlageDAO.findById(klageId)!!
             this.ref = fileStorageId
-            this.type = vedlegg.contentType
+            this.contentType = vedlegg.contentType
             this.sizeInBytes = vedlegg.bytes.size
         }.toVedlegg().also {
             logger.debug("Vedlegg metadata stored successfully in db. Id: {}", it.id)
