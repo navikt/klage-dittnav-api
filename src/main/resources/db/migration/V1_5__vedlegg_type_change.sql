@@ -1,2 +1,2 @@
 alter table vedlegg
-    alter column "type" type varchar(50) not null default 'Ukjent';
+    alter column "TYPE" type varchar(50);
