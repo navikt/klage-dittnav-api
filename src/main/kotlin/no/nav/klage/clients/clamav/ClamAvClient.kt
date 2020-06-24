@@ -23,6 +23,7 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
         }
 
         val (filename, result) = response[0]
+        logger.debug("$filename ${result.name}")
         return when(result) {
             ClamAvResult.OK -> true
             ClamAvResult.FOUND -> {

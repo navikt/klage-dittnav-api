@@ -25,23 +25,28 @@ class AttachmentValidator(
         logger.debug("Validating attachment.")
         //Can this happen?
         if (vedlegg.isEmpty) {
+            logger.warn("Attachment is empty")
             throw AttachmentIsEmptyException()
         }
 
         //This limit could be set other places (Spring), since we only upload one at a time
         if (vedlegg.isTooLarge()) {
+            logger.warn("Attachment too large")
             throw AttachmentTooLargeException()
         }
 
         if (totalSizeExistingAttachments + vedlegg.bytes.size > maxTotalSize.toBytes()) {
+            logger.warn("Attachment total too large")
             throw AttachmentTotalTooLargeException()
         }
 
         if (vedlegg.hasVirus()) {
+            logger.warn("Attachment has virus")
             throw AttachmentHasVirusException()
         }
 
         if (vedlegg.isPDF() && vedlegg.isEncrypted()) {
+            logger.warn("Attachment is encrypted")
             throw AttachmentEncryptedException()
         }
 
