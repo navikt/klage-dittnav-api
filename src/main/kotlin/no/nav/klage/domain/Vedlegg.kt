@@ -40,6 +40,6 @@ object Vedleggene : IntIdTable("vedlegg") {
     val tittel = varchar("tittel", 250)
     val ref = varchar("ref", 500)
     val klageId = reference("klage_id", Klager)
-    val contentType = varchar("content_type", 10)
+    val contentType = varchar("content_type", 50)
     val sizeInBytes = integer("size_in_bytes")
 }
