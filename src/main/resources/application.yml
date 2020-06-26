@@ -20,6 +20,10 @@ spring:
         whitelisted-mdc-keys:
           - Nav-Callid
           - Nav-Consumer-Id
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
 
 server:
   port: 7070
