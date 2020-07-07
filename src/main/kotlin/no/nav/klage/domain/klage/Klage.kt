@@ -3,7 +3,6 @@ package no.nav.klage.domain.klage
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.Vedlegg
 import java.time.Instant
-import java.time.LocalDate
 
 data class Klage(
     val id: Int? = null,
@@ -13,7 +12,7 @@ data class Klage(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val enhetId: String? = null,
-    val vedtaksdato: LocalDate,
+    val vedtaksdato: String,
     val referanse: String? = null,
     val vedlegg: List<Vedlegg> = listOf()
 )

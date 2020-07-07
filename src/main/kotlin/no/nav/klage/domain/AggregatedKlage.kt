@@ -13,7 +13,7 @@ data class AggregatedKlage(
     val adresse: String,
     val telefon: String,
     val navenhet: String,
-    val vedtaksdato: LocalDate,
+    val vedtaksdato: String,
     val navReferanse: String,
     val kortRedegjoerelse: String,
     val dato: LocalDate,
