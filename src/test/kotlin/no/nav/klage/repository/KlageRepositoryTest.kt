@@ -1,14 +1,16 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.Tema
+import no.nav.klage.domain.klage.Klage
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.*
-import java.time.LocalDate
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -49,6 +51,6 @@ class KlageRepositoryTest {
         foedselsnummer = "123455667",
         fritekst = fritekst,
         tema = Tema.AAP,
-        vedtaksdato = LocalDate.now()
+        vedtaksdato = "some date"
     )
 }

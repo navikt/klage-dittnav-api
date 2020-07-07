@@ -3,14 +3,13 @@ package no.nav.klage.domain.klage
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.Vedlegg
-import java.time.LocalDate
 
 data class KlageView(
     val id: Int? = null,
     val fritekst: String,
     val tema: Tema,
     val enhetId: String? = null,
-    val vedtaksdato: LocalDate,
+    val vedtaksdato: String,
     val referanse: String? = null,
     val vedlegg: List<Vedlegg> = listOf()
 )

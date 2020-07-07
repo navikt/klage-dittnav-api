@@ -22,7 +22,7 @@ spring:
           - Nav-Consumer-Id
   servlet:
     multipart:
-#       Size limitations are also handled by app it self to get nice fault messages, but this setting seems to fail faster?
+#       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
       max-request-size: 32MB
       max-file-size: 32MB
 

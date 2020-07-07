@@ -6,7 +6,7 @@ create table klage
     status           varchar(15) not null default 'DRAFT',
     tema             varchar(3)  not null default 'UKJ',
     enhet_id         varchar(4)  null,
-    vedtaksdato      date        not null,
+    vedtaksdato      varchar(100) not null,
     referanse        varchar(25) null,
     modified_by_user timestamptz not null default now(),
     created          timestamptz not null default now()

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.mock.web.MockMultipartFile
 import java.nio.charset.Charset
-import java.time.LocalDate
 import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -59,7 +58,7 @@ class VedleggRepositoryTest {
         foedselsnummer = "123455667",
         fritekst = "fritekst",
         tema = Tema.AAP,
-        vedtaksdato = LocalDate.now()
+        vedtaksdato = "some date"
     )
 
     private val vedlegg1 = MockMultipartFile("vedlegg.txt", "vedlegg.txt", "txt", "file".toByteArray(Charset.defaultCharset()))
