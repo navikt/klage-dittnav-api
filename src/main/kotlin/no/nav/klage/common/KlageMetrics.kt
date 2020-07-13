@@ -11,14 +11,14 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
 
-        private const val COUNTER_KLAGER_CREATED = "klager.created"
+        private const val COUNTER_KLAGER_FINALIZED = "klager_finalized"
     }
 
-    fun incrementKlagerCreated() {
+    fun incrementKlagerFinalized() {
         try {
-            meterRegistry.counter(COUNTER_KLAGER_CREATED).increment()
+            meterRegistry.counter(COUNTER_KLAGER_FINALIZED).increment()
         } catch (e: Exception) {
-            logger.warn("klageCounter failed", e)
+            logger.warn("incrementKlagerFinalized failed", e)
         }
     }
 }

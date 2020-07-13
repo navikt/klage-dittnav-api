@@ -57,6 +57,6 @@ class KlageService(
         existingKlage.status = DONE
         klageRepository.updateKlage(existingKlage)
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, existingKlage))
-        klageMetrics.incrementKlagerCreated()
+        klageMetrics.incrementKlagerFinalized()
     }
 }
