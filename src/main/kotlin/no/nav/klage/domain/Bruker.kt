@@ -17,10 +17,7 @@ data class Navn(
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String
-) {
-    fun toKlageskjemaString(): String =
-        "${fornavn.orEmpty()} ${mellomnavn.orEmpty()} ${etternavn.orEmpty()}"
-}
+)
 
 data class Adresse(
     val adressenavn: String?,

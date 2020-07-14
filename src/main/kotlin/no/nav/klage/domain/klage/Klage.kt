@@ -11,6 +11,7 @@ data class Klage(
     var status: KlageStatus = KlageStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
+    val ytelse: String,
     val enhetId: String? = null,
     val vedtaksdato: String,
     val referanse: String? = null,
@@ -21,7 +22,7 @@ enum class KlageStatus {
     DRAFT, DONE, DELETED
 }
 
-fun Klage.toKlageView() = KlageView(id, fritekst, tema, enhetId, vedtaksdato, referanse, vedlegg)
+fun Klage.toKlageView() = KlageView(id, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg)
 
 fun Klage.validateUpdate(currentIdentifikasjonsnummer: String) {
     if (foedselsnummer != currentIdentifikasjonsnummer) {

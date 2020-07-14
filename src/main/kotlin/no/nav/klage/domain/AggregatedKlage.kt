@@ -9,19 +9,19 @@ data class AggregatedKlage(
     val id: Int,
     val klageInstans: Boolean,
     val trygderetten: Boolean,
-    val navn: String,
+    val fornavn: String,
+    val etternavn: String,
     val adresse: String,
     val telefon: String,
     val navenhet: String,
     val vedtaksdato: String,
     val navReferanse: String,
-    val kortRedegjoerelse: String,
     val dato: LocalDate,
-    val oversiktVedlegg: String,
     val begrunnelse: String,
     val identifikasjonstype: String,
     val identifikasjonsnummer: String,
     val tema: String,
+    val ytelse: String,
     val vedlegg: List<Vedlegg>
 )
 
@@ -34,19 +34,19 @@ fun createAggregatedKlage(
         id = klage.id!!,
         klageInstans = false, // TODO: False for MVP
         trygderetten = false, // TODO: False for MVP
-        navn = bruker.navn.toKlageskjemaString(),
+        fornavn = bruker.navn.fornavn,
+        etternavn = bruker.navn.etternavn,
         adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
         telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
         navenhet = klage.enhetId ?: "Ukjent enhet",
         vedtaksdato = klage.vedtaksdato,
         navReferanse = klage.referanse ?: "Ikke angitt",
-        kortRedegjoerelse = klage.fritekst,
         dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-        oversiktVedlegg = "???",
         begrunnelse = klage.fritekst,
         identifikasjonstype = bruker.folkeregisteridentifikator.type,
         identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
         tema = klage.tema.name,
+        ytelse = klage.ytelse,
         vedlegg = klage.vedlegg
     )
 }
