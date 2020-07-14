@@ -75,6 +75,7 @@ class KlageRepository {
         status = klage.status.name
         modifiedByUser = Instant.now()
         tema = klage.tema.name
+        ytelse = klage.ytelse
         klage.enhetId?.let { enhetId = it }
         vedtaksdato = klage.vedtaksdato
         klage.referanse?.let { referanse = it }
