@@ -10,6 +10,7 @@ data class AggregatedKlage(
     val klageInstans: Boolean,
     val trygderetten: Boolean,
     val fornavn: String,
+    val mellomnavn: String,
     val etternavn: String,
     val adresse: String,
     val telefon: String,
@@ -35,6 +36,7 @@ fun createAggregatedKlage(
         klageInstans = false, // TODO: False for MVP
         trygderetten = false, // TODO: False for MVP
         fornavn = bruker.navn.fornavn,
+        mellomnavn = bruker.navn.mellomnavn ?: "",
         etternavn = bruker.navn.etternavn,
         adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
         telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
