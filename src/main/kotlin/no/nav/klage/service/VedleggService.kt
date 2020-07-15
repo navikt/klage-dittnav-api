@@ -1,5 +1,6 @@
 package no.nav.klage.service
 
+import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Vedlegg
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.repository.KlageRepository
@@ -23,7 +24,8 @@ class VedleggService(
     private val klageRepository: KlageRepository,
     private val image2PDF: Image2PDF,
     private val vedleggWebClient: WebClient,
-    private val attachmentValidator: AttachmentValidator
+    private val attachmentValidator: AttachmentValidator,
+    private val vedleggMetrics: VedleggMetrics
 ) {
 
     companion object {
@@ -32,11 +34,16 @@ class VedleggService(
     }
 
     fun addVedlegg(klageId: Int, vedlegg: MultipartFile): Vedlegg {
+        val timeStart = System.currentTimeMillis()
+        vedleggMetrics.registerVedleggSize(vedlegg.bytes.size.toDouble())
+        vedleggMetrics.incrementVedleggType(vedlegg.contentType ?: "unknown")
         attachmentValidator.validateAttachment(vedlegg, klageRepository.getKlageById(klageId).attachmentsTotalSize())
         //Convert attachment (if not already pdf)
         val convertedBytes = image2PDF.convert(vedlegg.bytes)
         val vedleggIdInFileStore = uploadAttachmentToFilestore(convertedBytes, vedlegg.originalFilename!!)
-        return vedleggRepository.storeVedlegg(klageId, vedlegg, vedleggIdInFileStore)
+        return vedleggRepository.storeVedlegg(klageId, vedlegg, vedleggIdInFileStore).also {
+            vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
+        }
     }
 
     fun deleteVedlegg(klageId: Int, vedleggId: Int): Boolean {

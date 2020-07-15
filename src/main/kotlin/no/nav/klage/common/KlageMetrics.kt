@@ -12,13 +12,23 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         private val logger = getLogger(javaClass.enclosingClass)
 
         private const val COUNTER_KLAGER_FINALIZED = "klager_finalized"
+        private const val COUNTER_KLAGER_INITIALIZED = "klager_initialized"
     }
 
-    fun incrementKlagerFinalized() {
+    fun incrementKlagerInitialized() {
         try {
-            meterRegistry.counter(COUNTER_KLAGER_FINALIZED).increment()
+            meterRegistry.counter(COUNTER_KLAGER_INITIALIZED).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementKlagerInitialized failed", e)
+        }
+    }
+
+    fun incrementKlagerFinalized(ytelse: String) {
+        try {
+            meterRegistry.counter(COUNTER_KLAGER_FINALIZED, "ytelse", ytelse).increment()
         } catch (e: Exception) {
             logger.warn("incrementKlagerFinalized failed", e)
         }
     }
+
 }
