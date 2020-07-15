@@ -1,6 +1,7 @@
 package no.nav.klage.service
 
 import no.nav.klage.common.KlageMetrics
+import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.createAggregatedKlage
 import no.nav.klage.domain.klage.KlageStatus.DONE
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 class KlageService(
     private val klageRepository: KlageRepository,
     private val klageMetrics: KlageMetrics,
+    private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: KafkaProducer
 ) {
 
@@ -31,7 +33,9 @@ class KlageService(
     fun getKlage(klageId: Int): KlageView = klageRepository.getKlageById(klageId).toKlageView()
 
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
-        return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView()
+        return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView().also {
+            klageMetrics.incrementKlagerInitialized()
+        }
     }
 
     fun updateKlage(klage: KlageView, bruker: Bruker): KlageView {
@@ -57,6 +61,7 @@ class KlageService(
         existingKlage.status = DONE
         klageRepository.updateKlage(existingKlage)
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, existingKlage))
-        klageMetrics.incrementKlagerFinalized()
+        klageMetrics.incrementKlagerFinalized(existingKlage.ytelse)
+        vedleggMetrics.registerNumberOfVedleggPerUser(existingKlage.vedlegg.size.toDouble())
     }
 }
