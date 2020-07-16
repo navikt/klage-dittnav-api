@@ -6,7 +6,6 @@ env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/klage-dittnav-api:${{ github.sha }}
 
 jobs:
-#  Removed build. Do we need it, or are we assuming that dev always run first?
   deploytoprod:
     name: Deploy to prod
     if: github.ref == 'refs/heads/master'
