@@ -10,7 +10,6 @@ jobs:
 #  Removed build. Do we need it, or are we assuming that dev always run first?
   deploytoprod:
     name: Deploy to prod
-    needs: deploytodev
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
