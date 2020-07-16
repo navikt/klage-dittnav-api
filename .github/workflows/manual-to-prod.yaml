@@ -1,5 +1,4 @@
-name: build
-
+name: Manual deploy to production
 on:
   workflow_dispatch:
 
