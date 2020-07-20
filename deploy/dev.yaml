@@ -1,4 +1,4 @@
-ingress: https://klage-dittnav-api.dev-nav.no
+ingress: https://klage-dittnav-api.dev.nav.no
 externalHosts:
   - api-gw-q1.oera.no
 springProfile: dev-gcp
