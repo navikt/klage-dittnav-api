@@ -7,6 +7,7 @@ import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -25,6 +26,7 @@ class KlageController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @GetMapping("/klager")
@@ -37,8 +39,13 @@ class KlageController(
     fun createKlage(
         @RequestBody klage: KlageView, response: HttpServletResponse
     ): KlageView {
+        val bruker = brukerService.getBruker()
         logger.debug("Create klage is requested.")
-        return klageService.createKlage(klage, brukerService.getBruker())
+        secureLogger.debug(
+            "Create klage is requested for user with fnr {}.",
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        return klageService.createKlage(klage, bruker)
     }
 
     @PutMapping("/klager/{klageId}")
@@ -47,17 +54,29 @@ class KlageController(
         @RequestBody klage: KlageView,
         response: HttpServletResponse
     ): KlageView {
+        val bruker = brukerService.getBruker()
         logger.debug("Update klage is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Update klage is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
         if (klage.id != klageId) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "id in klage does not match resource id")
         }
-        return klageService.updateKlage(klage, brukerService.getBruker())
+        return klageService.updateKlage(klage, bruker)
     }
 
     @DeleteMapping("/klager/{klageId}")
     fun deleteKlage(@PathVariable klageId: Int) {
-        logger.debug("Delete klage is requested. Id: ", { klageId })
-        klageService.deleteKlage(klageId, brukerService.getBruker())
+        val bruker = brukerService.getBruker()
+        logger.debug("Delete klage is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Delete klage is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        klageService.deleteKlage(klageId, bruker)
     }
 
     @PostMapping("/klager/{klageId}/finalize")
@@ -65,8 +84,14 @@ class KlageController(
     fun finalizeKlage(
         @PathVariable klageId: Int
     ) {
+        val bruker = brukerService.getBruker()
         logger.debug("Finalize klage is requested. Id: {}", klageId)
-        klageService.finalizeKlage(klageId, brukerService.getBruker())
+        secureLogger.debug(
+            "Finalize klage is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        klageService.finalizeKlage(klageId, bruker)
     }
 
     @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])

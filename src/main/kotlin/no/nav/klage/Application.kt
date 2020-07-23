@@ -6,8 +6,8 @@ import org.springframework.boot.runApplication
 
 @SpringBootApplication
 @EnableJwtTokenValidation
-class KlageDittNavAPIApplication
+class Application
 
 fun main() {
-    runApplication<KlageDittNavAPIApplication>()
+    runApplication<Application>()
 }
