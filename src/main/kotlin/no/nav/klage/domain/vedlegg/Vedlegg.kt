@@ -9,4 +9,4 @@ data class Vedlegg(
     val sizeInBytes: Int
 )
 
-fun Vedlegg.toVedleggView(content: String) = VedleggView(tittel, ref,klageId, contentType, id, sizeInBytes, content)
+fun Vedlegg.toVedleggView(content: String) = VedleggView(tittel, ref, klageId, contentType, id, sizeInBytes, content)
