@@ -1,7 +1,7 @@
 package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
 
 data class Klage(

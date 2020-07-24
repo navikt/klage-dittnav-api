@@ -1,4 +1,4 @@
-package no.nav.klage.domain
+package no.nav.klage.domain.vedlegg
 
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.Klager
@@ -6,15 +6,6 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-
-data class Vedlegg(
-    val tittel: String,
-    val ref: String,
-    val klageId: Int,
-    val contentType: String = "Ukjent",
-    val id: Int?,
-    val sizeInBytes: Int
-)
 
 class VedleggDAO(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<VedleggDAO>(Vedleggene)

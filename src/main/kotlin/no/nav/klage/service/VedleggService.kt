@@ -2,9 +2,11 @@ package no.nav.klage.service
 
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.vedlegg.Vedlegg
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.validateAccess
+import no.nav.klage.domain.vedlegg.VedleggView
+import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.repository.VedleggResponse
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.util.*
 
 @Service
 @Transactional
@@ -97,6 +100,11 @@ class VedleggService(
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
+    }
+
+    fun expandVedleggToVedleggView(vedlegg: Vedlegg, bruker: Bruker): VedleggView {
+        val content = getVedlegg(vedlegg.id!!, bruker)
+        return vedlegg.toVedleggView(Base64.getEncoder().encodeToString(content))
     }
 
     private fun Klage.attachmentsTotalSize() = this.vedlegg.sumBy { it.sizeInBytes }

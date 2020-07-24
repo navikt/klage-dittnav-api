@@ -1,7 +1,7 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.Vedlegg
-import no.nav.klage.domain.VedleggDAO
+import no.nav.klage.domain.vedlegg.Vedlegg
+import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Repository

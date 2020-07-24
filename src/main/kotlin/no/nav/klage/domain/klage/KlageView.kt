@@ -2,7 +2,7 @@ package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.vedlegg.Vedlegg
 
 data class KlageView(
     val id: Int? = null,
