@@ -9,7 +9,10 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
@@ -112,6 +115,33 @@ class KlageController(
         if (!vedleggService.deleteVedlegg(klageId, vedleggId)) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment not found.")
         }
+    }
+
+    @ResponseBody
+    @GetMapping("/klager/{klageId}/vedlegg/{vedleggId}")
+    fun getVedleggFromKlage(
+        @PathVariable klageId: Int,
+        @PathVariable vedleggId: Int
+    ): ResponseEntity<ByteArray> {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get vedlegg to klage is requested. KlageId: {} - VedleggId: {}", klageId, vedleggId)
+        secureLogger.debug(
+            "Vedlegg from klage is requested. KlageId: {}, vedleggId: {}, fnr: {} ",
+            klageId,
+            vedleggId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+
+        val content = vedleggService.getVedlegg(vedleggId, bruker)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "attachment; filename=" + "vedlegg.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
     }
 
     @GetMapping("/vedtak")
