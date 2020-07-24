@@ -1,8 +1,10 @@
 package no.nav.klage.service
 
 import no.nav.klage.common.VedleggMetrics
+import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Vedlegg
 import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.klage.validateAccess
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.repository.VedleggResponse
@@ -80,6 +82,21 @@ class VedleggService(
 
         logger.debug("Attachment uploaded to file store with id: {}", response.id)
         return response.id
+    }
+
+    fun getVedlegg(vedleggId: Int, bruker: Bruker): ByteArray {
+        val vedlegg = vedleggRepository.getVedleggById(vedleggId)
+        val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
+        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+
+        logger.debug("Getting attachment from file store. VedleggId: {}, ref: {}", vedleggId, vedlegg.ref)
+
+        return vedleggWebClient
+            .get()
+            .uri("/" + vedlegg.ref)
+            .retrieve()
+            .bodyToMono<ByteArray>()
+            .block() ?: throw RuntimeException("Attachment could not be fetched")
     }
 
     private fun Klage.attachmentsTotalSize() = this.vedlegg.sumBy { it.sizeInBytes }
