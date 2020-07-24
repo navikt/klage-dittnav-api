@@ -103,7 +103,7 @@ class VedleggService(
     }
 
     fun expandVedleggToVedleggView(vedlegg: Vedlegg, bruker: Bruker): VedleggView {
-        val content = getVedlegg(vedlegg.id!!, bruker)
+        val content = getVedlegg(vedlegg.id, bruker)
         return vedlegg.toVedleggView(Base64.getEncoder().encodeToString(content))
     }
 

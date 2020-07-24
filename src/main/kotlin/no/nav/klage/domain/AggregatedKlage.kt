@@ -33,7 +33,7 @@ fun createAggregatedKlage(
 ): AggregatedKlage {
 
     return AggregatedKlage(
-        id = klage.id!!,
+        id = klage.id,
         klageInstans = false, // TODO: False for MVP
         trygderetten = false, // TODO: False for MVP
         fornavn = bruker.navn.fornavn,

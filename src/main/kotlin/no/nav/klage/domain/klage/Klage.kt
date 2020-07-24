@@ -5,7 +5,7 @@ import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
 
 data class Klage(
-    val id: Int? = null,
+    val id: Int,
     val foedselsnummer: String,
     val fritekst: String,
     var status: KlageStatus = KlageStatus.DRAFT,

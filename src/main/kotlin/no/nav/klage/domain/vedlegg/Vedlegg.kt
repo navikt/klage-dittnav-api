@@ -5,7 +5,7 @@ data class Vedlegg(
     val ref: String,
     val klageId: Int,
     val contentType: String = "Ukjent",
-    val id: Int?,
+    val id: Int,
     val sizeInBytes: Int
 )
 

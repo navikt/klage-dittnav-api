@@ -5,7 +5,7 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.Vedlegg
 
 data class KlageView(
-    val id: Int? = null,
+    val id: Int,
     val fritekst: String,
     val tema: Tema,
     val ytelse: String,
