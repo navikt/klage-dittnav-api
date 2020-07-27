@@ -5,8 +5,8 @@ data class Vedlegg(
     val ref: String,
     val klageId: Int,
     val contentType: String = "Ukjent",
-    val id: Int,
+    val id: Int? = null,
     val sizeInBytes: Int
 )
 
-fun Vedlegg.toVedleggView(content: String) = VedleggView(tittel, ref, klageId, contentType, id, sizeInBytes, content)
+fun Vedlegg.toVedleggView(content: String) = VedleggView(tittel, ref, klageId, contentType, id!!, sizeInBytes, content)
