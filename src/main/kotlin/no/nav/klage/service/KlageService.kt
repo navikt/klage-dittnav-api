@@ -30,7 +30,11 @@ class KlageService(
         }
     }
 
-    fun getKlage(klageId: Int): KlageView = klageRepository.getKlageById(klageId).toKlageView()
+    fun getKlage(klageId: Int, bruker: Bruker): KlageView {
+        val klage = klageRepository.getKlageById(klageId)
+        klage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        return klage.toKlageView()
+    }
 
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView().also {
