@@ -9,7 +9,7 @@ import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.klage.toKlage
 import no.nav.klage.domain.klage.toKlageView
-import no.nav.klage.domain.klage.validateUpdate
+import no.nav.klage.domain.klage.validateAccess
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import org.springframework.stereotype.Service
@@ -32,7 +32,7 @@ class KlageService(
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
         val klage = klageRepository.getKlageById(klageId)
-        klage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
         return klage.toKlageView()
     }
 
@@ -46,21 +46,21 @@ class KlageService(
         val klageId = klage.id
         checkNotNull(klageId) { "Klage is missing id" }
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
         return klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView()
     }
 
     fun deleteKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
         klageRepository.deleteKlage(klageId)
     }
 
     fun finalizeKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateUpdate(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
         existingKlage.status = DONE
         klageRepository.updateKlage(existingKlage)

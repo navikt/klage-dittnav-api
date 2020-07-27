@@ -2,9 +2,9 @@ package no.nav.klage.service
 
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.vedlegg.Vedlegg
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.validateAccess
+import no.nav.klage.domain.vedlegg.Vedlegg
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.repository.KlageRepository
