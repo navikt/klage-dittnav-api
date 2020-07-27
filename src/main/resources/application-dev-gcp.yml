@@ -1,5 +1,4 @@
 allowed.origins:
-  https://klage-dittnav.dev-gcp.nais.io,
   https://klage-dittnav.dev.nav.no,
   http://localhost:8080
 
