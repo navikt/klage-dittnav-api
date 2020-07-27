@@ -1,5 +1,6 @@
 allowed.origins:
-  '*'
+  https://klage-dittnav.nav.no
+
 
 logging:
   level:
