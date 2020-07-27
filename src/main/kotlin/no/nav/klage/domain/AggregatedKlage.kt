@@ -4,6 +4,7 @@ import no.nav.klage.domain.klage.Klage
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
+import no.nav.klage.domain.vedlegg.Vedlegg
 
 data class AggregatedKlage(
     val id: Int,

@@ -1,8 +1,8 @@
 package no.nav.klage.controller
 
-import no.nav.klage.domain.Vedlegg
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.domain.klage.KlageView
+import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
 import no.nav.klage.service.VedleggService
@@ -101,9 +101,11 @@ class KlageController(
     fun addVedleggToKlage(
         @PathVariable klageId: Int,
         @RequestParam vedlegg: MultipartFile
-    ): Vedlegg {
+    ): VedleggView {
         logger.debug("Add vedlegg to klage is requested. KlageId: {}", klageId)
-        return vedleggService.addVedlegg(klageId, vedlegg)
+        val temporaryVedlegg = vedleggService.addVedlegg(klageId, vedlegg)
+        val bruker = brukerService.getBruker()
+        return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
     }
 
     @DeleteMapping("/klager/{klageId}/vedlegg/{vedleggId}")

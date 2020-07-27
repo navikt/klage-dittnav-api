@@ -1,8 +1,8 @@
 package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.VedleggDAO
-import no.nav.klage.domain.Vedleggene
+import no.nav.klage.domain.vedlegg.VedleggDAO
+import no.nav.klage.domain.vedlegg.Vedleggene
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

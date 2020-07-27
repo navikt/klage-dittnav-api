@@ -1,7 +1,7 @@
 package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.Vedlegg
+import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
 
 data class Klage(
@@ -22,7 +22,7 @@ enum class KlageStatus {
     DRAFT, DONE, DELETED
 }
 
-fun Klage.toKlageView() = KlageView(id, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg)
+fun Klage.toKlageView() = KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg)
 
 fun Klage.validateUpdate(currentIdentifikasjonsnummer: String) {
     validateAccess(currentIdentifikasjonsnummer)
