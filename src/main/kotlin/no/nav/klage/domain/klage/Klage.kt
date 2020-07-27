@@ -24,14 +24,10 @@ enum class KlageStatus {
 
 fun Klage.toKlageView() = KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg)
 
-fun Klage.validateUpdate(currentIdentifikasjonsnummer: String) {
-    validateAccess(currentIdentifikasjonsnummer)
+fun Klage.validateAccess(currentIdentifikasjonsnummer: String) {
     if (status === KlageStatus.DONE) {
         throw RuntimeException("Klage is already finalized.")
     }
-}
-
-fun Klage.validateAccess(currentIdentifikasjonsnummer: String) {
     if (foedselsnummer != currentIdentifikasjonsnummer) {
         throw RuntimeException("Folkeregisteridentifikator in klage does not match current user.")
     }
