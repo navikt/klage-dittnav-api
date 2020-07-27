@@ -1,5 +1,7 @@
 allowed.origins:
-  '*'
+  https://klage-dittnav.dev.nav.no,
+  http://localhost:8080
+
 
 logging:
   level:
