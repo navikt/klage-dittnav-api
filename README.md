@@ -90,7 +90,7 @@ services:
 
 ## Endepunkter
 
-### App spesifikke
+### App-spesifikke
 CRUD Rest-API for klager
 ```
 http://localhost:7070/klager

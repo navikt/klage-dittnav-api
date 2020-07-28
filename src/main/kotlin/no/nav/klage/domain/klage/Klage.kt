@@ -15,14 +15,15 @@ data class Klage(
     val enhetId: String? = null,
     val vedtaksdato: String,
     val referanse: String? = null,
-    val vedlegg: List<Vedlegg> = listOf()
+    val vedlegg: List<Vedlegg> = listOf(),
+    val journalpostId: String? = null
 )
 
 enum class KlageStatus {
     DRAFT, DONE, DELETED
 }
 
-fun Klage.toKlageView() = KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg)
+fun Klage.toKlageView() = KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg, journalpostId)
 
 fun Klage.validateAccess(currentIdentifikasjonsnummer: String) {
     if (status === KlageStatus.DONE) {

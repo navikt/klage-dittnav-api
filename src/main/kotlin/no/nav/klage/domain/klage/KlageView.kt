@@ -12,7 +12,8 @@ data class KlageView(
     val enhetId: String? = null,
     val vedtaksdato: String,
     val referanse: String? = null,
-    val vedlegg: List<Vedlegg> = listOf()
+    val vedlegg: List<Vedlegg> = listOf(),
+    val journalpostId: String? = null
 )
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
@@ -25,5 +26,6 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     enhetId = enhetId,
     vedtaksdato = vedtaksdato,
     referanse = referanse,
-    vedlegg = vedlegg
+    vedlegg = vedlegg,
+    journalpostId = journalpostId
 )

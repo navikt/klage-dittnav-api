@@ -51,6 +51,20 @@ class KlageController(
         return klageService.getKlage(klageId, bruker)
     }
 
+    @GetMapping("/klager/{klageId}/journalpostid")
+    fun getJournalpostId(
+        @PathVariable klageId: Int
+    ): String? {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get journalpost id is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Get journalpost id is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        return klageService.getJournalpostId(klageId, bruker)
+    }
+
     @PostMapping("/klager")
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlage(
