@@ -36,6 +36,10 @@ class KlageService(
         return klage.toKlageView()
     }
 
+    fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
+        return getKlage(klageId, bruker).journalpostId
+    }
+
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView().also {
             klageMetrics.incrementKlagerInitialized()

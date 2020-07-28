@@ -23,6 +23,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var vedtaksdato by Klager.vedtaksdato
     var referanse by Klager.referanse
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
+    val journalpostId by Klager.journalpostId
 }
 
 object Klager : IntIdTable("klage") {
@@ -35,6 +36,7 @@ object Klager : IntIdTable("klage") {
     var enhetId = varchar("enhet_id", 4).nullable()
     var vedtaksdato = varchar("vedtaksdato", 100)
     var referanse = varchar("referanse", 25).nullable()
+    var journalpostId = varchar("journalpost_id", 50).nullable()
 }
 
 fun KlageDAO.toKlage() =
@@ -49,7 +51,8 @@ fun KlageDAO.toKlage() =
         enhetId = this.enhetId,
         vedtaksdato = this.vedtaksdato,
         referanse = this.referanse,
-        vedlegg = this.vedlegg.map { it.toVedlegg() }
+        vedlegg = this.vedlegg.map { it.toVedlegg() },
+        journalpostId = this.journalpostId
     )
 
 private fun String.toTema() = try {

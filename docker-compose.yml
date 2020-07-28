@@ -15,6 +15,7 @@ services:
 #      Bruk de to neste linjene dersom du er på Windows:
 #      SECURITY_TOKEN_SERVICE_REST_URL: http://host.docker.internal:8088
 #      PDL_BASE_URL: http://host.docker.internal:7000/graphql
+      SPRING_PROFILES_ACTIVE: local
   klage-dittnav-db:
     container_name: klage-dittnav-db
     image: library/postgres:11
