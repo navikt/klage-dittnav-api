@@ -40,6 +40,12 @@ class KlageService(
         return getKlage(klageId, bruker).journalpostId
     }
 
+    fun setJournalpostId(klageId: Int, journalpostId: String) {
+        val klage = klageRepository.getKlageById(klageId)
+        val updatedKlage = klage.copy(journalpostId = journalpostId)
+        klageRepository.updateKlage(updatedKlage)
+    }
+
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView().also {
             klageMetrics.incrementKlagerInitialized()

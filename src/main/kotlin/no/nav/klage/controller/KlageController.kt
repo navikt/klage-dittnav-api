@@ -56,13 +56,22 @@ class KlageController(
         @PathVariable klageId: Int
     ): String? {
         val bruker = brukerService.getBruker()
-        logger.debug("Get journalpost id is requested. Id: {}", klageId)
+        logger.debug("Get journalpost id is requested. KlageId: {}", klageId)
         secureLogger.debug(
-            "Get journalpost id is requested. Id: {}, fnr: {}",
+            "Get journalpost id is requested. KlageId: {}, fnr: {}",
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         return klageService.getJournalpostId(klageId, bruker)
+    }
+
+    //TODO: Limit access to backend service
+    @PostMapping("/klager/{klageId}/journalpostid/{journalpostId}")
+    fun setJournalpostId(
+        @PathVariable klageId: Int,
+        @PathVariable journalpostId: String
+    ) {
+        klageService.setJournalpostId(klageId, journalpostId)
     }
 
     @PostMapping("/klager")
