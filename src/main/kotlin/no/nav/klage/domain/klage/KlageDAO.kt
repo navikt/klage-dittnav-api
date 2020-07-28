@@ -23,7 +23,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var vedtaksdato by Klager.vedtaksdato
     var referanse by Klager.referanse
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
-    val journalpostId by Klager.journalpostId
+    var journalpostId by Klager.journalpostId
 }
 
 object Klager : IntIdTable("klage") {
