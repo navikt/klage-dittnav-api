@@ -177,7 +177,7 @@ class KlageController(
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "attachment; filename=" + "vedlegg.pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
         return ResponseEntity(
             content,
             responseHeaders,
