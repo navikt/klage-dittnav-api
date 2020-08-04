@@ -1,6 +1,5 @@
 package no.nav.klage.controller
 
-import no.nav.klage.domain.Journalpost
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.vedlegg.VedleggView
@@ -66,15 +65,7 @@ class KlageController(
         return klageService.getJournalpostId(klageId, bruker)
     }
 
-    //TODO: Limit access to backend service
-    @PostMapping("/klager/{klageId}/journalpostid")
-    fun setJournalpostId(
-        @PathVariable klageId: Int,
-        @RequestBody journalpost: Journalpost
-    ) {
-        logger.debug("Set journalpostId on klage is called. KlageId: {}, journalpostId: {}", klageId, journalpost.id)
-        klageService.setJournalpostId(klageId, journalpost.id)
-    }
+
 
     @PostMapping("/klager")
     @ResponseStatus(HttpStatus.CREATED)
