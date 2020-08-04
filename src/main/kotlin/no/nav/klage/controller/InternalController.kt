@@ -4,7 +4,7 @@ import no.nav.klage.domain.Journalpost
 import no.nav.klage.service.KlageService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
-import no.nav.security.oidc.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
