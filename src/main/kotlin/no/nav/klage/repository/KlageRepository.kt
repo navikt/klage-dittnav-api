@@ -3,7 +3,6 @@ package no.nav.klage.repository
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageStatus.DELETED
-import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.klage.Klager
 import no.nav.klage.domain.klage.toKlage
 import no.nav.klage.util.getLogger
@@ -62,11 +61,7 @@ class KlageRepository {
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
-        val klageFromDB = KlageDAO.findById(checkNotNull(id))
-        if (klageFromDB?.status != DRAFT.name) {
-            throw IllegalStateException("Klage can only be modified if status == DRAFT")
-        }
-        return klageFromDB
+        return KlageDAO.findById(checkNotNull(id)) ?: throw RuntimeException("Klage with id $id not found in db.")
     }
 
     private fun KlageDAO.fromKlage(klage: Klage) {
