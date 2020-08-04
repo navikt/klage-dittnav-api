@@ -37,7 +37,9 @@ class KlageService(
     }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
-        return getKlage(klageId, bruker).journalpostId
+        val klage = klageRepository.getKlageById(klageId)
+        klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer, false)
+        return klage.toKlageView().journalpostId
     }
 
     fun setJournalpostId(klageId: Int, journalpostId: String) {
