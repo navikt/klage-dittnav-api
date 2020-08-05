@@ -1,5 +1,6 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
@@ -16,14 +17,16 @@ data class Klage(
     val vedtaksdato: String,
     val referanse: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
-    val journalpostId: String? = null
+    val journalpostId: String? = null,
+    val journalpostStatus: JournalpostStatus = JournalpostStatus.UNREGISTERED
 )
 
 enum class KlageStatus {
     DRAFT, DONE, DELETED
 }
 
-fun Klage.toKlageView() = KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg, journalpostId)
+fun Klage.toKlageView() =
+    KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg, journalpostId, journalpostStatus)
 
 fun Klage.validateAccess(currentIdentifikasjonsnummer: String, checkFinalized: Boolean = true) {
     if (checkFinalized && status === KlageStatus.DONE) {

@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Journalpost
+import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.service.KlageService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
@@ -22,7 +23,6 @@ class InternalController(
         private val secureLogger = getSecureLogger()
     }
 
-    //TODO: Limit access to backend service
     @PostMapping("/klager/{klageId}/journalpostid")
     fun setJournalpostId(
         @PathVariable klageId: Int,
@@ -30,5 +30,14 @@ class InternalController(
     ) {
         logger.debug("Set journalpostId on klage is called. KlageId: {}, journalpostId: {}", klageId, journalpost.id)
         klageService.setJournalpostId(klageId, journalpost.id)
+    }
+
+    @PostMapping("/journalpoststatus/{journalpostId}")
+    fun setJournalpostStatus(
+        @PathVariable journalpostId: String,
+        @RequestBody journalpostStatus: JournalpostStatus
+    ) {
+        logger.debug("Set journalpostf status on klage with journalpostId {} is called.", journalpostId)
+        klageService.setJournalpostStatus(journalpostId, journalpostStatus)
     }
 }

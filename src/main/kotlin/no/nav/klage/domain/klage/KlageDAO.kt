@@ -1,5 +1,6 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
@@ -24,6 +25,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var referanse by Klager.referanse
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
     var journalpostId by Klager.journalpostId
+    var journalpostStatus by Klager.journalpostStatus
 }
 
 object Klager : IntIdTable("klage") {
@@ -37,6 +39,7 @@ object Klager : IntIdTable("klage") {
     var vedtaksdato = varchar("vedtaksdato", 100)
     var referanse = varchar("referanse", 25).nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
+    var journalpostStatus = varchar("journalpost_status", 25)
 }
 
 fun KlageDAO.toKlage() =
@@ -52,7 +55,8 @@ fun KlageDAO.toKlage() =
         vedtaksdato = this.vedtaksdato,
         referanse = this.referanse,
         vedlegg = this.vedlegg.map { it.toVedlegg() },
-        journalpostId = this.journalpostId
+        journalpostId = this.journalpostId,
+        journalpostStatus = this.journalpostStatus.toJournalpostStatus()
     )
 
 private fun String.toTema() = try {
@@ -65,4 +69,10 @@ private fun String.toStatus() = try {
     KlageStatus.valueOf(this)
 } catch (e: IllegalArgumentException) {
     KlageStatus.DRAFT
+}
+
+private fun String.toJournalpostStatus() = try {
+    JournalpostStatus.valueOf(this)
+} catch (e: IllegalArgumentException) {
+    JournalpostStatus.DRAFT
 }
