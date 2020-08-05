@@ -27,6 +27,10 @@ class KlageRepository {
         return KlageDAO.findById(id)?.toKlage() ?: throw RuntimeException("Klage not found")
     }
 
+    fun getKlageByJournalpostId(journalpostId: String): Klage {
+        return KlageDAO.find { Klager.journalpostId eq journalpostId }.map { it.toKlage() }[0]
+    }
+
     fun getKlagerByFnr(fnr: String): List<Klage> {
         return KlageDAO.find { Klager.foedselsnummer eq fnr }.map { it.toKlage() }
     }

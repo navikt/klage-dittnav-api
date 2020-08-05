@@ -1,5 +1,6 @@
 package no.nav.klage.controller
 
+import no.nav.klage.domain.JoarkStatus
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.vedlegg.VedleggView
@@ -63,6 +64,20 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         return klageService.getJournalpostId(klageId, bruker)
+    }
+
+    @GetMapping("/klager/{klageId}/joarkstatus")
+    fun getJoarkStatus(
+        @PathVariable klageId: Int
+    ): JoarkStatus? {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get Joark status is requested. KlageId: {}", klageId)
+        secureLogger.debug(
+            "Get Joark status is requested. KlageId: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        return klageService.getJoarkStatus(klageId, bruker)
     }
 
 

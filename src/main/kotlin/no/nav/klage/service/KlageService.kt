@@ -3,6 +3,7 @@ package no.nav.klage.service
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.JoarkStatus
 import no.nav.klage.domain.createAggregatedKlage
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
@@ -42,9 +43,21 @@ class KlageService(
         return klage.toKlageView().journalpostId
     }
 
+    fun getJoarkStatus(klageId: Int, bruker: Bruker): JoarkStatus {
+        val klage = klageRepository.getKlageById(klageId)
+        klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer, false)
+        return klage.toKlageView().joarkStatus
+    }
+
     fun setJournalpostId(klageId: Int, journalpostId: String) {
         val klage = klageRepository.getKlageById(klageId)
         val updatedKlage = klage.copy(journalpostId = journalpostId)
+        klageRepository.updateKlage(updatedKlage)
+    }
+
+    fun setJoarkstatus(journalpostId: String, joarkStatus: JoarkStatus) {
+        val klage = klageRepository.getKlageByJournalpostId(journalpostId)
+        val updatedKlage = klage.copy(joarkStatus = joarkStatus)
         klageRepository.updateKlage(updatedKlage)
     }
 
@@ -80,4 +93,5 @@ class KlageService(
         klageMetrics.incrementKlagerFinalized(existingKlage.ytelse)
         vedleggMetrics.registerNumberOfVedleggPerUser(existingKlage.vedlegg.size.toDouble())
     }
+
 }
