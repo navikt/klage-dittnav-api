@@ -1,7 +1,7 @@
 package no.nav.klage.controller
 
-import no.nav.klage.domain.JoarkStatus
 import no.nav.klage.domain.Journalpost
+import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.service.KlageService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
@@ -32,12 +32,12 @@ class InternalController(
         klageService.setJournalpostId(klageId, journalpost.id)
     }
 
-    @PostMapping("/joarkstatus/{journalpostId}")
-    fun setJoarkStatus(
+    @PostMapping("/journalpoststatus/{journalpostId}")
+    fun setJournalpostStatus(
         @PathVariable journalpostId: String,
-        @RequestBody joarkStatus: JoarkStatus
+        @RequestBody journalpostStatus: JournalpostStatus
     ) {
-        logger.debug("Set Joark status on klage with journalpostId {} is called.", journalpostId)
-        klageService.setJoarkstatus(journalpostId, joarkStatus)
+        logger.debug("Set journalpostf status on klage with journalpostId {} is called.", journalpostId)
+        klageService.setJournalpostStatus(journalpostId, journalpostStatus)
     }
 }

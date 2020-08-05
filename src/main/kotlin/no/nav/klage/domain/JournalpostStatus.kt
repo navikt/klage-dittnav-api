@@ -1,7 +1,7 @@
 package no.nav.klage.domain
 
 //TODO: Implement correct status names.
-enum class JoarkStatus {
+enum class JournalpostStatus {
     UNREGISTERED,
     DRAFT,
     FINISHED

@@ -1,6 +1,6 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.JoarkStatus
+import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
@@ -25,7 +25,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var referanse by Klager.referanse
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
     var journalpostId by Klager.journalpostId
-    var joarkStatus by Klager.joarkStatus
+    var journalpostStatus by Klager.journalpostStatus
 }
 
 object Klager : IntIdTable("klage") {
@@ -39,7 +39,7 @@ object Klager : IntIdTable("klage") {
     var vedtaksdato = varchar("vedtaksdato", 100)
     var referanse = varchar("referanse", 25).nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
-    var joarkStatus = varchar("joark_status", 50)
+    var journalpostStatus = varchar("journalpost_status", 25)
 }
 
 fun KlageDAO.toKlage() =
@@ -56,7 +56,7 @@ fun KlageDAO.toKlage() =
         referanse = this.referanse,
         vedlegg = this.vedlegg.map { it.toVedlegg() },
         journalpostId = this.journalpostId,
-        joarkStatus = this.joarkStatus.toJoarkStatus()
+        journalpostStatus = this.journalpostStatus.toJournalpostStatus()
     )
 
 private fun String.toTema() = try {
@@ -71,8 +71,8 @@ private fun String.toStatus() = try {
     KlageStatus.DRAFT
 }
 
-private fun String.toJoarkStatus() = try {
-    JoarkStatus.valueOf(this)
+private fun String.toJournalpostStatus() = try {
+    JournalpostStatus.valueOf(this)
 } catch (e: IllegalArgumentException) {
-    JoarkStatus.DRAFT
+    JournalpostStatus.DRAFT
 }

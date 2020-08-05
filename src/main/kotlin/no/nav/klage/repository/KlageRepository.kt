@@ -79,5 +79,6 @@ class KlageRepository {
         vedtaksdato = klage.vedtaksdato
         klage.referanse?.let { referanse = it }
         klage.journalpostId?.let { journalpostId = it }
+        journalpostStatus = klage.journalpostStatus.name
     }
 }

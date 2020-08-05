@@ -1,7 +1,7 @@
 package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.JoarkStatus
+import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.Vedlegg
 
@@ -15,7 +15,7 @@ data class KlageView(
     val referanse: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
     val journalpostId: String? = null,
-    val joarkStatus: JoarkStatus
+    val journalpostStatus: JournalpostStatus
 )
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
@@ -30,5 +30,5 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     referanse = referanse,
     vedlegg = vedlegg,
     journalpostId = journalpostId,
-    joarkStatus = joarkStatus
+    journalpostStatus = journalpostStatus
 )
