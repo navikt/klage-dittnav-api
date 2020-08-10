@@ -33,11 +33,6 @@ class KlageController(
         private val secureLogger = getSecureLogger()
     }
 
-    @GetMapping("/klager")
-    fun getKlager(): List<KlageView> {
-        return klageService.getKlager()
-    }
-
     @GetMapping("/klager/{klageId}")
     fun getKlage(
         @PathVariable klageId: Int

@@ -25,9 +25,6 @@ enum class KlageStatus {
     DRAFT, DONE, DELETED
 }
 
-fun Klage.toKlageView() =
-    KlageView(id!!, fritekst, tema, ytelse, enhetId, vedtaksdato, referanse, vedlegg, journalpostId, journalpostStatus)
-
 fun Klage.validateAccess(currentIdentifikasjonsnummer: String, checkFinalized: Boolean = true) {
     if (checkFinalized && status === KlageStatus.DONE) {
         throw RuntimeException("Klage is already finalized.")
