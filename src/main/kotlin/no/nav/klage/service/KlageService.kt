@@ -11,6 +11,7 @@ import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.klage.toKlage
 import no.nav.klage.domain.klage.validateAccess
+import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import org.springframework.stereotype.Service
@@ -30,6 +31,12 @@ class KlageService(
         val klage = klageRepository.getKlageById(klageId)
         klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
         return klage.toKlageView(bruker)
+    }
+
+    fun getDraftKlagerByFnr(bruker: Bruker): List<KlageView> {
+        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+        val klager = klageRepository.getDraftKlagerByFnr(fnr)
+        return klager.map { it.toKlageView(bruker) }
     }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
@@ -67,7 +74,7 @@ class KlageService(
         val existingKlage = klageRepository.getKlageById(klageId)
         existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
-        return klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView(bruker)
+        return klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView(bruker, false)
     }
 
     fun deleteKlage(klageId: Int, bruker: Bruker) {
@@ -88,7 +95,7 @@ class KlageService(
         vedleggMetrics.registerNumberOfVedleggPerUser(existingKlage.vedlegg.size.toDouble())
     }
 
-    fun Klage.toKlageView(bruker: Bruker) =
+    fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true) =
         KlageView(
             id!!,
             fritekst,
@@ -98,10 +105,14 @@ class KlageService(
             vedtaksdato,
             referanse,
             vedlegg.map {
-                vedleggService.expandVedleggToVedleggView(
-                    it,
-                    bruker
-                )
+                if (expandVedleggToVedleggView) {
+                    vedleggService.expandVedleggToVedleggView(
+                        it,
+                        bruker
+                    )
+                } else {
+                    it.toVedleggView("")
+                }
             },
             journalpostId,
             journalpostStatus

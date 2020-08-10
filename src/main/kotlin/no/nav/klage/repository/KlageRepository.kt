@@ -1,11 +1,9 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.klage.Klage
-import no.nav.klage.domain.klage.KlageDAO
+import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
-import no.nav.klage.domain.klage.Klager
-import no.nav.klage.domain.klage.toKlage
 import no.nav.klage.util.getLogger
+import org.jetbrains.exposed.sql.and
 import org.springframework.stereotype.Repository
 import java.time.Instant
 
@@ -33,6 +31,10 @@ class KlageRepository {
 
     fun getKlagerByFnr(fnr: String): List<Klage> {
         return KlageDAO.find { Klager.foedselsnummer eq fnr }.map { it.toKlage() }
+    }
+
+    fun getDraftKlagerByFnr(fnr: String): List<Klage> {
+        return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }.map { it.toKlage() }
     }
 
     fun createKlage(klage: Klage): Klage {
