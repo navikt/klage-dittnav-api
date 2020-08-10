@@ -35,7 +35,13 @@ class KlageController(
 
     @GetMapping("/klager")
     fun getKlager(): List<KlageView> {
-        return klageService.getKlager()
+        val bruker = brukerService.getBruker()
+        logger.debug("Get klager for user is requested.")
+        secureLogger.debug(
+            "Get klager for user is requested. Fnr: {}",
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        return klageService.getDraftKlagerByFnr(bruker)
     }
 
     @GetMapping("/klager/{klageId}")

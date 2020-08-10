@@ -3,7 +3,8 @@ package no.nav.klage.domain.klage
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.vedlegg.Vedlegg
+import no.nav.klage.domain.vedlegg.VedleggView
+import no.nav.klage.domain.vedlegg.toVedlegg
 
 data class KlageView(
     val id: Int,
@@ -13,7 +14,7 @@ data class KlageView(
     val enhetId: String? = null,
     val vedtaksdato: String,
     val referanse: String? = null,
-    val vedlegg: List<Vedlegg> = listOf(),
+    val vedlegg: List<VedleggView> = listOf(),
     val journalpostId: String? = null,
     val journalpostStatus: JournalpostStatus = JournalpostStatus.UNREGISTERED
 )
@@ -28,7 +29,7 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     enhetId = enhetId,
     vedtaksdato = vedtaksdato,
     referanse = referanse,
-    vedlegg = vedlegg,
+    vedlegg = vedlegg.map { it.toVedlegg() },
     journalpostId = journalpostId,
     journalpostStatus = journalpostStatus
 )
