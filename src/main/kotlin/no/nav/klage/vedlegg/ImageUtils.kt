@@ -77,10 +77,9 @@ object ImageUtils {
     private fun scaleDown(origImage: BufferedImage, newDim: Dimension): BufferedImage {
         val newWidth = newDim.getWidth().toInt()
         val newHeight = newDim.getHeight().toInt()
-        val tempImg = origImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH)
         val scaledImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_3BYTE_BGR)
         val g = scaledImg.graphics as Graphics2D
-        g.drawImage(tempImg, 0, 0, null)
+        g.drawImage(origImage, 0, 0, newWidth, newHeight, null)
         g.dispose()
         return scaledImg
     }
