@@ -1,6 +1,5 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.JournalpostStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
@@ -13,12 +12,10 @@ data class Klage(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val ytelse: String,
-    val enhetId: String? = null,
-    val vedtaksdato: String,
-    val referanse: String? = null,
+    val vedtak: String,
+    val saksnummer: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
-    val journalpostId: String? = null,
-    val journalpostStatus: JournalpostStatus = JournalpostStatus.UNREGISTERED
+    val journalpostId: String? = null
 )
 
 enum class KlageStatus {

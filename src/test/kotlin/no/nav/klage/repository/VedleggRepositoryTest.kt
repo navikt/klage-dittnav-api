@@ -59,7 +59,7 @@ class VedleggRepositoryTest {
         fritekst = "fritekst",
         tema = Tema.AAP,
         ytelse = "Foreldrepenger",
-        vedtaksdato = "some date"
+        vedtak = "some date"
     )
 
     private val vedlegg1 = MockMultipartFile("vedlegg.txt", "vedlegg.txt", "txt", "file".toByteArray(Charset.defaultCharset()))

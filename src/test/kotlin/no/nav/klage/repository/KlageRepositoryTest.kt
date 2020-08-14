@@ -52,6 +52,6 @@ class KlageRepositoryTest {
         fritekst = fritekst,
         tema = Tema.AAP,
         ytelse = "Foreldrepenger",
-        vedtaksdato = "some date"
+        vedtak = "some date"
     )
 }
