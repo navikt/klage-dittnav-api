@@ -51,7 +51,6 @@ class KlageRepositoryTest {
         foedselsnummer = "123455667",
         fritekst = fritekst,
         tema = Tema.AAP,
-        ytelse = "Foreldrepenger",
-        vedtaksdato = "some date"
+        vedtak = "some date"
     )
 }

@@ -15,15 +15,13 @@ data class AggregatedKlage(
     val etternavn: String,
     val adresse: String,
     val telefon: String,
-    val navenhet: String,
-    val vedtaksdato: String,
-    val navReferanse: String?,
+    val vedtak: String,
+    val saksnummer: String?,
     val dato: LocalDate,
     val begrunnelse: String,
     val identifikasjonstype: String,
     val identifikasjonsnummer: String,
     val tema: String,
-    val ytelse: String,
     val vedlegg: List<Vedlegg>
 )
 
@@ -41,15 +39,13 @@ fun createAggregatedKlage(
         etternavn = bruker.navn.etternavn,
         adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
         telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
-        navenhet = klage.enhetId ?: "Ukjent enhet",
-        vedtaksdato = klage.vedtaksdato,
-        navReferanse = klage.referanse,
+        vedtak = klage.vedtak,
+        saksnummer = klage.saksnummer,
         dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
         begrunnelse = klage.fritekst,
         identifikasjonstype = bruker.folkeregisteridentifikator.type,
         identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
         tema = klage.tema.name,
-        ytelse = klage.ytelse,
         vedlegg = klage.vedlegg
     )
 }

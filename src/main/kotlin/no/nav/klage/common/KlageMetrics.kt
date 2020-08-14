@@ -23,9 +23,9 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         }
     }
 
-    fun incrementKlagerFinalized(ytelse: String) {
+    fun incrementKlagerFinalized(tema: String) {
         try {
-            meterRegistry.counter(COUNTER_KLAGER_FINALIZED, "ytelse", ytelse).increment()
+            meterRegistry.counter(COUNTER_KLAGER_FINALIZED, "tema", tema).increment()
         } catch (e: Exception) {
             logger.warn("incrementKlagerFinalized failed", e)
         }
