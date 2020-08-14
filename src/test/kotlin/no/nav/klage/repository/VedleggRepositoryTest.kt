@@ -58,6 +58,7 @@ class VedleggRepositoryTest {
         foedselsnummer = "123455667",
         fritekst = "fritekst",
         tema = Tema.AAP,
+        ytelse = "Foreldrepenger",
         vedtak = "some date"
     )
 

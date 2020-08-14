@@ -18,6 +18,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var status by Klager.status
     var modifiedByUser by Klager.modifiedByUser
     var tema by Klager.tema
+    var ytelse by Klager.ytelse
     var vedtak by Klager.vedtak
     var saksnummer by Klager.saksnummer
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
@@ -30,6 +31,7 @@ object Klager : IntIdTable("klage") {
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
+    var ytelse = varchar("ytelse", 50)
     var vedtak = varchar("vedtak", 100)
     var saksnummer = varchar("saksnummer", 25).nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
@@ -43,6 +45,7 @@ fun KlageDAO.toKlage() =
         status = this.status.toStatus(),
         modifiedByUser = this.modifiedByUser,
         tema = this.tema.toTema(),
+        ytelse = this.ytelse,
         vedtak = this.vedtak,
         saksnummer = this.saksnummer,
         vedlegg = this.vedlegg.map { it.toVedlegg() },

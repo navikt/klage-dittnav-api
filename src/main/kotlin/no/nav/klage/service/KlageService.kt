@@ -87,6 +87,7 @@ class KlageService(
             id!!,
             fritekst,
             tema,
+            ytelse,
             vedtak,
             saksnummer,
             vedlegg.map {

@@ -11,6 +11,7 @@ data class Klage(
     var status: KlageStatus = KlageStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
+    val ytelse: String,
     val vedtak: String,
     val saksnummer: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
