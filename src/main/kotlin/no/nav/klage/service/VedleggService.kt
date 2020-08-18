@@ -28,7 +28,7 @@ class VedleggService(
     private val vedleggRepository: VedleggRepository,
     private val klageRepository: KlageRepository,
     private val image2PDF: Image2PDF,
-    private val vedleggWebClient: WebClient,
+    private val fileWebClient: WebClient,
     private val attachmentValidator: AttachmentValidator,
     private val vedleggMetrics: VedleggMetrics
 ) {
@@ -55,7 +55,7 @@ class VedleggService(
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
 
         logger.debug("Deleting attachment in file store. VedleggId: {}", vedleggId)
-        val deletedInGCS = vedleggWebClient
+        val deletedInGCS = fileWebClient
             .delete()
             .uri("/" + vedlegg.ref)
             .retrieve()
@@ -74,7 +74,7 @@ class VedleggService(
         logger.debug("Uploading attachment to file store.")
         val bodyBuilder = MultipartBodyBuilder()
         bodyBuilder.part("file", bytes).filename(originalFilename)
-        val response = vedleggWebClient
+        val response = fileWebClient
             .post()
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
@@ -94,7 +94,7 @@ class VedleggService(
 
         logger.debug("Getting attachment from file store. VedleggId: {}, ref: {}", vedleggId, vedlegg.ref)
 
-        return vedleggWebClient
+        return fileWebClient
             .get()
             .uri("/" + vedlegg.ref)
             .retrieve()

@@ -57,7 +57,7 @@ spec:
         - host: {{host}}
         {{/each}}
       rules:
-        - application: klage-vedlegg-api
+        - application: klage-file-api
         - application: clamav
           namespace: clamav
   envFrom:
