@@ -15,6 +15,7 @@ import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 @Service
 @Transactional
@@ -71,15 +72,17 @@ class KlageService(
         klageRepository.deleteKlage(klageId)
     }
 
-    fun finalizeKlage(klageId: Int, bruker: Bruker) {
+    fun finalizeKlage(klageId: Int, bruker: Bruker): Instant {
         val existingKlage = klageRepository.getKlageById(klageId)
         existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
         existingKlage.status = DONE
-        klageRepository.updateKlage(existingKlage)
-        kafkaProducer.sendToKafka(createAggregatedKlage(bruker, existingKlage))
-        klageMetrics.incrementKlagerFinalized(existingKlage.tema.toString())
-        vedleggMetrics.registerNumberOfVedleggPerUser(existingKlage.vedlegg.size.toDouble())
+        val updatedKlage = klageRepository.updateKlage(existingKlage)
+        kafkaProducer.sendToKafka(createAggregatedKlage(bruker, updatedKlage))
+        klageMetrics.incrementKlagerFinalized(updatedKlage.tema.toString())
+        vedleggMetrics.registerNumberOfVedleggPerUser(updatedKlage.vedlegg.size.toDouble())
+
+        return updatedKlage.modifiedByUser ?: throw RuntimeException("No modified date after finalize klage")
     }
 
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true) =
