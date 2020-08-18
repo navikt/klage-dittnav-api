@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -120,7 +123,7 @@ class KlageController(
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlage(
         @PathVariable klageId: Int
-    ) {
+    ): Map<String, LocalDate> {
         val bruker = brukerService.getBruker()
         logger.debug("Finalize klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -128,7 +131,8 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        klageService.finalizeKlage(klageId, bruker)
+        val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
+        return mapOf("finalizedDate" to ZonedDateTime.ofInstant(finalizedInstant, ZoneOffset.UTC).toLocalDate())
     }
 
     @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
