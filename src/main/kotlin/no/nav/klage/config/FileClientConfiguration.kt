@@ -8,13 +8,13 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class VedleggClientConfiguration(private val webClientBuilder: WebClient.Builder) {
+class FileClientConfiguration(private val webClientBuilder: WebClient.Builder) {
 
-    @Value("\${ATTACHMENT_BASE_URL}")
+    @Value("\${FILE_BASE_URL}")
     private lateinit var url: String
 
     @Bean
-    fun vedleggWebClient(): WebClient =
+    fun fileWebClient(): WebClient =
         webClientBuilder
             .baseUrl(url)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
