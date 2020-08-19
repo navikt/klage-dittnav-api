@@ -33,3 +33,11 @@ spec:
       expr: (100 * (sum by (backend) (rate(traefik_backend_requests_total{code=~"^4\\d\\d", backend=~"klage-dittnav-api*"}[3m])) / sum by (backend) (rate(traefik_backend_requests_total{backend=~"klage-dittnav-api*"}[3m])))) > 10
       for: 3m
       action: "Check the logs to see why \{{ $labels.backend }} returns error responses."
+    - alert: Klage initialized
+      expr: increase(klager_initialized_total [1m])
+      for: 1m
+      action: "New klage initialized"
+    - alert: Klage finalized
+      expr: increase(klager_finalized_total [1m])
+      for: 1m
+      action: "New klage finalized"
