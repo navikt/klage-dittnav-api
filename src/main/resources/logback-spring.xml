@@ -47,5 +47,6 @@
     </springProfile>
 
     <logger name="no.nav.klage" level="debug"/>
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
 
 </configuration>
