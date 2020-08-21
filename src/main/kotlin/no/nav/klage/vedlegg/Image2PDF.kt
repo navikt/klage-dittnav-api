@@ -27,16 +27,15 @@ class Image2PDF {
     private val A4: PDRectangle = PDRectangle.A4
 
     fun convert(bytes: ByteArray): ByteArray {
-        val mediaType = MediaType.valueOf(Tika().detect(bytes))
+        val mediaType = valueOf(Tika().detect(bytes))
         if (APPLICATION_PDF == mediaType) {
             return bytes
         }
         if (validImageTypes(mediaType)) {
             return embedImageInPDF(mediaType.subtype, bytes)
         }
-        val exception =
-            AttachmentCouldNotBeConvertedException("mediaType could not be converted: $mediaType")
-        logger.warn("User tried to upload an unsupported file type", exception)
+        val exception = AttachmentCouldNotBeConvertedException()
+        logger.warn("User tried to upload an unsupported file type: $mediaType", exception)
         throw exception
     }
 
