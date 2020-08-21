@@ -1,5 +1,6 @@
 package no.nav.klage.vedlegg
 
+import no.nav.klage.domain.exception.AttachmentCouldNotBeConvertedException
 import no.nav.klage.util.getLogger
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
@@ -33,7 +34,10 @@ class Image2PDF {
         if (validImageTypes(mediaType)) {
             return embedImageInPDF(mediaType.subtype, bytes)
         }
-        throw RuntimeException("mediaType could not be converted: $mediaType")
+        val exception =
+            AttachmentCouldNotBeConvertedException("mediaType could not be converted: $mediaType")
+        logger.warn("User tried to upload an unsupported file type", exception)
+        throw exception
     }
 
     private fun embedImageInPDF(imgType: String, image: ByteArray): ByteArray {
