@@ -57,7 +57,7 @@ class KlageService(
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView(bruker).also {
             klageMetrics.incrementKlagerInitialized()
-            val klageIdAsString = klage.id.toString()
+            val klageIdAsString = it.id.toString()
             slackClient.postMessage(
                 String.format(
                     "Klage med id <%s|%s> er påbegynt.",
