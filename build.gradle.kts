@@ -11,9 +11,19 @@ val pdfboxVersion = "2.0.19"
 val tikaVersion = "1.24.1"
 val springSleuthVersion = "2.2.3.RELEASE"
 
+val githubUser: String by project
+val githubPassword: String by project
+
 repositories {
     mavenCentral()
     maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/simple-slack-poster")
+        credentials {
+            username = githubUser
+            password = githubPassword
+        }
+    }
     jcenter()
 }
 
@@ -53,6 +63,8 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
+
+    implementation("no.nav.slackposter:simple-slack-poster:5")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
