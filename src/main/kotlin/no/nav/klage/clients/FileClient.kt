@@ -33,6 +33,7 @@ class FileClient(private val fileWebClient: WebClient) {
         bodyBuilder.part("file", vedleggFile).filename(originalFilename)
         val response = fileWebClient
             .post()
+            .uri { it.path("/attachment").build() }
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
             .bodyToMono<VedleggResponse>()
@@ -57,7 +58,7 @@ class FileClient(private val fileWebClient: WebClient) {
     fun deleteVedleggFile(vedleggRef: String): Boolean {
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
         val deletedInFileStore = fileWebClient.delete()
-            .uri{ it.path("/attachment/{id}").build(vedleggRef)}
+            .uri { it.path("/attachment/{id}").build(vedleggRef) }
             .retrieve()
             .bodyToMono<Boolean>()
             .block()
