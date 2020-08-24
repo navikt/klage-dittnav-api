@@ -34,10 +34,12 @@ spec:
       for: 3m
       action: "Check the logs to see why \{{ $labels.backend }} returns error responses."
     - alert: Klage initialized
-      expr: increase(klager_initialized_total [1m])
+      severity: good
+      expr: increase(klager_initialized_total [2m]) > 0
       for: 1m
       action: "New klage initialized"
     - alert: Klage finalized
-      expr: increase(klager_finalized_total [1m])
+      severity: good
+      expr: increase(klager_finalized_total [2m]) > 0
       for: 1m
       action: "New klage finalized"

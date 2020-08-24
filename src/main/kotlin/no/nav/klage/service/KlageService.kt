@@ -14,6 +14,8 @@ import no.nav.klage.domain.klage.validateAccess
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
+import no.nav.slackposter.Kibana
+import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -26,6 +28,7 @@ class KlageService(
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: KafkaProducer,
     private val vedleggService: VedleggService,
+    private val slackClient: SlackClient,
     private val fileClient: FileClient
 ) {
 
@@ -56,6 +59,14 @@ class KlageService(
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView(bruker).also {
             klageMetrics.incrementKlagerInitialized()
+            val klageIdAsString = it.id.toString()
+            slackClient.postMessage(
+                String.format(
+                    "Klage med id <%s|%s> er påbegynt.",
+                    Kibana.createUrl(klageIdAsString),
+                    klageIdAsString
+                )
+            )
         }
     }
 
@@ -83,6 +94,15 @@ class KlageService(
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, updatedKlage))
         klageMetrics.incrementKlagerFinalized(updatedKlage.tema.toString())
         vedleggMetrics.registerNumberOfVedleggPerUser(updatedKlage.vedlegg.size.toDouble())
+
+        val klageIdAsString = klageId.toString()
+        slackClient.postMessage(
+            String.format(
+                "Klage med id <%s|%s> er sendt inn.",
+                Kibana.createUrl(klageIdAsString),
+                klageIdAsString
+            )
+        )
 
         return updatedKlage.modifiedByUser ?: throw RuntimeException("No modified date after finalize klage")
     }

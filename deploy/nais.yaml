@@ -64,6 +64,8 @@ spec:
     - secret: srvklage-dittnav
     - secret: sts-apikey
     - secret: pdl-apikey
+    - secret: slack-url
+    - secret: slack-channel-id
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
