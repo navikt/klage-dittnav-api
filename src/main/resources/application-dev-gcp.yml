@@ -27,7 +27,7 @@ SERVICE_USER_USERNAME: srvklage-dittnav
 
 CLAM_AV_URL: http://clamav.clamav/scan
 
-FILE_BASE_URL: http://klage-file-api/attachment
+FILE_BASE_URL: http://klage-file-api
 
 #These are read from the environment:
 #DB_HOST
