@@ -213,13 +213,9 @@ class KlageController(
 
         val content = klageService.getKlagePdf(klageId, bruker)
 
-        val current = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val formatted = current.format(formatter)
-
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage-$formatted.pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage.pdf")
         return ResponseEntity(
             content,
             responseHeaders,
