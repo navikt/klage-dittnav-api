@@ -40,4 +40,8 @@ PDL_APIKEY: test
 AZURE_APP_WELL_KNOWN_URL: https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0/.well-known/openid-configuration
 AZURE_APP_CLIENT_ID: test
 
+SLACK_URL: http://localhost
+SLACK_CHANNEL_ID: test
+NAIS_CLUSTER_NAME: local
+
 
