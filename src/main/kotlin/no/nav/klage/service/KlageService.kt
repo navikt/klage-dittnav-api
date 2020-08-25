@@ -1,5 +1,6 @@
 package no.nav.klage.service
 
+import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
@@ -27,7 +28,8 @@ class KlageService(
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: KafkaProducer,
     private val vedleggService: VedleggService,
-    private val slackClient: SlackClient
+    private val slackClient: SlackClient,
+    private val fileClient: FileClient
 ) {
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
@@ -103,6 +105,13 @@ class KlageService(
         )
 
         return updatedKlage.modifiedByUser ?: throw RuntimeException("No modified date after finalize klage")
+    }
+
+    fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer, false)
+        requireNotNull(existingKlage.journalpostId)
+        return fileClient.getKlageFile(existingKlage.journalpostId)
     }
 
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true) =

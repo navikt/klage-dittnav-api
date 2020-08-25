@@ -32,7 +32,7 @@ SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
 
 CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan
 
-FILE_BASE_URL: http://localhost:7080/attachment
+FILE_BASE_URL: http://localhost:7080
 
 STS_APIKEY: test
 PDL_APIKEY: test

@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -140,9 +142,14 @@ class KlageController(
         @PathVariable klageId: Int,
         @RequestParam vedlegg: MultipartFile
     ): VedleggView {
-        logger.debug("Add vedlegg to klage is requested. KlageId: {}", klageId)
-        val temporaryVedlegg = vedleggService.addVedlegg(klageId, vedlegg)
         val bruker = brukerService.getBruker()
+        logger.debug("Add vedlegg to klage is requested. KlageId: {}", klageId)
+        secureLogger.debug(
+            "Add Vedlegg to klage is requested. KlageId: {}, fnr: {} ",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val temporaryVedlegg = vedleggService.addVedlegg(klageId, vedlegg, bruker)
         return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
     }
 
@@ -151,8 +158,15 @@ class KlageController(
         @PathVariable klageId: Int,
         @PathVariable vedleggId: Int
     ) {
+        val bruker = brukerService.getBruker()
         logger.debug("Delete vedlegg from klage is requested. KlageId: {}, VedleggId: {}", klageId, vedleggId)
-        if (!vedleggService.deleteVedlegg(klageId, vedleggId)) {
+        secureLogger.debug(
+            "Delete vedlegg from klage is requested. KlageId: {}, vedleggId: {}, fnr: {} ",
+            klageId,
+            vedleggId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        if (!vedleggService.deleteVedlegg(klageId, vedleggId, bruker)) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment not found.")
         }
     }
@@ -183,6 +197,32 @@ class KlageController(
             HttpStatus.OK
         )
     }
+
+    @ResponseBody
+    @GetMapping("/klager/{klageId}/pdf")
+    fun getKlagePdf(
+        @PathVariable klageId: Int
+    ): ResponseEntity<ByteArray> {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get klage pdf is requested. KlageId: {}", klageId)
+        secureLogger.debug(
+            "Get klage pdf is requested. KlageId: {}, fnr: {} ",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+
+        val content = klageService.getKlagePdf(klageId, bruker)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
+    }
+
 
     @GetMapping("/vedtak")
     fun getVedtak(): List<Vedtak> {

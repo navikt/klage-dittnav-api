@@ -37,7 +37,4 @@ class VedleggRepository {
         logger.debug("Deleting vedlegg metadata from db. VedleggId: {}", vedleggId)
         VedleggDAO.findById(vedleggId)?.delete()
     }
-
 }
-
-data class VedleggResponse(val id: String)
