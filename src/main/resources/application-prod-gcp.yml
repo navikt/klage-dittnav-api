@@ -31,6 +31,8 @@ CLAM_AV_URL: http://clamav.clamav/scan
 
 FILE_BASE_URL: http://klage-file-api
 
+KLAGE_FILE_API_CLIENT_ID: 877b5cc3-89e9-4822-b7b1-ca6749ef7cd0
+
 #These are read from the environment:
 #DB_HOST
 #DB_USERNAME

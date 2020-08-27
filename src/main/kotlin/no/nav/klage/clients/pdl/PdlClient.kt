@@ -1,6 +1,6 @@
 package no.nav.klage.clients.pdl
 
-import no.nav.klage.clients.sts.StsClient
+import no.nav.klage.clients.StsClient
 import no.nav.klage.util.TokenUtil
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
