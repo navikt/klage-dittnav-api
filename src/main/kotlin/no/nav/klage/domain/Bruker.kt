@@ -5,7 +5,8 @@ data class Bruker
     val navn: Navn,
     val adresse: Adresse?,
     val kontaktinformasjon: Kontaktinformasjon?,
-    val folkeregisteridentifikator: Identifikator
+    val folkeregisteridentifikator: Identifikator,
+    val tokenExpires: Long? = null
 )
 
 data class Identifikator(

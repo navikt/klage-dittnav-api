@@ -6,6 +6,7 @@ import io.mockk.mockk
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.*
 import no.nav.klage.domain.Navn
+import no.nav.klage.util.TokenUtil
 import no.nav.pam.geography.PostDataDAO
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,7 +16,8 @@ import org.junit.jupiter.api.Test
 internal class BrukerServiceTest {
     private val pdlClient: PdlClient = mockk()
     private val postDataDAO: PostDataDAO = mockk()
-    private val brukerService = BrukerService(pdlClient)
+    private val tokenUtil: TokenUtil = mockk()
+    private val brukerService = BrukerService(pdlClient, tokenUtil)
     private val fornavn = "Fornavn"
     private val mellomnavn = "Mellomnavn"
     private val etternavn = "Etternavn"
@@ -186,11 +188,13 @@ internal class BrukerServiceTest {
     fun `should convert from pdl format to Bruker object`() {
         every { pdlClient.getPersonInfo() } returns hentPdlPersonResponse
         every { postDataDAO.findPostData(any()).get().city } returns poststed
+        every { tokenUtil.getExpiry() } returns 1
         val expectedOutput = Bruker(
             Navn(fornavn, mellomnavn, etternavn),
             Adresse(adressenavn, postnummer, poststed, husnummer, husbokstav),
             Kontaktinformasjon("$landskode $nummer", null),
-            Identifikator(idType, folkeregisteridentifikator)
+            Identifikator(idType, folkeregisteridentifikator),
+            1
         )
         val output: Bruker = brukerService.getBruker()
         assertEquals(expectedOutput, output)

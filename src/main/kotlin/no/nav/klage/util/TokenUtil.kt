@@ -17,5 +17,8 @@ class TokenUtil(private val ctxHolder: TokenValidationContextHolder) {
         val token = ctxHolder.tokenValidationContext?.getJwtToken(issuer)?.tokenAsString
         return checkNotNull(token) { "Token must be present" }
     }
+
+    fun getExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
+
 }
 
