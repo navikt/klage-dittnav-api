@@ -4,11 +4,15 @@ import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
+import no.nav.klage.util.TokenUtil
 import no.nav.pam.geography.PostDataDAO
 import org.springframework.stereotype.Service
 
 @Service
-class BrukerService(private val pdlClient: PdlClient) {
+class BrukerService(
+    private val pdlClient: PdlClient,
+    private val tokenUtil: TokenUtil
+) {
 
     private val postDataDAO = PostDataDAO()
 
@@ -36,7 +40,8 @@ class BrukerService(private val pdlClient: PdlClient) {
             navn = pdlNavn.toBrukerNavn(),
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
-            folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator()
+            folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator(),
+            tokenExpires = tokenUtil.getExpiry()
         )
     }
 
