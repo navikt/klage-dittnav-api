@@ -44,4 +44,6 @@ SLACK_URL: http://localhost
 SLACK_CHANNEL_ID: test
 NAIS_CLUSTER_NAME: local
 
+KLAGE_FILE_API_CLIENT_ID: none
+
 

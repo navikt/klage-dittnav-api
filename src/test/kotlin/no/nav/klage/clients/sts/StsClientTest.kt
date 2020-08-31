@@ -1,5 +1,6 @@
 package no.nav.klage.clients.sts
 
+import no.nav.klage.clients.StsClient
 import no.nav.klage.clients.createShortCircuitWebClient
 import no.nav.klage.clients.createShortCircuitWebClientQueued
 import org.intellij.lang.annotations.Language

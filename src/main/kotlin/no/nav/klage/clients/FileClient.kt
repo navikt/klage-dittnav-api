@@ -1,6 +1,7 @@
 package no.nav.klage.clients
 
 import no.nav.klage.util.getLogger
+import org.springframework.http.HttpHeaders
 import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
@@ -8,7 +9,10 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
-class FileClient(private val fileWebClient: WebClient) {
+class FileClient(
+    private val fileWebClient: WebClient,
+    private val azureADClient: AzureADClient
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -20,6 +24,7 @@ class FileClient(private val fileWebClient: WebClient) {
 
         return fileWebClient.get()
             .uri { it.path("/klage/{id}").build(journalpostId) }
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Klage file could not be fetched")
@@ -34,6 +39,7 @@ class FileClient(private val fileWebClient: WebClient) {
         val response = fileWebClient
             .post()
             .uri { it.path("/attachment").build() }
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
             .bodyToMono<VedleggResponse>()
@@ -50,6 +56,7 @@ class FileClient(private val fileWebClient: WebClient) {
         logger.debug("Fetching vedlegg file with vedlegg ref {}", vedleggRef)
         return fileWebClient.get()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
@@ -59,6 +66,7 @@ class FileClient(private val fileWebClient: WebClient) {
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
         val deletedInFileStore = fileWebClient.delete()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .bodyToMono<Boolean>()
             .block()
