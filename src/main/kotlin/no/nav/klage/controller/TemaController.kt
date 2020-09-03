@@ -26,7 +26,7 @@ class TemaController {
             logger.warn("Trying to get tema with illegal code: $code", iae)
             ResponseEntity.notFound().build()
         } catch (e: Exception) {
-            logger.error("Could not get tema. Tema was: $code", e)
+            logger.error("Unexpected exception. Could not get tema with code: $code", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
