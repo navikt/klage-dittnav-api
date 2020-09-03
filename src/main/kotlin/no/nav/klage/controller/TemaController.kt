@@ -23,10 +23,10 @@ class TemaController {
         return try {
             ResponseEntity.ok(Tema.valueOf(code).toResponse())
         } catch (iae: IllegalArgumentException) {
-            logger.warn("Trying to get tema with illegal code", iae)
+            logger.warn("Trying to get tema with illegal code: $code", iae)
             ResponseEntity.notFound().build()
         } catch (e: Exception) {
-            logger.error("Could not get tema", e)
+            logger.error("Could not get tema. Tema was: $code", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
