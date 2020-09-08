@@ -59,6 +59,7 @@ class KlageService(
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView(bruker).also {
             klageMetrics.incrementKlagerInitialized()
+            klageMetrics.incrementReferrer(klage.referrer ?: "none")
             val klageIdAsString = it.id.toString()
             slackClient.postMessage(
                 String.format(
