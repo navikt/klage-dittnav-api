@@ -60,14 +60,6 @@ class KlageService(
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView(bruker).also {
             klageMetrics.incrementKlagerInitialized()
             klageMetrics.incrementReferrer(if (klage.referrer.isNullOrBlank()) "none" else klage.referrer)
-            val klageIdAsString = it.id.toString()
-            slackClient.postMessage(
-                String.format(
-                    "Klage med id <%s|%s> er påbegynt.",
-                    Kibana.createUrl(klageIdAsString),
-                    klageIdAsString
-                )
-            )
         }
     }
 
