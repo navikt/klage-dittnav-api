@@ -56,6 +56,8 @@ spec:
         {{#each externalHosts as |host|}}
         - host: {{host}}
         {{/each}}
+        - host: login.microsoftonline.com
+        - host: hooks.slack.com
       rules:
         - application: klage-file-api
         - application: clamav
