@@ -75,8 +75,8 @@ dependencies {
     testImplementation("org.springframework:spring-mock:2.0.8")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
-        exclude(group = "org.mockito")
     }
+    testImplementation("org.mockito:mockito-inline:2.13.0")
 }
 
 idea {

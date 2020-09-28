@@ -15,29 +15,31 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class PdlClient(
-        private val pdlWebClient: WebClient,
-        private val tokenUtil: TokenUtil,
-        private val stsClient: StsClient,
-        private val slackClient: SlackClient,
-        private val retryPdl: Retry
+    private val pdlWebClient: WebClient,
+    private val tokenUtil: TokenUtil,
+    private val stsClient: StsClient,
+    private val slackClient: SlackClient,
+    private val retryPdl: Retry
 ) {
 
     fun getPersonInfo(): HentPdlPersonResponse {
         var results = HentPdlPersonResponse(null, null)
 
-        retryPdl.executeFunction {
-            runCatching {
-                results = pdlWebClient.post()
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken()}")
-                        .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
-                        .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
-                        .retrieve()
-                        .bodyToMono<HentPdlPersonResponse>()
-                        .block() ?: throw RuntimeException("Person not found")
+        runCatching {
+            retryPdl.executeFunction {
 
-            }.onFailure {
-                slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+                results = pdlWebClient.post()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken()}")
+                    .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
+                    .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
+                    .retrieve()
+                    .bodyToMono<HentPdlPersonResponse>()
+                    .block() ?: throw RuntimeException("Person not found")
+
             }
+        }.onFailure {
+            slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+            throw RuntimeException("PDL could not be reached")
         }
 
         return results

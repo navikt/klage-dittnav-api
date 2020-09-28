@@ -14,9 +14,9 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class StsClient(
-        private val stsWebClient: WebClient,
-        private val slackClient: SlackClient,
-        private val retrySts: Retry
+    private val stsWebClient: WebClient,
+    private val slackClient: SlackClient,
+    private val retrySts: Retry
 ) {
 
     private var cachedOidcToken: OidcToken? = null
@@ -30,22 +30,22 @@ class StsClient(
 
         if (cachedOidcToken.shouldBeRenewed()) {
             logger.debug("Getting token from STS")
-
-            retrySts.executeFunction {
-                runCatching {
+            runCatching {
+                retrySts.executeFunction {
                     cachedOidcToken = stsWebClient.get()
-                            .uri { uriBuilder ->
-                                uriBuilder
-                                        .queryParam("grant_type", "client_credentials")
-                                        .queryParam("scope", "openid")
-                                        .build()
-                            }
-                            .retrieve()
-                            .bodyToMono<OidcToken>()
-                            .block()
-                }.onFailure {
-                    slackClient.postMessage("Kontakt med sts feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+                        .uri { uriBuilder ->
+                            uriBuilder
+                                .queryParam("grant_type", "client_credentials")
+                                .queryParam("scope", "openid")
+                                .build()
+                        }
+                        .retrieve()
+                        .bodyToMono<OidcToken>()
+                        .block()
                 }
+            }.onFailure {
+                slackClient.postMessage("Kontakt med sts feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+                throw RuntimeException("STS could not be reached")
             }
         }
 

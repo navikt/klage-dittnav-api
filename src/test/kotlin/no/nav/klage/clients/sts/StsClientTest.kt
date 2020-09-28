@@ -4,12 +4,17 @@ import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.RetryConfig
 import io.github.resilience4j.retry.RetryRegistry
 import no.nav.klage.clients.StsClient
+import no.nav.klage.clients.createFailingWebClient
 import no.nav.klage.clients.createShortCircuitWebClient
 import no.nav.klage.clients.createShortCircuitWebClientQueued
+import no.nav.slackposter.Severity
 import no.nav.slackposter.SlackClient
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
+import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 
@@ -21,7 +26,7 @@ class StsClientTest {
     private val retryConfig: RetryConfig = RetryConfig
             .custom<RetryConfig>()
             .maxAttempts(5)
-            .waitDuration(Duration.ofSeconds(3))
+            .waitDuration(Duration.ofMillis(1))
             .retryExceptions(RuntimeException::class.java)
             .build()
 
@@ -58,6 +63,33 @@ class StsClientTest {
         assertEquals(token1, token2)
     }
 
+    @Test
+    fun `should post to slack client when sts call fails`() {
+        val webClient = createFailingWebClient()
+        val mockedSlackClient = mock(SlackClient::class.java)
+        val stsClient = StsClient(webClient, mockedSlackClient, retrySts)
+
+        assertThrows(RuntimeException::class.java) {
+            stsClient.oidcToken()
+        }
+
+        verify(mockedSlackClient, times(1)).postMessage(anyString(), any(Severity::class.java))
+    }
+
+    @Test
+    fun `should retry sts call 5 times on error`() {
+        val webClient = spy(createFailingWebClient())
+        val mockedSlackClient = mock(SlackClient::class.java)
+        val stsClient = StsClient(webClient, mockedSlackClient, retrySts)
+
+        assertThrows(RuntimeException::class.java) {
+            stsClient.oidcToken()
+        }
+
+        verify(webClient, times(5)).get()
+    }
+
+
     @Language("json")
     private val defaultToken = """
         {
@@ -75,4 +107,6 @@ class StsClientTest {
           "expires_in": 1
         }
     """.trimIndent()
+
+    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 }
