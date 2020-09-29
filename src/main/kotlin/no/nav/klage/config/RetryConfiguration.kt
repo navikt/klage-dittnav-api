@@ -10,18 +10,25 @@ import java.time.Duration
 @Configuration
 class RetryConfiguration {
 
-    private val retryConfig: RetryConfig = RetryConfig
+    private val stsRetryConfig: RetryConfig = RetryConfig
         .custom<RetryConfig>()
         .maxAttempts(5)
         .waitDuration(Duration.ofSeconds(3))
         .retryExceptions(RuntimeException::class.java)
         .build()
 
-    private val retryRegistry = RetryRegistry.of(retryConfig)
+    private val pdlRetryConfig: RetryConfig = RetryConfig
+        .custom<RetryConfig>()
+        .maxAttempts(2)
+        .waitDuration(Duration.ofSeconds(3))
+        .retryExceptions(RuntimeException::class.java)
+        .build()
+
+    private val retryRegistry = RetryRegistry.of(mapOf("sts" to stsRetryConfig, "pdl" to pdlRetryConfig))
 
     @Bean
-    fun retrySts(): Retry = retryRegistry.retry("STS")
+    fun retrySts(): Retry = retryRegistry.retry("STS", stsRetryConfig)
 
     @Bean
-    fun retryPdl(): Retry = retryRegistry.retry("PDL")
+    fun retryPdl(): Retry = retryRegistry.retry("PDL", pdlRetryConfig)
 }
