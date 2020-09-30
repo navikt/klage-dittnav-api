@@ -10,6 +10,7 @@ val logstashVersion = "5.1"
 val pdfboxVersion = "2.0.19"
 val tikaVersion = "1.24.1"
 val springSleuthVersion = "2.2.3.RELEASE"
+val resilience4jVersion = "1.5.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -52,6 +53,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.postgresql:postgresql")
 
+    implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
+    implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
+
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
@@ -71,8 +75,8 @@ dependencies {
     testImplementation("org.springframework:spring-mock:2.0.8")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
-        exclude(group = "org.mockito")
     }
+    testImplementation("org.mockito:mockito-inline:2.13.0")
 }
 
 idea {

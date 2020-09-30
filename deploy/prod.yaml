@@ -1,5 +1,4 @@
 ingress: https://klage-dittnav-api.nav.no
 externalHosts:
   - api-gw.oera.no
-  - hooks.slack.com
 springProfile: prod-gcp
