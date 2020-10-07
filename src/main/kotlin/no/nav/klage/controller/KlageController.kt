@@ -95,7 +95,7 @@ class KlageController(
         @PathVariable klageId: Int,
         @RequestBody klage: KlageView,
         response: HttpServletResponse
-    ): KlageView {
+    ) {
         val bruker = brukerService.getBruker()
         logger.debug("Update klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -106,7 +106,7 @@ class KlageController(
         if (klage.id != klageId) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "id in klage does not match resource id")
         }
-        return klageService.updateKlage(klage, bruker)
+        klageService.updateKlage(klage, bruker)
     }
 
     @DeleteMapping("/klager/{klageId}")

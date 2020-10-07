@@ -40,9 +40,8 @@ docker-compose down
 ### Kontakt med PDL
 
 For å få kontakt med PDL er det nødvendig med et autorisasjons-token fra STS (Security Token Service). I disse kallene
-settes to headere, `Authorization` og `Nav-Consumer-Token`. Når vi får på plass personlig innlogging skal dette tokenet
-settes i `Authorization`, mens det er STS-tokenet som skal i den andre. Inntil videre kan vi bruke STS-token i begge 
-headere. 
+settes to headere, `Authorization` og `Nav-Consumer-Token`. Her settes token fra innlogget bruker i `Authorization`, 
+mens det er STS-tokenet som skal i den andre. 
 
 #### Windows-spesifikt
 

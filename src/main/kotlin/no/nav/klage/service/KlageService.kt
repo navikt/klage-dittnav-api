@@ -63,12 +63,12 @@ class KlageService(
         }
     }
 
-    fun updateKlage(klage: KlageView, bruker: Bruker): KlageView {
+    fun updateKlage(klage: KlageView, bruker: Bruker) {
         val klageId = klage.id
         val existingKlage = klageRepository.getKlageById(klageId)
         existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
-        return klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView(bruker, false)
+        klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView(bruker, false)
     }
 
     fun deleteKlage(klageId: Int, bruker: Bruker) {
