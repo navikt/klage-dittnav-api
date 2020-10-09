@@ -17,6 +17,7 @@
         <root level="info">
             <appender-ref ref="text"/>
         </root>
+        <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
     </springProfile>
 
     <springProfile name="!local">
@@ -44,9 +45,11 @@
         <root level="info">
             <appender-ref ref="json"/>
         </root>
+        <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug" additivity="false">
+            <appender-ref ref="secureJson"/>
+        </logger>
     </springProfile>
 
     <logger name="no.nav.klage" level="debug"/>
-    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
 
 </configuration>
