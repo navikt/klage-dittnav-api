@@ -10,6 +10,7 @@ import no.nav.klage.util.TokenUtil
 import no.nav.pam.geography.PostDataDAO
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -37,6 +38,8 @@ internal class BrukerServiceTest {
     private val hentPdlPersonResponseWithMissingNavn: HentPdlPersonResponse = createPdlPersonResponseWithMissingNavn()
     private val hentPdlPersonResponseWithMissingFolkeregisteridentifikator: HentPdlPersonResponse =
         createPdlPersonResponseWithMissingFolkeregisteridentifikator()
+    private val hentPdlPersonResponseWithWrongPostnummer: HentPdlPersonResponse =
+        createPdlPersonResponseWithWrongPostnummer()
 
     private fun createFullPdlPersonResponse(): HentPdlPersonResponse {
         return HentPdlPersonResponse(
@@ -179,6 +182,57 @@ internal class BrukerServiceTest {
         )
     }
 
+    private fun createPdlPersonResponseWithWrongPostnummer(): HentPdlPersonResponse {
+        return HentPdlPersonResponse(
+            HentPerson(
+                Person(
+                    emptyList(),
+                    listOf(
+                        no.nav.klage.clients.pdl.Navn(
+                            fornavn,
+                            mellomnavn,
+                            etternavn
+                        )
+                    ),
+                    listOf(
+                        Bostedsadresse(
+                            null,
+                            null,
+                            VegAdresse(
+                                null,
+                                husnummer,
+                                husbokstav,
+                                null,
+                                adressenavn,
+                                null,
+                                null,
+                                "9999",
+                                null
+                            ),
+                            null,
+                            null
+                        )
+                    ),
+                    listOf(
+                        Telefonnummer(
+                            landskode,
+                            nummer,
+                            null
+                        )
+                    ),
+                    listOf(
+                        Folkeregisteridentifikator(
+                            folkeregisteridentifikator,
+                            idType,
+                            status
+                        )
+                    )
+                )
+            ),
+            null
+        )
+    }
+
     @BeforeEach
     fun init() {
         clearAllMocks()
@@ -203,6 +257,7 @@ internal class BrukerServiceTest {
     @Test
     fun `should throw exception when name is missing from PDL`() {
         every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithMissingNavn
+        every { tokenUtil.getExpiry() } returns 1
 
         val exception = Assertions.assertThrows(IllegalStateException::class.java) {
             brukerService.getBruker()
@@ -212,8 +267,19 @@ internal class BrukerServiceTest {
     }
 
     @Test
+    fun `should handle exception from pam-geography`() {
+        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithWrongPostnummer
+        every { tokenUtil.getExpiry() } returns 1
+
+        val output: Bruker = brukerService.getBruker()
+
+        assertNull(output.adresse?.poststed)
+    }
+
+    @Test
     fun `should throw exception when folkeregisteridentifikator is missing from PDL`() {
         every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithMissingFolkeregisteridentifikator
+        every { tokenUtil.getExpiry() } returns 1
 
         val exception = Assertions.assertThrows(IllegalStateException::class.java) {
             brukerService.getBruker()

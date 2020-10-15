@@ -56,13 +56,23 @@ class BrukerService(
         etternavn = etternavn
     )
 
-    private fun VegAdresse.toBrukerAdresse() = Adresse(
-        adressenavn = adressenavn,
-        postnummer = postnummer,
-        poststed = postDataDAO.findPostData(postnummer).get().city,
-        husnummer = husnummer,
-        husbokstav = husbokstav
-    )
+    private fun VegAdresse.toBrukerAdresse() = try {
+        Adresse(
+                adressenavn = adressenavn,
+                postnummer = postnummer,
+                poststed = postDataDAO.findPostData(postnummer).get().city,
+                husnummer = husnummer,
+                husbokstav = husbokstav
+        )
+    } catch (e: NoSuchElementException) {
+        Adresse(
+                adressenavn = adressenavn,
+                postnummer = postnummer,
+                poststed = null,
+                husnummer = husnummer,
+                husbokstav = husbokstav
+        )
+    }
 
     private fun Telefonnummer.toKontaktinformasjon() = no.nav.klage.domain.Kontaktinformasjon(
         telefonnummer = "$landskode $nummer",
