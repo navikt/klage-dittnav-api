@@ -58,11 +58,11 @@ class BrukerService(
 
     private fun VegAdresse.toBrukerAdresse() =
         Adresse(
-                adressenavn = adressenavn,
-                postnummer = postnummer,
-                poststed = postDataDAO.findPostData(postnummer).orElse(null)?.city,
-                husnummer = husnummer,
-                husbokstav = husbokstav
+            adressenavn = adressenavn,
+            postnummer = postnummer,
+            poststed = postDataDAO.findPostData(postnummer).orElse(null)?.city,
+            husnummer = husnummer,
+            husbokstav = husbokstav
         )
 
     private fun Telefonnummer.toKontaktinformasjon() = no.nav.klage.domain.Kontaktinformasjon(
