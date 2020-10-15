@@ -267,7 +267,7 @@ internal class BrukerServiceTest {
     }
 
     @Test
-    fun `should handle exception from pam-geography`() {
+    fun `should receive poststed null when missing in pam-geograaphy`() {
         every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithWrongPostnummer
         every { tokenUtil.getExpiry() } returns 1
 
