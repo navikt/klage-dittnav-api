@@ -1,6 +1,7 @@
 allowed.origins:
   https://klage-dittnav.dev.nav.no,
-  http://localhost:8080
+  http://localhost:8080,
+  http://localhost:3000
 
 
 logging:
