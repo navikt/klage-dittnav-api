@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 class TokenUtil(private val ctxHolder: TokenValidationContextHolder) {
 
-    private val issuer = "selvbetjening"
+    private val issuer = "tokenx"
 
     fun getSubject(): String {
         val subject = ctxHolder.tokenValidationContext?.getClaims(issuer)?.subject

@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx")
 class KlageController(
     private val brukerService: BrukerService,
     private val klageService: KlageService,
