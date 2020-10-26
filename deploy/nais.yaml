@@ -58,7 +58,7 @@ spec:
         {{#each externalHosts as |host|}}
         - host: {{host}}
         {{/each}}
-        - host: login.microsoftonline.com
+        - host: b2clogin.com
         - host: hooks.slack.com
       rules:
         - application: klage-file-api
