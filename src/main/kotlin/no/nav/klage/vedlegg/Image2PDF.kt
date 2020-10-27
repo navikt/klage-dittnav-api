@@ -76,7 +76,9 @@ class Image2PDF {
             PDPageContentStream(doc, page).use { contentStream ->
                 val xImage: PDImageXObject = PDImageXObject.createFromByteArray(doc, scaledImg, "img")
                 contentStream.drawImage(xImage, A4.lowerLeftX, A4.lowerLeftY)
+                contentStream.close()
             }
+            doc.close()
         } catch (ex: Exception) {
             throw RuntimeException("Converting attachment failed", ex)
         }
