@@ -78,7 +78,6 @@ class Image2PDF {
                 contentStream.drawImage(xImage, A4.lowerLeftX, A4.lowerLeftY)
                 contentStream.close()
             }
-            doc.close()
         } catch (ex: Exception) {
             throw RuntimeException("Converting attachment failed", ex)
         }
