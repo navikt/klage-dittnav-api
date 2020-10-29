@@ -114,6 +114,7 @@ class KlageService(
             tema,
             ytelse,
             vedtak,
+            status,
             saksnummer,
             vedlegg.map {
                 if (expandVedleggToVedleggView) {
