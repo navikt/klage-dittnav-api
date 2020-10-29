@@ -19,6 +19,8 @@ import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Service
 @Transactional
@@ -115,6 +117,7 @@ class KlageService(
             ytelse,
             vedtak,
             status,
+            ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime(),
             saksnummer,
             vedlegg.map {
                 if (expandVedleggToVedleggView) {
