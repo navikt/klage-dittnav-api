@@ -11,6 +11,7 @@ data class KlageView(
     val tema: Tema,
     val ytelse: String,
     val vedtak: String,
+    val status: KlageStatus = KlageStatus.DRAFT,
     val saksnummer: String? = null,
     val vedlegg: List<VedleggView> = listOf(),
     val journalpostId: String? = null,
