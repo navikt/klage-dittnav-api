@@ -16,11 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.time.*
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -134,7 +130,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
-        return mapOf("finalizedDate" to ZonedDateTime.ofInstant(finalizedInstant, ZoneOffset.UTC).toLocalDate())
+        return mapOf("finalizedDate" to ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo")).toLocalDate())
     }
 
     @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
