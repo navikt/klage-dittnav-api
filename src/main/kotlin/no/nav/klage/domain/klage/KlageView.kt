@@ -4,6 +4,10 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.domain.vedlegg.toVedlegg
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 data class KlageView(
     val id: Int,
@@ -11,6 +15,8 @@ data class KlageView(
     val tema: Tema,
     val ytelse: String,
     val vedtak: String,
+    val status: KlageStatus = KlageStatus.DRAFT,
+    val modifiedByUser: LocalDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/Oslo")).toLocalDateTime(),
     val saksnummer: String? = null,
     val vedlegg: List<VedleggView> = listOf(),
     val journalpostId: String? = null,
