@@ -61,7 +61,6 @@ class KlageService(
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView(bruker).also {
             klageMetrics.incrementKlagerInitialized()
-            klageMetrics.incrementReferrer(if (klage.referrer.isNullOrBlank()) "none" else klage.referrer)
         }
     }
 

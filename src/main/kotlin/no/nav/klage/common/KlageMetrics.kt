@@ -12,7 +12,6 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         private val logger = getLogger(javaClass.enclosingClass)
 
         private const val COUNTER_KLAGER_FINALIZED = "klager_finalized"
-        private const val COUNTER_KLAGER_REFERRER = "klager_referrer"
         private const val COUNTER_KLAGER_INITIALIZED = "klager_initialized"
     }
 
@@ -21,14 +20,6 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
             meterRegistry.counter(COUNTER_KLAGER_INITIALIZED).increment()
         } catch (e: Exception) {
             logger.warn("incrementKlagerInitialized failed", e)
-        }
-    }
-
-    fun incrementReferrer(referrer: String) {
-        try {
-            meterRegistry.counter(COUNTER_KLAGER_REFERRER, "referrer", referrer).increment()
-        } catch (e: Exception) {
-            logger.warn("incrementReferrer failed", e)
         }
     }
 
