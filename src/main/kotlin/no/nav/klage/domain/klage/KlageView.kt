@@ -17,8 +17,7 @@ data class KlageView(
     val saksnummer: String? = null,
     val vedlegg: List<VedleggView> = listOf(),
     val journalpostId: String? = null,
-    val finalizedDate: LocalDate? = null,
-    val referrer: String? = null
+    val finalizedDate: LocalDate? = null
 )
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
