@@ -4,10 +4,7 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.domain.vedlegg.toVedlegg
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 
 data class KlageView(
     val id: Int,
@@ -20,6 +17,7 @@ data class KlageView(
     val saksnummer: String? = null,
     val vedlegg: List<VedleggView> = listOf(),
     val journalpostId: String? = null,
+    val finalizedDate: LocalDate? = null,
     val referrer: String? = null
 )
 
