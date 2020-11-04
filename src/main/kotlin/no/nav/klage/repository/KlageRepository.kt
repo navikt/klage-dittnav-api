@@ -22,7 +22,7 @@ class KlageRepository {
     }
 
     fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw RuntimeException("Klage not found")
+        return KlageDAO.findById(id)?.toKlage() ?: throw NotFoundException("Klage not found")
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -67,6 +67,6 @@ class KlageRepository {
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
-        return KlageDAO.findById(checkNotNull(id)) ?: throw RuntimeException("Klage with id $id not found in db.")
+        return KlageDAO.findById(checkNotNull(id)) ?: throw NotFoundException("Klage with id $id not found in db.")
     }
 }

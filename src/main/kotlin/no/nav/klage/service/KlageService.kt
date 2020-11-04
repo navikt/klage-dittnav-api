@@ -111,7 +111,7 @@ class KlageService(
             )
         )
 
-        return updatedKlage.modifiedByUser ?: throw RuntimeException("No modified date after finalize klage")
+        return updatedKlage.modifiedByUser ?: throw ForbiddenException("No modified date after finalize klage")
     }
 
     fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
