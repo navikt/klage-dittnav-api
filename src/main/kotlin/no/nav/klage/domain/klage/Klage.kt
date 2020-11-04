@@ -1,9 +1,9 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.Tema
-import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
 import java.time.LocalDate
+import no.nav.klage.domain.Tema
+import no.nav.klage.domain.vedlegg.Vedlegg
 
 data class Klage(
     val id: Int? = null,
