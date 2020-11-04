@@ -5,19 +5,18 @@ import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.createAggregatedKlage
-import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
-import no.nav.klage.domain.klage.KlageView
-import no.nav.klage.domain.klage.toKlage
-import no.nav.klage.domain.klage.validateAccess
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.slackposter.Kibana
 import no.nav.slackposter.SlackClient
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -36,7 +35,9 @@ class KlageService(
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
         val klage = klageRepository.getKlageById(klageId)
-        klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
         return klage.toKlageView(bruker)
     }
 
@@ -48,7 +49,9 @@ class KlageService(
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
         val klage = klageRepository.getKlageById(klageId)
-        klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer, false)
+        if (!klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
         return klage.journalpostId
     }
 
@@ -61,21 +64,37 @@ class KlageService(
     fun updateKlage(klage: KlageView, bruker: Bruker) {
         val klageId = klage.id
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
+        if (existingKlage.isFinalized()) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Klage is already finalized.")
+        }
 
         klageRepository.updateKlage(klage.toKlage(bruker)).toKlageView(bruker, false)
     }
 
     fun deleteKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
+        if (existingKlage.isFinalized()) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Klage is already finalized.")
+        }
 
         klageRepository.deleteKlage(klageId)
     }
 
     fun finalizeKlage(klageId: Int, bruker: Bruker): Instant {
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
+
+        if (existingKlage.isFinalized()) {
+            return existingKlage.modifiedByUser ?: throw RuntimeException("No modified date after finalize klage")
+        }
 
         existingKlage.status = DONE
         val updatedKlage = klageRepository.updateKlage(existingKlage)
@@ -97,7 +116,9 @@ class KlageService(
 
     fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer, false)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
         requireNotNull(existingKlage.journalpostId)
         return fileClient.getKlageFile(existingKlage.journalpostId)
     }
