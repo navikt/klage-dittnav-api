@@ -4,7 +4,9 @@ import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @Repository
@@ -22,7 +24,7 @@ class KlageRepository {
     }
 
     fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw NotFoundException("Klage not found")
+        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -67,6 +69,6 @@ class KlageRepository {
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
-        return KlageDAO.findById(checkNotNull(id)) ?: throw NotFoundException("Klage with id $id not found in db.")
+        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage with id $id not found in db.")
     }
 }

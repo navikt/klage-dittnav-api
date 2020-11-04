@@ -93,7 +93,7 @@ class KlageService(
         }
 
         if (existingKlage.isFinalized()) {
-            return existingKlage.modifiedByUser ?: throw RuntimeException("No modified date after finalize klage")
+            return existingKlage.modifiedByUser ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "No modified date after finalize klage")
         }
 
         existingKlage.status = DONE
