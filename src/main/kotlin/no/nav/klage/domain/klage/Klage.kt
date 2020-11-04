@@ -22,11 +22,5 @@ enum class KlageStatus {
     DRAFT, DONE, DELETED
 }
 
-fun Klage.validateAccess(currentIdentifikasjonsnummer: String, checkFinalized: Boolean = true) {
-    if (checkFinalized && status === KlageStatus.DONE) {
-        throw RuntimeException("Klage is already finalized.")
-    }
-    if (foedselsnummer != currentIdentifikasjonsnummer) {
-        throw RuntimeException("Folkeregisteridentifikator in klage does not match current user.")
-    }
-}
+fun Klage.validateAccess(currentIdentifikasjonsnummer: String) = (foedselsnummer == currentIdentifikasjonsnummer)
+fun Klage.isFinalized() = (status === KlageStatus.DONE)

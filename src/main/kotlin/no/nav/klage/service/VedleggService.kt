@@ -4,6 +4,7 @@ import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.klage.isFinalized
 import no.nav.klage.domain.klage.validateAccess
 import no.nav.klage.domain.vedlegg.Vedlegg
 import no.nav.klage.domain.vedlegg.VedleggView
@@ -13,9 +14,11 @@ import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
 import no.nav.klage.vedlegg.Image2PDF
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -36,7 +39,12 @@ class VedleggService(
 
     fun addVedlegg(klageId: Int, vedlegg: MultipartFile, bruker: Bruker): Vedlegg {
         val existingKlage = klageRepository.getKlageById(klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
+        if (existingKlage.isFinalized()) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Klage is already finalized.")
+        }
 
         val timeStart = System.currentTimeMillis()
         vedleggMetrics.registerVedleggSize(vedlegg.bytes.size.toDouble())
@@ -54,7 +62,12 @@ class VedleggService(
     fun deleteVedlegg(klageId: Int, vedleggId: Int, bruker: Bruker): Boolean {
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
+        if (existingKlage.isFinalized()) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Klage is already finalized.")
+        }
         val deletedInGCS = fileClient.deleteVedleggFile(vedlegg.ref)
         vedleggRepository.deleteVedlegg(vedleggId)
         return deletedInGCS
@@ -63,14 +76,18 @@ class VedleggService(
     fun getVedlegg(vedleggId: Int, bruker: Bruker): ByteArray {
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
 
         return fileClient.getVedleggFile(vedlegg.ref)
     }
 
     fun expandVedleggToVedleggView(vedlegg: Vedlegg, bruker: Bruker): VedleggView {
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
-        existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        if (!existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        }
         val content = fileClient.getVedleggFile(vedlegg.ref)
         return vedlegg.toVedleggView(Base64.getEncoder().encodeToString(content))
     }
