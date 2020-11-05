@@ -40,8 +40,10 @@ class InternalController(
     @GetMapping("/klager/{klageId}/internal/journalpostid")
     fun getJournalpostId(
         @PathVariable klageId: Int
-    ) {
-        logger.debug("Get journalpostId on klage is requested. KlageId: {}", klageId)
-        klageService.getJournalpostIdWithoutValidation(klageId)
+    ): JournalpostIdResponse {
+        logger.debug("Get journalpostId on klage is requested from an internal service. KlageId: {}", klageId)
+        return JournalpostIdResponse(journalpostId = klageService.getJournalpostIdWithoutValidation(klageId) ?: "")
     }
 }
+
+data class JournalpostIdResponse(val journalpostId: String)
