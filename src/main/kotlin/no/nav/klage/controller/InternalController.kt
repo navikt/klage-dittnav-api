@@ -28,7 +28,7 @@ class InternalController(
         klageService.setJournalpostIdWithoutValidation(klageId, journalpost.id)
     }
 
-    @PostMapping("/klager/{klageId}/internal/journalpostid")
+    @PostMapping("/internal/klager/{klageId}/journalpostid")
     fun setJournalpostIdInternal(
         @PathVariable klageId: Int,
         @RequestBody journalpost: Journalpost
@@ -37,13 +37,13 @@ class InternalController(
         klageService.setJournalpostIdWithoutValidation(klageId, journalpost.id)
     }
 
-    @GetMapping("/klager/{klageId}/internal/journalpostid")
+    @GetMapping("/internal/klager/{klageId}/journalpostid")
     fun getJournalpostId(
         @PathVariable klageId: Int
     ): JournalpostIdResponse {
         logger.debug("Get journalpostId on klage is requested from an internal service. KlageId: {}", klageId)
-        return JournalpostIdResponse(journalpostId = klageService.getJournalpostIdWithoutValidation(klageId) ?: "")
+        return JournalpostIdResponse(journalpostId = klageService.getJournalpostIdWithoutValidation(klageId))
     }
 }
 
-data class JournalpostIdResponse(val journalpostId: String)
+data class JournalpostIdResponse(val journalpostId: String?)
