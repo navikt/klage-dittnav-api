@@ -5,10 +5,7 @@ import no.nav.klage.service.KlageService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @ProtectedWithClaims(issuer = "azuread")
@@ -27,7 +24,15 @@ class InternalController(
         @PathVariable klageId: Int,
         @RequestBody journalpost: Journalpost
     ) {
-        logger.debug("Set journalpostId on klage is called. KlageId: {}, journalpostId: {}", klageId, journalpost.id)
-        klageService.setJournalpostId(klageId, journalpost.id)
+        logger.debug("Set journalpostId on klage is requested. KlageId: {}, journalpostId: {}", klageId, journalpost.id)
+        klageService.setJournalpostIdWithoutValidation(klageId, journalpost.id)
+    }
+
+    @GetMapping("/klager/{klageId}/journalpostid")
+    fun getJournalpostId(
+        @PathVariable klageId: Int
+    ) {
+        logger.debug("Get journalpostId on klage is requested. KlageId: {}", klageId)
+        klageService.getJournalpostIdWithoutValidation(klageId)
     }
 }

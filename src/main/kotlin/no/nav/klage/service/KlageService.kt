@@ -52,12 +52,6 @@ class KlageService(
         return klage.journalpostId
     }
 
-    fun setJournalpostId(klageId: Int, journalpostId: String) {
-        val klage = klageRepository.getKlageById(klageId)
-        val updatedKlage = klage.copy(journalpostId = journalpostId)
-        klageRepository.updateKlage(updatedKlage)
-    }
-
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         return klageRepository.createKlage(klage.toKlage(bruker, DRAFT)).toKlageView(bruker).also {
             klageMetrics.incrementKlagerInitialized()
@@ -106,6 +100,17 @@ class KlageService(
         existingKlage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer, false)
         requireNotNull(existingKlage.journalpostId)
         return fileClient.getKlageFile(existingKlage.journalpostId)
+    }
+
+    fun getJournalpostIdWithoutValidation(klageId: Int): String? {
+        val klage = klageRepository.getKlageById(klageId)
+        return klage.journalpostId
+    }
+
+    fun setJournalpostIdWithoutValidation(klageId: Int, journalpostId: String) {
+        val klage = klageRepository.getKlageById(klageId)
+        val updatedKlage = klage.copy(journalpostId = journalpostId)
+        klageRepository.updateKlage(updatedKlage)
     }
 
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageView {
