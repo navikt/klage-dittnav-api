@@ -121,7 +121,7 @@ class KlageController(
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlage(
         @PathVariable klageId: Int
-    ): Map<String, LocalDate> {
+    ): Map<String, String> {
         val bruker = brukerService.getBruker()
         logger.debug("Finalize klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -130,7 +130,11 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
-        return mapOf("finalizedDate" to ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo")).toLocalDate())
+        val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
+        return mapOf(
+                "finalizedDate" to zonedDateTime.toLocalDate().toString(),
+                "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+        )
     }
 
     @PostMapping(value = ["/klager/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
