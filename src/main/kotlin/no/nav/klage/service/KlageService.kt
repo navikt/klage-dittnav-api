@@ -93,7 +93,7 @@ class KlageService(
         }
 
         if (existingKlage.isFinalized()) {
-            return existingKlage.modifiedByUser ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "No modified date after finalize klage")
+            return existingKlage.modifiedByUser ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No modified date after finalize klage")
         }
 
         existingKlage.status = DONE
@@ -111,7 +111,7 @@ class KlageService(
             )
         )
 
-        return updatedKlage.modifiedByUser ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "No modified date after finalize klage")
+        return updatedKlage.modifiedByUser ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No modified date after finalize klage")
     }
 
     fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
