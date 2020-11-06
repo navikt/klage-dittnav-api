@@ -1,5 +1,8 @@
 package no.nav.klage.service
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
@@ -17,9 +20,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 @Service
 @Transactional
@@ -111,7 +111,7 @@ class KlageService(
             )
         )
 
-        return updatedKlage.modifiedByUser ?: throw ForbiddenException("No modified date after finalize klage")
+        return updatedKlage.modifiedByUser ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "No modified date after finalize klage")
     }
 
     fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
