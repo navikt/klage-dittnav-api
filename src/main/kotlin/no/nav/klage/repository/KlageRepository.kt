@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import java.time.Instant
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
 import no.nav.klage.util.getLogger
@@ -7,7 +8,6 @@ import org.jetbrains.exposed.sql.and
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 import org.springframework.web.server.ResponseStatusException
-import java.time.Instant
 
 @Repository
 class KlageRepository {
@@ -23,8 +23,8 @@ class KlageRepository {
         }
     }
 
-    fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+    fun getKlageById(id: Int): Klage? {
+        return KlageDAO.findById(id)?.toKlage()
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -51,24 +51,24 @@ class KlageRepository {
     fun updateKlage(klage: Klage): Klage {
         logger.debug("Updating klage in db. Id: {}", klage.id)
         val klageFromDB = getKlageToModify(klage.id)
-        klageFromDB.apply {
+        klageFromDB?.apply {
             fromKlage(klage)
         }
         logger.debug("Klage successfully updated in db.")
-        return klageFromDB.toKlage()
+        return klageFromDB?.toKlage() ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not get updated Klage in db")
     }
 
     fun deleteKlage(id: Int) {
         logger.debug("Deleting klage in db. Id: {}", id)
         val klageFromDB = getKlageToModify(id)
-        klageFromDB.apply {
+        klageFromDB?.apply {
             status = DELETED.name
             modifiedByUser = Instant.now()
-        }
+        } ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not delete Klage in db")
         logger.debug("Klage successfully marked as deleted in db.")
     }
 
-    private fun getKlageToModify(id: Int?): KlageDAO {
-        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage with id $id not found in db.")
+    private fun getKlageToModify(id: Int?): KlageDAO? {
+        return KlageDAO.findById(checkNotNull(id))
     }
 }
