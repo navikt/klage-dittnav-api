@@ -23,8 +23,8 @@ class KlageRepository {
         }
     }
 
-    fun getKlageById(id: Int): Klage? {
-        return KlageDAO.findById(id)?.toKlage()
+    fun getKlageById(id: Int): Klage {
+        return KlageDAO.findById(id)?.toKlage() ?: throw RuntimeException("Klage not found")
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -50,21 +50,21 @@ class KlageRepository {
 
     fun updateKlage(klage: Klage): Klage {
         logger.debug("Updating klage in db. Id: {}", klage.id)
-        val klageFromDB = getKlageToModify(klage.id)
-        klageFromDB?.apply {
+        val klageFromDB = getKlageToModify(klage.id) ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not get Klage to update in db")
+        klageFromDB.apply {
             fromKlage(klage)
         }
         logger.debug("Klage successfully updated in db.")
-        return klageFromDB?.toKlage() ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not get updated Klage in db")
+        return klageFromDB.toKlage()
     }
 
     fun deleteKlage(id: Int) {
         logger.debug("Deleting klage in db. Id: {}", id)
-        val klageFromDB = getKlageToModify(id)
-        klageFromDB?.apply {
+        val klageFromDB = getKlageToModify(id) ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not delete Klage in db")
+        klageFromDB.apply {
             status = DELETED.name
             modifiedByUser = Instant.now()
-        } ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not delete Klage in db")
+        }
         logger.debug("Klage successfully marked as deleted in db.")
     }
 
