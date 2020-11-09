@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @ProtectedWithClaims(issuer = "azuread")
+@RequestMapping("internal")
 class InternalController(
     private val klageService: KlageService
 ) {
@@ -19,7 +20,7 @@ class InternalController(
         private val secureLogger = getSecureLogger()
     }
 
-    @PostMapping("/internal/klager/{klageId}/journalpostid")
+    @PostMapping("/klager/{klageId}/journalpostid")
     fun setJournalpostIdInternal(
         @PathVariable klageId: Int,
         @RequestBody journalpost: Journalpost
@@ -28,7 +29,7 @@ class InternalController(
         klageService.setJournalpostIdWithoutValidation(klageId, journalpost.id)
     }
 
-    @GetMapping("/internal/klager/{klageId}/journalpostid")
+    @GetMapping("/klager/{klageId}/journalpostid")
     fun getJournalpostId(
         @PathVariable klageId: Int
     ): JournalpostIdResponse {
