@@ -19,15 +19,6 @@ class InternalController(
         private val secureLogger = getSecureLogger()
     }
 
-    @PostMapping("/klager/{klageId}/journalpostid")
-    fun setJournalpostId(
-        @PathVariable klageId: Int,
-        @RequestBody journalpost: Journalpost
-    ) {
-        logger.debug("Set journalpostId on klage is requested. KlageId: {}, journalpostId: {}", klageId, journalpost.id)
-        klageService.setJournalpostIdWithoutValidation(klageId, journalpost.id)
-    }
-
     @PostMapping("/internal/klager/{klageId}/journalpostid")
     fun setJournalpostIdInternal(
         @PathVariable klageId: Int,
