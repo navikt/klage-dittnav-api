@@ -53,6 +53,7 @@ class Image2PDF {
                         imgType
                     )
                     doc.save(outputStream)
+                    doc.document.close()
                     doc.close()
                     return outputStream.toByteArray()
                 }
