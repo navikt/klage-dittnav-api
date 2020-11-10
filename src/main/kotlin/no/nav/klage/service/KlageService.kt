@@ -38,7 +38,7 @@ class KlageService(
         if (!klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
         }
-        return klage.toKlageView(bruker)
+        return klage.toKlageView(bruker, klage.status === DRAFT)
     }
 
     fun getDraftKlagerByFnr(bruker: Bruker): List<KlageView> {
