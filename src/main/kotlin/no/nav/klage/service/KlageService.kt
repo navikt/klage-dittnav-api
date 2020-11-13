@@ -135,28 +135,31 @@ class KlageService(
     }
 
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageView {
-        val modifiedDateTime = ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
+        val modifiedDateTime =
+            ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
-                id!!,
-                fritekst,
-                tema,
-                ytelse,
-                vedtak,
-                status,
-                modifiedDateTime,
-                saksnummer,
-                vedlegg.map {
-                    if (expandVedleggToVedleggView) {
-                        vedleggService.expandVedleggToVedleggView(
-                                it,
-                                bruker
-                        )
-                    } else {
-                        it.toVedleggView("")
-                    }
-                },
-                journalpostId,
-                finalizedDate = if (status === DONE) modifiedDateTime.toLocalDate() else null
+            id!!,
+            fritekst,
+            tema,
+            ytelse,
+            vedtak,
+            status,
+            modifiedDateTime,
+            saksnummer,
+            vedlegg.map {
+                if (expandVedleggToVedleggView) {
+                    vedleggService.expandVedleggToVedleggView(
+                        it,
+                        bruker
+                    )
+                } else {
+                    it.toVedleggView("")
+                }
+            },
+            journalpostId,
+            finalizedDate = if (status === DONE) modifiedDateTime.toLocalDate() else null,
+            vedtakType = vedtakType,
+            vedtakDate = vedtakDate
         )
     }
 }

@@ -69,16 +69,4 @@ class KlageRepository {
     private fun getKlageToModify(id: Int?): KlageDAO {
         return KlageDAO.findById(checkNotNull(id)) ?: throw RuntimeException("Klage with id $id not found in db.")
     }
-
-    private fun KlageDAO.fromKlage(klage: Klage) {
-        foedselsnummer = klage.foedselsnummer
-        fritekst = klage.fritekst
-        status = klage.status.name
-        modifiedByUser = Instant.now()
-        tema = klage.tema.name
-        ytelse = klage.ytelse
-        vedtak = klage.vedtak
-        klage.saksnummer?.let { saksnummer = it }
-        klage.journalpostId?.let { journalpostId = it }
-    }
 }

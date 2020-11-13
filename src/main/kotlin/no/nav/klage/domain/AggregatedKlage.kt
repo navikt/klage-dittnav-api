@@ -1,10 +1,11 @@
 package no.nav.klage.domain
 
 import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.vedlegg.Vedlegg
+import no.nav.klage.util.vedtakFromTypeAndDate
 import java.time.LocalDate
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
-import no.nav.klage.domain.vedlegg.Vedlegg
 
 data class AggregatedKlage(
     val id: Int,
@@ -30,6 +31,10 @@ fun createAggregatedKlage(
     bruker: Bruker,
     klage: Klage
 ): AggregatedKlage {
+    var vedtak = klage.vedtak
+    if (klage.vedtakType != null || klage.vedtakDate != null) {
+        vedtak = vedtakFromTypeAndDate(klage.vedtakType, klage.vedtakDate)
+    }
 
     return AggregatedKlage(
         id = klage.id!!,
@@ -40,7 +45,7 @@ fun createAggregatedKlage(
         etternavn = bruker.navn.etternavn,
         adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
         telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
-        vedtak = klage.vedtak,
+        vedtak = vedtak ?: "",
         saksnummer = klage.saksnummer,
         dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
         begrunnelse = klage.fritekst,
@@ -50,4 +55,7 @@ fun createAggregatedKlage(
         ytelse = klage.ytelse,
         vedlegg = klage.vedlegg
     )
+
+
 }
+
