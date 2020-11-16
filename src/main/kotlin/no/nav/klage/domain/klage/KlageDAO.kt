@@ -37,7 +37,7 @@ object Klager : IntIdTable("klage") {
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
-    var ytelse = varchar("ytelse", 50)
+    var ytelse = varchar("ytelse", 300)
     var vedtak = varchar("vedtak", 100).nullable()
     var saksnummer = varchar("saksnummer", 25).nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
