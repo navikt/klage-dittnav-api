@@ -1,0 +1,2 @@
+ALTER TABLE klage
+    ALTER COLUMN ytelse TYPE VARCHAR(300);
