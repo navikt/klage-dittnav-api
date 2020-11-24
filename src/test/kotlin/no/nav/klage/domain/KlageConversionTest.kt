@@ -8,7 +8,6 @@ import org.h2.jdbcx.JdbcConnectionPool
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -55,182 +54,45 @@ class KlageConversionTest {
     inner class KlageDAOToKlage {
 
         @Nested
-        inner class VedtakBasedOnVedtakTypeAndVedtakDate {
-
-            @Test
-            fun `should populate earlier vedtak with date in Klage based on vedtakType and vedtakDate in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtakType = VedtakType.EARLIER, vedtakDate = vedtakDate)
-                val expectedOutput = klageInDB.copy(vedtak = earlierVedtakWithDate)
-
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
-            }
-
-            @Test
-            fun `should populate earlier vedtak without date in Klage based on vedtakType in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtakType = VedtakType.EARLIER)
-                val expectedOutput = klageInDB.copy(vedtak = earlierVedtak)
-
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
-            }
-
-            @Test
-            fun `should populate latest vedtak without date in Klage based on vedtakType in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtakType = VedtakType.LATEST)
-                val expectedOutput = klageInDB.copy(vedtak = latestVedtak)
-
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
-            }
-
-            @Test
-            fun `should populate latest vedtak without date in Klage based on vedtakType and vedtakDate in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtakType = VedtakType.LATEST, vedtakDate = vedtakDate)
-                val expectedOutput = klageInDB.copy(vedtak = latestVedtak)
-
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
-            }
-
-            @Test
-            fun `should populate earlier vedtak with date in Klage based on vedtakType and vedtakDate in KlageDAO, ignoring vedtak in KlageDAO`() {
-                val klageInDB = templateKlage.copy(
-                    vedtak = earlierVedtakWithDateVersion2,
-                    vedtakType = VedtakType.EARLIER,
-                    vedtakDate = vedtakDate
-                )
-                val expectedOutput = klageInDB.copy(vedtak = earlierVedtakWithDate)
-
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
-            }
-
-        }
-
-        @Nested
         inner class VedtakTypeAndVedtakDateBasedOnVedtak {
 
             @Test
             fun `should populate vedtakDate and vedtakType in Klage based on earlier vedtak with date in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtak = earlierVedtakWithDate)
+                val klageInDB = templateKlage
                 val expectedOutput = klageInDB.copy(vedtakType = VedtakType.EARLIER, vedtakDate = vedtakDate)
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
+                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB, earlierVedtakWithDate)
             }
 
             @Test
             fun `should populate vedtakType in Klage based on earlier vedtak without date in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtak = earlierVedtak)
+                val klageInDB = templateKlage
                 val expectedOutput = klageInDB.copy(vedtakType = VedtakType.EARLIER)
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
+                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB, earlierVedtak)
             }
 
             @Test
             fun `should populate vedtakType in Klage based on latest vedtak without date in KlageDAO`() {
-                val klageInDB = templateKlage.copy(vedtak = latestVedtak)
+                val klageInDB = templateKlage
                 val expectedOutput = klageInDB.copy(vedtakType = VedtakType.LATEST)
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
+                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB, latestVedtak)
             }
 
             @Test
             fun `should populate vedtak, vedtakDate and vedtakType in Klage based on corresponding date and type values in KlageDAO, ignoring existing vedtak`() {
                 val klageInDB = templateKlage.copy(
                     vedtakType = VedtakType.EARLIER,
-                    vedtakDate = vedtakDate,
-                    vedtak = earlierVedtakWithDateVersion2
-                )
-                val expectedOutput = klageInDB.copy(
-                    vedtakType = VedtakType.EARLIER,
-                    vedtakDate = vedtakDate,
-                    vedtak = earlierVedtakWithDate
+                    vedtakDate = vedtakDate
                 )
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB)
+                verifyConversionToKlageFromKlageDAO(klageInDB, klageInDB, earlierVedtakWithDateVersion2)
             }
         }
     }
 
-    @Nested
-    inner class KlageToKlageDAO {
-        @Test
-        fun `should populate vedtakType and vedtakDate in KlageDAO based on earlier vedtak with date in Klage`() {
-            val inputKlage = templateKlage.copy(vedtak = earlierVedtakWithDate)
-
-            transaction {
-                val result = KlageDAO.new {
-                    fromKlage(inputKlage)
-                }
-
-                assertEquals(VedtakType.EARLIER.name, result.vedtakType)
-                assertEquals(vedtakDate, result.vedtakDate)
-                assertNull(result.vedtak)
-            }
-        }
-
-        @Test
-        fun `should populate vedtakType in KlageDAO based on earlier vedtak without date in Klage`() {
-            val inputKlage = templateKlage.copy(vedtak = earlierVedtak)
-
-            transaction {
-                val result = KlageDAO.new {
-                    fromKlage(inputKlage)
-                }
-
-                assertEquals(VedtakType.EARLIER.name, result.vedtakType)
-                assertNull(result.vedtakDate)
-                assertNull(result.vedtak)
-            }
-        }
-
-        @Test
-        fun `should populate vedtakType in KlageDAO based on latest vedtak in Klage`() {
-            val inputKlage = templateKlage.copy(vedtak = latestVedtak)
-
-            transaction {
-                val result = KlageDAO.new {
-                    fromKlage(inputKlage)
-                }
-
-                assertEquals(VedtakType.LATEST.name, result.vedtakType)
-                assertNull(result.vedtakDate)
-                assertNull(result.vedtak)
-            }
-        }
-
-        @Test
-        fun `should populate vedtakType and vedtakDate in KlageDAO based on corresponding values in Klage, ignoring vedtak`() {
-            val inputKlage = templateKlage.copy(
-                vedtak = earlierVedtakWithDateVersion2,
-                vedtakType = VedtakType.EARLIER,
-                vedtakDate = vedtakDate
-            )
-
-            transaction {
-                val result = KlageDAO.new {
-                    fromKlage(inputKlage)
-                }
-
-                assertEquals(VedtakType.EARLIER.name, result.vedtakType)
-                assertEquals(vedtakDate, result.vedtakDate)
-                assertNull(result.vedtak)
-            }
-        }
-
-        @Test
-        fun `should populate vedtakDate in KlageDAO based on corresponding value in Klage, ignoring vedtak`() {
-            val inputKlage = templateKlage.copy(vedtak = earlierVedtakWithDate, vedtakDate = vedtakDate)
-
-            transaction {
-                val result = KlageDAO.new {
-                    fromKlage(inputKlage)
-                }
-
-                assertNull(result.vedtakType)
-                assertEquals(vedtakDate, result.vedtakDate)
-                assertNull(result.vedtak)
-            }
-        }
-    }
-
-    private fun verifyConversionToKlageFromKlageDAO(expectedOutput: Klage, klageInDB: Klage) {
+    private fun verifyConversionToKlageFromKlageDAO(expectedOutput: Klage, klageInDB: Klage, vedtakInKlage: String? = null) {
         transaction {
             val inputKlageDAO = KlageDAO.new {
                 foedselsnummer = klageInDB.foedselsnummer
@@ -238,7 +100,7 @@ class KlageConversionTest {
                 fritekst = klageInDB.fritekst
                 tema = klageInDB.tema.name
                 ytelse = klageInDB.ytelse
-                vedtak = klageInDB.vedtak
+                vedtak = vedtakInKlage
                 vedtakType = klageInDB.vedtakType?.name
                 vedtakDate = klageInDB.vedtakDate
             }

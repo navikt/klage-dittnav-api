@@ -31,10 +31,7 @@ fun createAggregatedKlage(
     bruker: Bruker,
     klage: Klage
 ): AggregatedKlage {
-    var vedtak = klage.vedtak
-    if (klage.vedtakType != null || klage.vedtakDate != null) {
-        vedtak = vedtakFromTypeAndDate(klage.vedtakType, klage.vedtakDate)
-    }
+    val vedtak = vedtakFromTypeAndDate(klage.vedtakType, klage.vedtakDate)
 
     return AggregatedKlage(
         id = klage.id!!,
@@ -55,7 +52,5 @@ fun createAggregatedKlage(
         ytelse = klage.ytelse,
         vedlegg = klage.vedlegg
     )
-
-
 }
 
