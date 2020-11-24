@@ -11,7 +11,6 @@ data class KlageView(
     val fritekst: String,
     val tema: Tema,
     val ytelse: String,
-    val vedtak: String? = null,
     val status: KlageStatus = KlageStatus.DRAFT,
     val modifiedByUser: LocalDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/Oslo"))
         .toLocalDateTime(),
@@ -30,7 +29,6 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     status = status,
     tema = tema,
     ytelse = ytelse,
-    vedtak = vedtak,
     saksnummer = saksnummer,
     vedlegg = vedlegg.map { it.toVedlegg() },
     journalpostId = journalpostId,

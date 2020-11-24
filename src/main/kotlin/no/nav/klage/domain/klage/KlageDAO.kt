@@ -54,7 +54,6 @@ fun KlageDAO.toKlage(): Klage {
         modifiedByUser = this.modifiedByUser,
         tema = this.tema.toTema(),
         ytelse = this.ytelse,
-        vedtak = this.vedtak,
         saksnummer = this.saksnummer,
         vedlegg = this.vedlegg.map { it.toVedlegg() },
         journalpostId = this.journalpostId,
@@ -62,11 +61,7 @@ fun KlageDAO.toKlage(): Klage {
         vedtakDate = this.vedtakDate
     )
 
-    outputKlage = if (this.vedtakType != null || this.vedtakDate != null) {
-        //Fyller ut gammel vedtaksform basert på ny form
-        outputKlage.copy(vedtak = vedtakFromTypeAndDate(this.vedtakType.toVedtakType(), this.vedtakDate))
-    } else if (this.vedtak != null) {
-        //Fyller ut nye vedtaksformer basert på gamle
+    outputKlage = if (this.vedtak != null && (this.vedtakType == null && this.vedtakDate == null)) {
         outputKlage.copy(
             vedtakType = vedtakTypeFromVedtak(this.vedtak!!),
             vedtakDate = vedtakDateFromVedtak(this.vedtak!!)
@@ -94,14 +89,6 @@ fun String?.toVedtakType() =
     if (this != null) VedtakType.valueOf(this) else null
 
 fun KlageDAO.fromKlage(klage: Klage) {
-    var outputVedtakType = klage.vedtakType
-    var outputVedtakDate = klage.vedtakDate
-
-    if (klage.vedtak != null && outputVedtakType == null && outputVedtakDate == null) {
-        outputVedtakDate = vedtakDateFromVedtak(klage.vedtak)
-        outputVedtakType = vedtakTypeFromVedtak(klage.vedtak)
-    }
-
     foedselsnummer = klage.foedselsnummer
     fritekst = klage.fritekst
     status = klage.status.name
@@ -111,6 +98,6 @@ fun KlageDAO.fromKlage(klage: Klage) {
     vedtak = null
     klage.saksnummer?.let { saksnummer = it }
     klage.journalpostId?.let { journalpostId = it }
-    vedtakType = outputVedtakType?.name
-    vedtakDate = outputVedtakDate
+    vedtakType = klage.vedtakType?.name
+    vedtakDate = klage.vedtakDate
 }

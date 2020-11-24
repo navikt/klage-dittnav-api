@@ -13,7 +13,6 @@ data class Klage(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val ytelse: String,
-    val vedtak: String? = null,
     val saksnummer: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
     val journalpostId: String? = null,

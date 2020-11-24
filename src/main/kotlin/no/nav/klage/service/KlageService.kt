@@ -142,7 +142,6 @@ class KlageService(
             fritekst,
             tema,
             ytelse,
-            vedtak,
             status,
             modifiedDateTime,
             saksnummer,
