@@ -33,7 +33,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
 
 object Klager : IntIdTable("klage") {
     var foedselsnummer = varchar("foedselsnummer", 11)
-    var fritekst = varchar("fritekst", 255)
+    var fritekst = text("fritekst")
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
@@ -43,7 +43,7 @@ object Klager : IntIdTable("klage") {
     var journalpostId = varchar("journalpost_id", 50).nullable()
     var vedtakType = varchar("vedtak_type", 25).nullable()
     var vedtakDate = date("vedtak_date").nullable()
-    var checkboxesSelected = varchar("checkboxes_selected",255).nullable()
+    var checkboxesSelected = text("checkboxes_selected").nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {
