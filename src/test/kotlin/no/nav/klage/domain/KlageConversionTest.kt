@@ -61,7 +61,7 @@ class KlageConversionTest {
                 val klageInDB = templateKlage
                 val expectedOutput = klageInDB.copy(vedtakType = VedtakType.EARLIER, vedtakDate = vedtakDate)
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB, earlierVedtakWithDate)
+                verifyVedtakConversionToKlageFromKlageDAO(expectedOutput, klageInDB, earlierVedtakWithDate)
             }
 
             @Test
@@ -69,7 +69,7 @@ class KlageConversionTest {
                 val klageInDB = templateKlage
                 val expectedOutput = klageInDB.copy(vedtakType = VedtakType.EARLIER)
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB, earlierVedtak)
+                verifyVedtakConversionToKlageFromKlageDAO(expectedOutput, klageInDB, earlierVedtak)
             }
 
             @Test
@@ -77,7 +77,7 @@ class KlageConversionTest {
                 val klageInDB = templateKlage
                 val expectedOutput = klageInDB.copy(vedtakType = VedtakType.LATEST)
 
-                verifyConversionToKlageFromKlageDAO(expectedOutput, klageInDB, latestVedtak)
+                verifyVedtakConversionToKlageFromKlageDAO(expectedOutput, klageInDB, latestVedtak)
             }
 
             @Test
@@ -87,12 +87,54 @@ class KlageConversionTest {
                     vedtakDate = vedtakDate
                 )
 
-                verifyConversionToKlageFromKlageDAO(klageInDB, klageInDB, earlierVedtakWithDateVersion2)
+                verifyVedtakConversionToKlageFromKlageDAO(klageInDB, klageInDB, earlierVedtakWithDateVersion2)
+            }
+        }
+
+        @Nested
+        inner class CheckboxesSelectedListBasedOnCheckboxesSelectedString {
+            @Test
+            fun `should populate checkboxesSelected in Klage based on checkboxesSelected string in KlageDAO`() {
+                val klageInDB = templateKlage
+                val expectedOutput = klageInDB.copy(
+                    checkboxesSelected = setOf(
+                        CheckboxEnum.AVSLAG_PAA_SOKNAD,
+                        CheckboxEnum.FOR_LITE_UTBETALT
+                    )
+                )
+
+                verifyCheckboxesSelectedConversionToKlageFromKlageDAO(
+                    expectedOutput,
+                    klageInDB,
+                    "FOR_LITE_UTBETALT,AVSLAG_PAA_SOKNAD"
+                )
             }
         }
     }
 
-    private fun verifyConversionToKlageFromKlageDAO(expectedOutput: Klage, klageInDB: Klage, vedtakInKlage: String? = null) {
+    @Nested
+    inner class KlageToKlageDAO {
+        @Test
+        fun `should populate checkboxesSelected in KlageDAO based on checkboxesSelected in Klage`() {
+            val inputKlage = templateKlage.copy(
+                checkboxesSelected = setOf(CheckboxEnum.FOR_LITE_UTBETALT, CheckboxEnum.AVSLAG_PAA_SOKNAD)
+            )
+
+            transaction {
+                val result = KlageDAO.new {
+                    fromKlage(inputKlage)
+                }
+
+                assertEquals("FOR_LITE_UTBETALT,AVSLAG_PAA_SOKNAD", result.checkBoxesSelected)
+            }
+        }
+    }
+
+    private fun verifyVedtakConversionToKlageFromKlageDAO(
+        expectedOutput: Klage,
+        klageInDB: Klage,
+        vedtakInKlage: String? = null
+    ) {
         transaction {
             val inputKlageDAO = KlageDAO.new {
                 foedselsnummer = klageInDB.foedselsnummer
@@ -103,6 +145,27 @@ class KlageConversionTest {
                 vedtak = vedtakInKlage
                 vedtakType = klageInDB.vedtakType?.name
                 vedtakDate = klageInDB.vedtakDate
+            }
+
+            val result = inputKlageDAO.toKlage().copy(id = exampleId, modifiedByUser = modifiedByUser)
+
+            assertEquals(expectedOutput, result)
+        }
+    }
+
+    private fun verifyCheckboxesSelectedConversionToKlageFromKlageDAO(
+        expectedOutput: Klage,
+        klageInDB: Klage,
+        checkboxesSelectedString: String? = null
+    ) {
+        transaction {
+            val inputKlageDAO = KlageDAO.new {
+                foedselsnummer = klageInDB.foedselsnummer
+                status = klageInDB.status.name
+                fritekst = klageInDB.fritekst
+                tema = klageInDB.tema.name
+                ytelse = klageInDB.ytelse
+                checkBoxesSelected = checkboxesSelectedString
             }
 
             val result = inputKlageDAO.toKlage().copy(id = exampleId, modifiedByUser = modifiedByUser)

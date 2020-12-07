@@ -158,7 +158,8 @@ class KlageService(
             journalpostId,
             finalizedDate = if (status === DONE) modifiedDateTime.toLocalDate() else null,
             vedtakType = vedtakType,
-            vedtakDate = vedtakDate
+            vedtakDate = vedtakDate,
+            checkboxesSelected = checkboxesSelected ?: emptySet()
         )
     }
 }
