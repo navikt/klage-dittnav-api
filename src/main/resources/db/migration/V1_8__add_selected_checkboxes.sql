@@ -1,2 +1,2 @@
 ALTER TABLE klage
-    ADD COLUMN checkboxes_selected varchar
+    ADD COLUMN checkboxes_selected text
