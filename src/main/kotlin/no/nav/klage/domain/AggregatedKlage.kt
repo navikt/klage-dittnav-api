@@ -24,7 +24,8 @@ data class AggregatedKlage(
     val identifikasjonsnummer: String,
     val tema: String,
     val ytelse: String,
-    val vedlegg: List<Vedlegg>
+    val vedlegg: List<Vedlegg>,
+    val userChoices: List<String>?
 )
 
 fun createAggregatedKlage(
@@ -50,7 +51,8 @@ fun createAggregatedKlage(
         identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
         tema = klage.tema.name,
         ytelse = klage.ytelse,
-        vedlegg = klage.vedlegg
+        vedlegg = klage.vedlegg,
+        userChoices = klage.checkboxesSelected?.map { x -> x.fullText }
     )
 }
 

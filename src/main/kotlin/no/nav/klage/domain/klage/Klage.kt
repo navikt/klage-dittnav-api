@@ -17,7 +17,8 @@ data class Klage(
     val vedlegg: List<Vedlegg> = listOf(),
     val journalpostId: String? = null,
     val vedtakType: VedtakType? = null,
-    val vedtakDate: LocalDate? = null
+    val vedtakDate: LocalDate? = null,
+    val checkboxesSelected: Set<CheckboxEnum>? = null
 )
 
 enum class KlageStatus {

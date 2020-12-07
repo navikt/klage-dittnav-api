@@ -4,7 +4,6 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
 import no.nav.klage.util.vedtakDateFromVedtak
-import no.nav.klage.util.vedtakFromTypeAndDate
 import no.nav.klage.util.vedtakTypeFromVedtak
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -29,11 +28,12 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var journalpostId by Klager.journalpostId
     var vedtakType by Klager.vedtakType
     var vedtakDate by Klager.vedtakDate
+    var checkBoxesSelected by Klager.checkboxesSelected
 }
 
 object Klager : IntIdTable("klage") {
     var foedselsnummer = varchar("foedselsnummer", 11)
-    var fritekst = varchar("fritekst", 255)
+    var fritekst = text("fritekst")
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
@@ -43,6 +43,7 @@ object Klager : IntIdTable("klage") {
     var journalpostId = varchar("journalpost_id", 50).nullable()
     var vedtakType = varchar("vedtak_type", 25).nullable()
     var vedtakDate = date("vedtak_date").nullable()
+    var checkboxesSelected = text("checkboxes_selected").nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {
@@ -58,7 +59,8 @@ fun KlageDAO.toKlage(): Klage {
         vedlegg = this.vedlegg.map { it.toVedlegg() },
         journalpostId = this.journalpostId,
         vedtakType = this.vedtakType.toVedtakType(),
-        vedtakDate = this.vedtakDate
+        vedtakDate = this.vedtakDate,
+        checkboxesSelected = this.checkBoxesSelected?.toCheckboxEnumSet()
     )
 
     outputKlage = if (this.vedtak != null && (this.vedtakType == null && this.vedtakDate == null)) {
@@ -88,6 +90,13 @@ fun String.toStatus() = try {
 fun String?.toVedtakType() =
     if (this != null) VedtakType.valueOf(this) else null
 
+fun String.toCheckboxEnumSet() =
+    if (this == "") {
+        emptySet()
+    } else {
+        this.split(",").map { x -> CheckboxEnum.valueOf(x) }.toSet()
+    }
+
 fun KlageDAO.fromKlage(klage: Klage) {
     foedselsnummer = klage.foedselsnummer
     fritekst = klage.fritekst
@@ -100,4 +109,5 @@ fun KlageDAO.fromKlage(klage: Klage) {
     klage.journalpostId?.let { journalpostId = it }
     vedtakType = klage.vedtakType?.name
     vedtakDate = klage.vedtakDate
+    klage.checkboxesSelected?.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
 }
