@@ -4,8 +4,10 @@ import no.nav.klage.domain.vedlegg.Vedlegg
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.util.getLogger
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 
 @Repository
 class VedleggRepository {
@@ -30,7 +32,7 @@ class VedleggRepository {
 
     fun getVedleggById(id: Int): Vedlegg {
         logger.debug("Fetching vedlegg metadata from db. VedleggId: {}", id)
-        return VedleggDAO.findById(id)?.toVedlegg() ?: throw RuntimeException("Vedlegg not found")
+        return VedleggDAO.findById(id)?.toVedlegg() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Vedlegg not found")
     }
 
     fun deleteVedlegg(vedleggId: Int) {
