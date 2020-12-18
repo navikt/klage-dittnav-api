@@ -26,7 +26,7 @@ data class AggregatedKlage(
     val ytelse: String,
     val vedlegg: List<Vedlegg>,
     val userChoices: List<String>?,
-    val userSaksnummer: String?,
+    val userSaksnummer: String? = null,
     val internalSaksnummer: String?
 )
 
@@ -55,7 +55,8 @@ fun createAggregatedKlage(
         ytelse = klage.ytelse,
         vedlegg = klage.vedlegg,
         userChoices = klage.checkboxesSelected?.map { x -> x.fullText },
-        userSaksnummer = klage.userSaksnummer,
+        //TODO: Include when client is updated:
+        //userSaksnummer = klage.userSaksnummer,
         internalSaksnummer = klage.internalSaksnummer
     )
 }
