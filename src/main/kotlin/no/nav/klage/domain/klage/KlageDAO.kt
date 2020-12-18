@@ -23,12 +23,13 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var tema by Klager.tema
     var ytelse by Klager.ytelse
     var vedtak by Klager.vedtak
-    var saksnummer by Klager.saksnummer
+    var userSaksnummer by Klager.userSaksnummer
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
     var journalpostId by Klager.journalpostId
     var vedtakType by Klager.vedtakType
     var vedtakDate by Klager.vedtakDate
     var checkBoxesSelected by Klager.checkboxesSelected
+    var internalSaksnummer by Klager.internalSaksnummer
 }
 
 object Klager : IntIdTable("klage") {
@@ -39,11 +40,12 @@ object Klager : IntIdTable("klage") {
     var tema = varchar("tema", 3)
     var ytelse = varchar("ytelse", 300)
     var vedtak = varchar("vedtak", 100).nullable()
-    var saksnummer = varchar("saksnummer", 25).nullable()
+    var userSaksnummer = varchar("user_saksnummer", 25).nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
     var vedtakType = varchar("vedtak_type", 25).nullable()
     var vedtakDate = date("vedtak_date").nullable()
     var checkboxesSelected = text("checkboxes_selected").nullable()
+    var internalSaksnummer = text("internal_saksnummer").nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {
@@ -55,12 +57,13 @@ fun KlageDAO.toKlage(): Klage {
         modifiedByUser = this.modifiedByUser,
         tema = this.tema.toTema(),
         ytelse = this.ytelse,
-        saksnummer = this.saksnummer,
+        userSaksnummer = this.userSaksnummer,
         vedlegg = this.vedlegg.map { it.toVedlegg() },
         journalpostId = this.journalpostId,
         vedtakType = this.vedtakType.toVedtakType(),
         vedtakDate = this.vedtakDate,
-        checkboxesSelected = this.checkBoxesSelected?.toCheckboxEnumSet()
+        checkboxesSelected = this.checkBoxesSelected?.toCheckboxEnumSet(),
+        internalSaksnummer = this.internalSaksnummer
     )
 
     outputKlage = if (this.vedtak != null && (this.vedtakType == null && this.vedtakDate == null)) {
@@ -105,9 +108,10 @@ fun KlageDAO.fromKlage(klage: Klage) {
     tema = klage.tema.name
     ytelse = klage.ytelse
     vedtak = null
-    klage.saksnummer?.let { saksnummer = it }
+    userSaksnummer = klage.userSaksnummer
     klage.journalpostId?.let { journalpostId = it }
     vedtakType = klage.vedtakType?.name
     vedtakDate = klage.vedtakDate
     klage.checkboxesSelected?.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
+    internalSaksnummer = klage.internalSaksnummer
 }

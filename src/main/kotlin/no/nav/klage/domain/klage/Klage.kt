@@ -13,12 +13,13 @@ data class Klage(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val ytelse: String,
-    val saksnummer: String? = null,
+    val userSaksnummer: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
     val journalpostId: String? = null,
     val vedtakType: VedtakType? = null,
     val vedtakDate: LocalDate? = null,
-    val checkboxesSelected: Set<CheckboxEnum>? = null
+    val checkboxesSelected: Set<CheckboxEnum>? = null,
+    val internalSaksnummer: String? = null
 )
 
 enum class KlageStatus {

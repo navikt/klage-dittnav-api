@@ -144,7 +144,7 @@ class KlageService(
             ytelse,
             status,
             modifiedDateTime,
-            saksnummer,
+            userSaksnummer,
             vedlegg.map {
                 if (expandVedleggToVedleggView) {
                     vedleggService.expandVedleggToVedleggView(
@@ -159,7 +159,9 @@ class KlageService(
             finalizedDate = if (status === DONE) modifiedDateTime.toLocalDate() else null,
             vedtakType = vedtakType,
             vedtakDate = vedtakDate,
-            checkboxesSelected = checkboxesSelected ?: emptySet()
+            checkboxesSelected = checkboxesSelected ?: emptySet(),
+            userSaksnummer = userSaksnummer,
+            internalSaksnummer = internalSaksnummer
         )
     }
 }

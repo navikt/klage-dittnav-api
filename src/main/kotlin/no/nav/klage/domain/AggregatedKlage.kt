@@ -25,7 +25,9 @@ data class AggregatedKlage(
     val tema: String,
     val ytelse: String,
     val vedlegg: List<Vedlegg>,
-    val userChoices: List<String>?
+    val userChoices: List<String>?,
+    val userSaksnummer: String?,
+    val internalSaksnummer: String?
 )
 
 fun createAggregatedKlage(
@@ -44,7 +46,7 @@ fun createAggregatedKlage(
         adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
         telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
         vedtak = vedtak ?: "",
-        saksnummer = klage.saksnummer,
+        saksnummer = klage.userSaksnummer,
         dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
         begrunnelse = klage.fritekst,
         identifikasjonstype = bruker.folkeregisteridentifikator.type,
@@ -52,7 +54,9 @@ fun createAggregatedKlage(
         tema = klage.tema.name,
         ytelse = klage.ytelse,
         vedlegg = klage.vedlegg,
-        userChoices = klage.checkboxesSelected?.map { x -> x.fullText }
+        userChoices = klage.checkboxesSelected?.map { x -> x.fullText },
+        userSaksnummer = klage.userSaksnummer,
+        internalSaksnummer = klage.internalSaksnummer
     )
 }
 

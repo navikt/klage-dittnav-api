@@ -20,8 +20,9 @@ data class KlageView(
     val finalizedDate: LocalDate? = null,
     val vedtakType: VedtakType? = null,
     val vedtakDate: LocalDate? = null,
-    //Remove default value after frontend update
-    val checkboxesSelected: Set<CheckboxEnum> = emptySet()
+    val checkboxesSelected: Set<CheckboxEnum>,
+    val userSaksnummer: String? = null,
+    val internalSaksnummer: String? = null
 )
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
@@ -31,10 +32,11 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     status = status,
     tema = tema,
     ytelse = ytelse,
-    saksnummer = saksnummer,
+    userSaksnummer = userSaksnummer ?: saksnummer,
     vedlegg = vedlegg.map { it.toVedlegg() },
     journalpostId = journalpostId,
     vedtakType = vedtakType,
     vedtakDate = vedtakDate,
-    checkboxesSelected = checkboxesSelected
+    checkboxesSelected = checkboxesSelected,
+    internalSaksnummer = internalSaksnummer
 )
