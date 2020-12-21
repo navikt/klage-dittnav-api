@@ -144,7 +144,6 @@ class KlageService(
             ytelse,
             status,
             modifiedDateTime,
-            userSaksnummer,
             vedlegg.map {
                 if (expandVedleggToVedleggView) {
                     vedleggService.expandVedleggToVedleggView(
