@@ -40,7 +40,7 @@ object Klager : IntIdTable("klage") {
     var tema = varchar("tema", 3)
     var ytelse = varchar("ytelse", 300)
     var vedtak = varchar("vedtak", 100).nullable()
-    var userSaksnummer = varchar("user_saksnummer", 25).nullable()
+    var userSaksnummer = text("user_saksnummer").nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
     var vedtakType = varchar("vedtak_type", 25).nullable()
     var vedtakDate = date("vedtak_date").nullable()
