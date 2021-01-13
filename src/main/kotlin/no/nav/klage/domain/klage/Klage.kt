@@ -19,7 +19,8 @@ data class Klage(
     val vedtakType: VedtakType? = null,
     val vedtakDate: LocalDate? = null,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
-    val internalSaksnummer: String? = null
+    val internalSaksnummer: String? = null,
+    val fullmektig: String? = null
 )
 
 enum class KlageStatus {
@@ -32,4 +33,15 @@ enum class VedtakType {
 
 fun Klage.validateAccess(currentIdentifikasjonsnummer: String) = (foedselsnummer == currentIdentifikasjonsnummer)
 fun Klage.isFinalized() = (status === KlageStatus.DONE)
+fun Klage.isDeleted() = (status === KlageStatus.DELETED)
+
+fun Klage.writableOnceFieldsMatch(existingKlage: Klage): Boolean {
+    return id == existingKlage.id &&
+            foedselsnummer == existingKlage.foedselsnummer &&
+            tema == existingKlage.tema &&
+            ytelse == existingKlage.ytelse &&
+            journalpostId == existingKlage.journalpostId &&
+            internalSaksnummer == existingKlage.internalSaksnummer &&
+            fullmektig == existingKlage.fullmektig
+}
 

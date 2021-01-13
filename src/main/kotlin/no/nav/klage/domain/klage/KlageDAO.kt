@@ -30,6 +30,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var vedtakDate by Klager.vedtakDate
     var checkBoxesSelected by Klager.checkboxesSelected
     var internalSaksnummer by Klager.internalSaksnummer
+    var fullmektig by Klager.fullmektig
 }
 
 object Klager : IntIdTable("klage") {
@@ -46,6 +47,7 @@ object Klager : IntIdTable("klage") {
     var vedtakDate = date("vedtak_date").nullable()
     var checkboxesSelected = text("checkboxes_selected").nullable()
     var internalSaksnummer = text("internal_saksnummer").nullable()
+    var fullmektig = varchar("fullmektig", 11).nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {
@@ -63,7 +65,8 @@ fun KlageDAO.toKlage(): Klage {
         vedtakType = this.vedtakType.toVedtakType(),
         vedtakDate = this.vedtakDate,
         checkboxesSelected = this.checkBoxesSelected?.toCheckboxEnumSet(),
-        internalSaksnummer = this.internalSaksnummer
+        internalSaksnummer = this.internalSaksnummer,
+        fullmektig = this.fullmektig
     )
 
     outputKlage = if (this.vedtak != null && (this.vedtakType == null && this.vedtakDate == null)) {
@@ -114,4 +117,5 @@ fun KlageDAO.fromKlage(klage: Klage) {
     vedtakDate = klage.vedtakDate
     klage.checkboxesSelected?.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
     internalSaksnummer = klage.internalSaksnummer
+    fullmektig = klage.fullmektig
 }

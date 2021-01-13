@@ -2,7 +2,7 @@ package no.nav.klage.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import no.nav.klage.domain.AggregatedKlage
+import no.nav.klage.domain.klage.AggregatedKlage
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value

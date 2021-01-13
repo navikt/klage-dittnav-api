@@ -1,5 +1,6 @@
 package no.nav.klage.clients.pdl
 
+import no.nav.klage.domain.Tema
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -46,12 +47,6 @@ data class Telefonnummer(
     val prioritet: String?
 )
 
-data class Metadata(
-    val opplysningsId: String?,
-    val master: String,
-    val endringer: List<Endring>
-)
-
 enum class Endringstype {
     OPPRETT,
     KORRIGER,
@@ -64,24 +59,6 @@ data class Endring(
     val registrertAv: String?,
     val systemKilde: String?,
     val kilde: String?
-)
-
-data class Folkeregistermetadata(
-    val ajourholdstidspunkt: LocalDateTime?,
-    val gyldighetstidspunkt: LocalDateTime?,
-    val opphoerstidspunkt: LocalDateTime?,
-    val kilde: String?,
-    val aarsak: String?,
-    val sekvens: Int?
-)
-
-data class Matrikkeladresse(
-    val matrikkelId: Int?,
-    val bruksenhetsnummer: String?,
-    val tilleggsnavn: String?,
-    val postnummer: String?,
-    val kommunenummer: String?,
-    val koordinater: Koordinater?
 )
 
 data class VegAdresse(
@@ -112,3 +89,15 @@ data class Folkeregisteridentifikator(
     val type: String,
     val status: String
 )
+
+data class Fullmakt(
+    val motpartsPersonident: String,
+    val motpartsRolle: FullmaktsRolle,
+    val omraader: List<Tema>,
+    val gyldigFraOgMed: LocalDate,
+    val gyldigTilOgMed: LocalDate
+)
+
+enum class FullmaktsRolle {
+    FULLMAKTSGIVER, FULLMEKTIG
+}

@@ -1,10 +1,10 @@
-query($ident: ID!, $bostedHistorikk: Boolean!, $folkeregisteridentifikatorHistorikk: Boolean!){
+query($ident: ID!){
     hentPerson(ident: $ident) {
         adressebeskyttelse{
             gradering
         },
         navn{fornavn,mellomnavn,etternavn},
-        bostedsadresse(historikk: $bostedHistorikk) {
+        bostedsadresse(historikk: false) {
             angittFlyttedato,
             coAdressenavn,
             ukjentBosted {
@@ -25,7 +25,7 @@ query($ident: ID!, $bostedHistorikk: Boolean!, $folkeregisteridentifikatorHistor
             nummer
             prioritet
         },
-        folkeregisteridentifikator(historikk: $folkeregisteridentifikatorHistorikk){
+        folkeregisteridentifikator(historikk: false){
             identifikasjonsnummer
             type
             status
