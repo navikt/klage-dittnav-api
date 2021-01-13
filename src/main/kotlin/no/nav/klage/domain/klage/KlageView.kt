@@ -21,12 +21,13 @@ data class KlageView(
     val vedtakDate: LocalDate? = null,
     val checkboxesSelected: Set<CheckboxEnum>,
     val userSaksnummer: String? = null,
-    val internalSaksnummer: String? = null
+    val internalSaksnummer: String? = null,
+    val fullmaktsgiver: String? = null
 )
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
     id = id,
-    foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+    foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
     fritekst = fritekst,
     status = status,
     tema = tema,
@@ -37,5 +38,6 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     vedtakType = vedtakType,
     vedtakDate = vedtakDate,
     checkboxesSelected = checkboxesSelected,
-    internalSaksnummer = internalSaksnummer
+    internalSaksnummer = internalSaksnummer,
+    fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer }
 )

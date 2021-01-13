@@ -71,9 +71,14 @@ class KlageRepository {
         }
     }
 
-    fun updateKlage(klage: Klage): Klage {
+    fun updateKlage(klage: Klage, checkWritableOnceFields: Boolean = true): Klage {
         logger.debug("Updating klage in db. Id: {}", klage.id)
         val klageFromDB = getKlageToModify(klage.id)
+
+        if (checkWritableOnceFields && !klage.writableOnceFieldsMatch(klageFromDB.toKlage())) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Illegal update operation")
+        }
+
         klageFromDB.apply {
             fromKlage(klage)
         }

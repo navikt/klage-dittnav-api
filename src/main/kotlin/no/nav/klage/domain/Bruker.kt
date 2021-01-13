@@ -42,3 +42,5 @@ data class Kontaktinformasjon(
 
 private fun String?.orEmpty(): String = this ?: ""
 
+fun Bruker.getCompoundedNavn(): String =
+    navn.fornavn + " " + if (navn.mellomnavn != null) { navn.mellomnavn + " "} else {""} + navn.etternavn
