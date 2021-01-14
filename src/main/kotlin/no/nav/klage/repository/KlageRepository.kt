@@ -1,13 +1,13 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
+import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
-import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @Repository
@@ -25,10 +25,7 @@ class KlageRepository {
     }
 
     fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Klage not found"
-        )
+        return KlageDAO.findById(id)?.toKlage() ?: throw KlageNotFoundException("Klage with id $id not found in db.")
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -43,7 +40,7 @@ class KlageRepository {
         return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }
             .map { it.toKlage() }
     }
-    
+
     fun getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
         fnr: String,
         tema: Tema,
@@ -76,7 +73,7 @@ class KlageRepository {
         val klageFromDB = getKlageToModify(klage.id)
 
         if (checkWritableOnceFields && !klage.writableOnceFieldsMatch(klageFromDB.toKlage())) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Illegal update operation")
+            throw AttemptedIllegalUpdateException()
         }
 
         klageFromDB.apply {
@@ -97,9 +94,6 @@ class KlageRepository {
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
-        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Klage with id $id not found in db."
-        )
+        return KlageDAO.findById(checkNotNull(id)) ?: throw KlageNotFoundException("Klage with id $id not found in db.")
     }
 }
