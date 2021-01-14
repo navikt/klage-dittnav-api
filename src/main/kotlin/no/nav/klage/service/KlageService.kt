@@ -81,7 +81,7 @@ class KlageService(
 
     fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
         if (klage.fullmaktsgiver != null) {
-            brukerService.getFullmaktsgiver(klage.tema, klage.fullmaktsgiver)
+            brukerService.verifyFullmakt(klage.tema, klage.fullmaktsgiver)
         }
 
         return klageRepository

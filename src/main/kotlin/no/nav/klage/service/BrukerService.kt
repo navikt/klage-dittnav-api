@@ -5,12 +5,10 @@ import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.klage.domain.Tema
+import no.nav.klage.domain.exception.FullmaktNotFoundException
 import no.nav.klage.util.TokenUtil
-import no.nav.klage.util.dateIsWithinInclusiveRange
 import no.nav.pam.geography.PostDataDAO
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 
 @Service
@@ -27,10 +25,10 @@ class BrukerService(
     }
 
     fun getFullmaktsgiver(tema: Tema, fnr: String): Bruker {
-        if (verifyFullmakt(tema, fnr)) {
+        if (fullmaktExists(tema, fnr)) {
             val fullmaktsgiverPersonInfo = pdlClient.getPersonInfoWithSystemUser(fnr)
             return mapToBruker(fullmaktsgiverPersonInfo)
-        } else throw ResponseStatusException(HttpStatus.NOT_FOUND, "Fullmakt not found")
+        } else throw FullmaktNotFoundException()
     }
 
     fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
@@ -57,17 +55,22 @@ class BrukerService(
         )
     }
 
-    fun verifyFullmakt(tema: Tema, fullmaktsGiverFnr: String): Boolean {
+    fun verifyFullmakt(tema: Tema, fullmaktsGiverFnr: String) {
+        when {
+            !fullmaktExists(tema, fullmaktsGiverFnr) -> throw FullmaktNotFoundException()
+        }
+    }
+
+    private fun fullmaktExists(tema: Tema, fullmaktsGiverFnr: String): Boolean {
         val fullmektigResponse = pdlClient.getFullmektigInfoWithSystemUser(fullmaktsGiverFnr)
         val fullmaktList = fullmektigResponse.data?.hentPerson?.fullmakt
-        val validFullmakt = fullmaktList?.find { fullmakt ->
+        val validFullmakt = fullmaktList?.any { fullmakt ->
             tokenUtil.getSubject() == fullmakt.motpartsPersonident &&
                     fullmakt.motpartsRolle == FullmaktsRolle.FULLMEKTIG &&
                     fullmakt.omraader.contains(tema) &&
-                    dateIsWithinInclusiveRange(LocalDate.now(), fullmakt.gyldigFraOgMed, fullmakt.gyldigTilOgMed)
+                    LocalDate.now() in fullmakt.gyldigFraOgMed..fullmakt.gyldigTilOgMed
         }
-
-        return validFullmakt != null
+        return validFullmakt!!
     }
 
     private fun Folkeregisteridentifikator.toIdentifikator() = Identifikator(
