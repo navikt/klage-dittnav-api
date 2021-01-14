@@ -58,5 +58,19 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         logger.warn("User tried to upload too large attachment", ex)
         return create(Status.BAD_REQUEST, AttachmentTooLargeException(), request)
     }
+
+    @ExceptionHandler
+    fun handleFullmaktNotFound(
+        ex: FullmaktNotFoundException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.NOT_FOUND, ex, request)
+
+    @ExceptionHandler
+    fun handleUpdateMismatch(
+        ex: UpdateMismatchException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
 }
 

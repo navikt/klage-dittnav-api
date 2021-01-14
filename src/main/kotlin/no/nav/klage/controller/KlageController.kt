@@ -2,6 +2,8 @@ package no.nav.klage.controller
 
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.Vedtak
+import no.nav.klage.domain.exception.KlageNotFoundException
+import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.service.BrukerService
@@ -16,7 +18,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.server.ResponseStatusException
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
@@ -118,7 +119,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         if (klage.id != klageId) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "id in klage does not match resource id")
+            throw UpdateMismatchException("Id in klage does not match resource id")
         }
         klageService.updateKlage(klage, bruker)
     }
@@ -150,8 +151,8 @@ class KlageController(
         val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
         val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
         return mapOf(
-            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
-            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+                "finalizedDate" to zonedDateTime.toLocalDate().toString(),
+                "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
         )
     }
 
@@ -185,7 +186,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         if (!vedleggService.deleteVedlegg(klageId, vedleggId, bruker)) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Attachment not found.")
+            throw KlageNotFoundException("Attachment not found.")
         }
     }
 
