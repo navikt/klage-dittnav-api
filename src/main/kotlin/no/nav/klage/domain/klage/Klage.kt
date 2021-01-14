@@ -31,7 +31,7 @@ enum class VedtakType {
     LATEST, EARLIER
 }
 
-fun Klage.validateAccess(currentIdentifikasjonsnummer: String) = (foedselsnummer == currentIdentifikasjonsnummer)
+fun Klage.isAccessibleToUser(usersIdentifikasjonsnummer: String) = (foedselsnummer == usersIdentifikasjonsnummer)
 fun Klage.isFinalized() = (status === KlageStatus.DONE)
 fun Klage.isDeleted() = (status === KlageStatus.DELETED)
 

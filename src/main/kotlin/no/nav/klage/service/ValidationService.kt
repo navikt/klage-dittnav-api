@@ -7,7 +7,7 @@ import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.isDeleted
 import no.nav.klage.domain.klage.isFinalized
-import no.nav.klage.domain.klage.validateAccess
+import no.nav.klage.domain.klage.isAccessibleToUser
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,11 +18,11 @@ class ValidationService(
     fun validateAccess(klage: Klage, bruker: Bruker) {
         if (klage.fullmektig != null && klage.fullmektig == bruker.folkeregisteridentifikator.identifikasjonsnummer) {
             val fullmaktsGiver = brukerService.getFullmaktsgiver(klage.tema, klage.foedselsnummer)
-            if (!klage.validateAccess(fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer)) {
+            if (!klage.isAccessibleToUser(fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer)) {
                 throw KlageNotFoundException()
             }
         } else {
-            if (!klage.validateAccess(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            if (!klage.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
                 throw KlageNotFoundException()
             }
         }
