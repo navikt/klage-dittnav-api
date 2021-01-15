@@ -4,6 +4,7 @@ import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.createAggregatedKlage
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
@@ -41,10 +42,10 @@ class KlageService(
         return klage.toKlageView(bruker, klage.status === DRAFT)
     }
 
-    fun getDraftKlagerByFnr(bruker: Bruker): List<KlageView> {
+    fun getDraftKlagerByFnrAndTema(bruker: Bruker, tema: Tema): List<KlageView> {
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-        val klager = klageRepository.getDraftKlagerByFnr(fnr)
-        return klager.map { it.toKlageView(bruker) }
+        val klager = klageRepository.getDraftKlagerByFnrAndTema(fnr, tema)
+        return klager.map { it.toKlageView(bruker, false) }
     }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {

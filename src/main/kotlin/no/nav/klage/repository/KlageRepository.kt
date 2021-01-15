@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
 import no.nav.klage.util.getLogger
@@ -24,7 +25,10 @@ class KlageRepository {
     }
 
     fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Klage not found"
+        )
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -35,8 +39,10 @@ class KlageRepository {
         return KlageDAO.find { Klager.foedselsnummer eq fnr }.map { it.toKlage() }
     }
 
-    fun getDraftKlagerByFnr(fnr: String): List<Klage> {
-        return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }.map { it.toKlage() }
+    fun getDraftKlagerByFnrAndTema(fnr: String, tema: Tema): List<Klage> {
+        return KlageDAO.find {
+            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.status eq KlageStatus.DRAFT.toString())
+        }.map { it.toKlage() }
     }
 
     fun createKlage(klage: Klage): Klage {
@@ -69,6 +75,9 @@ class KlageRepository {
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
-        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage with id $id not found in db.")
+        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Klage with id $id not found in db."
+        )
     }
 }
