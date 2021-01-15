@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
 import no.nav.klage.util.getLogger
@@ -24,7 +25,10 @@ class KlageRepository {
     }
 
     fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        return KlageDAO.findById(id)?.toKlage() ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Klage not found"
+        )
     }
 
     fun getKlageByJournalpostId(journalpostId: String): Klage {
@@ -36,7 +40,37 @@ class KlageRepository {
     }
 
     fun getDraftKlagerByFnr(fnr: String): List<Klage> {
-        return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }.map { it.toKlage() }
+        return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }
+            .map { it.toKlage() }
+    }
+
+    fun getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
+        fnr: String,
+        tema: Tema,
+        ytelse: String?,
+        internalSaksnummer: String?
+    ): Klage {
+        return if (ytelse.isNullOrBlank() && internalSaksnummer.isNullOrBlank()) {
+            KlageDAO.find {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
+            }.sortedByDescending { it.modifiedByUser }
+                .map { it.toKlage() }[0]
+        } else if (ytelse.isNullOrBlank()) {
+            KlageDAO.find {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+            }.sortedByDescending { it.modifiedByUser }
+                .map { it.toKlage() }[0]
+        } else if (internalSaksnummer.isNullOrBlank()) {
+            KlageDAO.find {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
+            }.sortedByDescending { it.modifiedByUser }
+                .map { it.toKlage() }[0]
+        } else {
+            KlageDAO.find {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+            }.sortedByDescending { it.modifiedByUser }
+                .map { it.toKlage() }[0]
+        }
     }
 
     fun createKlage(klage: Klage): Klage {
@@ -69,6 +103,9 @@ class KlageRepository {
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
-        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage with id $id not found in db.")
+        return KlageDAO.findById(checkNotNull(id)) ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Klage with id $id not found in db."
+        )
     }
 }

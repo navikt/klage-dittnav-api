@@ -1,5 +1,6 @@
 package no.nav.klage.controller
 
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.Vedtak
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.vedlegg.VedleggView
@@ -16,7 +17,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
-import java.time.*
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -42,6 +44,22 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         return klageService.getDraftKlagerByFnr(bruker)
+    }
+
+    @GetMapping("/klager/draft")
+    fun getDraftKlageByQuery(
+        @RequestParam tema: Tema,
+        @RequestParam ytelse: String?,
+        @RequestParam internalSaksnummer: String?
+    ): KlageView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get klager for user is requested.")
+        secureLogger.debug(
+            "Get klager for user is requested. Fnr: {}, tema: {}",
+            bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            tema
+        )
+        return klageService.getLatestDraftKlageByParams(bruker, tema, ytelse, internalSaksnummer)
     }
 
     @GetMapping("/klager/{klageId}")
@@ -132,8 +150,8 @@ class KlageController(
         val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
         val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
         return mapOf(
-                "finalizedDate" to zonedDateTime.toLocalDate().toString(),
-                "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
+            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
         )
     }
 
