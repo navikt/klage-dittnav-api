@@ -43,33 +43,33 @@ class KlageRepository {
         return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }
             .map { it.toKlage() }
     }
-
+    
     fun getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
         fnr: String,
         tema: Tema,
         ytelse: String?,
         internalSaksnummer: String?
-    ): Klage {
+    ): Klage? {
         return if (ytelse.isNullOrBlank() && internalSaksnummer.isNullOrBlank()) {
             KlageDAO.find {
                 Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.sortedByDescending { it.modifiedByUser }
-                .map { it.toKlage() }[0]
+            }.maxBy { it.modifiedByUser }
+                ?.toKlage()
         } else if (ytelse.isNullOrBlank()) {
             KlageDAO.find {
                 Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.sortedByDescending { it.modifiedByUser }
-                .map { it.toKlage() }[0]
+            }.maxBy { it.modifiedByUser }
+                ?.toKlage()
         } else if (internalSaksnummer.isNullOrBlank()) {
             KlageDAO.find {
                 Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.sortedByDescending { it.modifiedByUser }
-                .map { it.toKlage() }[0]
+            }.maxBy { it.modifiedByUser }
+                ?.toKlage()
         } else {
             KlageDAO.find {
                 Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.sortedByDescending { it.modifiedByUser }
-                .map { it.toKlage() }[0]
+            }.maxBy { it.modifiedByUser }
+                ?.toKlage()
         }
     }
 

@@ -55,18 +55,18 @@ class KlageService(
         internalSaksnummer: String?
     ): KlageView {
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-        try {
-            val klage =
-                klageRepository.getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
-                    fnr,
-                    tema,
-                    ytelse,
-                    internalSaksnummer
-                )
+
+        val klage =
+            klageRepository.getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
+                fnr,
+                tema,
+                ytelse,
+                internalSaksnummer
+            )
+        if (klage != null) {
             return klage.toKlageView(bruker, false)
-        } catch (e: Exception) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
         }
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
     }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
