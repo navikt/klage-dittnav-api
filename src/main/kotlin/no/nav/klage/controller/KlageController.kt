@@ -35,7 +35,7 @@ class KlageController(
         private val secureLogger = getSecureLogger()
     }
 
-    @GetMapping("/klager/kladd/{tema}")
+    @GetMapping("/klager/draft/{tema}")
     fun getDraftKlagerBytema(
         @PathVariable tema: Tema
     ): List<KlageView> {
