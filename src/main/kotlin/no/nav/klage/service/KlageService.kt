@@ -7,7 +7,7 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.createAggregatedKlage
+import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
@@ -69,7 +69,7 @@ class KlageService(
         if (klage != null) {
             return klage.toKlageView(bruker, false)
         }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Klage not found")
+        throw KlageNotFoundException()
     }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
