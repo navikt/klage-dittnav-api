@@ -50,27 +50,16 @@ class KlageRepository {
         ytelse: String?,
         internalSaksnummer: String?
     ): Klage? {
-        return if (ytelse.isNullOrBlank() && internalSaksnummer.isNullOrBlank()) {
-            KlageDAO.find {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.maxBy { it.modifiedByUser }
-                ?.toKlage()
+        return KlageDAO.find { if (ytelse.isNullOrBlank() && internalSaksnummer.isNullOrBlank()) {
+            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
         } else if (ytelse.isNullOrBlank()) {
-            KlageDAO.find {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.maxBy { it.modifiedByUser }
-                ?.toKlage()
+            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
         } else if (internalSaksnummer.isNullOrBlank()) {
-            KlageDAO.find {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.maxBy { it.modifiedByUser }
-                ?.toKlage()
+            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
         } else {
-            KlageDAO.find {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
-            }.maxBy { it.modifiedByUser }
-                ?.toKlage()
-        }
+            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+        }}.maxBy { it.modifiedByUser }
+            ?.toKlage()
     }
 
     fun createKlage(klage: Klage): Klage {
