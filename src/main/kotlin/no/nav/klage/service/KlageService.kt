@@ -55,9 +55,10 @@ class KlageService(
         bruker: Bruker,
         tema: Tema,
         ytelse: String?,
-        internalSaksnummer: String?
+        internalSaksnummer: String?,
+        fullmaktsgiver: String?
     ): KlageView {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+        val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val klage =
             klageRepository.getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
@@ -67,6 +68,7 @@ class KlageService(
                 internalSaksnummer
             )
         if (klage != null) {
+            validationService.validateAccess(klage, bruker)
             return klage.toKlageView(bruker, false)
         }
         throw KlageNotFoundException()
