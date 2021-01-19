@@ -63,7 +63,11 @@ class BrukerService(
 
     private fun fullmaktExists(tema: Tema, fullmaktsGiverFnr: String): Boolean {
         val fullmektigResponse = pdlClient.getFullmektigInfoWithSystemUser(fullmaktsGiverFnr)
+        if (fullmektigResponse.data?.hentPerson == null) {
+            throw FullmaktNotFoundException()
+        }
         val fullmaktList = fullmektigResponse.data?.hentPerson?.fullmakt
+
         val validFullmakt = fullmaktList?.any { fullmakt ->
             tokenUtil.getSubject() == fullmakt.motpartsPersonident &&
                     fullmakt.motpartsRolle == FullmaktsRolle.FULLMEKTIG &&
