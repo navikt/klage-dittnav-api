@@ -51,7 +51,8 @@ class KlageController(
     fun getDraftKlageByQuery(
         @RequestParam tema: Tema,
         @RequestParam ytelse: String?,
-        @RequestParam internalSaksnummer: String?
+        @RequestParam internalSaksnummer: String?,
+        @RequestParam fullmaktsgiver: String?
     ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Get klager for user is requested.")
@@ -60,7 +61,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema
         )
-        return klageService.getLatestDraftKlageByParams(bruker, tema, ytelse, internalSaksnummer)
+        return klageService.getLatestDraftKlageByParams(bruker, tema, ytelse, internalSaksnummer, fullmaktsgiver)
     }
 
     @GetMapping("/klager/{klageId}")
