@@ -54,4 +54,4 @@ maxTotalSize: 32MB
 navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
-ALL_FULLMAKT_OMRAADER: *
+ALL_FULLMAKT_OMRAADER: "*"
