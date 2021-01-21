@@ -8,6 +8,7 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.FullmaktNotFoundException
 import no.nav.klage.util.TokenUtil
 import no.nav.pam.geography.PostDataDAO
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -16,6 +17,9 @@ class BrukerService(
     private val pdlClient: PdlClient,
     private val tokenUtil: TokenUtil
 ) {
+
+    @Value("\${ALL_FULLMAKT_OMRAADER}")
+    private lateinit var allFullmaktOmraader: String
 
     private val postDataDAO = PostDataDAO()
 
@@ -66,15 +70,14 @@ class BrukerService(
         if (fullmektigResponse.data?.hentPerson == null) {
             throw FullmaktNotFoundException()
         }
-        val fullmaktList = fullmektigResponse.data?.hentPerson?.fullmakt
+        val fullmaktList = fullmektigResponse.data.hentPerson.fullmakt
 
-        val validFullmakt = fullmaktList?.any { fullmakt ->
+        return fullmaktList.any { fullmakt ->
             tokenUtil.getSubject() == fullmakt.motpartsPersonident &&
                     fullmakt.motpartsRolle == FullmaktsRolle.FULLMEKTIG &&
-                    fullmakt.omraader.contains(tema) &&
+                    (fullmakt.omraader.contains(tema.name) || fullmakt.omraader.contains(allFullmaktOmraader)) &&
                     LocalDate.now() in fullmakt.gyldigFraOgMed..fullmakt.gyldigTilOgMed
         }
-        return validFullmakt!!
     }
 
     private fun Folkeregisteridentifikator.toIdentifikator() = Identifikator(
