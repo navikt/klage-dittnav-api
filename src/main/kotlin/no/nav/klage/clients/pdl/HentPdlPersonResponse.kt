@@ -1,6 +1,5 @@
 package no.nav.klage.clients.pdl
 
-import no.nav.klage.domain.Tema
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -93,7 +92,7 @@ data class Folkeregisteridentifikator(
 data class Fullmakt(
     val motpartsPersonident: String,
     val motpartsRolle: FullmaktsRolle,
-    val omraader: List<Tema>,
+    val omraader: List<String>,
     val gyldigFraOgMed: LocalDate,
     val gyldigTilOgMed: LocalDate
 )
