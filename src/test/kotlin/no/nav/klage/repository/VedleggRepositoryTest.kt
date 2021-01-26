@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.Klage
 import org.flywaydb.core.Flyway
@@ -58,7 +59,8 @@ class VedleggRepositoryTest {
         foedselsnummer = "123455667",
         fritekst = "fritekst",
         tema = Tema.AAP,
-        ytelse = "Foreldrepenger"
+        ytelse = "Foreldrepenger",
+        language = LanguageEnum.NB
     )
 
     private val vedlegg1 =
