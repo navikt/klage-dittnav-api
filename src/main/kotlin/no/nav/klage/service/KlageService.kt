@@ -183,7 +183,8 @@ class KlageService(
             checkboxesSelected = checkboxesSelected ?: emptySet(),
             userSaksnummer = userSaksnummer,
             internalSaksnummer = internalSaksnummer,
-            fullmaktsgiver = fullmektig?.let { foedselsnummer }
+            fullmaktsgiver = fullmektig?.let { foedselsnummer },
+            language = language
         )
     }
 
