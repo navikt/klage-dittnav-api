@@ -3,8 +3,6 @@ package no.nav.klage.domain.klage
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
-import no.nav.klage.util.vedtakDateFromVedtak
-import no.nav.klage.util.vedtakTypeFromVedtak
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -22,11 +20,9 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var modifiedByUser by Klager.modifiedByUser
     var tema by Klager.tema
     var ytelse by Klager.ytelse
-    var vedtak by Klager.vedtak
     var userSaksnummer by Klager.userSaksnummer
     val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
     var journalpostId by Klager.journalpostId
-    var vedtakType by Klager.vedtakType
     var vedtakDate by Klager.vedtakDate
     var checkBoxesSelected by Klager.checkboxesSelected
     var internalSaksnummer by Klager.internalSaksnummer
@@ -40,10 +36,8 @@ object Klager : IntIdTable("klage") {
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
     var ytelse = varchar("ytelse", 300)
-    var vedtak = varchar("vedtak", 100).nullable()
     var userSaksnummer = text("user_saksnummer").nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
-    var vedtakType = varchar("vedtak_type", 25).nullable()
     var vedtakDate = date("vedtak_date").nullable()
     var checkboxesSelected = text("checkboxes_selected").nullable()
     var internalSaksnummer = text("internal_saksnummer").nullable()
@@ -51,34 +45,22 @@ object Klager : IntIdTable("klage") {
 }
 
 fun KlageDAO.toKlage(): Klage {
-    var outputKlage = Klage(
-        id = this.id.toString().toInt(),
-        foedselsnummer = this.foedselsnummer,
-        fritekst = this.fritekst,
-        status = this.status.toStatus(),
-        modifiedByUser = this.modifiedByUser,
-        tema = this.tema.toTema(),
-        ytelse = this.ytelse,
-        userSaksnummer = this.userSaksnummer,
-        vedlegg = this.vedlegg.map { it.toVedlegg() },
-        journalpostId = this.journalpostId,
-        vedtakType = this.vedtakType.toVedtakType(),
-        vedtakDate = this.vedtakDate,
-        checkboxesSelected = this.checkBoxesSelected?.toCheckboxEnumSet(),
-        internalSaksnummer = this.internalSaksnummer,
-        fullmektig = this.fullmektig
+    return Klage(
+        id = id.toString().toInt(),
+        foedselsnummer = foedselsnummer,
+        fritekst = fritekst,
+        status = status.toStatus(),
+        modifiedByUser = modifiedByUser,
+        tema = tema.toTema(),
+        ytelse = ytelse,
+        userSaksnummer = userSaksnummer,
+        vedlegg = vedlegg.map { it.toVedlegg() },
+        journalpostId = journalpostId,
+        vedtakDate = vedtakDate,
+        checkboxesSelected = checkBoxesSelected?.toCheckboxEnumSet(),
+        internalSaksnummer = internalSaksnummer,
+        fullmektig = fullmektig
     )
-
-    outputKlage = if (this.vedtak != null && (this.vedtakType == null && this.vedtakDate == null)) {
-        outputKlage.copy(
-            vedtakType = vedtakTypeFromVedtak(this.vedtak!!),
-            vedtakDate = vedtakDateFromVedtak(this.vedtak!!)
-        )
-    } else {
-        outputKlage
-    }
-
-    return outputKlage
 }
 
 fun String.toTema() = try {
@@ -92,9 +74,6 @@ fun String.toStatus() = try {
 } catch (e: IllegalArgumentException) {
     KlageStatus.DRAFT
 }
-
-fun String?.toVedtakType() =
-    if (this != null) VedtakType.valueOf(this) else null
 
 fun String.toCheckboxEnumSet() =
     if (this == "") {
@@ -110,10 +89,8 @@ fun KlageDAO.fromKlage(klage: Klage) {
     modifiedByUser = Instant.now()
     tema = klage.tema.name
     ytelse = klage.ytelse
-    vedtak = null
     userSaksnummer = klage.userSaksnummer
     klage.journalpostId?.let { journalpostId = it }
-    vedtakType = klage.vedtakType?.name
     vedtakDate = klage.vedtakDate
     klage.checkboxesSelected?.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
     internalSaksnummer = klage.internalSaksnummer

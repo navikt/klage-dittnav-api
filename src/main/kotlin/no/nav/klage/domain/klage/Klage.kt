@@ -16,7 +16,6 @@ data class Klage(
     val userSaksnummer: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
     val journalpostId: String? = null,
-    val vedtakType: VedtakType? = null,
     val vedtakDate: LocalDate? = null,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
     val internalSaksnummer: String? = null,
@@ -25,10 +24,6 @@ data class Klage(
 
 enum class KlageStatus {
     DRAFT, DONE, DELETED
-}
-
-enum class VedtakType {
-    LATEST, EARLIER
 }
 
 fun Klage.isAccessibleToUser(usersIdentifikasjonsnummer: String) = (foedselsnummer == usersIdentifikasjonsnummer)

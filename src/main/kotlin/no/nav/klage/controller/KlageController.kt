@@ -1,7 +1,6 @@
 package no.nav.klage.controller
 
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.Vedtak
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.klage.KlageView
@@ -241,12 +240,5 @@ class KlageController(
             responseHeaders,
             HttpStatus.OK
         )
-    }
-
-
-    @GetMapping("/vedtak")
-    fun getVedtak(): List<Vedtak> {
-        logger.debug("Get vedtak is requested.")
-        return listOf()
     }
 }
