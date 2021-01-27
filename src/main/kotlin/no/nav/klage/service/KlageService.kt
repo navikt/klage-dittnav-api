@@ -14,7 +14,7 @@ import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
-import no.nav.klage.util.vedtakFromTypeAndDate
+import no.nav.klage.util.vedtakFromDate
 import no.nav.slackposter.Kibana
 import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
@@ -178,7 +178,6 @@ class KlageService(
             },
             journalpostId,
             finalizedDate = if (status === DONE) modifiedDateTime.toLocalDate() else null,
-            vedtakType = vedtakType,
             vedtakDate = vedtakDate,
             checkboxesSelected = checkboxesSelected ?: emptySet(),
             userSaksnummer = userSaksnummer,
@@ -191,7 +190,7 @@ class KlageService(
         bruker: Bruker,
         klage: Klage
     ): AggregatedKlage {
-        val vedtak = vedtakFromTypeAndDate(klage.vedtakType, klage.vedtakDate)
+        val vedtak = vedtakFromDate(klage.vedtakDate)
         val fullmektigKlage = klage.fullmektig != null
 
         if (fullmektigKlage) {
