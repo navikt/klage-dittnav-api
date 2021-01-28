@@ -128,9 +128,11 @@ class KlageService(
         val klageIdAsString = klageId.toString()
         slackClient.postMessage(
             String.format(
-                "Klage med id <%s|%s> er sendt inn.",
+                "Klage (<%s|%s>) med tema %s er sendt inn%s",
                 Kibana.createUrl(klageIdAsString),
-                klageIdAsString
+                klageIdAsString,
+                existingKlage.tema.name,
+                (if (existingKlage.fullmektig.isNullOrEmpty()) "." else " med fullmakt.")
             )
         )
 
