@@ -1,6 +1,7 @@
 package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.domain.vedlegg.toVedlegg
@@ -21,7 +22,8 @@ data class KlageView(
     val checkboxesSelected: Set<CheckboxEnum>,
     val userSaksnummer: String? = null,
     val internalSaksnummer: String? = null,
-    val fullmaktsgiver: String? = null
+    val fullmaktsgiver: String? = null,
+    val language: LanguageEnum = LanguageEnum.NB
 )
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
@@ -37,5 +39,6 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     vedtakDate = vedtakDate,
     checkboxesSelected = checkboxesSelected,
     internalSaksnummer = internalSaksnummer,
-    fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer }
+    fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
+    language = language
 )

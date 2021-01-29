@@ -1,5 +1,6 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
@@ -27,6 +28,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var checkBoxesSelected by Klager.checkboxesSelected
     var internalSaksnummer by Klager.internalSaksnummer
     var fullmektig by Klager.fullmektig
+    var language by Klager.language
 }
 
 object Klager : IntIdTable("klage") {
@@ -42,6 +44,7 @@ object Klager : IntIdTable("klage") {
     var checkboxesSelected = text("checkboxes_selected").nullable()
     var internalSaksnummer = text("internal_saksnummer").nullable()
     var fullmektig = varchar("fullmektig", 11).nullable()
+    var language = text("language").nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {
@@ -59,7 +62,8 @@ fun KlageDAO.toKlage(): Klage {
         vedtakDate = vedtakDate,
         checkboxesSelected = checkBoxesSelected?.toCheckboxEnumSet(),
         internalSaksnummer = internalSaksnummer,
-        fullmektig = fullmektig
+        fullmektig = fullmektig,
+        language = getLanguageEnum(this.language)
     )
 }
 
@@ -73,6 +77,17 @@ fun String.toStatus() = try {
     KlageStatus.valueOf(this)
 } catch (e: IllegalArgumentException) {
     KlageStatus.DRAFT
+}
+
+fun getLanguageEnum(input: String?): LanguageEnum {
+    return when (input) {
+        null -> {
+            LanguageEnum.NB
+        }
+        else -> {
+            LanguageEnum.valueOf(input)
+        }
+    }
 }
 
 fun String.toCheckboxEnumSet() =
@@ -95,4 +110,5 @@ fun KlageDAO.fromKlage(klage: Klage) {
     klage.checkboxesSelected?.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
     internalSaksnummer = klage.internalSaksnummer
     fullmektig = klage.fullmektig
+    language = klage.language.name
 }

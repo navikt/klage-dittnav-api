@@ -113,6 +113,7 @@ class KlageConversionTest {
         fritekst = fritekst,
         tema = tema,
         ytelse = ytelse,
-        modifiedByUser = modifiedByUser
+        modifiedByUser = modifiedByUser,
+        language = LanguageEnum.NB
     )
 }
