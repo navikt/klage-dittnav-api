@@ -13,7 +13,7 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
 
         private const val COUNTER_KLAGER_FINALIZED = "klager_finalized"
         private const val COUNTER_KLAGER_INITIALIZED = "klager_initialized"
-        private const val COUNTER_KLAGER_GRUNN = "klager_grunn"
+        private const val COUNTER_KLAGER_FINALIZED_GRUNN = "klager_finalized_grunn"
         private const val COUNTER_KLAGER_FINALIZED_FULLMAKT = "klager_finalized_fullmakt"
     }
 
@@ -36,7 +36,7 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
     fun incrementKlagerGrunn(ytelse: String, checkboxesSelected: Set<CheckboxEnum>) {
         try {
             checkboxesSelected.forEach {
-                meterRegistry.counter(COUNTER_KLAGER_GRUNN, "ytelse", ytelse, "grunn", it.name).increment()
+                meterRegistry.counter(COUNTER_KLAGER_FINALIZED_GRUNN, "ytelse", ytelse, "grunn", it.name).increment()
             }
         } catch (e: Exception) {
             logger.warn("incrementKlagerGrunn failed", e)
