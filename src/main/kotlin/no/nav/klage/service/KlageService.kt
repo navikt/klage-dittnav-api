@@ -4,10 +4,10 @@ import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.exception.KlageIsFinalizedException
-import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.Tema
+import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.exception.KlageNotFoundException
+import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
@@ -115,7 +115,8 @@ class KlageService(
         validationService.checkKlageStatus(existingKlage, false)
 
         if (existingKlage.isFinalized()) {
-            return existingKlage.modifiedByUser ?: throw KlageIsFinalizedException("No modified date after finalize klage")
+            return existingKlage.modifiedByUser
+                ?: throw KlageIsFinalizedException("No modified date after finalize klage")
         }
 
         validationService.validateAccess(existingKlage, bruker)
@@ -182,7 +183,8 @@ class KlageService(
             checkboxesSelected = checkboxesSelected ?: emptySet(),
             userSaksnummer = userSaksnummer,
             internalSaksnummer = internalSaksnummer,
-            fullmaktsgiver = fullmektig?.let { foedselsnummer }
+            fullmaktsgiver = fullmektig?.let { foedselsnummer },
+            language = language
         )
     }
 

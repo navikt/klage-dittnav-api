@@ -1,5 +1,6 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
@@ -19,7 +20,8 @@ data class Klage(
     val vedtakDate: LocalDate? = null,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
     val internalSaksnummer: String? = null,
-    val fullmektig: String? = null
+    val fullmektig: String? = null,
+    val language: LanguageEnum
 )
 
 enum class KlageStatus {
