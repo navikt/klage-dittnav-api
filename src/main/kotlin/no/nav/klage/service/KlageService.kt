@@ -11,8 +11,8 @@ import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
-import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
+import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.vedtakFromDate
 import no.nav.slackposter.Kibana
@@ -90,7 +90,7 @@ class KlageService(
             .createKlage(klage.toKlage(bruker, DRAFT))
             .toKlageView(bruker)
             .also {
-                klageMetrics.incrementKlagerInitialized()
+                klageMetrics.incrementKlagerInitialized(klage.tema.toString())
             }
     }
 
@@ -123,8 +123,7 @@ class KlageService(
         existingKlage.status = DONE
         val updatedKlage = klageRepository.updateKlage(existingKlage)
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, updatedKlage))
-        klageMetrics.incrementKlagerFinalized(updatedKlage.tema.toString())
-        vedleggMetrics.registerNumberOfVedleggPerUser(updatedKlage.vedlegg.size.toDouble())
+        registerFinalizedMetrics(updatedKlage)
 
         val klageIdAsString = klageId.toString()
         slackClient.postMessage(
@@ -188,6 +187,15 @@ class KlageService(
             fullmaktsgiver = fullmektig?.let { foedselsnummer },
             language = language
         )
+    }
+
+    private fun registerFinalizedMetrics(klage: Klage) {
+        klageMetrics.incrementKlagerFinalized(klage.tema.toString())
+        klageMetrics.incrementKlagerGrunn(klage.tema.toString(), klage.checkboxesSelected ?: emptySet())
+        if (klage.fullmektig != null) {
+            klageMetrics.incrementFullmakt(klage.tema.toString())
+        }
+        vedleggMetrics.registerNumberOfVedleggPerUser(klage.vedlegg.size.toDouble())
     }
 
     private fun createAggregatedKlage(
