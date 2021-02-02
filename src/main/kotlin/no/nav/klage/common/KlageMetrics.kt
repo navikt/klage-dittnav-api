@@ -15,6 +15,8 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         private const val COUNTER_KLAGER_INITIALIZED = "klager_initialized"
         private const val COUNTER_KLAGER_FINALIZED_GRUNN = "klager_finalized_grunn"
         private const val COUNTER_KLAGER_FINALIZED_FULLMAKT = "klager_finalized_fullmakt"
+        private const val COUNTER_KLAGER_OPTIONAL_SAKSNUMMER = "klager_optional_saksnummer"
+        private const val COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO = "klager_optional_vedtaksdato"
     }
 
     fun incrementKlagerInitialized(ytelse: String) {
@@ -47,7 +49,23 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         try {
             meterRegistry.counter(COUNTER_KLAGER_FINALIZED_FULLMAKT, "ytelse", ytelse).increment()
         } catch (e: Exception) {
-            logger.warn("incrementKlagerFinalized failed", e)
+            logger.warn("incrementFullmakt failed", e)
+        }
+    }
+
+    fun incrementOptionalSaksnummer(ytelse: String) {
+        try {
+            meterRegistry.counter(COUNTER_KLAGER_OPTIONAL_SAKSNUMMER, "ytelse", ytelse).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementOptionalSaksnummer failed", e)
+        }
+    }
+
+    fun incrementOptionalVedtaksdato(ytelse: String) {
+        try {
+            meterRegistry.counter(COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO, "ytelse", ytelse).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementOptionalVedtaksdato failed", e)
         }
     }
 
