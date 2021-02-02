@@ -195,6 +195,12 @@ class KlageService(
         if (klage.fullmektig != null) {
             klageMetrics.incrementFullmakt(klage.tema.toString())
         }
+        if (klage.userSaksnummer != null) {
+            klageMetrics.incrementOptionalSaksnummer(klage.tema.toString())
+        }
+        if (klage.vedtakDate != null) {
+            klageMetrics.incrementOptionalVedtaksdato(klage.tema.toString())
+        }
         vedleggMetrics.registerNumberOfVedleggPerUser(klage.vedlegg.size.toDouble())
     }
 
