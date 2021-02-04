@@ -1,12 +1,14 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
 import no.nav.klage.domain.exception.KlageNotFoundException
-import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DELETED
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.or
 import org.springframework.stereotype.Repository
 import java.time.Instant
 
@@ -41,21 +43,23 @@ class KlageRepository {
             .map { it.toKlage() }
     }
 
-    fun getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
+    fun getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
         fnr: String,
         tema: Tema,
-        ytelse: String?,
-        internalSaksnummer: String?
+        internalSaksnummer: String?,
+        titleKey: TitleEnum?
     ): Klage? {
-        return KlageDAO.find { if (ytelse.isNullOrBlank() && internalSaksnummer.isNullOrBlank()) {
-            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
-        } else if (ytelse.isNullOrBlank()) {
-            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
-        } else if (internalSaksnummer.isNullOrBlank()) {
-            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
-        } else {
-            Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq ytelse) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
-        }}.maxBy { it.modifiedByUser }
+        return KlageDAO.find {
+            if (titleKey == null && internalSaksnummer.isNullOrBlank()) {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
+            } else if (titleKey == null) {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+            } else if (internalSaksnummer.isNullOrBlank()) {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
+            } else {
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+            }
+        }.maxBy { it.modifiedByUser }
             ?.toKlage()
     }
 

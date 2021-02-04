@@ -11,8 +11,9 @@ import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
-import no.nav.klage.kafka.KafkaProducer
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.toVedleggView
+import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.vedtakFromDate
 import no.nav.slackposter.Kibana
@@ -54,18 +55,25 @@ class KlageService(
     fun getLatestDraftKlageByParams(
         bruker: Bruker,
         tema: Tema,
-        ytelse: String?,
         internalSaksnummer: String?,
-        fullmaktsgiver: String?
+        fullmaktsgiver: String?,
+        titleKey: TitleEnum?,
+        ytelse: String?
     ): KlageView {
         val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
+        var processedTitleKey = titleKey
+        if (ytelse == null && titleKey == null) {
+            processedTitleKey = TitleEnum.valueOf(tema.name)
+        } else if (ytelse != null && titleKey == null) {
+            processedTitleKey = TitleEnum.getTitleKeyFromNbTitle(ytelse)
+        }
 
         val klage =
-            klageRepository.getLatestDraftKlageByFnrTemaYtelseInternalSaksnummer(
+            klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
                 fnr,
                 tema,
-                ytelse,
-                internalSaksnummer
+                internalSaksnummer,
+                processedTitleKey
             )
         if (klage != null) {
             validationService.validateAccess(klage, bruker)
@@ -165,7 +173,6 @@ class KlageService(
             id!!,
             fritekst,
             tema,
-            ytelse,
             status,
             modifiedDateTime,
             vedlegg.map {
@@ -185,7 +192,9 @@ class KlageService(
             userSaksnummer = userSaksnummer,
             internalSaksnummer = internalSaksnummer,
             fullmaktsgiver = fullmektig?.let { foedselsnummer },
-            language = language
+            language = language,
+            titleKey = titleKey,
+            ytelse = titleKey.nb
         )
     }
 
@@ -229,9 +238,9 @@ class KlageService(
                 identifikasjonstype = fullmaktsGiver.folkeregisteridentifikator.type,
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
-                ytelse = klage.ytelse,
+                ytelse = klage.titleKey.nb,
                 vedlegg = klage.vedlegg,
-                userChoices = klage.checkboxesSelected?.map { x -> x.fullText },
+                userChoices = klage.checkboxesSelected?.map { x -> x.getFullText(klage.language) },
                 userSaksnummer = klage.userSaksnummer,
                 internalSaksnummer = klage.internalSaksnummer,
                 fullmektigNavn = bruker.getCompoundedNavn(),
@@ -253,9 +262,9 @@ class KlageService(
                 identifikasjonstype = bruker.folkeregisteridentifikator.type,
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
-                ytelse = klage.ytelse,
+                ytelse = klage.titleKey.nb,
                 vedlegg = klage.vedlegg,
-                userChoices = klage.checkboxesSelected?.map { x -> x.fullText },
+                userChoices = klage.checkboxesSelected?.map { x -> x.getFullText(klage.language) },
                 userSaksnummer = klage.userSaksnummer,
                 internalSaksnummer = klage.internalSaksnummer,
                 fullmektigNavn = null,

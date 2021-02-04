@@ -2,6 +2,7 @@ package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
 import org.jetbrains.exposed.dao.IntEntity
@@ -29,6 +30,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var internalSaksnummer by Klager.internalSaksnummer
     var fullmektig by Klager.fullmektig
     var language by Klager.language
+    var titleKey by Klager.titleKey
 }
 
 object Klager : IntIdTable("klage") {
@@ -37,7 +39,7 @@ object Klager : IntIdTable("klage") {
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
-    var ytelse = varchar("ytelse", 300)
+    var ytelse = varchar("ytelse", 300).nullable()
     var userSaksnummer = text("user_saksnummer").nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
     var vedtakDate = date("vedtak_date").nullable()
@@ -45,6 +47,7 @@ object Klager : IntIdTable("klage") {
     var internalSaksnummer = text("internal_saksnummer").nullable()
     var fullmektig = varchar("fullmektig", 11).nullable()
     var language = text("language").nullable()
+    var titleKey = text("title_key").nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {
@@ -55,7 +58,6 @@ fun KlageDAO.toKlage(): Klage {
         status = status.toStatus(),
         modifiedByUser = modifiedByUser,
         tema = tema.toTema(),
-        ytelse = ytelse,
         userSaksnummer = userSaksnummer,
         vedlegg = vedlegg.map { it.toVedlegg() },
         journalpostId = journalpostId,
@@ -63,7 +65,8 @@ fun KlageDAO.toKlage(): Klage {
         checkboxesSelected = checkBoxesSelected?.toCheckboxEnumSet(),
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmektig,
-        language = getLanguageEnum(this.language)
+        language = getLanguageEnum(this.language),
+        titleKey = getTitleEnum(this.titleKey, this.ytelse, this.tema)
     )
 }
 
@@ -90,6 +93,21 @@ fun getLanguageEnum(input: String?): LanguageEnum {
     }
 }
 
+fun getTitleEnum(titleKey: String?, ytelse: String?, tema: String): TitleEnum {
+    return when (titleKey) {
+        null -> {
+            if (ytelse != null && TitleEnum.getTitleKeyFromNbTitle(ytelse) != null) {
+                TitleEnum.getTitleKeyFromNbTitle(ytelse)!!
+            } else {
+                TitleEnum.valueOf(tema)
+            }
+        }
+        else -> {
+            TitleEnum.valueOf(titleKey)
+        }
+    }
+}
+
 fun String.toCheckboxEnumSet() =
     if (this == "") {
         emptySet()
@@ -103,7 +121,6 @@ fun KlageDAO.fromKlage(klage: Klage) {
     status = klage.status.name
     modifiedByUser = Instant.now()
     tema = klage.tema.name
-    ytelse = klage.ytelse
     userSaksnummer = klage.userSaksnummer
     klage.journalpostId?.let { journalpostId = it }
     vedtakDate = klage.vedtakDate
@@ -111,4 +128,5 @@ fun KlageDAO.fromKlage(klage: Klage) {
     internalSaksnummer = klage.internalSaksnummer
     fullmektig = klage.fullmektig
     language = klage.language.name
+    titleKey = klage.titleKey.name
 }

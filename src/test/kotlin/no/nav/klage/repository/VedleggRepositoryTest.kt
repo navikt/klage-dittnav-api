@@ -3,6 +3,7 @@ package no.nav.klage.repository
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.titles.TitleEnum
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
@@ -59,8 +60,8 @@ class VedleggRepositoryTest {
         foedselsnummer = "123455667",
         fritekst = "fritekst",
         tema = Tema.AAP,
-        ytelse = "Foreldrepenger",
-        language = LanguageEnum.NB
+        language = LanguageEnum.NB,
+        titleKey = TitleEnum.ALDERSPENSJON
     )
 
     private val vedlegg1 =
