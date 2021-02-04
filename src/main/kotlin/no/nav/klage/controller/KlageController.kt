@@ -4,6 +4,7 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.klage.KlageView
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
@@ -51,7 +52,8 @@ class KlageController(
         @RequestParam tema: Tema,
         @RequestParam ytelse: String?,
         @RequestParam internalSaksnummer: String?,
-        @RequestParam fullmaktsgiver: String?
+        @RequestParam fullmaktsgiver: String?,
+        @RequestParam titleKey: TitleEnum?
     ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Get klager for user is requested.")
@@ -60,7 +62,14 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema
         )
-        return klageService.getLatestDraftKlageByParams(bruker, tema, ytelse, internalSaksnummer, fullmaktsgiver)
+        return klageService.getLatestDraftKlageByParams(
+            bruker,
+            tema,
+            internalSaksnummer,
+            fullmaktsgiver,
+            titleKey,
+            ytelse
+        )
     }
 
     @GetMapping("/klager/{klageId}")
@@ -151,8 +160,8 @@ class KlageController(
         val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
         val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
         return mapOf(
-                "finalizedDate" to zonedDateTime.toLocalDate().toString(),
-                "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
+            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
         )
     }
 

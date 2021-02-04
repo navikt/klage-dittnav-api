@@ -2,6 +2,7 @@ package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.Vedlegg
 import java.time.Instant
 import java.time.LocalDate
@@ -13,7 +14,6 @@ data class Klage(
     var status: KlageStatus = KlageStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
-    val ytelse: String,
     val userSaksnummer: String? = null,
     val vedlegg: List<Vedlegg> = listOf(),
     val journalpostId: String? = null,
@@ -21,7 +21,8 @@ data class Klage(
     val checkboxesSelected: Set<CheckboxEnum>? = null,
     val internalSaksnummer: String? = null,
     val fullmektig: String? = null,
-    val language: LanguageEnum
+    val language: LanguageEnum,
+    val titleKey: TitleEnum
 )
 
 enum class KlageStatus {
@@ -36,7 +37,7 @@ fun Klage.writableOnceFieldsMatch(existingKlage: Klage): Boolean {
     return id == existingKlage.id &&
             foedselsnummer == existingKlage.foedselsnummer &&
             tema == existingKlage.tema &&
-            ytelse == existingKlage.ytelse &&
+            titleKey == existingKlage.titleKey &&
             journalpostId == existingKlage.journalpostId &&
             internalSaksnummer == existingKlage.internalSaksnummer &&
             fullmektig == existingKlage.fullmektig
