@@ -133,6 +133,6 @@ enum class TitleEnum(val nb: String, val en: String) {
 
     companion object {
         private val map = TitleEnum.values().associateBy(TitleEnum::nb)
-        fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse]
+        fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse.capitalize()]
     }
 }
