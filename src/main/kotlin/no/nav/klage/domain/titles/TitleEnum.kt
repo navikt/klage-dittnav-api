@@ -126,7 +126,7 @@ enum class TitleEnum(val nb: String, val en: String) {
     ),
     SYKEPENGER("Sykepenger", "EN_Sykepenger"),
     TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "EN_Ytelser til tidligere familiepleier"),
-    TILTAKSPENGER("Tiltakspenger for arbeidsrettet tiltak", "EN_Tiltakspenger for arbeidsrettet tiltak"),
+    TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "EN_Tiltakspenger for arbeidsmarkedstiltak"),
     UFORETRYGD("Uføretrygd", "EN_Uføretrygd"),
     YRKESSKADETRYGD("Yrkesskade og yrkesskadetrygd", "EN_Yrkesskade og yrkesskadetrygd"),
     FEIL("Her har det skjedd noe feil.", "EN_Her har det skjedd noe feil");
