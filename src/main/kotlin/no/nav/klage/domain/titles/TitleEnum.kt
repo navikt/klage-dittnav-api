@@ -1,5 +1,6 @@
 package no.nav.klage.domain.titles
 
+import no.nav.klage.domain.LanguageEnum
 
 enum class TitleEnum(val nb: String, val en: String) {
     AAP("Arbeidsavklaringspenger", "EN_Arbeidsavklaringspenger"),
@@ -134,5 +135,24 @@ enum class TitleEnum(val nb: String, val en: String) {
     companion object {
         private val map = TitleEnum.values().associateBy(TitleEnum::nb)
         fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse.capitalize()]
+    }
+
+    fun getChosenTitle(language: LanguageEnum): String {
+        return when (language) {
+            LanguageEnum.NB -> this.nb
+            LanguageEnum.EN -> this.en
+        }
+    }
+
+    data class TitleInAllLanguages(
+        val nb: String,
+        val en: String
+    )
+
+    fun getTitleInAllLanguages(): TitleInAllLanguages {
+        return TitleInAllLanguages(
+            this.nb,
+            this.en
+        )
     }
 }
