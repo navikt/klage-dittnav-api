@@ -1,8 +1,6 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageStatus
 import no.nav.klage.domain.titles.TitleEnum
@@ -34,15 +32,6 @@ class KlageRepositoryTest {
     private val noTitleKeyAndInternalSaksnummer = "no titleKey and internalSaksnummer"
     private val noTitleKeyAndNoInternalSaksnummer = "no titleKey and no internalSaksnummer"
 
-    private val klage1 = Klage(
-        foedselsnummer = fnr,
-        fritekst = exampleFritekst,
-        tema = Tema.AAP,
-        language = LanguageEnum.NB,
-        titleKey = TitleEnum.ALDERSPENSJON
-    )
-
-
     private lateinit var klageRepository: KlageRepository
     private lateinit var datasource: DataSource
 
@@ -65,17 +54,6 @@ class KlageRepositoryTest {
     fun cleanup() {
         transaction {
             KlageDAO.all().forEach { x -> x.delete() }
-        }
-    }
-
-    @Test
-    fun `get inserted klage from db`() {
-        transaction {
-            KlageDAO.all().forEach { x -> x.delete() }
-            klageRepository.createKlage(klage1)
-
-            val hentetKlage = klageRepository.getKlageById(1)
-            Assertions.assertEquals(exampleFritekst, hentetKlage.fritekst)
         }
     }
 
