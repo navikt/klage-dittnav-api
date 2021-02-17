@@ -71,16 +71,6 @@ class KlageRepositoryTest {
         }
     }
 
-    @Test
-    fun `get inserted klage from db`() {
-        transaction {
-            klageRepository.createKlage(klage1)
-
-            val hentetKlage = klageRepository.getKlageById(1)
-            Assertions.assertEquals(exampleFritekst, hentetKlage.fritekst)
-        }
-    }
-
     @Nested
     inner class GetLatestDraft {
         @Test
