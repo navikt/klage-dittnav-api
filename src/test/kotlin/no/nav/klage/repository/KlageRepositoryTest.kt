@@ -59,6 +59,9 @@ class KlageRepositoryTest {
         flyway.migrate()
 
         Database.connect(datasource)
+        transaction {
+            KlageDAO.all().forEach { x -> x.delete() }
+        }
     }
 
     @BeforeEach
