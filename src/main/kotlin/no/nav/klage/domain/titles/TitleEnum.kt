@@ -76,16 +76,16 @@ enum class TitleEnum(val nb: String, val en: String) {
     ALDERSPENSJON("Alderspensjon", "Old-age pension"),
     ARBEID("Arbeid", "Work"),
     ARBEIDSAVKLARINGSPENGER("Arbeidsavklaringspenger (AAP)", "Work assessment allowance (AAP)"),
-    AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual early retirement pension (AFP)"),
+    AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual pension from The Norwegian Public Service Pension Fund"),
     BARNEBIDRAG_OG_BIDRAGSFORSKUDD(
         "Barnebidrag og bidragsforskudd",
-        "Child support and advance payments of child support"
+        "Child support and advance payment"
     ),
-    BARNEPENSJON("Barnepensjon", "Children's pension"),
+    BARNEPENSJON("Barnepensjon", "Child who has lost one or both parents"),
     BARNETRYGD("Barnetrygd", "Child benefit"),
-    BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Vehicle and special equipment for vehicles benefit"),
+    BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Car (motor vehicle)"),
     DAGPENGER("Dagpenger", "Unemployment benefits"),
-    EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support"),
+    EKTEFELLEBIDRAG("Ektefellebidrag", "Alimony"),
     ENGANGSSTONAD("Engangsstønad", "Lump-sum grant"),
     ENSLIG_MOR_ELLER_FAR("Enslig mor eller far", "Single mother or father"),
     FORELDREPENGER_GENERELL(
@@ -95,16 +95,16 @@ enum class TitleEnum(val nb: String, val en: String) {
     FORELDREPENGER("Foreldrepenger", "Parental benefit"),
     GJENLEVENDE(
         "Pensjon til gjenlevende ektefelle eller samboer",
-        "Pension to surviving spouse or cohabitant"
+        "Surviving spouse, partner or cohabitant"
     ),
-    GRAVFERDSSTONAD("Gravferdsstønad", "Funeral grant"),
+    GRAVFERDSSTONAD("Gravferdsstønad", "Grant for funeral and coffin transportation arrangements"),
     GRUNN_OG_HJELPESTONAD("Grunnstønad og hjelpestønad", "Basic benefit and attendance benefit"),
     HJELPEMIDLER(
         "Hjelpemidler og tilrettelegging ved nedsatt funksjonsevne",
-        "Assistive technology and facilitation for impaired functional ability"
+        "Various"
     ),
     KONTANTSTOTTE("Kontantstøtte", "Cash-for-care benefit"),
-    KRIGSPENSJON("Krigspensjon", "War pension"),
+    KRIGSPENSJON("Krigspensjon", "Pension, war veterans"),
     LONNSGARANTI("Lønnsgaranti ved konkurs hos arbeidsgiver", "Salary guarantee upon bankruptcy of employer"),
     LONNSKOMPENSASJON("Lønnskompensasjon for permitterte", "Salary compensation for persons who are laid-off"),
     MIDLERTIDIG_KOMPENSASJON(
@@ -116,12 +116,12 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Assessment of need for assistance according to Section 14 a of the NAV Act"
     ),
     OKONOMISK_SOSIALHJELP("Midlertidig økonomisk sosialhjelp", "Temporary financial social assistance"),
-    OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Upbringing support"),
-    OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
-    OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
+    OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Child support / upbringing support"),
+    OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Stay or work in Norway or on Norwegian continental shelf"),
+    OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Stay or work outside Norway / certificates of coverage"),
     SUPPLERENDE_STONAD(
         "Supplerende stønad til pensjon ved kort botid i Norge",
-        "Supplementary benefit to pension for persons who have only lived a short period of time in Norway"
+        "Supplementary benefits for people over 67 years"
     ),
     SVANGERSKAPSPENGER("Svangerskapspenger", "Pregnancy benefit"),
     SYKDOM_I_FAMILIEN(
@@ -129,7 +129,7 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Care benefit, training allowance, attendance allowance"
     ),
     SYKEPENGER("Sykepenger", "Sickness benefit"),
-    TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Benefits to former family caregivers"),
+    TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Family carer"),
     TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "Benefits while participating in employment schemes"),
     UFORETRYGD("Uføretrygd", "Disability benefit"),
     YRKESSKADE("Yrkesskade", "Occupational injury"),
