@@ -1,8 +1,6 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageStatus
 import no.nav.klage.domain.titles.TitleEnum
@@ -17,7 +15,7 @@ import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KlageRepositoryTest {
-    private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"
+    private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"
 
     private val exampleFritekst = "fritekst"
     private val exampleFritekst2 = "fritekst2"
@@ -59,99 +57,105 @@ class KlageRepositoryTest {
         }
     }
 
-    @Nested
-    inner class GetLatestDraft {
-        @Test
-        fun `should get correct klage based on internalSaksnummer and titleKey`() {
-            transaction {
-                createDBEntries()
+    @Test
+    fun `should get correct klage based on internalSaksnummer and titleKey`() {
+        transaction {
+            createDBEntries()
 
-                val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                    fnr,
-                    exampleTema,
-                    exampleInternalSaksnummer,
-                    exampleTitleKey
-                )
-                Assertions.assertEquals(titleKeyAndInternalSaksnummer, hentetKlage?.fritekst)
-            }
-        }
-
-        @Test
-        fun `should get correct klage based on internalSaksnummer and no titleKey`() {
-            transaction {
-                createDBEntries()
-
-                val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                    fnr,
-                    exampleTema,
-                    exampleInternalSaksnummer,
-                    null
-                )
-                Assertions.assertEquals(noTitleKeyAndInternalSaksnummer, hentetKlage?.fritekst)
-            }
-        }
-
-        @Test
-        fun `should get correct klage based on no internalSaksnummer and titleKey`() {
-            transaction {
-                createDBEntries()
-
-                val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                    fnr,
-                    exampleTema,
-                    null,
-                    exampleTitleKey
-                )
-                Assertions.assertEquals(titleKeyAndNoInternalSaksnummer, hentetKlage?.fritekst)
-            }
-        }
-
-        @Test
-        fun `should get correct klage based on no internalSaksnummer and no titleKey`() {
-            transaction {
-                createDBEntries()
-
-                val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                    fnr,
-                    exampleTema,
-                    null,
-                    null
-                )
-                Assertions.assertEquals(noTitleKeyAndNoInternalSaksnummer, hentetKlage?.fritekst)
-            }
-        }
-
-        @Test
-        fun `should get latest klage`() {
-            transaction {
-                createTwoSimilarEntries()
-
-
-                val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                    fnr,
-                    exampleTema,
-                    exampleInternalSaksnummer,
-                    exampleTitleKey
-                )
-                Assertions.assertEquals(exampleFritekst2, hentetKlage?.fritekst)
-            }
-        }
-
-        @Test
-        fun `should get klage with titleKey based on ytelse in KlageDAO and titleKey in request`() {
-            transaction {
-                createDBEntryWithYtelse()
-
-                val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                    fnr,
-                    exampleTema,
-                    null,
-                    exampleTitleKey
-                )
-                Assertions.assertEquals(exampleTitleKey, hentetKlage?.titleKey)
-            }
+            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                exampleTema,
+                exampleInternalSaksnummer,
+                exampleTitleKey
+            )
+            Assertions.assertEquals(titleKeyAndInternalSaksnummer, hentetKlage?.fritekst)
         }
     }
+
+    @Test
+    fun `should get correct klage based on internalSaksnummer and no titleKey`() {
+        transaction {
+            createDBEntries()
+
+            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                exampleTema,
+                exampleInternalSaksnummer,
+                null
+            )
+            Assertions.assertEquals(noTitleKeyAndInternalSaksnummer, hentetKlage?.fritekst)
+        }
+    }
+
+    @Test
+    fun `should get correct klage based on no internalSaksnummer and titleKey`() {
+        transaction {
+            createDBEntries()
+
+            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                exampleTema,
+                null,
+                exampleTitleKey
+            )
+            Assertions.assertEquals(titleKeyAndNoInternalSaksnummer, hentetKlage?.fritekst)
+        }
+    }
+
+    @Test
+    fun `should get correct klage based on no internalSaksnummer and no titleKey`() {
+        transaction {
+            createDBEntries()
+
+            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                exampleTema,
+                null,
+                null
+            )
+            Assertions.assertEquals(noTitleKeyAndNoInternalSaksnummer, hentetKlage?.fritekst)
+        }
+    }
+
+    @Test
+    fun `should get latest klage`() {
+        transaction {
+            createTwoSimilarEntries()
+
+
+            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                exampleTema,
+                exampleInternalSaksnummer,
+                exampleTitleKey
+            )
+            Assertions.assertEquals(exampleFritekst2, hentetKlage?.fritekst)
+        }
+    }
+
+    @Test
+    fun `should get klage with titleKey based on ytelse in KlageDAO and titleKey in request`() {
+        transaction {
+            createDBEntryWithYtelse()
+
+            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                exampleTema,
+                null,
+                exampleTitleKey
+            )
+            Assertions.assertEquals(exampleTitleKey, hentetKlage?.titleKey)
+        }
+    }
+
+
+    @AfterAll
+    fun cleanupAfter() {
+        transaction {
+            KlageDAO.all().forEach { x -> x.delete() }
+        }
+    }
+
 
     private fun createTwoSimilarEntries() {
         KlageDAO.new {
