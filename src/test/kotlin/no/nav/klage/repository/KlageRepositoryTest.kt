@@ -1,11 +1,10 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageStatus
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.util.getLogger
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
@@ -17,6 +16,12 @@ import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KlageRepositoryTest {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
+
     private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"
 
     private val exampleFritekst = "fritekst"
@@ -162,6 +167,9 @@ class KlageRepositoryTest {
             titleKey = exampleTitleKey.name
             internalSaksnummer = exampleInternalSaksnummer
             modifiedByUser = exampleModifiedByUser
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to {}", it.id)
         }
 
         KlageDAO.new {
@@ -172,6 +180,9 @@ class KlageRepositoryTest {
             titleKey = exampleTitleKey.name
             internalSaksnummer = exampleInternalSaksnummer
             modifiedByUser = exampleModifiedByUser2
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to {}", it.id)
         }
     }
 
@@ -184,6 +195,9 @@ class KlageRepositoryTest {
             tema = exampleTema.name
             titleKey = exampleTitleKey.name
             internalSaksnummer = exampleInternalSaksnummer
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to {}", it.id)
         }
 
         //titleKey and no internalSaksnummer
@@ -193,6 +207,9 @@ class KlageRepositoryTest {
             fritekst = titleKeyAndNoInternalSaksnummer
             tema = exampleTema.name
             titleKey = exampleTitleKey.name
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to ${it.id}")
         }
 
         //no titleKey and internalSaksnummer
@@ -202,6 +219,9 @@ class KlageRepositoryTest {
             fritekst = noTitleKeyAndInternalSaksnummer
             tema = exampleTema.name
             internalSaksnummer = exampleInternalSaksnummer
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to {}", it.id)
         }
 
         //no titleKey and no internalSaksnummer
@@ -210,6 +230,9 @@ class KlageRepositoryTest {
             status = draftStatus.name
             fritekst = noTitleKeyAndNoInternalSaksnummer
             tema = exampleTema.name
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to {}", it.id)
         }
     }
 
@@ -220,6 +243,9 @@ class KlageRepositoryTest {
             fritekst = exampleFritekst
             tema = exampleTema.name
             ytelse = exampleTitleKey.nb
+        }.also {
+            println("id in new klage is set to ${it.id}")
+            logger.debug("id in new klage is set to {}", it.id)
         }
     }
 
