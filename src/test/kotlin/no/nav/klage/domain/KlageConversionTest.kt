@@ -8,11 +8,8 @@ import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import java.time.Instant
 import javax.sql.DataSource
 
@@ -28,7 +25,7 @@ class KlageConversionTest {
     private val exampleStatus = KlageStatus.DRAFT
     private val exampleTitleKey = TitleEnum.ALDERSPENSJON
 
-    private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"
+    private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"
 
     private lateinit var klageRepository: KlageRepository
     private lateinit var datasource: DataSource
@@ -150,6 +147,13 @@ class KlageConversionTest {
 
                 assertEquals("FOR_LITE_UTBETALT,AVSLAG_PAA_SOKNAD", result.checkBoxesSelected)
             }
+        }
+    }
+
+    @AfterAll
+    fun cleanup() {
+        transaction {
+            KlageDAO.all().forEach { x -> x.delete() }
         }
     }
 
