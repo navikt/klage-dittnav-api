@@ -76,35 +76,35 @@ enum class TitleEnum(val nb: String, val en: String) {
     ALDERSPENSJON("Alderspensjon", "Old-age pension"),
     ARBEID("Arbeid", "Work"),
     ARBEIDSAVKLARINGSPENGER("Arbeidsavklaringspenger (AAP)", "Work assessment allowance (AAP)"),
-    AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual pension from The Norwegian Public Service Pension Fund"),
+    AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual early retirement pension (AFP)"),
     BARNEBIDRAG_OG_BIDRAGSFORSKUDD(
         "Barnebidrag og bidragsforskudd",
-        "Child support and advance payment"
+        "Child support (Barnebidrag) and advance payments of child support (Bidragsforskudd)"
     ),
-    BARNEPENSJON("Barnepensjon", "Child who has lost one or both parents"),
-    BARNETRYGD("Barnetrygd", "Child benefit"),
-    BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Car (motor vehicle)"),
-    DAGPENGER("Dagpenger", "Unemployment benefits"),
-    EKTEFELLEBIDRAG("Ektefellebidrag", "Alimony"),
+    BARNEPENSJON("Barnepensjon", "Children's pension (Barnepensjon)"),
+    BARNETRYGD("Barnetrygd", "Child benefit (Barnetrygd)"),
+    BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Vehicle and special equipment for vehicles benefit"),
+    DAGPENGER("Dagpenger", "Unemployment benefits (Dagpenger)"),
+    EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support (Ektefellebidrag)"),
     ENGANGSSTONAD("Engangsstønad", "Lump-sum grant"),
     ENSLIG_MOR_ELLER_FAR("Enslig mor eller far", "Single mother or father"),
     FORELDREPENGER_GENERELL(
         "Foreldrepenger, engangsstønad og svangerskapspenger",
-        "Parental benefit, lump-sum grant and pregnancy benefit"
+        "Parental benefit (Foreldrepenger), lump-sum grant (Engangsstønad) and pregnancy benefit (Svangerskapspenger)"
     ),
     FORELDREPENGER("Foreldrepenger", "Parental benefit"),
     GJENLEVENDE(
         "Pensjon til gjenlevende ektefelle eller samboer",
-        "Surviving spouse, partner or cohabitant"
+        "Pension to surviving spouse or cohabitant"
     ),
-    GRAVFERDSSTONAD("Gravferdsstønad", "Grant for funeral and coffin transportation arrangements"),
-    GRUNN_OG_HJELPESTONAD("Grunnstønad og hjelpestønad", "Basic benefit and attendance benefit"),
+    GRAVFERDSSTONAD("Gravferdsstønad", "Funeral grant (Gravferdsstønad)"),
+    GRUNN_OG_HJELPESTONAD("Grunnstønad og hjelpestønad", "Basic benefit (Grunnstønad) and attendance benefit (Hjelpestønad)"),
     HJELPEMIDLER(
         "Hjelpemidler og tilrettelegging ved nedsatt funksjonsevne",
-        "Various"
+        "Assistive technology and facilitation for impaired functional ability"
     ),
-    KONTANTSTOTTE("Kontantstøtte", "Cash-for-care benefit"),
-    KRIGSPENSJON("Krigspensjon", "Pension, war veterans"),
+    KONTANTSTOTTE("Kontantstøtte", "Cash-for-care benefit (Kontantstøtte)"),
+    KRIGSPENSJON("Krigspensjon", "War pension (Krigspensjon)"),
     LONNSGARANTI("Lønnsgaranti ved konkurs hos arbeidsgiver", "Salary guarantee upon bankruptcy of employer"),
     LONNSKOMPENSASJON("Lønnskompensasjon for permitterte", "Salary compensation for persons who are laid-off"),
     MIDLERTIDIG_KOMPENSASJON(
@@ -115,24 +115,24 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Vurdering av behov for bistand etter NAV loven § 14 a",
         "Assessment of need for assistance according to Section 14 a of the NAV Act"
     ),
-    OKONOMISK_SOSIALHJELP("Midlertidig økonomisk sosialhjelp", "Temporary financial social assistance"),
-    OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Child support / upbringing support"),
-    OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Stay or work in Norway or on Norwegian continental shelf"),
-    OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Stay or work outside Norway / certificates of coverage"),
+    OKONOMISK_SOSIALHJELP("Midlertidig økonomisk sosialhjelp", "Temporary financial social assistance (Sosialhjelp)"),
+    OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Upbringing support (Oppfostringsbidrag)"),
+    OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
+    OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
     SUPPLERENDE_STONAD(
         "Supplerende stønad til pensjon ved kort botid i Norge",
-        "Supplementary benefits for people over 67 years"
+        "Supplementary benefit to pension for persons who have only lived a short period of time in Norway"
     ),
     SVANGERSKAPSPENGER("Svangerskapspenger", "Pregnancy benefit"),
     SYKDOM_I_FAMILIEN(
         "Omsorgspenger, opplæringspenger, pleiepenger",
-        "Care benefit, training allowance, attendance allowance"
+        "Care benefit (Omsorgspenger), training allowance (Opplæringspenger), attendance allowance (Pleiepenger)"
     ),
-    SYKEPENGER("Sykepenger", "Sickness benefit"),
-    TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Family carer"),
-    TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "Benefits while participating in employment schemes"),
-    UFORETRYGD("Uføretrygd", "Disability benefit"),
-    YRKESSKADE("Yrkesskade", "Occupational injury"),
+    SYKEPENGER("Sykepenger", "Sickness benefit (Sykepenger)"),
+    TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Benefits to former family caregivers"),
+    TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "Benefits (Tiltakspenger) while participating in employment schemes"),
+    UFORETRYGD("Uføretrygd", "Disability benefit (Uføretrygd)"),
+    YRKESSKADE("Yrkesskade", "Occupational injury (Yrkesskade)"),
     FEIL("Her har det skjedd noe feil.", "Error");
 
     companion object {

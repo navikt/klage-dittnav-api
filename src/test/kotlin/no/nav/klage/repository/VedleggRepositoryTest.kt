@@ -3,23 +3,22 @@ package no.nav.klage.repository
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.vedlegg.VedleggDAO
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.springframework.mock.web.MockMultipartFile
 import java.nio.charset.Charset
 import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VedleggRepositoryTest {
-    private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"
+    private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"
 
     private lateinit var vedleggRepository: VedleggRepository
     private lateinit var klageRepository: KlageRepository
@@ -54,6 +53,14 @@ class VedleggRepositoryTest {
         val vedlegg = nyKlage.vedlegg[0]
 
         Assertions.assertEquals(vedleggExternalRef, vedlegg.ref)
+    }
+
+    @AfterAll
+    fun cleanup() {
+        transaction {
+            VedleggDAO.all().forEach { x -> x.delete() }
+            KlageDAO.all().forEach { x -> x.delete() }
+        }
     }
 
     private val klage1 = Klage(
