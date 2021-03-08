@@ -86,13 +86,13 @@ enum class TitleEnum(val nb: String, val en: String) {
     BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Vehicle and special equipment for vehicles benefit"),
     DAGPENGER("Dagpenger", "Unemployment benefits (Dagpenger)"),
     EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support (Ektefellebidrag)"),
-    ENGANGSSTONAD("Engangsstønad", "Lump-sum grant"),
+    ENGANGSSTONAD("Engangsstønad", "Lump-sum grant (Engangsstønad)"),
     ENSLIG_MOR_ELLER_FAR("Enslig mor eller far", "Single mother or father"),
     FORELDREPENGER_GENERELL(
         "Foreldrepenger, engangsstønad og svangerskapspenger",
         "Parental benefit (Foreldrepenger), lump-sum grant (Engangsstønad) and pregnancy benefit (Svangerskapspenger)"
     ),
-    FORELDREPENGER("Foreldrepenger", "Parental benefit"),
+    FORELDREPENGER("Foreldrepenger", "Parental benefit (Foreldrepenger)"),
     GJENLEVENDE(
         "Pensjon til gjenlevende ektefelle eller samboer",
         "Pension to surviving spouse or cohabitant"
@@ -123,7 +123,7 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Supplerende stønad til pensjon ved kort botid i Norge",
         "Supplementary benefit to pension for persons who have only lived a short period of time in Norway"
     ),
-    SVANGERSKAPSPENGER("Svangerskapspenger", "Pregnancy benefit"),
+    SVANGERSKAPSPENGER("Svangerskapspenger", "Pregnancy benefit (Svangerskapspenger)"),
     SYKDOM_I_FAMILIEN(
         "Omsorgspenger, opplæringspenger, pleiepenger",
         "Care benefit (Omsorgspenger), training allowance (Opplæringspenger), attendance allowance (Pleiepenger)"
