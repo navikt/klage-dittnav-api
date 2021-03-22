@@ -15,6 +15,7 @@ import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
+import no.nav.klage.util.getLogger
 import no.nav.klage.util.vedtakFromDate
 import no.nav.slackposter.Kibana
 import no.nav.slackposter.SlackClient
@@ -38,6 +39,10 @@ class KlageService(
     private val brukerService: BrukerService,
     private val validationService: ValidationService
 ) {
+
+    companion object {
+        private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
+    }
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
         val klage = klageRepository.getKlageById(klageId)
@@ -98,7 +103,12 @@ class KlageService(
             .createKlage(klage.toKlage(bruker, DRAFT))
             .toKlageView(bruker)
             .also {
-                klageMetrics.incrementKlagerInitialized(klage.tema.toString())
+                val temaReport = if (klage.isLonnskompensasjon()) {
+                    LOENNSKOMPENSASJON_GRAFANA_TEMA
+                } else {
+                    klage.tema.toString()
+                }
+                klageMetrics.incrementKlagerInitialized(temaReport)
             }
     }
 
@@ -199,18 +209,31 @@ class KlageService(
     }
 
     private fun registerFinalizedMetrics(klage: Klage) {
-        klageMetrics.incrementKlagerFinalized(klage.tema.toString())
-        klageMetrics.incrementKlagerGrunn(klage.tema.toString(), klage.checkboxesSelected ?: emptySet())
+        val temaReport = if (klage.isLonnskompensasjon()) {
+            LOENNSKOMPENSASJON_GRAFANA_TEMA
+        } else {
+            klage.tema.toString()
+        }
+        klageMetrics.incrementKlagerFinalized(temaReport)
+        klageMetrics.incrementKlagerGrunn(temaReport, klage.checkboxesSelected ?: emptySet())
         if (klage.fullmektig != null) {
-            klageMetrics.incrementFullmakt(klage.tema.toString())
+            klageMetrics.incrementFullmakt(temaReport)
         }
         if (klage.userSaksnummer != null) {
-            klageMetrics.incrementOptionalSaksnummer(klage.tema.toString())
+            klageMetrics.incrementOptionalSaksnummer(temaReport)
         }
         if (klage.vedtakDate != null) {
-            klageMetrics.incrementOptionalVedtaksdato(klage.tema.toString())
+            klageMetrics.incrementOptionalVedtaksdato(temaReport)
         }
         vedleggMetrics.registerNumberOfVedleggPerUser(klage.vedlegg.size.toDouble())
+    }
+
+    private fun Klage.isLonnskompensasjon(): Boolean {
+        return tema == Tema.DAG && titleKey.nb == "Lønnskompensasjon for permitterte"
+    }
+
+    private fun KlageView.isLonnskompensasjon(): Boolean {
+        return tema == Tema.DAG && titleKey?.nb == "Lønnskompensasjon for permitterte"
     }
 
     private fun createAggregatedKlage(
