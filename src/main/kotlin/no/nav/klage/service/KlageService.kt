@@ -12,10 +12,8 @@ import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.titles.TitleEnum
-import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
-import no.nav.klage.util.getLogger
 import no.nav.klage.util.vedtakFromDate
 import no.nav.slackposter.Kibana
 import no.nav.slackposter.SlackClient
