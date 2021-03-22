@@ -12,6 +12,7 @@ import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.klage.KlageStatus.DONE
 import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.vedtakFromDate
@@ -226,13 +227,12 @@ class KlageService(
         vedleggMetrics.registerNumberOfVedleggPerUser(klage.vedlegg.size.toDouble())
     }
 
-    private fun Klage.isLonnskompensasjon(): Boolean {
-        return tema == Tema.DAG && titleKey.nb == "Lønnskompensasjon for permitterte"
-    }
+    private fun Klage.isLonnskompensasjon() =
+        tema == Tema.DAG && titleKey == TitleEnum.LONNSKOMPENSASJON
 
-    private fun KlageView.isLonnskompensasjon(): Boolean {
-        return tema == Tema.DAG && titleKey?.nb == "Lønnskompensasjon for permitterte"
-    }
+
+    private fun KlageView.isLonnskompensasjon() =
+        tema == Tema.DAG && titleKey == TitleEnum.LONNSKOMPENSASJON
 
     private fun createAggregatedKlage(
         bruker: Bruker,
