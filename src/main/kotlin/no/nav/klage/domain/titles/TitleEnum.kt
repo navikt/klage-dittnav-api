@@ -120,8 +120,12 @@ enum class TitleEnum(val nb: String, val en: String) {
     OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
     OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
     SUPPLERENDE_STONAD(
-        "Supplerende stønad til pensjon ved kort botid i Norge",
-        "Supplementary benefit to pension for persons who have only lived a short period of time in Norway"
+        "Supplerende stønad til personer over 67 år med kort botid i Norge",
+        "Supplementary benefit for persons over 67 who have only lived a short period of time in Norway"
+    ),
+    SUPPLERENDE_STONAD_UFORE_FLYKTNINGER(
+        "Supplerende stønad til uføre flyktninger",
+        "Supplementary benefit for disabled refugees"
     ),
     SVANGERSKAPSPENGER("Svangerskapspenger", "Pregnancy benefit (Svangerskapspenger)"),
     SYKDOM_I_FAMILIEN(
