@@ -28,7 +28,7 @@ PDL_BASE_URL: https://api-gw.oera.no/pdl-api/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw.oera.no/security-token-service/
 SERVICE_USER_USERNAME: srvklage-dittnav
 
-CLAM_AV_URL: http://clamav.clamav/scan
+CLAM_AV_URL: http://clamav.clamav.svc.cluster.local
 
 FILE_BASE_URL: http://klage-file-api
 

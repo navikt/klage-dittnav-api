@@ -30,7 +30,7 @@ SECURITY_TOKEN_SERVICE_REST_URL: http://localhost:8088
 SERVICE_USER_USERNAME: srvklage-dittnav
 SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
 
-CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan
+CLAM_AV_URL: http://clamav.clamav.svc.cluster.local
 
 FILE_BASE_URL: http://localhost:7080
 
