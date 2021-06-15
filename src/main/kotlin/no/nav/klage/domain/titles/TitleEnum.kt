@@ -85,6 +85,8 @@ enum class TitleEnum(val nb: String, val en: String) {
     BARNETRYGD("Barnetrygd", "Child benefit (Barnetrygd)"),
     BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Vehicle and special equipment for vehicles benefit"),
     DAGPENGER("Dagpenger", "Unemployment benefits (Dagpenger)"),
+    DAGPENGER_FERIEPENGER("Feriepenger av dagpenger", "Holiday pay and unemployment benefits (Feriepenger av dagpenger)"),
+    DAGPENGER_TILBAKEBETALING_FORSKUDD("Tilbakebetaling av forskudd på dagpenger", "Repayment of advance payment of unemployment benefits (Tilbakebetaling av forskudd på dagpenger)"),
     EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support (Ektefellebidrag)"),
     ENGANGSSTONAD("Engangsstønad", "Lump-sum grant (Engangsstønad)"),
     ENSLIG_MOR_ELLER_FAR("Enslig mor eller far", "Single mother or father"),
