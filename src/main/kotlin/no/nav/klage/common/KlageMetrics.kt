@@ -2,6 +2,7 @@ package no.nav.klage.common
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.klage.domain.klage.CheckboxEnum
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
 @Component
@@ -17,6 +18,7 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         private const val COUNTER_KLAGER_FINALIZED_FULLMAKT = "klager_finalized_fullmakt"
         private const val COUNTER_KLAGER_OPTIONAL_SAKSNUMMER = "klager_optional_saksnummer"
         private const val COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO = "klager_optional_vedtaksdato"
+        private const val COUNTER_KLAGER_FINALIZED_TITLE = "klager_finalized_title"
     }
 
     fun incrementKlagerInitialized(ytelse: String) {
@@ -64,6 +66,14 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
     fun incrementOptionalVedtaksdato(ytelse: String) {
         try {
             meterRegistry.counter(COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO, "ytelse", ytelse).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementOptionalVedtaksdato failed", e)
+        }
+    }
+
+    fun incrementKlagerFinalizedTitle(title: TitleEnum) {
+        try {
+            meterRegistry.counter(COUNTER_KLAGER_FINALIZED_TITLE, "tittel", title.nb).increment()
         } catch (e: Exception) {
             logger.warn("incrementOptionalVedtaksdato failed", e)
         }

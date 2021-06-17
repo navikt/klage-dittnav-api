@@ -213,6 +213,7 @@ class KlageService(
         } else {
             klage.tema.toString()
         }
+        klageMetrics.incrementKlagerFinalizedTitle(klage.titleKey)
         klageMetrics.incrementKlagerFinalized(temaReport)
         klageMetrics.incrementKlagerGrunn(temaReport, klage.checkboxesSelected ?: emptySet())
         if (klage.fullmektig != null) {
