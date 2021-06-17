@@ -75,7 +75,7 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         try {
             meterRegistry.counter(COUNTER_KLAGER_FINALIZED_TITLE, "tittel", title.nb).increment()
         } catch (e: Exception) {
-            logger.warn("incrementOptionalVedtaksdato failed", e)
+            logger.warn("incrementKlageTitle failed", e)
         }
     }
 
