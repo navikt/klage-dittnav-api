@@ -73,6 +73,8 @@ class FileClient(
 
         if (deletedInFileStore) {
             logger.debug("Attachment successfully deleted in file store.")
+        } else {
+            logger.debug("Attachment $vedleggRef was not deleted in file store. File could be missing from filestore.")
         }
 
         return deletedInFileStore

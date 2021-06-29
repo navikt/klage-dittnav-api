@@ -55,3 +55,6 @@ navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
 ALL_FULLMAKT_OMRAADER: "*"
+
+# 0 0 13 * * WED
+DRAFT_CLEANUP_CHECK_CRON: 0 0 13 * * WED

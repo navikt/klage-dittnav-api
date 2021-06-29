@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.or
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Repository
 class KlageRepository {
@@ -24,6 +25,14 @@ class KlageRepository {
         return KlageDAO.find { Klager.status neq DELETED.name }.map {
             it.toKlage()
         }
+    }
+
+    fun get180DaysOldDraftKlager(): List<Klage> {
+        val expiryDate = Instant.now().minus(180, ChronoUnit.DAYS)
+        return KlageDAO.find { Klager.status eq KlageStatus.DRAFT.name and Klager.modifiedByUser.less(expiryDate) }
+            .map {
+                it.toKlage()
+            }
     }
 
     fun getKlageById(id: Int): Klage {

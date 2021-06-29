@@ -25,7 +25,7 @@ KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_CLIENTID: klage-dittnav-api
 KAFKA_TOPIC: aapen-klager-klageOpprettet
 
-PDL_BASE_URL: http://localhost:7000/graphql
+PDL_BASE_URL: https://pdl-api.dev-fss.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: http://localhost:8088
 SERVICE_USER_USERNAME: srvklage-dittnav
 SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
