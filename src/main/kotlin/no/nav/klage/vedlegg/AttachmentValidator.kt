@@ -59,7 +59,8 @@ class AttachmentValidator(
 
     private fun MultipartFile.isEncrypted(): Boolean {
         return try {
-            PDDocument.load(this.bytes)
+            val temp: PDDocument = PDDocument.load(this.bytes)
+            temp.close()
             false
         } catch (ipe: InvalidPasswordException) {
             true
