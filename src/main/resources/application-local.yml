@@ -49,3 +49,6 @@ KLAGE_FILE_API_CLIENT_ID: 64245dd5-e178-495e-9af2-5d8961690437
 
 LOGINSERVICE_IDPORTEN_DISCOVERY_URL: https://navtestb2c.b2clogin.com/navtestb2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
 LOGINSERVICE_IDPORTEN_AUDIENCE: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
+
+DRAFT_CLEANUP_CHECK_CRON: 0 0 13 * * WED
+MAX_DRAFT_AGE_IN_DAYS: 180

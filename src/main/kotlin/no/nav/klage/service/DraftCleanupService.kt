@@ -39,7 +39,7 @@ class DraftCleanupService(
         var klagerSuccessfullyDeleted = 0
         var expiredKlager = 0
 
-        val oldDrafts = klageRepository.get180DaysOldDraftKlager()
+        val oldDrafts = klageRepository.getExpiredDraftKlager()
         expiredKlager = oldDrafts.count()
         logger.debug("Found $expiredKlager expired draft klager")
         slackClient.postMessage("Fant $expiredKlager utgåtte draft-klager")
