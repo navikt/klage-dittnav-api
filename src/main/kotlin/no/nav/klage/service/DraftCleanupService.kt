@@ -28,7 +28,7 @@ class DraftCleanupService(
         private val secureLogger = getSecureLogger()
     }
 
-    @Scheduled(cron = "\${DRAFT_CLEANUP_CRON", zone = "Europe/Oslo")
+    @Scheduled(cron = "\${DRAFT_CLEANUP_CRON}", zone = "Europe/Oslo")
     fun markOldDraftsAsDeleted() {
 
         logger.debug("Looking for expired draft klager")
