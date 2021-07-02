@@ -9,8 +9,10 @@ import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.or
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Repository
 class KlageRepository {
@@ -20,10 +22,21 @@ class KlageRepository {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
+    private lateinit var maxDraftAgeInDays: String
+
     fun getKlager(): List<Klage> {
         return KlageDAO.find { Klager.status neq DELETED.name }.map {
             it.toKlage()
         }
+    }
+
+    fun getExpiredDraftKlager(): List<Klage> {
+        val expiryDate = Instant.now().minus(maxDraftAgeInDays.toLong(), ChronoUnit.DAYS)
+        return KlageDAO.find { Klager.status eq KlageStatus.DRAFT.name and Klager.modifiedByUser.less(expiryDate) }
+            .map {
+                it.toKlage()
+            }
     }
 
     fun getKlageById(id: Int): Klage {
