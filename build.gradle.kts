@@ -12,6 +12,7 @@ val tikaVersion = "1.24.1"
 val springSleuthVersion = "2.2.3.RELEASE"
 val resilience4jVersion = "1.5.0"
 val problemSpringWebStartVersion = "0.26.2"
+val shedlockVersion = "4.23.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -68,6 +69,9 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
+
+    implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
     implementation("no.nav.slackposter:simple-slack-poster:5")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
