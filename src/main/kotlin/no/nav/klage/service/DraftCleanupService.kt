@@ -1,5 +1,6 @@
 package no.nav.klage.service
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
@@ -29,6 +30,7 @@ class DraftCleanupService(
     }
 
     @Scheduled(cron = "\${DRAFT_CLEANUP_CRON}", zone = "Europe/Oslo")
+    @SchedulerLock(name = "markOldDraftsAsDeleted")
     fun markOldDraftsAsDeleted() {
 
         logger.debug("Looking for expired draft klager")
