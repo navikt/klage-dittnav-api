@@ -1,30 +1,28 @@
-package no.nav.klage.domain.klage
+package no.nav.klage.domain.anke
 
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
+import no.nav.klage.domain.ankevedlegg.AnkeVedleggView
+import no.nav.klage.domain.ankevedlegg.toAnkeVedlegg
 import no.nav.klage.domain.titles.TitleEnum
-import no.nav.klage.domain.vedlegg.VedleggView
-import no.nav.klage.domain.vedlegg.toVedlegg
 import no.nav.klage.util.getFormattedLocalDateTime
 import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.parseTitleKey
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class KlageView(
+data class AnkeView(
     val id: Int,
     val fritekst: String,
     val tema: Tema,
     val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
-    val vedlegg: List<VedleggView> = listOf(),
+    val vedlegg: List<AnkeVedleggView> = listOf(),
     val journalpostId: String? = null,
     val finalizedDate: LocalDate? = null,
     val vedtakDate: LocalDate? = null,
-    val checkboxesSelected: Set<CheckboxEnum>,
-    val userSaksnummer: String? = null,
     val internalSaksnummer: String? = null,
     val fullmaktsgiver: String? = null,
     val language: LanguageEnum = LanguageEnum.NB,
@@ -32,22 +30,19 @@ data class KlageView(
     val ytelse: String?
 )
 
-fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
+fun AnkeView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
 
-fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
+fun AnkeView.toAnke(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Anke(
     id = id,
     foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
     fritekst = fritekst,
     status = status,
     tema = tema,
-    userSaksnummer = userSaksnummer,
-    vedlegg = vedlegg.map { it.toVedlegg() },
+    vedlegg = vedlegg.map { it.toAnkeVedlegg() },
     journalpostId = journalpostId,
     vedtakDate = vedtakDate,
-    checkboxesSelected = checkboxesSelected,
     internalSaksnummer = internalSaksnummer,
     fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
     language = language,
     titleKey = parseTitleKey(titleKey, ytelse, tema)
 )
-

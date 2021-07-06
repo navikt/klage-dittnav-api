@@ -1,9 +1,10 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.Tema
+import no.nav.klage.domain.*
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.Vedlegg
+import no.nav.klage.util.klageAnkeIsAccessibleToUser
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import java.time.Instant
 import java.time.LocalDate
 
@@ -11,7 +12,7 @@ data class Klage(
     val id: Int? = null,
     val foedselsnummer: String,
     val fritekst: String,
-    var status: KlageStatus = KlageStatus.DRAFT,
+    var status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val userSaksnummer: String? = null,
@@ -25,13 +26,13 @@ data class Klage(
     val titleKey: TitleEnum
 )
 
-enum class KlageStatus {
-    DRAFT, DONE, DELETED
-}
 
-fun Klage.isAccessibleToUser(usersIdentifikasjonsnummer: String) = (foedselsnummer == usersIdentifikasjonsnummer)
-fun Klage.isFinalized() = (status === KlageStatus.DONE)
-fun Klage.isDeleted() = (status === KlageStatus.DELETED)
+
+fun Klage.isAccessibleToUser(usersIdentifikasjonsnummer: String) = klageAnkeIsAccessibleToUser(usersIdentifikasjonsnummer, foedselsnummer)
+fun Klage.isFinalized() = status.isFinalized()
+fun Klage.isDeleted() = status.isDeleted()
+fun Klage.isLonnskompensasjon() = klageAnkeIsLonnskompensasjon(tema, titleKey)
+
 
 fun Klage.writableOnceFieldsMatch(existingKlage: Klage): Boolean {
     return id == existingKlage.id &&

@@ -22,7 +22,7 @@ class KlageConversionTest {
     private val exampleYtelse = "Alderspensjon"
     private val exampleYtelse2 = "Barnepensjon"
     private val exampleModifiedByUser = Instant.parse("2020-11-12T09:35:39.727803600Z")
-    private val exampleStatus = KlageStatus.DRAFT
+    private val exampleStatus = KlageAnkeStatus.DRAFT
     private val exampleTitleKey = TitleEnum.ALDERSPENSJON
 
     private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"

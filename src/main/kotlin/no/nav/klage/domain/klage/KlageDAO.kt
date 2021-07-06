@@ -1,10 +1,11 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.Tema
-import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.VedleggDAO
 import no.nav.klage.domain.vedlegg.Vedleggene
+import no.nav.klage.util.getLanguageEnum
+import no.nav.klage.util.getTitleEnum
+import no.nav.klage.util.toStatus
+import no.nav.klage.util.toTema
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -68,44 +69,6 @@ fun KlageDAO.toKlage(): Klage {
         language = getLanguageEnum(this.language),
         titleKey = getTitleEnum(this.titleKey, this.ytelse, this.tema)
     )
-}
-
-fun String.toTema() = try {
-    Tema.valueOf(this)
-} catch (e: IllegalArgumentException) {
-    Tema.UKJ
-}
-
-fun String.toStatus() = try {
-    KlageStatus.valueOf(this)
-} catch (e: IllegalArgumentException) {
-    KlageStatus.DRAFT
-}
-
-fun getLanguageEnum(input: String?): LanguageEnum {
-    return when (input) {
-        null -> {
-            LanguageEnum.NB
-        }
-        else -> {
-            LanguageEnum.valueOf(input)
-        }
-    }
-}
-
-fun getTitleEnum(titleKey: String?, ytelse: String?, tema: String): TitleEnum {
-    return when (titleKey) {
-        null -> {
-            if (ytelse != null && TitleEnum.getTitleKeyFromNbTitle(ytelse) != null) {
-                TitleEnum.getTitleKeyFromNbTitle(ytelse)!!
-            } else {
-                TitleEnum.valueOf(tema)
-            }
-        }
-        else -> {
-            TitleEnum.valueOf(titleKey)
-        }
-    }
 }
 
 fun String.toCheckboxEnumSet() =

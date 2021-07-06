@@ -4,13 +4,12 @@ import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
-import no.nav.klage.domain.klage.KlageStatus.DONE
-import no.nav.klage.domain.klage.KlageStatus.DRAFT
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.KafkaProducer
@@ -46,8 +45,8 @@ class KlageService(
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
         val klage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(klage, false)
-        validationService.validateAccess(klage, bruker)
-        return klage.toKlageView(bruker, klage.status === DRAFT)
+        validationService.validateKlageAccess(klage, bruker)
+        return klage.toKlageView(bruker, klage.status === KlageAnkeStatus.DRAFT)
     }
 
     fun getDraftKlagerByFnr(bruker: Bruker): List<KlageView> {
@@ -80,7 +79,7 @@ class KlageService(
                 processedTitleKey
             )
         if (klage != null) {
-            validationService.validateAccess(klage, bruker)
+            validationService.validateKlageAccess(klage, bruker)
             return klage.toKlageView(bruker, false)
         }
         throw KlageNotFoundException()
@@ -89,7 +88,7 @@ class KlageService(
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
         val klage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(klage, false)
-        validationService.validateAccess(klage, bruker)
+        validationService.validateKlageAccess(klage, bruker)
         return klage.journalpostId
     }
 
@@ -99,7 +98,7 @@ class KlageService(
         }
 
         return klageRepository
-            .createKlage(klage.toKlage(bruker, DRAFT))
+            .createKlage(klage.toKlage(bruker, KlageAnkeStatus.DRAFT))
             .toKlageView(bruker)
             .also {
                 val temaReport = if (klage.isLonnskompensasjon()) {
@@ -114,7 +113,7 @@ class KlageService(
     fun updateKlage(klage: KlageView, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klage.id)
         validationService.checkKlageStatus(existingKlage)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         klageRepository
             .updateKlage(klage.toKlage(bruker))
             .toKlageView(bruker, false)
@@ -123,7 +122,7 @@ class KlageService(
     fun deleteKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         klageRepository.deleteKlage(klageId)
     }
 
@@ -136,8 +135,8 @@ class KlageService(
                 ?: throw KlageIsFinalizedException("No modified date after finalize klage")
         }
 
-        validationService.validateAccess(existingKlage, bruker)
-        existingKlage.status = DONE
+        validationService.validateKlageAccess(existingKlage, bruker)
+        existingKlage.status = KlageAnkeStatus.DONE
         val updatedKlage = klageRepository.updateKlage(existingKlage)
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, updatedKlage))
         registerFinalizedMetrics(updatedKlage)
@@ -159,7 +158,7 @@ class KlageService(
     fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage, false)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         requireNotNull(existingKlage.journalpostId)
         return fileClient.getKlageFile(existingKlage.journalpostId)
     }
@@ -195,7 +194,7 @@ class KlageService(
                 }
             },
             journalpostId,
-            finalizedDate = if (status === DONE) modifiedDateTime.toLocalDate() else null,
+            finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,
             vedtakDate = vedtakDate,
             checkboxesSelected = checkboxesSelected ?: emptySet(),
             userSaksnummer = userSaksnummer,
@@ -227,13 +226,6 @@ class KlageService(
         }
         vedleggMetrics.registerNumberOfVedleggPerUser(klage.vedlegg.size.toDouble())
     }
-
-    private fun Klage.isLonnskompensasjon() =
-        tema == Tema.DAG && titleKey == TitleEnum.LONNSKOMPENSASJON
-
-
-    private fun KlageView.isLonnskompensasjon() =
-        tema == Tema.DAG && titleKey == TitleEnum.LONNSKOMPENSASJON
 
     private fun createAggregatedKlage(
         bruker: Bruker,
