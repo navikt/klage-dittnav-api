@@ -56,9 +56,9 @@ class KlageController(
         @RequestParam titleKey: TitleEnum?
     ): KlageView {
         val bruker = brukerService.getBruker()
-        logger.debug("Get klager for user is requested.")
+        logger.debug("Get draft klage for user is requested.")
         secureLogger.debug(
-            "Get klager for user is requested. Fnr: {}, tema: {}",
+            "Get draft klage for user is requested. Fnr: {}, tema: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema
         )

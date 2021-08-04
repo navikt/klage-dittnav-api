@@ -6,7 +6,7 @@ import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
 @Component
-class KlageMetrics(private val meterRegistry: MeterRegistry) {
+class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -19,6 +19,7 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
         private const val COUNTER_KLAGER_OPTIONAL_SAKSNUMMER = "klager_optional_saksnummer"
         private const val COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO = "klager_optional_vedtaksdato"
         private const val COUNTER_KLAGER_FINALIZED_TITLE = "klager_finalized_title"
+
     }
 
     fun incrementKlagerInitialized(ytelse: String) {
@@ -78,5 +79,4 @@ class KlageMetrics(private val meterRegistry: MeterRegistry) {
             logger.warn("incrementKlageTitle failed", e)
         }
     }
-
 }
