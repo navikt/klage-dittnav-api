@@ -1,10 +1,10 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.klage.*
-import no.nav.klage.domain.klage.KlageStatus.DELETED
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
@@ -26,14 +26,14 @@ class KlageRepository {
     private lateinit var maxDraftAgeInDays: String
 
     fun getKlager(): List<Klage> {
-        return KlageDAO.find { Klager.status neq DELETED.name }.map {
+        return KlageDAO.find { Klager.status neq KlageAnkeStatus.DELETED.name }.map {
             it.toKlage()
         }
     }
 
     fun getExpiredDraftKlager(): List<Klage> {
         val expiryDate = Instant.now().minus(maxDraftAgeInDays.toLong(), ChronoUnit.DAYS)
-        return KlageDAO.find { Klager.status eq KlageStatus.DRAFT.name and Klager.modifiedByUser.less(expiryDate) }
+        return KlageDAO.find { Klager.status eq KlageAnkeStatus.DRAFT.name and Klager.modifiedByUser.less(expiryDate) }
             .map {
                 it.toKlage()
             }
@@ -52,7 +52,7 @@ class KlageRepository {
     }
 
     fun getDraftKlagerByFnr(fnr: String): List<Klage> {
-        return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageStatus.DRAFT.toString()) }
+        return KlageDAO.find { Klager.foedselsnummer eq fnr and (Klager.status eq KlageAnkeStatus.DRAFT.toString()) }
             .map { it.toKlage() }
     }
 
@@ -64,13 +64,13 @@ class KlageRepository {
     ): Klage? {
         return KlageDAO.find {
             if (titleKey == null && internalSaksnummer.isNullOrBlank()) {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             } else if (titleKey == null) {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             } else if (internalSaksnummer.isNullOrBlank()) {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             } else {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             }
         }.maxBy { it.modifiedByUser }
             ?.toKlage()
@@ -104,7 +104,7 @@ class KlageRepository {
         logger.debug("Deleting klage in db. Id: {}", id)
         val klageFromDB = getKlageToModify(id)
         klageFromDB.apply {
-            status = DELETED.name
+            status = KlageAnkeStatus.DELETED.name
             modifiedByUser = Instant.now()
         }
         logger.debug("Klage successfully marked as deleted in db.")

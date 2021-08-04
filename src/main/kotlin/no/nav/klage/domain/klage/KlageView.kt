@@ -1,20 +1,24 @@
 package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.domain.vedlegg.toVedlegg
-import java.time.*
+import no.nav.klage.util.getFormattedLocalDateTime
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
+import no.nav.klage.util.parseTitleKey
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class KlageView(
     val id: Int,
     val fritekst: String,
     val tema: Tema,
-    val status: KlageStatus = KlageStatus.DRAFT,
-    val modifiedByUser: LocalDateTime = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/Oslo"))
-        .toLocalDateTime(),
+    val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
+    val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
     val vedlegg: List<VedleggView> = listOf(),
     val journalpostId: String? = null,
     val finalizedDate: LocalDate? = null,
@@ -28,7 +32,9 @@ data class KlageView(
     val ytelse: String?
 )
 
-fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) = Klage(
+fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
+
+fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
     id = id,
     foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
     fritekst = fritekst,
@@ -45,10 +51,3 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageStatus = KlageStatus.DRAFT) =
     titleKey = parseTitleKey(titleKey, ytelse, tema)
 )
 
-private fun parseTitleKey(titleKey: TitleEnum?, ytelse: String?, tema: Tema): TitleEnum {
-    return when {
-        titleKey != null -> titleKey
-        ytelse != null && TitleEnum.getTitleKeyFromNbTitle(ytelse) != null -> TitleEnum.getTitleKeyFromNbTitle(ytelse)!!
-        else -> TitleEnum.valueOf(tema.name)
-    }
-}

@@ -1,8 +1,8 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.KlageDAO
-import no.nav.klage.domain.klage.KlageStatus
 import no.nav.klage.domain.titles.TitleEnum
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
@@ -20,7 +20,7 @@ class KlageRepositoryTest {
     private val exampleFritekst = "fritekst"
     private val exampleFritekst2 = "fritekst2"
     private val fnr = "12345678910"
-    private val draftStatus = KlageStatus.DRAFT
+    private val draftStatus = KlageAnkeStatus.DRAFT
     private val exampleTema = Tema.AAP
     private val exampleTitleKey = TitleEnum.ARBEIDSAVKLARINGSPENGER
     private val exampleInternalSaksnummer = "123456"

@@ -37,7 +37,7 @@ class VedleggService(
     fun addVedlegg(klageId: Int, vedlegg: MultipartFile, bruker: Bruker): Vedlegg {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         val timeStart = System.currentTimeMillis()
         vedleggMetrics.registerVedleggSize(vedlegg.bytes.size.toDouble())
         vedleggMetrics.incrementVedleggType(vedlegg.contentType ?: "unknown")
@@ -55,7 +55,7 @@ class VedleggService(
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
         validationService.checkKlageStatus(existingKlage)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         val deletedInGCS = fileClient.deleteVedleggFile(vedlegg.ref)
         vedleggRepository.deleteVedlegg(vedleggId)
         return deletedInGCS
@@ -65,14 +65,14 @@ class VedleggService(
         val vedlegg = vedleggRepository.getVedleggById(vedleggId)
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
         validationService.checkKlageStatus(existingKlage, false)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         return fileClient.getVedleggFile(vedlegg.ref)
     }
 
     fun expandVedleggToVedleggView(vedlegg: Vedlegg, bruker: Bruker): VedleggView {
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
         validationService.checkKlageStatus(existingKlage, false)
-        validationService.validateAccess(existingKlage, bruker)
+        validationService.validateKlageAccess(existingKlage, bruker)
         val content = fileClient.getVedleggFile(vedlegg.ref)
         return vedlegg.toVedleggView(Base64.getEncoder().encodeToString(content))
     }
