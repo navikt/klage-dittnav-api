@@ -19,7 +19,7 @@ class FileClient(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun getKlageFile(journalpostId: String): ByteArray {
+    fun getKlageAnkeFile(journalpostId: String): ByteArray {
         logger.debug("Fetching klage file with journalpost id {}", journalpostId)
 
         return fileWebClient.get()

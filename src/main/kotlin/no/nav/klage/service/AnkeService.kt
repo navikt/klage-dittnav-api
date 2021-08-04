@@ -10,9 +10,7 @@ import no.nav.klage.domain.anke.isLonnskompensasjon
 import no.nav.klage.domain.anke.toAnke
 import no.nav.klage.domain.ankevedlegg.toAnkeVedleggView
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.kafka.KafkaProducer
 import no.nav.klage.repository.AnkeRepository
-import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -55,7 +53,7 @@ class AnkeService(
                 } else {
                     anke.tema.toString()
                 }
-                klageMetrics.incrementKlagerInitialized(temaReport)
+                klageMetrics.incrementAnkerInitialized(temaReport)
             }
     }
 
@@ -136,7 +134,7 @@ class AnkeService(
         validationService.checkAnkeStatus(existingAnke, false)
         validationService.validateAnkeAccess(existingAnke, bruker)
         requireNotNull(existingAnke.journalpostId)
-        return fileClient.getKlageFile(existingAnke.journalpostId)
+        return fileClient.getKlageAnkeFile(existingAnke.journalpostId)
     }
 
 

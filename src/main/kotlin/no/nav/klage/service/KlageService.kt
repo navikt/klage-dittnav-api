@@ -160,7 +160,7 @@ class KlageService(
         validationService.checkKlageStatus(existingKlage, false)
         validationService.validateKlageAccess(existingKlage, bruker)
         requireNotNull(existingKlage.journalpostId)
-        return fileClient.getKlageFile(existingKlage.journalpostId)
+        return fileClient.getKlageAnkeFile(existingKlage.journalpostId)
     }
 
     fun getJournalpostIdWithoutValidation(klageId: Int): String? {
