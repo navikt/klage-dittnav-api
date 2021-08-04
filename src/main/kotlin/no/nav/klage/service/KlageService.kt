@@ -1,7 +1,7 @@
 package no.nav.klage.service
 
 import no.nav.klage.clients.FileClient
-import no.nav.klage.common.KlageMetrics
+import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
@@ -28,7 +28,7 @@ import java.time.ZonedDateTime
 @Transactional
 class KlageService(
     private val klageRepository: KlageRepository,
-    private val klageMetrics: KlageMetrics,
+    private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: KafkaProducer,
     private val vedleggService: VedleggService,
@@ -106,7 +106,7 @@ class KlageService(
                 } else {
                     klage.tema.toString()
                 }
-                klageMetrics.incrementKlagerInitialized(temaReport)
+                klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
     }
 
@@ -212,17 +212,17 @@ class KlageService(
         } else {
             klage.tema.toString()
         }
-        klageMetrics.incrementKlagerFinalizedTitle(klage.titleKey)
-        klageMetrics.incrementKlagerFinalized(temaReport)
-        klageMetrics.incrementKlagerGrunn(temaReport, klage.checkboxesSelected ?: emptySet())
+        klageAnkeMetrics.incrementKlagerFinalizedTitle(klage.titleKey)
+        klageAnkeMetrics.incrementKlagerFinalized(temaReport)
+        klageAnkeMetrics.incrementKlagerGrunn(temaReport, klage.checkboxesSelected ?: emptySet())
         if (klage.fullmektig != null) {
-            klageMetrics.incrementFullmakt(temaReport)
+            klageAnkeMetrics.incrementFullmakt(temaReport)
         }
         if (klage.userSaksnummer != null) {
-            klageMetrics.incrementOptionalSaksnummer(temaReport)
+            klageAnkeMetrics.incrementOptionalSaksnummer(temaReport)
         }
         if (klage.vedtakDate != null) {
-            klageMetrics.incrementOptionalVedtaksdato(temaReport)
+            klageAnkeMetrics.incrementOptionalVedtaksdato(temaReport)
         }
         vedleggMetrics.registerNumberOfVedleggPerUser(klage.vedlegg.size.toDouble())
     }

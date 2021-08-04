@@ -1,7 +1,7 @@
 package no.nav.klage.service
 
 import no.nav.klage.clients.FileClient
-import no.nav.klage.common.KlageMetrics
+import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.anke.Anke
@@ -21,7 +21,7 @@ import java.time.ZonedDateTime
 @Transactional
 class AnkeService(
     private val ankeRepository: AnkeRepository,
-    private val klageMetrics: KlageMetrics,
+    private val klageAnkeMetrics: KlageAnkeMetrics,
     private val fileClient: FileClient,
     private val brukerService: BrukerService,
     private val validationService: ValidationService,
@@ -53,7 +53,7 @@ class AnkeService(
                 } else {
                     anke.tema.toString()
                 }
-                klageMetrics.incrementAnkerInitialized(temaReport)
+                klageAnkeMetrics.incrementAnkerInitialized(temaReport)
             }
     }
 

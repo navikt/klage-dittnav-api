@@ -6,8 +6,8 @@ import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
 @Component
-class KlageMetrics(private val meterRegistry: MeterRegistry) {
-    //TODO: Legg inn anke her
+class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
+
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
