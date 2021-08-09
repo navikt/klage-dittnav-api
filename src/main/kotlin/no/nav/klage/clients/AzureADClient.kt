@@ -30,8 +30,14 @@ class AzureADClient(
     @Value("\${AZURE_APP_WELL_KNOWN_URL}")
     private lateinit var discoveryUrl: String
 
-    @Value("\${KLAGE_FILE_API_CLIENT_ID}")
-    private lateinit var klageFileApiClientId: String
+    @Value("\${KLAGE_FILE_API_APP_NAME}")
+    private lateinit var klageFileApiAppName: String
+
+    @Value("\${NAIS_CLUSTER_NAME}")
+    lateinit var naisCluster: String
+
+    @Value("\${NAIS_NAMESPACE}")
+    lateinit var naisNamespace: String
 
     private fun oidcDiscovery(): OidcDiscovery {
         if (cachedOidcDiscovery == null) {
@@ -50,7 +56,7 @@ class AzureADClient(
 
     fun klageFileApiOidcToken(): String {
         if (cachedKlageFileApiOidcToken.shouldBeRenewed()) {
-            cachedKlageFileApiOidcToken = returnUpdatedToken(klageFileApiClientId)
+            cachedKlageFileApiOidcToken = returnUpdatedToken(getKlageFileApiScope())
         }
 
         return cachedKlageFileApiOidcToken!!.token
@@ -75,6 +81,8 @@ class AzureADClient(
     }
 
     private fun OidcToken?.shouldBeRenewed(): Boolean = this?.hasExpired() ?: true
+
+    private fun getKlageFileApiScope(): String = "${naisCluster}.${naisNamespace}.${klageFileApiAppName}"
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class OidcDiscovery(val token_endpoint: String, val jwks_uri: String, val issuer: String)
