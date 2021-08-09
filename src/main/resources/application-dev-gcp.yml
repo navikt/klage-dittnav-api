@@ -27,13 +27,6 @@ PDL_BASE_URL: https://api-gw-q1.oera.no/pdl-api/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
 SERVICE_USER_USERNAME: srvklage-dittnav
 
-CLAM_AV_URL: http://clamav.clamav/scan
-
-FILE_BASE_URL: http://klage-file-api
-
-KLAGE_FILE_API_CLIENT_ID: 64245dd5-e178-495e-9af2-5d8961690437
-
-
 #These are read from the environment:
 #DB_HOST
 #DB_USERNAME

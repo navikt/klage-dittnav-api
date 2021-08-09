@@ -55,3 +55,9 @@ navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
 ALL_FULLMAKT_OMRAADER: "*"
+
+KLAGE_FILE_API_APP_NAME: klage-file-api
+
+CLAM_AV_URL: http://clamav.clamav/scan
+
+FILE_BASE_URL: http://klage-file-api
