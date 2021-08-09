@@ -62,15 +62,15 @@ class AzureADClient(
         return cachedKlageFileApiOidcToken!!.token
     }
 
-    private fun returnUpdatedToken(targetClientId: String): OidcToken {
+    private fun returnUpdatedToken(scope: String): OidcToken {
         val map = LinkedMultiValueMap<String, String>()
 
         map.add("client_id", clientId)
         map.add("client_secret", clientSecret)
         map.add("grant_type", "client_credentials")
-        map.add("scope", "api://${targetClientId}/.default")
+        map.add("scope", "api://${scope}/.default")
 
-        logger.debug("Getting access token from OIDC for target client {}", targetClientId)
+        logger.debug("Getting access token from OIDC for target client {}", scope)
 
         return azureADWebClient.post()
             .uri(oidcDiscovery().token_endpoint)
