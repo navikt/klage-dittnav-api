@@ -20,6 +20,8 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         private const val COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO = "klager_optional_vedtaksdato"
         private const val COUNTER_KLAGER_FINALIZED_TITLE = "klager_finalized_title"
 
+        private const val COUNTER_ANKER_FINALIZED = "anker_finalized"
+        private const val COUNTER_ANKER_INITIALIZED = "anker_initialized"
     }
 
     fun incrementKlagerInitialized(ytelse: String) {
@@ -79,4 +81,21 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
             logger.warn("incrementKlageTitle failed", e)
         }
     }
+
+    fun incrementAnkerInitialized(ytelse: String) {
+        try {
+            meterRegistry.counter(COUNTER_ANKER_INITIALIZED, "ytelse", ytelse).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementAnkerInitialized failed", e)
+        }
+    }
+
+    fun incrementAnkerFinalized(ytelse: String) {
+        try {
+            meterRegistry.counter(COUNTER_ANKER_FINALIZED, "ytelse", ytelse).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementAnkerFinalized failed", e)
+        }
+    }
+
 }

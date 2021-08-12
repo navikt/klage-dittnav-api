@@ -59,6 +59,34 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.CONFLICT, ex, request)
 
     @ExceptionHandler
+    fun handleAnkeNotFound(
+        ex: AnkeNotFoundException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.NOT_FOUND, ex, request)
+
+    @ExceptionHandler
+    fun handleAnkeIsDeleted(
+        ex: AnkeIsDeletedException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.CONFLICT, ex, request)
+
+    @ExceptionHandler
+    fun handleAnkeIsFinalized(
+        ex: AnkeIsFinalizedException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.CONFLICT, ex, request)
+
+    @ExceptionHandler
+    fun handleAvailableAnkeNotFound(
+        ex: AvailableAnkeNotFoundException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.NOT_FOUND, ex, request)
+
+    @ExceptionHandler
     fun handleAttemptedIllegalUpdate(
         ex: AttemptedIllegalUpdateException,
         request: NativeWebRequest

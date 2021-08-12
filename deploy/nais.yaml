@@ -52,8 +52,6 @@ spec:
   secureLogs:
     enabled: true
   webproxy: true
-  tokenx:
-    enabled: true
   accessPolicy:
     inbound:
       rules:
@@ -68,6 +66,7 @@ spec:
         - host: hooks.slack.com
       rules:
         - application: klage-file-api
+        - application: kabal-api
         - application: clamav
           namespace: clamav
   envFrom:
