@@ -27,7 +27,7 @@ class FileClient(
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .bodyToMono<ByteArray>()
-            .block() ?: throw RuntimeException("Klage file could not be fetched")
+            .block() ?: throw RuntimeException("File could not be fetched")
     }
 
 

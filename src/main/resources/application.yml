@@ -61,3 +61,6 @@ KLAGE_FILE_API_APP_NAME: klage-file-api
 CLAM_AV_URL: http://clamav.clamav/scan
 
 FILE_BASE_URL: http://klage-file-api
+
+KABAL_API_BASE_URL: http://kabal-api
+KABAL_API_APP_NAME: kabal-api

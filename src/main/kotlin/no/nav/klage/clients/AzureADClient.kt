@@ -18,6 +18,7 @@ class AzureADClient(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private var cachedKlageFileApiOidcToken: OidcToken? = null
+        private var cachedKabalApiOidcToken: OidcToken? = null
         private var cachedOidcDiscovery: OidcDiscovery? = null
     }
 
@@ -32,6 +33,9 @@ class AzureADClient(
 
     @Value("\${KLAGE_FILE_API_APP_NAME}")
     private lateinit var klageFileApiAppName: String
+
+    @Value("\${KABAL_API_APP_NAME}")
+    private lateinit var kabalApiAppName: String
 
     @Value("\${NAIS_CLUSTER_NAME}")
     lateinit var naisCluster: String
@@ -62,6 +66,14 @@ class AzureADClient(
         return cachedKlageFileApiOidcToken!!.token
     }
 
+    fun kabalApiOidcToken(): String {
+        if (cachedKabalApiOidcToken.shouldBeRenewed()) {
+            cachedKabalApiOidcToken = returnUpdatedToken(getKabalApiScope())
+        }
+
+        return cachedKabalApiOidcToken!!.token
+    }
+
     private fun returnUpdatedToken(scope: String): OidcToken {
         val map = LinkedMultiValueMap<String, String>()
 
@@ -82,7 +94,11 @@ class AzureADClient(
 
     private fun OidcToken?.shouldBeRenewed(): Boolean = this?.hasExpired() ?: true
 
-    private fun getKlageFileApiScope(): String = "${naisCluster}.${naisNamespace}.${klageFileApiAppName}"
+    private fun getKlageFileApiScope(): String = getScopeString(klageFileApiAppName)
+
+    private fun getKabalApiScope(): String = getScopeString(kabalApiAppName)
+
+    private fun getScopeString(appName: String): String = "${naisCluster}.${naisNamespace}.${appName}"
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class OidcDiscovery(val token_endpoint: String, val jwks_uri: String, val issuer: String)
