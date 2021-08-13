@@ -239,8 +239,6 @@ class KlageService(
 
             return AggregatedKlage(
                 id = klage.id!!,
-                klageInstans = false, // TODO: False for MVP
-                trygderetten = false, // TODO: False for MVP
                 fornavn = fullmaktsGiver.navn.fornavn,
                 mellomnavn = fullmaktsGiver.navn.mellomnavn ?: "",
                 etternavn = fullmaktsGiver.navn.etternavn,
@@ -263,8 +261,6 @@ class KlageService(
         } else {
             return AggregatedKlage(
                 id = klage.id!!,
-                klageInstans = false, // TODO: False for MVP
-                trygderetten = false, // TODO: False for MVP
                 fornavn = bruker.navn.fornavn,
                 mellomnavn = bruker.navn.mellomnavn ?: "",
                 etternavn = bruker.navn.etternavn,

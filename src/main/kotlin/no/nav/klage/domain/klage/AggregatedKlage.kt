@@ -5,8 +5,6 @@ import java.time.LocalDate
 
 data class AggregatedKlage(
     val id: Int,
-    val klageInstans: Boolean,
-    val trygderetten: Boolean,
     val fornavn: String,
     val mellomnavn: String,
     val etternavn: String,
@@ -22,8 +20,14 @@ data class AggregatedKlage(
     val vedlegg: List<Vedlegg>,
     val userChoices: List<String>?,
     val userSaksnummer: String? = null,
-    val internalSaksnummer: String?,
+    val internalSaksnummer: String?, 
     val fullmektigNavn: String?,
-    val fullmektigFnr: String?
+    val fullmektigFnr: String?,
+    val klageAnkeType: KlageAnkeType? = KlageAnkeType.KLAGE,
+    val previousUtfall: String? = null
 )
+
+enum class KlageAnkeType {
+    KLAGE, ANKE
+}
 
