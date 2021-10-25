@@ -4,8 +4,6 @@ externalHosts:
 springProfile: dev-gcp
 
 envs:
-  - name: SPRING_PROFILES_ACTIVE
-    value: {{springProfile}}
   - name: JAVA_TOOL_OPTIONS
     value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   - name: JAVA_OPTS
