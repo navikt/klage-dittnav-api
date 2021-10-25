@@ -77,7 +77,6 @@ spec:
     - secret: slack-channel-id
     - configmap: loginservice-idporten
   env:
-    - name: SPRING_PROFILES_ACTIVE
-      value: {{springProfile}}
-    - name: JAVA_OPTS
-      value: "-Xms256m -Xmx512m"
+  {{#each envs as |env|}}
+     {{env}}
+  {{/each}}

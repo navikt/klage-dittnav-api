@@ -2,3 +2,8 @@ ingress: https://klage-dittnav-api.nav.no
 externalHosts:
   - api-gw.oera.no
 springProfile: prod-gcp
+envs:
+  - name: SPRING_PROFILES_ACTIVE
+    value: {{springProfile}}
+  - name: JAVA_OPTS
+    value: "-Xms256m -Xmx512m"
