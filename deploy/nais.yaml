@@ -80,6 +80,6 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
   {{#each envs}}
-    - name: {{name } }
+    - name: {{name}}
       value: {{value}}
   {{/each}}
