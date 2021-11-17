@@ -98,8 +98,15 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         ex: MaxUploadSizeExceededException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> {
-        logger.warn("User tried to upload too large attachment", ex)
         return create(Status.BAD_REQUEST, AttachmentTooLargeException(), request)
+    }
+
+    @ExceptionHandler
+    fun handleAttachmentTotalTooLargeException(
+        ex: AttachmentTotalTooLargeException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> {
+        return create(Status.BAD_REQUEST, ex, request)
     }
 
     @ExceptionHandler
