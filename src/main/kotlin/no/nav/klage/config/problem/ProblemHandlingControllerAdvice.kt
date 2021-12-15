@@ -26,17 +26,6 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    override fun log(
-        throwable: Throwable,
-        problem: Problem?,
-        request: NativeWebRequest?,
-        status: HttpStatus
-    ) {
-        if (throwable is JwtTokenUnauthorizedException) {
-            logger.info("{}: {}", status.reasonPhrase, throwable.message)
-        } else AdviceTraits.log(throwable, status)
-    }
-
     @ExceptionHandler
     fun handleKlageNotFound(
         ex: KlageNotFoundException,

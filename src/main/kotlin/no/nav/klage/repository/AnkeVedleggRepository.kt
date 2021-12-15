@@ -20,10 +20,10 @@ class AnkeVedleggRepository {
     fun storeAnkeVedlegg(ankeId: Int, vedlegg: MultipartFile, fileStorageId: String, internalSaksnummer: String): AnkeVedlegg {
         logger.debug("Storing ankeVedlegg metadata in db. AnkeId: {}", ankeId)
         return AnkeVedleggDAO.new {
-            this.tittel = vedlegg.originalFilename
+            this.tittel = vedlegg.originalFilename.toString()
             this.ankeId = AnkeDAO.findById(ankeId)!!
             this.ref = fileStorageId
-            this.contentType = vedlegg.contentType
+            this.contentType = vedlegg.contentType.toString()
             this.sizeInBytes = vedlegg.bytes.size
             this.ankeInternalSaksnummer = UUID.fromString(internalSaksnummer)
         }.toAnkeVedlegg().also {

@@ -72,7 +72,7 @@ class KlageRepository {
             } else {
                 Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             }
-        }.maxBy { it.modifiedByUser }
+        }.maxByOrNull { it.modifiedByUser }
             ?.toKlage()
     }
 

@@ -43,12 +43,12 @@ class DraftCleanupService(
         var vedleggFilesSuccessfullyDeleted = 0
         var vedleggSuccessfullyDeleted = 0
         var klagerSuccessfullyDeleted = 0
-        var expiredKlager = 0
+        var expiredKlager: Int
 
         var ankerSuccessfullyDeleted = 0
         var ankeVedleggSuccessfullyDeleted = 0
         var ankeVedleggFilesSuccessfullyDeleted = 0
-        var expiredAnker = 0
+        var expiredAnker: Int
 
         val oldKlageDrafts = klageRepository.getExpiredDraftKlager()
         expiredKlager = oldKlageDrafts.count()

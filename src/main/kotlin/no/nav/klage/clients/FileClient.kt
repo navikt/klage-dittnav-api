@@ -69,7 +69,7 @@ class FileClient(
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .bodyToMono<Boolean>()
-            .block()
+            .block()!!
 
         if (deletedInFileStore) {
             logger.debug("Attachment successfully deleted in file store.")

@@ -1,6 +1,7 @@
 package no.nav.klage.domain.titles
 
 import no.nav.klage.domain.LanguageEnum
+import java.util.*
 
 enum class TitleEnum(val nb: String, val en: String) {
     AAP("Arbeidsavklaringspenger", "Work assessment allowance (AAP)"),
@@ -146,7 +147,11 @@ enum class TitleEnum(val nb: String, val en: String) {
 
     companion object {
         private val map = TitleEnum.values().associateBy(TitleEnum::nb)
-        fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse.capitalize()]
+        fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(
+                Locale.getDefault()
+            ) else it.toString()
+        }]
     }
 
     fun getChosenTitle(language: LanguageEnum): String {

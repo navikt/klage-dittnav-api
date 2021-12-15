@@ -45,7 +45,7 @@ class AnkeRepository {
         val inputUUID = UUID.fromString(internalSaksnummer)
         return AnkeDAO.find {
             Anker.foedselsnummer eq fnr and (Anker.internalSaksnummer eq inputUUID) and (Anker.status eq KlageAnkeStatus.DRAFT.toString())
-        }.maxBy { it.modifiedByUser }
+        }.maxByOrNull { it.modifiedByUser }
             ?.toAnke()
     }
 

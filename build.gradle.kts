@@ -31,9 +31,9 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.72"
-    id("org.springframework.boot") version "2.2.6.RELEASE"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.3.72"
+    id("org.jetbrains.kotlin.jvm") version "1.6.0"
+    id("org.springframework.boot") version "2.5.7"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.6.0"
     idea
 }
 
@@ -92,7 +92,10 @@ idea {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions{
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+        jvmTarget = "17"
+    }
 }
 
 tasks.withType<Test> {
@@ -105,9 +108,3 @@ tasks.withType<Test> {
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
 }
-
-kotlin.sourceSets["main"].kotlin.srcDirs("src/main/kotlin")
-kotlin.sourceSets["test"].kotlin.srcDirs("src/test/kotlin")
-
-sourceSets["main"].resources.srcDirs("src/main/resources")
-sourceSets["test"].resources.srcDirs("src/test/resources")
