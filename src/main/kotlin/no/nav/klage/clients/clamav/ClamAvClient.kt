@@ -23,7 +23,12 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
             listOf(ScanResult("Unknown", ClamAvResult.ERROR))
         }
 
-        if(response.size != 1) {
+        if (response == null) {
+            logger.warn("No response from virus scan.")
+            return false
+        }
+
+        if (response.size != 1) {
             logger.warn("Wrong size response from virus scan.")
             return false
         }

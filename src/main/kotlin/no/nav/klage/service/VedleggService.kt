@@ -77,5 +77,5 @@ class VedleggService(
         return vedlegg.toVedleggView(Base64.getEncoder().encodeToString(content))
     }
 
-    private fun Klage.attachmentsTotalSize() = this.vedlegg.sumBy { it.sizeInBytes }
+    private fun Klage.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
 }

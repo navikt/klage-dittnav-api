@@ -76,5 +76,5 @@ class AnkeVedleggService(
         return ankeVedlegg.toAnkeVedleggView(Base64.getEncoder().encodeToString(content))
     }
 
-    private fun Anke.attachmentsTotalSize() = this.vedlegg.sumBy { it.sizeInBytes }
+    private fun Anke.attachmentsTotalSize() = this.vedlegg.sumOf{ it.sizeInBytes }
 }

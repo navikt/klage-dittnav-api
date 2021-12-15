@@ -19,10 +19,10 @@ class VedleggRepository {
     fun storeVedlegg(klageId: Int, vedlegg: MultipartFile, fileStorageId: String): Vedlegg {
         logger.debug("Storing vedlegg metadata in db. KlageId: {}", klageId)
         return VedleggDAO.new {
-            this.tittel = vedlegg.originalFilename
+            this.tittel = vedlegg.originalFilename.toString()
             this.klageId = KlageDAO.findById(klageId)!!
             this.ref = fileStorageId
-            this.contentType = vedlegg.contentType
+            this.contentType = vedlegg.contentType.toString()
             this.sizeInBytes = vedlegg.bytes.size
         }.toVedlegg().also {
             logger.debug("Vedlegg metadata stored successfully in db. Id: {}", it.id)
