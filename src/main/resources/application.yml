@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: klage-dittnav-api
   datasource:
     url: jdbc:postgresql://${DB_HOST}:5432/klage
     username: ${DB_USERNAME}
