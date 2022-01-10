@@ -7,7 +7,6 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageIsFinalizedException
-import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.titles.TitleEnum
@@ -62,7 +61,7 @@ class KlageService(
         fullmaktsgiver: String?,
         titleKey: TitleEnum?,
         ytelse: String?
-    ): KlageView {
+    ): KlageView? {
         val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
         var processedTitleKey = titleKey
         if (ytelse == null && titleKey == null) {
@@ -82,7 +81,7 @@ class KlageService(
             validationService.validateKlageAccess(klage, bruker)
             return klage.toKlageView(bruker, false)
         }
-        throw KlageNotFoundException()
+        return null
     }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {

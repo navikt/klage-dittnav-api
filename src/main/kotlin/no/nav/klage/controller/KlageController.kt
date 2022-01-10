@@ -47,6 +47,9 @@ class KlageController(
         return klageService.getDraftKlagerByFnr(bruker)
     }
 
+    /**
+     * Get possible draft. Might be null.
+     */
     @GetMapping("/klager/draft")
     fun getDraftKlageByQuery(
         @RequestParam tema: Tema,
@@ -54,7 +57,7 @@ class KlageController(
         @RequestParam internalSaksnummer: String?,
         @RequestParam fullmaktsgiver: String?,
         @RequestParam titleKey: TitleEnum?
-    ): KlageView {
+    ): KlageView? {
         val bruker = brukerService.getBruker()
         logger.debug("Get draft klage for user is requested.")
         secureLogger.debug(
