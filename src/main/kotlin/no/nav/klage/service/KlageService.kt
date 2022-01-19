@@ -79,7 +79,7 @@ class KlageService(
             )
         if (klage != null) {
             validationService.validateKlageAccess(klage, bruker)
-            return klage.toKlageView(bruker, false)
+            return klage.toKlageView(bruker, true)
         }
         return null
     }
