@@ -6,9 +6,23 @@ import org.springframework.stereotype.Component
 @Component
 class TokenUtil(private val ctxHolder: TokenValidationContextHolder) {
 
-    private val issuer = "selvbetjening"
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val issuer = "selvbetjening"
+    }
 
     fun getSubject(): String {
+        val token = ctxHolder.tokenValidationContext?.getClaims(issuer)
+
+        if (token?.get("pid") != null) {
+            logger.debug("Token: Found pid")
+        } else if (token?.get("sub") != null) {
+            logger.debug("Token: Found sub")
+        } else {
+            logger.debug("Token: Found none")
+        }
+
         val subject = ctxHolder.tokenValidationContext?.getClaims(issuer)?.subject
         return checkNotNull(subject) { "Subject not found in token" }
     }
