@@ -1,6 +1,7 @@
 package no.nav.klage.util
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
+import no.nav.security.token.support.core.exceptions.JwtTokenValidatorException
 import org.springframework.stereotype.Component
 
 @Component
@@ -15,16 +16,16 @@ class TokenUtil(private val ctxHolder: TokenValidationContextHolder) {
     fun getSubject(): String {
         val token = ctxHolder.tokenValidationContext?.getClaims(issuer)
 
-        if (token?.get("pid") != null) {
-            logger.debug("Token: Found pid")
-        } else if (token?.get("sub") != null) {
-            logger.debug("Token: Found sub")
-        } else {
-            logger.debug("Token: Found none")
-        }
-
-        val subject = ctxHolder.tokenValidationContext?.getClaims(issuer)?.subject
-        return checkNotNull(subject) { "Subject not found in token" }
+        val subject =
+            if (token?.get("pid") != null) {
+                token.get("pid").toString()
+            } else if (token?.subject != null) {
+                token.subject.toString()
+            } else {
+                throw JwtTokenValidatorException("pid/sub not found in token")
+            }
+        
+        return subject
     }
 
     fun getToken(): String {
