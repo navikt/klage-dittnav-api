@@ -7,7 +7,9 @@ import no.nav.klage.domain.Identifikator
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.FullmaktNotFoundException
 import no.nav.klage.util.TokenUtil
+import no.nav.klage.util.getLogger
 import no.nav.pam.geography.PostDataDAO
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,6 +19,11 @@ class BrukerService(
     private val pdlClient: PdlClient,
     private val tokenUtil: TokenUtil
 ) {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
 
     @Value("\${ALL_FULLMAKT_OMRAADER}")
     private lateinit var allFullmaktOmraader: String
@@ -37,7 +44,12 @@ class BrukerService(
 
     fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
         if (personInfo.errors != null) {
-            throw RuntimeException(personInfo.errors[0].message)
+            logger.warn("Errors from pdl: ${personInfo.errors}")
+            if (personInfo.errors[0].extensions.code == "unauthenticated") {
+                throw JwtTokenUnauthorizedException("Invalid token used towards PDL")
+            } else {
+                throw RuntimeException(personInfo.errors[0].message)
+            }
         }
 
         val pdlNavn = personInfo.data?.hentPerson?.navn?.firstOrNull()
