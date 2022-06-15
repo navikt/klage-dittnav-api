@@ -11,10 +11,11 @@ import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.toVedleggView
-import no.nav.klage.kafka.KafkaProducer
+import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
+import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.vedtakFromDate
-import no.nav.slackposter.Kibana
 import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +30,7 @@ class KlageService(
     private val klageRepository: KlageRepository,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
-    private val kafkaProducer: KafkaProducer,
+    private val kafkaProducer: AivenKafkaProducer,
     private val vedleggService: VedleggService,
     private val slackClient: SlackClient,
     private val fileClient: FileClient,
@@ -39,6 +40,10 @@ class KlageService(
 
     companion object {
         private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
+
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
@@ -141,14 +146,11 @@ class KlageService(
         registerFinalizedMetrics(updatedKlage)
 
         val klageIdAsString = klageId.toString()
-        slackClient.postMessage(
-            String.format(
-                "Klage (<%s|%s>) med tema %s er sendt inn%s",
-                Kibana.createUrl(klageIdAsString),
-                klageIdAsString,
-                existingKlage.tema.name,
-                (if (existingKlage.fullmektig.isNullOrEmpty()) "." else " med fullmakt.")
-            )
+        logger.debug(
+            "Klage {} med tema {} er sendt inn{}",
+            klageIdAsString,
+            existingKlage.tema.name,
+            (if (existingKlage.fullmektig.isNullOrEmpty()) "." else " med fullmakt.")
         )
 
         return updatedKlage.modifiedByUser ?: throw KlageIsFinalizedException("No modified date after finalize klage")
