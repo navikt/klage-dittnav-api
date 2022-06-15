@@ -77,7 +77,7 @@ FILE_BASE_URL: http://klage-file-api
 KABAL_API_BASE_URL: http://kabal-api
 KABAL_API_APP_NAME: kabal-api
 
-KAFKA_TOPIC: aapen-klager-klageOpprettet
+KAFKA_TOPIC: klage.privat-klage-mottatt-v1
 
 SERVICE_USER_USERNAME: srvklage-dittnav
 
