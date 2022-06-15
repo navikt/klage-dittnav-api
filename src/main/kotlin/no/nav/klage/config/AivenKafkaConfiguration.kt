@@ -45,8 +45,8 @@ class AivenKafkaConfiguration(
     @Bean
     fun aivenKafkaTemplate(): KafkaTemplate<String, String> {
         val config = mapOf(
-            ProducerConfig.CLIENT_ID_CONFIG to "klage-dittnav-api-producer",
-            ProducerConfig.ACKS_CONFIG to "all",
+            ProducerConfig.CLIENT_ID_CONFIG to "kabal-api-producer",
+            ProducerConfig.ACKS_CONFIG to "1",
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
         ) + commonConfig()
