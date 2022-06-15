@@ -50,6 +50,16 @@ management:
     tags:
       application: ${spring.application.name}
 
+#Token validation
+no.nav.security.jwt:
+  issuer.selvbetjening:
+    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
+    cookiename: selvbetjening-idtoken
+  issuer.azuread:
+    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+    accepted_audience: ${AZURE_APP_CLIENT_ID}
+
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
 
@@ -66,3 +76,11 @@ FILE_BASE_URL: http://klage-file-api
 
 KABAL_API_BASE_URL: http://kabal-api
 KABAL_API_APP_NAME: kabal-api
+
+KAFKA_TOPIC: aapen-klager-klageOpprettet
+
+SERVICE_USER_USERNAME: srvklage-dittnav
+
+logging:
+  level:
+    root: INFO

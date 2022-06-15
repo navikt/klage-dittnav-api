@@ -5,31 +5,8 @@ allowed.origins:
   http://localhost:3000
 
 
-logging:
-  level:
-    root: INFO
-
-#Token validation
-no.nav.security.jwt:
-  issuer.selvbetjening:
-    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
-    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
-    cookiename: selvbetjening-idtoken
-  issuer.azuread:
-    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
-    accepted_audience: ${AZURE_APP_CLIENT_ID}
-  issuer.tokenx:
-    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
-    accepted_audience: ${TOKEN_X_CLIENT_ID}
-
-
-KAFKA_BOOTSTRAP_SERVERS: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
-KAFKA_CLIENTID: klage-dittnav-api
-KAFKA_TOPIC: aapen-klager-klageOpprettet
-
 PDL_BASE_URL: https://api-gw-q1.oera.no/pdl-api/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
-SERVICE_USER_USERNAME: srvklage-dittnav
 
 #These are read from the environment:
 #DB_HOST
