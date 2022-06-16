@@ -1,5 +1,6 @@
 package no.nav.klage.controller
 
+import io.swagger.annotations.Api
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.security.token.support.core.api.Unprotected
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Unprotected
+@Api(tags = ["titles"])
 class TitleController {
 
     @GetMapping("/titles")

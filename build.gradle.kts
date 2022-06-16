@@ -13,6 +13,7 @@ val springSleuthVersion = "3.0.4"
 val resilience4jVersion = "1.5.0"
 val problemSpringWebStartVersion = "0.26.2"
 val shedlockVersion = "4.23.0"
+val springFoxVersion = "3.0.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -76,6 +77,7 @@ dependencies {
 
     implementation("no.nav.slackposter:simple-slack-poster:5")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
+    implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")

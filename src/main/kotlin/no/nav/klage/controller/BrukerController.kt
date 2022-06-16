@@ -1,5 +1,6 @@
 package no.nav.klage.controller
 
+import io.swagger.annotations.Api
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
 import no.nav.klage.service.BrukerService
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@Api(tags = ["bruker"])
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 class BrukerController(private val brukerService: BrukerService) {
     @GetMapping("/bruker")
