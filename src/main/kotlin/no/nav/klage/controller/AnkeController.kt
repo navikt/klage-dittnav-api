@@ -1,5 +1,6 @@
 package no.nav.klage.controller
 
+import io.swagger.annotations.Api
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.anke.NewAnkeRequest
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Profile("local", "dev-gcp")
 @RestController
+@Api(tags = ["anker"])
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 @RequestMapping("/anker")
 class AnkeController(
