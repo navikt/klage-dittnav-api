@@ -9,7 +9,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @SpringBootApplication
 @EnableJwtTokenValidation(ignore = ["springfox"])
 @EnableScheduling
-@EnableSwagger2
 class Application
 
 fun main() {
