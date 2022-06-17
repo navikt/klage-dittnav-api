@@ -148,6 +148,19 @@ class KlageRepositoryTest {
         }
     }
 
+    @Test
+    fun `updateFritekst works as expected`() {
+        transaction {
+            createDBEntryWithYtelse()
+
+            val klage = klageRepository.getDraftKlagerByFnr(fnr)[0]
+            klageRepository.updateFritekst(klage.id!!, exampleFritekst2)
+            val output = klageRepository.getKlageById(klage.id!!).fritekst
+
+            Assertions.assertEquals(exampleFritekst2, output)
+        }
+    }
+
 
     @AfterAll
     fun cleanupAfter() {

@@ -32,6 +32,22 @@ fun Klage.isDeleted() = status.isDeleted()
 fun Klage.isLonnskompensasjon() = klageAnkeIsLonnskompensasjon(tema, titleKey)
 
 
+
+// ja val fritekst: String,
+// nei? var status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
+// sideeffekt val modifiedByUser: Instant? = Instant.now(),
+
+// ja val userSaksnummer: String? = null,
+// ja val vedlegg: List<Vedlegg> = listOf(),
+// nei val journalpostId: String? = null,
+// ja val vedtakDate: LocalDate? = null,
+// ja val checkboxesSelected: Set<CheckboxEnum>? = null,
+
+// undersøk val fullmektig: String? = null,
+// undersøk val language: LanguageEnum,
+
+
+
 fun Klage.writableOnceFieldsMatch(existingKlage: Klage): Boolean {
     return id == existingKlage.id &&
             foedselsnummer == existingKlage.foedselsnummer &&

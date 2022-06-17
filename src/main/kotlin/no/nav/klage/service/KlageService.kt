@@ -118,6 +118,16 @@ class KlageService(
             .toKlageView(bruker, false)
     }
 
+    fun updateKlageFritekst(klageId: Int, fritekst: String, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        klageRepository
+            .updateFritekst(klageId, fritekst)
+            .toKlageView(bruker, false)
+    }
+
+
     fun deleteKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)

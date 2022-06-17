@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.annotations.Api
+import no.nav.klage.controller.view.StringInput
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
@@ -13,6 +14,7 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -137,6 +139,23 @@ class KlageControllerPrefixed(
             throw UpdateMismatchException("Id in klage does not match resource id")
         }
         klageService.updateKlage(klage, bruker)
+    }
+
+    @Unprotected
+    @PutMapping("/{klageId}/fritekst")
+    fun updateKlageFritekst(
+        @PathVariable klageId: Int,
+        @RequestBody input: StringInput,
+        response: HttpServletResponse
+    ) {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update klage fritekst is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Update klage fritekst is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        klageService.updateKlageFritekst(klageId, input.value, bruker)
     }
 
     @DeleteMapping("/{klageId}")

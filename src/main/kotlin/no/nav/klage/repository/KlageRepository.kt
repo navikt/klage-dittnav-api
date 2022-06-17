@@ -100,6 +100,17 @@ class KlageRepository {
         return klageFromDB.toKlage()
     }
 
+    fun updateFritekst(id: Int, fritekst: String): Klage {
+        logger.debug("Updating klage fritekst in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id)
+        klageFromDB.apply {
+            this.fritekst = fritekst
+        }
+
+        logger.debug("Klage fritekst successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
     fun deleteKlage(id: Int) {
         logger.debug("Deleting klage in db. Id: {}", id)
         val klageFromDB = getKlageToModify(id)
