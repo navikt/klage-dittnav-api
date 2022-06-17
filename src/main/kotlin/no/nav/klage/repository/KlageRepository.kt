@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.or
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 @Repository
@@ -105,9 +106,48 @@ class KlageRepository {
         val klageFromDB = getKlageToModify(id)
         klageFromDB.apply {
             this.fritekst = fritekst
+            this.modifiedByUser = Instant.now()
         }
 
         logger.debug("Klage fritekst successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateUserSaksnummer(id: Int, userSaksnummer: String?): Klage {
+        logger.debug("Updating klage userSaksnummer in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id)
+        klageFromDB.apply {
+            this.userSaksnummer = userSaksnummer
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage userSaksnummer successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateVedtakDate(id: Int, vedtakDate: LocalDate?): Klage {
+        logger.debug("Updating klage vedtakDate in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id)
+        klageFromDB.apply {
+            this.vedtakDate = vedtakDate
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage vedtakDate successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateCheckboxesSelected(id: Int, checkboxesSelected: Set<CheckboxEnum>?): Klage {
+        logger.debug("Updating klage checkboxesSelected in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id)
+        klageFromDB.apply {
+            checkboxesSelected?.let {
+                checkBoxesSelected = checkboxesSelected.joinToString(",") { x -> x.toString() }
+                this.modifiedByUser = Instant.now()
+            }
+        }
+
+        logger.debug("Klage checkboxesSelected successfully updated in db.")
         return klageFromDB.toKlage()
     }
 

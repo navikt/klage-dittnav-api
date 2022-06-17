@@ -1,6 +1,8 @@
 package no.nav.klage.controller
 
 import io.swagger.annotations.Api
+import no.nav.klage.controller.view.CheckboxesSelectedInput
+import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.StringInput
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
@@ -14,7 +16,6 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -141,9 +142,8 @@ class KlageControllerPrefixed(
         klageService.updateKlage(klage, bruker)
     }
 
-    @Unprotected
     @PutMapping("/{klageId}/fritekst")
-    fun updateKlageFritekst(
+    fun updateFritekst(
         @PathVariable klageId: Int,
         @RequestBody input: StringInput,
         response: HttpServletResponse
@@ -155,7 +155,55 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        klageService.updateKlageFritekst(klageId, input.value, bruker)
+        klageService.updateFritekst(klageId, input.value, bruker)
+    }
+
+    @PutMapping("/{klageId}/usersaksnummer")
+    fun updateUserSaksnummer(
+        @PathVariable klageId: Int,
+        @RequestBody input: StringInput,
+        response: HttpServletResponse
+    ) {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update klage userSaksnummer is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Update klage userSaksnummer is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        klageService.updateFritekst(klageId, input.value, bruker)
+    }
+
+    @PutMapping("/{klageId}/vedtakdate")
+    fun updateVedtakDate(
+        @PathVariable klageId: Int,
+        @RequestBody input: DateInput,
+        response: HttpServletResponse
+    ) {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update klage vedtakDate is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Update klage vedtakDate is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        klageService.updateVedtakDate(klageId, input.value, bruker)
+    }
+
+    @PutMapping("/{klageId}/checkboxesselected")
+    fun updateCheckboxesSelected(
+        @PathVariable klageId: Int,
+        @RequestBody input: CheckboxesSelectedInput,
+        response: HttpServletResponse
+    ) {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update klage checkboxesSelected is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Update klage checkboxesSelected is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        klageService.updateCheckboxesSelected(klageId, input.value, bruker)
     }
 
     @DeleteMapping("/{klageId}")

@@ -19,6 +19,7 @@ import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
@@ -118,7 +119,7 @@ class KlageService(
             .toKlageView(bruker, false)
     }
 
-    fun updateKlageFritekst(klageId: Int, fritekst: String, bruker: Bruker) {
+    fun updateFritekst(klageId: Int, fritekst: String, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
@@ -127,6 +128,32 @@ class KlageService(
             .toKlageView(bruker, false)
     }
 
+    fun updateUserSaksnummer(klageId: Int, userSaksnummer: String?, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        klageRepository
+            .updateUserSaksnummer(klageId, userSaksnummer)
+            .toKlageView(bruker, false)
+    }
+
+    fun updateVedtakDate(klageId: Int, vedtakDate: LocalDate?, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        klageRepository
+            .updateVedtakDate(klageId, vedtakDate)
+            .toKlageView(bruker, false)
+    }
+
+    fun updateCheckboxesSelected(klageId: Int, checkboxesSelected: Set<CheckboxEnum>?, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        klageRepository
+            .updateCheckboxesSelected(klageId, checkboxesSelected)
+            .toKlageView(bruker, false)
+    }
 
     fun deleteKlage(klageId: Int, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
