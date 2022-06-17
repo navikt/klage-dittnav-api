@@ -21,6 +21,7 @@ class OpenApiConfig {
             .apis(RequestHandlerSelectors.basePackage(KlageController::class.java.packageName))
             .build()
             .pathMapping("/")
+            .groupName("standard")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(
                 Tag("anker", "API for anker i klage-dittnav-api"),
@@ -38,6 +39,7 @@ class OpenApiConfig {
             .apis(RequestHandlerSelectors.basePackage(KlageControllerPrefixed::class.java.packageName))
             .build()
             .pathMapping("/")
+            .groupName("prefixed")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(
                 Tag("anker-prefixed", "API for anker i klage-dittnav-api"),
@@ -55,6 +57,7 @@ class OpenApiConfig {
             .apis(RequestHandlerSelectors.basePackage(InternalController::class.java.packageName))
             .build()
             .pathMapping("/")
+            .groupName("internal")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(
                 Tag("internal", "API for intern integrasjon i klage-dittnav-api"),
