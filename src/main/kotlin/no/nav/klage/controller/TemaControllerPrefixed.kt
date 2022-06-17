@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Unprotected
-@Api(tags = ["tema"])
-@RequestMapping("/temaer")
-class TemaController {
+@Api(tags = ["tema-prefixed"])
+@RequestMapping("/api/temaer")
+class TemaControllerPrefixed {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")

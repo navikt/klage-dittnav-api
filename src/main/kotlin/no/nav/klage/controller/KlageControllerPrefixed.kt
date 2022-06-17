@@ -1,7 +1,6 @@
 package no.nav.klage.controller
 
 import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
@@ -25,10 +24,10 @@ import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-@Api(tags = ["klager"])
+@Api(tags = ["klager-prefixed"])
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
-@RequestMapping("/klager")
-class KlageController(
+@RequestMapping("/api/klager")
+class KlageControllerPrefixed(
     private val brukerService: BrukerService,
     private val klageService: KlageService,
     private val vedleggService: VedleggService

@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Unprotected
-@Api(tags = ["titles"])
-@RequestMapping("/titles")
-class TitleController {
+@Api(tags = ["titles-prefixed"])
+@RequestMapping("/api/titles")
+class TitleControllerPrefixed {
 
     @GetMapping
     fun getTitles(): MutableMap<String, TitleEnum.TitleInAllLanguages> {
