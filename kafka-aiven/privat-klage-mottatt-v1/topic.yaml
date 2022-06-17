@@ -16,6 +16,9 @@ spec:
       application: klage-dittnav-api
       access: write
     - team: klage
+      application: klage-dlt-consumer
+      access: write
+    - team: klage
       application: klage-arkiver-journalpost
       access: read
     - team: klage
