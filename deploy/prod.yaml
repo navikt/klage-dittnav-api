@@ -5,3 +5,4 @@ springProfile: prod-gcp
 envs:
   - name: JAVA_OPTS
     value: "-Xms256m -Xmx512m"
+kafka_pool: nav-prod
