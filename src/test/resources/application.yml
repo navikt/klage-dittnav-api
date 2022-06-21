@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: klage-dittnav-api
+  profiles:
+    active: test
+  flyway:
+    enabled: false
+  datasource:
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 3
+
+management:
+  endpoint.prometheus.enabled: true
+  endpoints.web:
+    base-path: /internal
+    exposure.include: health,prometheus
+
+LOGINSERVICE_IDPORTEN_DISCOVERY_URL: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
+LOGINSERVICE_IDPORTEN_AUDIENCE: klage-dittnav-api-client-id
+
+AZURE_APP_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
+AZURE_APP_CLIENT_ID: klage-dittnav-api-client-id
+AZURE_APP_CLIENT_SECRET: azure-app-client-secret
+
+TOKEN_X_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
+TOKEN_X_CLIENT_ID: klage-dittnav-api-client-id
+
+no.nav.security.jwt:
+  issuer.selvbetjening:
+    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
+    cookiename: selvbetjening-idtoken
+  issuer.azuread:
+    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+    accepted_audience: ${AZURE_APP_CLIENT_ID}
+  issuer.tokenx:
+    discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
+    accepted_audience: ${TOKEN_X_CLIENT_ID}
+
+
+#Alt under er kun for å få lastet hele konteksten for programmet.
+
+allowed.origins:
+  http://localhost:3000,
+  http://localhost:8080
+
+KLAGE_DITTNAV_CLIENT_ID: klage-dittnav-client-id
+KLAGE_DITTNAV_TOKENX_IDP: idporten
+
+KLAGE_FILE_API_APP_NAME: klage-file-api
+
+KABAL_API_APP_NAME: kabal-api
+KABAL_API_BASE_URL: http://localhost/kabal-api
+
+NAIS_CLUSTER_NAME: local
+NAIS_NAMESPACE: klage
+
+SERVICE_USER_USERNAME: srvklage-dittnav
+SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
+
+CLAM_AV_URL: http://localhost
+
+FILE_BASE_URL: http://localhost
+
+STS_APIKEY: test
+PDL_APIKEY: test
+
+SLACK_URL: http://localhost
+SLACK_CHANNEL_ID: test
+
+PDL_BASE_URL: https://localhost
+SECURITY_TOKEN_SERVICE_REST_URL: http://localhost
+
+DRAFT_CLEANUP_CRON: 0 0 9,12,16 * * MON-FRI
+MAX_DRAFT_AGE_IN_DAYS: 180
+
+maxAttachmentSize: 8MB
+maxTotalSize: 32MB
+
+navCallId: Nav-Callid
+navConsumerId: Nav-Consumer-Id
+
+KAFKA_BOOTSTRAP_SERVERS: localhost
+KAFKA_CLIENTID: klage-dittnav-api
+KAFKA_TOPIC: aapen-klager-klageOpprettet
+
+ALL_FULLMAKT_OMRAADER: "*"
+

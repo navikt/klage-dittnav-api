@@ -5,6 +5,7 @@ val mockkVersion = "1.9.3"
 val h2Version = "1.4.200"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
+val tokenSupportVersion = "2.1.0"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
 val pdfboxVersion = "2.0.19"
@@ -13,10 +14,12 @@ val springSleuthVersion = "3.0.4"
 val resilience4jVersion = "1.5.0"
 val problemSpringWebStartVersion = "0.26.2"
 val shedlockVersion = "4.23.0"
-val springFoxVersion = "3.0.0"
+val springDocVersion = "1.6.9"
 
 val githubUser: String by project
 val githubPassword: String by project
+
+ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 repositories {
     mavenCentral()
@@ -69,7 +72,7 @@ dependencies {
     implementation("org.apache.tika:tika-core:$tikaVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
+    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
@@ -77,15 +80,15 @@ dependencies {
 
     implementation("no.nav.slackposter:simple-slack-poster:5")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
-    implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
+    implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
-    testImplementation("org.springframework:spring-mock:2.0.8")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
     }
     testImplementation("org.mockito:mockito-inline:2.13.0")
+    testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 
 idea {
