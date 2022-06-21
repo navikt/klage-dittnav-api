@@ -24,10 +24,10 @@ import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-@Tag(name = "klager")
+@Tag(name = "klager-prefixed")
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
-@RequestMapping("/klager")
-class KlageController(
+@RequestMapping("/api/klager")
+class KlageControllerPrefixed(
     private val brukerService: BrukerService,
     private val klageService: KlageService,
     private val vedleggService: VedleggService

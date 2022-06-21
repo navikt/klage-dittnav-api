@@ -26,10 +26,10 @@ import javax.servlet.http.HttpServletResponse
 
 @Profile("local", "dev-gcp")
 @RestController
-@Tag(name = "anker")
+@Tag(name = "anker-prefixed")
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
-@RequestMapping("/anker")
-class AnkeController(
+@RequestMapping("/api/anker")
+class AnkeControllerPrefixed(
     private val brukerService: BrukerService,
     private val ankeService: AnkeService,
     private val ankeVedleggService: AnkeVedleggService,
@@ -191,11 +191,7 @@ class AnkeController(
         @PathVariable vedleggId: Int
     ) {
         val bruker = brukerService.getBruker()
-        logger.debug(
-            "Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}",
-            ankeInternalSaksnummer,
-            vedleggId
-        )
+        logger.debug("Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}", ankeInternalSaksnummer, vedleggId)
         secureLogger.debug(
             "Delete vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
             ankeInternalSaksnummer,
@@ -214,11 +210,7 @@ class AnkeController(
         @PathVariable vedleggId: Int
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
-        logger.debug(
-            "Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}",
-            ankeInternalSaksnummer,
-            vedleggId
-        )
+        logger.debug("Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}", ankeInternalSaksnummer, vedleggId)
         secureLogger.debug(
             "Vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
             ankeInternalSaksnummer,
