@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.anke.NewAnkeRequest
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Profile("local", "dev-gcp")
 @RestController
-@Api(tags = ["anker-prefixed"])
+@Tag(name = "anker-prefixed")
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 @RequestMapping("/api/anker")
 class AnkeControllerPrefixed(

@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.controller.view.CheckboxesSelectedInput
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.StringInput
@@ -27,7 +27,7 @@ import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-@Api(tags = ["klager-prefixed"])
+@Tag(name = "klager-prefixed")
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 @RequestMapping("/api/klager")
 class KlageControllerPrefixed(

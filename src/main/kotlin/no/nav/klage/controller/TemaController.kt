@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.domain.Tema
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Unprotected
-@Api(tags = ["tema"])
+@Tag(name = "tema")
 @RequestMapping("/temaer")
 class TemaController {
 

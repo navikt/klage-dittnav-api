@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.domain.Journalpost
 import no.nav.klage.service.KlageService
 import no.nav.klage.util.getLogger
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @ProtectedWithClaims(issuer = "azuread")
 @RequestMapping("internal")
-@Api(tags = ["internal"])
+@Tag(name = "internal")
 class InternalController(
     private val klageService: KlageService
 ) {

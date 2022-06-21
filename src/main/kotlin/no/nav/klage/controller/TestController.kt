@@ -1,13 +1,17 @@
 package no.nav.klage.controller
 
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "test")
 @RestController
+@Profile("dev-gcp", "test")
 class TestController {
 
     companion object {

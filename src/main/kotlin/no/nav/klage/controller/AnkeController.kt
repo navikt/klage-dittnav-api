@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.anke.NewAnkeRequest
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Profile("local", "dev-gcp")
 @RestController
-@Api(tags = ["anker"])
+@Tag(name = "anker")
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 @RequestMapping("/anker")
 class AnkeController(
@@ -191,7 +191,11 @@ class AnkeController(
         @PathVariable vedleggId: Int
     ) {
         val bruker = brukerService.getBruker()
-        logger.debug("Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}", ankeInternalSaksnummer, vedleggId)
+        logger.debug(
+            "Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}",
+            ankeInternalSaksnummer,
+            vedleggId
+        )
         secureLogger.debug(
             "Delete vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
             ankeInternalSaksnummer,
@@ -210,7 +214,11 @@ class AnkeController(
         @PathVariable vedleggId: Int
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
-        logger.debug("Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}", ankeInternalSaksnummer, vedleggId)
+        logger.debug(
+            "Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}",
+            ankeInternalSaksnummer,
+            vedleggId
+        )
         secureLogger.debug(
             "Vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
             ankeInternalSaksnummer,

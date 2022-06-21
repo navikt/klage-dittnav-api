@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
 import no.nav.klage.service.BrukerService
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api(tags = ["bruker-prefixed"])
+@Tag(name = "bruker-prefixed")
 @ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 @RequestMapping("/api")
 class BrukerControllerPrefixed(private val brukerService: BrukerService) {
