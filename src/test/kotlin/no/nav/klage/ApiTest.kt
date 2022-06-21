@@ -26,7 +26,7 @@ import java.util.*
 @EnableMockOAuth2Server
 @SpringBootTest(classes = [Application::class])
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE, printOnlyOnFailure = false)
-class ApiAuthTest {
+class ApiTest {
 
     @Autowired
     lateinit var mockMvc: MockMvc
@@ -101,6 +101,12 @@ class ApiAuthTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/internal/health"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("UP"))
+    }
+
+    @Test
+    fun apiDocsLoads() {
+        mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs?group=internal"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
     }
 
     fun tokenxToken(

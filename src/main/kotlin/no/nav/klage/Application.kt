@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
-@EnableJwtTokenValidation(ignore = ["springdoc"])
+@EnableJwtTokenValidation(ignore = ["org.springdoc"])
 @EnableScheduling
 class Application
 
