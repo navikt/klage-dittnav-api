@@ -58,6 +58,13 @@ no.nav.security.jwt:
   issuer.tokenx:
     discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
     accepted_audience: ${TOKEN_X_CLIENT_ID}
+  client:
+    registration:
+      pdl-onbehalfof:
+        token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
+        grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+        client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+        audience: ${PDL_SCOPE}
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB

@@ -8,6 +8,8 @@ allowed.origins:
 PDL_BASE_URL: https://api-gw-q1.oera.no/pdl-api/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
 
+PDL_SCOPE: dev-fss.pdl.pdl-api
+
 #These are read from the environment:
 #DB_HOST
 #DB_USERNAME

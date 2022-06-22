@@ -32,8 +32,7 @@ class PdlClient(
             retryPdl.executeFunction {
 
                 results = pdlWebClient.post()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken()}")
-                    .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithPdlScope()}")
                     .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
                     .retrieve()
                     .bodyToMono<HentPdlPersonResponse>()
