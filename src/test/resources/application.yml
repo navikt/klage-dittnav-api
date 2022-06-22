@@ -81,9 +81,10 @@ maxTotalSize: 32MB
 navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
-KAFKA_BOOTSTRAP_SERVERS: localhost
-KAFKA_CLIENTID: klage-dittnav-api
-KAFKA_TOPIC: aapen-klager-klageOpprettet
+KAFKA_BROKERS: localhost
+KAFKA_TRUSTSTORE_PATH: somepath
+KAFKA_CREDSTORE_PASSWORD: somepass
+KAFKA_KEYSTORE_PATH: somepath
+KAFKA_TOPIC: atopic
 
 ALL_FULLMAKT_OMRAADER: "*"
-
