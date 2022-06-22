@@ -62,9 +62,13 @@ no.nav.security.jwt:
     registration:
       pdl-onbehalfof:
         token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
-        grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+        grant_type: urn:ietf:params:oauth:grant-type:token-exchange
         client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
         audience: ${PDL_SCOPE}
+        authentication:
+          client-id: ${TOKEN_X_CLIENT_ID}
+          client-jwk: ${TOKEN_X_PRIVATE_JWK}
+          client-auth-method: private_key_jwt
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
