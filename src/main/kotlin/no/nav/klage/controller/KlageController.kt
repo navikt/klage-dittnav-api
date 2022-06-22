@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @Tag(name = "klager")
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/klager")
 class KlageController(
     private val brukerService: BrukerService,

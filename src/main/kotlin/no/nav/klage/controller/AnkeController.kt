@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse
 @Profile("local", "dev-gcp")
 @RestController
 @Tag(name = "anker")
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/anker")
 class AnkeController(
     private val brukerService: BrukerService,

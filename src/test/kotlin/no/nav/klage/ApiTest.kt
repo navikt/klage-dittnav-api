@@ -62,7 +62,7 @@ class ApiTest {
     fun `kall på GET bruker med gyldig token gir forventet resultat`() {
         mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
-                .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
+                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isOk)
     }
@@ -106,33 +106,6 @@ class ApiTest {
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
     }
 
-
-    @Test
-    fun `kall på token-x-endepunkt med riktig token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/test/protected")
-                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isOk)
-    }
-
-    @Test
-    fun `kall på token-x-endepunkt med feil token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/test/protected")
-                .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-    }
-
-    @Test
-    fun `kall på token-x-endepunkt uten token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/test/protected")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-    }
-
     @Test
     fun contextLoads() {
         mockMvc.perform(MockMvcRequestBuilders.get("/internal/health"))
@@ -150,33 +123,6 @@ class ApiTest {
         fnr: String,
         audience: String = "klage-dittnav-api-client-id",
         issuerId: String = "tokenx",
-        clientId: String = "klage-dittnav-client-id",
-        claims: Map<String, Any> = mapOf(
-            "acr" to "Level4",
-            "idp" to "idporten",
-            "client_id" to clientId,
-            "pid" to fnr,
-        ),
-        expiry: Long = 3600,
-    ): String {
-
-        return server.issueToken(
-            issuerId,
-            clientId,
-            DefaultOAuth2TokenCallback(
-                issuerId = issuerId,
-                subject = UUID.randomUUID().toString(),
-                audience = listOf(audience),
-                claims = claims,
-                expiry = expiry,
-            )
-        ).serialize()
-    }
-
-    fun selvbetjeningToken(
-        fnr: String,
-        audience: String = "klage-dittnav-api-client-id",
-        issuerId: String = "selvbetjening",
         clientId: String = "klage-dittnav-client-id",
         claims: Map<String, Any> = mapOf(
             "acr" to "Level4",

@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @Tag(name = "klager-prefixed")
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/klager")
 class KlageControllerPrefixed(
     private val brukerService: BrukerService,

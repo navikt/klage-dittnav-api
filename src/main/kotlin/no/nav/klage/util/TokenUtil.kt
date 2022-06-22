@@ -10,7 +10,7 @@ class TokenUtil(private val ctxHolder: TokenValidationContextHolder) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val issuer = "selvbetjening"
+        private val issuer = "tokenx"
     }
 
     fun getSubject(): String {
