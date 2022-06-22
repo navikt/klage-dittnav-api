@@ -64,6 +64,7 @@ no.nav.security.jwt:
         token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
         grant_type: urn:ietf:params:oauth:grant-type:token-exchange
         client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+        subject_token_type: urn:ietf:params:oauth:token-type:jwt
         audience: ${PDL_SCOPE}
         authentication:
           client-id: ${TOKEN_X_CLIENT_ID}
