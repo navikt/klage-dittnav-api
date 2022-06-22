@@ -3,7 +3,10 @@ package no.nav.klage.clients.pdl
 import io.github.resilience4j.kotlin.retry.executeFunction
 import io.github.resilience4j.retry.Retry
 import no.nav.klage.clients.StsClient
-import no.nav.klage.util.*
+import no.nav.klage.util.TokenUtil
+import no.nav.klage.util.causeClass
+import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.rootCause
 import no.nav.slackposter.Severity
 import no.nav.slackposter.SlackClient
 import org.springframework.http.HttpHeaders
@@ -41,6 +44,7 @@ class PdlClient(
             }
         }.onFailure {
             slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+            secureLogger.error("PDL could not be reached", it)
             throw RuntimeException("PDL could not be reached")
         }
 
