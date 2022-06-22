@@ -1,6 +1,7 @@
 ingress: https://klage-dittnav-api.dev.nav.no
 externalHosts:
   - api-gw-q1.oera.no
+  - pdl-api.dev-fss-pub.nais.io
 springProfile: dev-gcp
 
 envs:

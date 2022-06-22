@@ -1,6 +1,7 @@
 ingress: https://klage-dittnav-api.nav.no
 externalHosts:
   - api-gw.oera.no
+  - pdl-api.prod-fss-pub.nais.io
 springProfile: prod-gcp
 envs:
   - name: JAVA_OPTS
