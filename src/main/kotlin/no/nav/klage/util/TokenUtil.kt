@@ -17,6 +17,7 @@ class TokenUtil(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val issuer = "tokenx"
+        private val secureLogger = getSecureLogger()
     }
 
     fun getSubject(): String {
@@ -42,6 +43,7 @@ class TokenUtil(
     fun getOnBehalfOfTokenWithPdlScope(): String {
         val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        secureLogger.debug("oboToken for pdl: {}", response.accessToken)
         return response.accessToken
     }
 
