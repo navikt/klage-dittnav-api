@@ -9,7 +9,7 @@ allowed.origins:
 PDL_BASE_URL: https://pdl-api.prod-fss-pub.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw.oera.no/security-token-service/
 
-PDL_SCOPE: prod-fss.pdl.pdl-api
+PDL_SCOPE: prod-fss:pdl:pdl-api
 
 #These are read from the environment:
 #DB_HOST
