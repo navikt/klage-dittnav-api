@@ -13,6 +13,8 @@ import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -262,7 +264,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = klage.fritekst,
+                begrunnelse = sanitizeText(klage.fritekst),
                 identifikasjonstype = fullmaktsGiver.folkeregisteridentifikator.type,
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
@@ -284,7 +286,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = klage.fritekst,
+                begrunnelse = sanitizeText(klage.fritekst),
                 identifikasjonstype = bruker.folkeregisteridentifikator.type,
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
