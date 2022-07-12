@@ -31,7 +31,7 @@ fun OpenKlageInput.toPDFInput(): PDFInput {
         etternavn = navn.etternavn,
         adresse = adresse,
         telefonnummer = telefonnummer,
-        vedtak = vedtakFromDate(vedtakDate) ?: "",
+        vedtak = vedtakFromDate(vedtakDate),
         begrunnelse = sanitizeText(fritekst),
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
