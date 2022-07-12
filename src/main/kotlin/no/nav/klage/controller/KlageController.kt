@@ -13,7 +13,6 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -257,15 +256,5 @@ class KlageController(
             responseHeaders,
             HttpStatus.OK
         )
-    }
-
-    /*
-    Handle request for favicon without token support throwing error.
-    Maybe we shouldn't expose the BE API to the internet at all? Could be that the new rewrite of FE will use
-    a proxy to reach us instead.
-     */
-    @Unprotected
-    @GetMapping("favicon.ico")
-    fun nothingToSeeHere() {
     }
 }
