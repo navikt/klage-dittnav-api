@@ -13,13 +13,14 @@ data class PDFInput (
     val mellomnavn: String? = null,
     val etternavn: String,
     val adresse: String,
-    val telefonnummer: String,
+    val telefonnummer: String?,
     val vedtak: String,
     val begrunnelse: String,
     val saksnummer: String?,
     val dato: String,
     val ytelse: String,
     val userChoices: List<String>? = emptyList(),
+    val uinnlogget: Boolean = true,
 )
 
 fun OpenKlageInput.toPDFInput(): PDFInput {

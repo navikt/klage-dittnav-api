@@ -12,7 +12,7 @@ data class OpenKlageInput (
     val foedselsnummer: String,
     val navn: Navn,
     val adresse: String,
-    val telefonnummer: String,
+    val telefonnummer: String?,
     val fritekst: String,
     val userSaksnummer: String? = null,
     val vedtakDate: LocalDate?,

@@ -27,7 +27,7 @@ class PdfController(
     }
 
     @ResponseBody
-    @PostMapping("/")
+    @PostMapping
     fun createPdf(
         @RequestBody input: OpenKlageInput
     ): ResponseEntity<ByteArray> {
