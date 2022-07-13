@@ -1,12 +1,27 @@
 <configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>[%d, %-5p, %C:%L] - %.-100000m%n</pattern>
         </encoder>
     </appender>
 
-    <root level="ERROR">
+<!--    <logger name="no.nav.security.token.support" level="debug" additivity="false">-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </logger>-->
+
+    <logger name="org.zalando.problem.spring.common.AdviceTraits" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+<!--    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug" additivity="false">-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </logger>-->
+
+    <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>
+
+    <logger name="no.nav.klage" level="debug"/>
 
 </configuration>

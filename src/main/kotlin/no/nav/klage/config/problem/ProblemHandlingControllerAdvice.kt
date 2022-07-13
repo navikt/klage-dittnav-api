@@ -3,7 +3,6 @@ package no.nav.klage.config.problem
 import no.nav.klage.domain.exception.*
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -11,7 +10,6 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.multipart.MaxUploadSizeExceededException
 import org.zalando.problem.Problem
 import org.zalando.problem.Status
-import org.zalando.problem.spring.common.AdviceTraits
 import org.zalando.problem.spring.web.advice.AdviceTrait
 import org.zalando.problem.spring.web.advice.ProblemHandling
 
@@ -116,6 +114,15 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     fun handleJwtTokenUnauthorizedException(
         ex: JwtTokenUnauthorizedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.UNAUTHORIZED, ex, request)
+    ): ResponseEntity<Problem> {
+        val newException = if (ex.message == null) {
+            if (request.getHeader("Authorization") == null) {
+                JwtTokenUnauthorizedException(msg = "No authorization header in request", cause = ex.cause)
+            } else {
+                JwtTokenUnauthorizedException(msg = ex.cause?.message, cause = ex.cause)
+            }
+        } else ex
+
+        return create(Status.UNAUTHORIZED, newException, request)
+    }
 }
