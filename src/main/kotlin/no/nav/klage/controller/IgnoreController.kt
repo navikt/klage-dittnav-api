@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class FaviconController {
+class IgnoreController {
 
     /*
     Handle request for favicon without token support throwing error.
@@ -15,5 +15,10 @@ class FaviconController {
     @Unprotected
     @GetMapping("favicon.ico")
     fun nothingToSeeHere() {
+    }
+
+    @Unprotected
+    @GetMapping("ads.txt")
+    fun nothingToSeeHereEither() {
     }
 }
