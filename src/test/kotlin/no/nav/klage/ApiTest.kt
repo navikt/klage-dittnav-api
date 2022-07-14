@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.zalando.problem.Problem
 import org.zalando.problem.ProblemModule
 import java.util.*
-import kotlin.math.exp
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableMockOAuth2Server
@@ -80,7 +79,7 @@ class ApiTest {
 
     @Test
     fun `kall på GET bruker med utgått token gir forventet resultat`() {
-        val token = selvbetjeningToken(fnr = FNR, expiry = -100)
+        val token = tokenxToken(fnr = FNR, expiry = -100)
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
@@ -94,7 +93,7 @@ class ApiTest {
 
     @Test
     fun `kall på GET bruker med feil audience i token gir forventet resultat`() {
-        val token = selvbetjeningToken(fnr = FNR, audience = "noeheltannet")
+        val token = tokenxToken(fnr = FNR, audience = "noeheltannet")
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
