@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.zalando.problem.Problem
 import org.zalando.problem.ProblemModule
 import java.util.*
+import kotlin.math.exp
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableMockOAuth2Server
@@ -61,7 +62,7 @@ class ApiTest {
     fun `kall på GET bruker med gyldig token gir forventet resultat`() {
         mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
-                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
+                .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isOk)
     }
@@ -79,7 +80,7 @@ class ApiTest {
 
     @Test
     fun `kall på GET bruker med utgått token gir forventet resultat`() {
-        val token = tokenxToken(fnr = FNR, expiry = -100)
+        val token = selvbetjeningToken(fnr = FNR, expiry = -100)
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
@@ -93,7 +94,7 @@ class ApiTest {
 
     @Test
     fun `kall på GET bruker med feil audience i token gir forventet resultat`() {
-        val token = tokenxToken(fnr = FNR, audience = "noeheltannet")
+        val token = selvbetjeningToken(fnr = FNR, audience = "noeheltannet")
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
@@ -103,6 +104,33 @@ class ApiTest {
         val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
+    }
+
+
+    @Test
+    fun `kall på token-x-endepunkt med riktig token gir forventet resultat`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/test/protected")
+                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
+    @Test
+    fun `kall på token-x-endepunkt med feil token gir forventet resultat`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/test/protected")
+                .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+    }
+
+    @Test
+    fun `kall på token-x-endepunkt uten token gir forventet resultat`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/test/protected")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
     }
 
     @Test
@@ -140,10 +168,35 @@ class ApiTest {
                 subject = UUID.randomUUID().toString(),
                 audience = listOf(audience),
                 claims = claims,
-                expiry = expiry
+                expiry = expiry,
             )
         ).serialize()
     }
 
+    fun selvbetjeningToken(
+        fnr: String,
+        audience: String = "klage-dittnav-api-client-id",
+        issuerId: String = "selvbetjening",
+        clientId: String = "klage-dittnav-client-id",
+        claims: Map<String, Any> = mapOf(
+            "acr" to "Level4",
+            "idp" to "idporten",
+            "client_id" to clientId,
+            "pid" to fnr,
+        ),
+        expiry: Long = 3600,
+    ): String {
 
+        return server.issueToken(
+            issuerId,
+            clientId,
+            DefaultOAuth2TokenCallback(
+                issuerId = issuerId,
+                subject = UUID.randomUUID().toString(),
+                audience = listOf(audience),
+                claims = claims,
+                expiry = expiry
+            )
+        ).serialize()
+    }
 }
