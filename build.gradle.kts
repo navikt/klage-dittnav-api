@@ -7,7 +7,7 @@ val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
 val tokenSupportVersion = "2.1.2"
 val oidcSupportVersion = "0.2.18"
-val logstashVersion = "5.1"
+val logstashVersion = "7.2"
 val pdfboxVersion = "2.0.19"
 val tikaVersion = "1.24.1"
 val springSleuthVersion = "3.0.4"
@@ -65,6 +65,8 @@ dependencies {
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
+    implementation("ch.qos.logback:logback-access")
+    implementation("org.codehaus.janino:janino")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
@@ -74,6 +76,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
+    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
