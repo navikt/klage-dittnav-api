@@ -47,7 +47,9 @@ class TokenUtil(
         return response.accessToken
     }
 
-    fun getExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
+    fun getExpiry(): Long? {
+        return ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
+    }
 
 }
 
