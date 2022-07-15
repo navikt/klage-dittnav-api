@@ -21,4 +21,9 @@ class IgnoreController {
     @GetMapping("ads.txt")
     fun nothingToSeeHereEither() {
     }
+
+    @Unprotected
+    @GetMapping("robots.txt")
+    fun stillNothingToSeeHere() {
+    }
 }

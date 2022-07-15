@@ -1,6 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return  ((formattedMessage.contains("Unauthorized: No authorization header in request")) || (formattedMessage.contains("Unauthorized: No valid token found in validation context")));</expression>
+            </evaluator>
+            <OnMismatch>NEUTRAL</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+        </filter>
         <encoder>
             <pattern>[%d, %-5p, %C:%L] - %.-100000m%n</pattern>
         </encoder>

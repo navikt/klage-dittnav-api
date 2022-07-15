@@ -117,8 +117,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     ): ResponseEntity<Problem> {
         val newException = if (ex.message == null) {
             if (request.getHeader("Authorization") == null) {
+                logger.debug("Returning error: No authorization header in request")
                 JwtTokenUnauthorizedException(msg = "No authorization header in request", cause = ex.cause)
             } else {
+                logger.debug("Returning error: ${ex.cause?.message}")
                 JwtTokenUnauthorizedException(msg = ex.cause?.message, cause = ex.cause)
             }
         } else ex
