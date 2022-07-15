@@ -41,7 +41,7 @@
         <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
             <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                 <evaluator>
-                    <expression>return  ((formattedMessage.contains("Unauthorized: No authorization header in request")) || (formattedMessage.contains("Unauthorized: No valid token found in validation context")));</expression>
+                    <expression>return ((formattedMessage.contains("Unauthorized: No authorization header in request")) || (formattedMessage.contains("Unauthorized: No valid token found in validation context")));</expression>
                 </evaluator>
                 <OnMismatch>NEUTRAL</OnMismatch>
                 <OnMatch>DENY</OnMatch>
