@@ -14,7 +14,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class KlageView(
-    val id: Int,
+    val id: String,
     val fritekst: String,
     val tema: Tema,
     val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
@@ -35,7 +35,7 @@ data class KlageView(
 fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
-    id = id,
+    id = id.toInt(),
     foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
     fritekst = fritekst,
     status = status,

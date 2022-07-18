@@ -117,7 +117,7 @@ class KlageService(
     }
 
     fun updateKlage(klage: KlageView, bruker: Bruker) {
-        val existingKlage = klageRepository.getKlageById(klage.id)
+        val existingKlage = klageRepository.getKlageById(klage.id.toInt())
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         klageRepository
@@ -194,7 +194,7 @@ class KlageService(
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
-            id!!,
+            id!!.toString(),
             fritekst,
             tema,
             status,

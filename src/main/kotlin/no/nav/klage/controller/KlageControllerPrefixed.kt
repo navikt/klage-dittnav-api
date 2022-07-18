@@ -89,7 +89,7 @@ class KlageControllerPrefixed(
 
     @GetMapping("/{klageId}")
     fun getKlage(
-        @PathVariable klageId: Int
+        @PathVariable klageId: String
     ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage is requested. Id: {}", klageId)
@@ -98,12 +98,12 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getKlage(klageId, bruker)
+        return klageService.getKlage(klageId.toInt(), bruker)
     }
 
     @GetMapping("/{klageId}/journalpostid")
     fun getJournalpostId(
-        @PathVariable klageId: Int
+        @PathVariable klageId: String
     ): String? {
         val bruker = brukerService.getBruker()
         logger.debug("Get journalpost id is requested. KlageId: {}", klageId)
@@ -112,7 +112,7 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getJournalpostId(klageId, bruker)
+        return klageService.getJournalpostId(klageId.toInt(), bruker)
     }
 
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
@@ -154,7 +154,7 @@ class KlageControllerPrefixed(
 
     @PutMapping("/{klageId}")
     fun updateKlage(
-        @PathVariable klageId: Int,
+        @PathVariable klageId: String,
         @RequestBody klage: KlageView,
         response: HttpServletResponse
     ) {
@@ -172,7 +172,7 @@ class KlageControllerPrefixed(
     }
 
     @DeleteMapping("/{klageId}")
-    fun deleteKlage(@PathVariable klageId: Int) {
+    fun deleteKlage(@PathVariable klageId: String) {
         val bruker = brukerService.getBruker()
         logger.debug("Delete klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -180,13 +180,13 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        klageService.deleteKlage(klageId, bruker)
+        klageService.deleteKlage(klageId.toInt(), bruker)
     }
 
     @PostMapping("/{klageId}/finalize")
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlage(
-        @PathVariable klageId: Int
+        @PathVariable klageId: String
     ): Map<String, String> {
         val bruker = brukerService.getBruker()
         logger.debug("Finalize klage is requested. Id: {}", klageId)
@@ -195,7 +195,7 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
+        val finalizedInstant = klageService.finalizeKlage(klageId.toInt(), bruker)
         val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
         return mapOf(
             "finalizedDate" to zonedDateTime.toLocalDate().toString(),
@@ -205,7 +205,7 @@ class KlageControllerPrefixed(
 
     @PostMapping(value = ["/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
     fun addVedleggToKlage(
-        @PathVariable klageId: Int,
+        @PathVariable klageId: String,
         @RequestParam vedlegg: MultipartFile
     ): VedleggView {
         val bruker = brukerService.getBruker()
@@ -215,13 +215,13 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryVedlegg = vedleggService.addVedlegg(klageId, vedlegg, bruker)
+        val temporaryVedlegg = vedleggService.addVedlegg(klageId.toInt(), vedlegg, bruker)
         return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
     }
 
     @DeleteMapping("/{klageId}/vedlegg/{vedleggId}")
     fun deleteVedlegg(
-        @PathVariable klageId: Int,
+        @PathVariable klageId: String,
         @PathVariable vedleggId: Int
     ) {
         val bruker = brukerService.getBruker()
@@ -232,7 +232,7 @@ class KlageControllerPrefixed(
             vedleggId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (!vedleggService.deleteVedlegg(klageId, vedleggId, bruker)) {
+        if (!vedleggService.deleteVedlegg(klageId.toInt(), vedleggId, bruker)) {
             throw KlageNotFoundException("Attachment not found.")
         }
     }
@@ -240,7 +240,7 @@ class KlageControllerPrefixed(
     @ResponseBody
     @GetMapping("/{klageId}/vedlegg/{vedleggId}")
     fun getVedleggFromKlage(
-        @PathVariable klageId: Int,
+        @PathVariable klageId: String,
         @PathVariable vedleggId: Int
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
@@ -267,7 +267,7 @@ class KlageControllerPrefixed(
     @ResponseBody
     @GetMapping("/{klageId}/pdf")
     fun getKlagePdf(
-        @PathVariable klageId: Int
+        @PathVariable klageId: String
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage pdf is requested. KlageId: {}", klageId)
@@ -277,7 +277,7 @@ class KlageControllerPrefixed(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = klageService.getKlagePdf(klageId, bruker)
+        val content = klageService.getKlagePdf(klageId.toInt(), bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
