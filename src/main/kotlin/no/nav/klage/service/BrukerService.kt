@@ -1,5 +1,6 @@
 package no.nav.klage.service
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
@@ -13,11 +14,14 @@ import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnaut
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 @Service
 class BrukerService(
     private val pdlClient: PdlClient,
-    private val tokenUtil: TokenUtil
+    private val tokenUtil: TokenUtil,
+    private val request: HttpServletRequest,
 ) {
 
     companion object {
@@ -67,8 +71,14 @@ class BrukerService(
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
             folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator(),
-            tokenExpires = tokenUtil.getExpiry()
+            tokenExpires = getExpiryFromIdPortenToken(request.getHeader("idporten-token"))
         )
+    }
+
+    private fun getExpiryFromIdPortenToken(token: String): Long {
+        val correctPartOfToken = Base64.getDecoder().decode(token.split(".")[1])
+        val value = jacksonObjectMapper().readTree(correctPartOfToken)
+        return value["exp"].asLong()
     }
 
     fun verifyFullmakt(tema: Tema, fullmaktsGiverFnr: String) {
