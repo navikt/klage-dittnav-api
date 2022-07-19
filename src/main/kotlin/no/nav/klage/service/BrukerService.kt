@@ -78,7 +78,7 @@ class BrukerService(
     private fun getExpiryFromIdPortenToken(token: String): Long {
         val correctPartOfToken = Base64.getDecoder().decode(token.split(".")[1])
         val value = jacksonObjectMapper().readTree(correctPartOfToken)
-        return value["exp"].asLong()
+        return value["exp"].asLong() * 1000
     }
 
     fun verifyFullmakt(tema: Tema, fullmaktsGiverFnr: String) {
