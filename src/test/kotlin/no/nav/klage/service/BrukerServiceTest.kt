@@ -357,7 +357,7 @@ internal class BrukerServiceTest {
             Adresse(adressenavn, postnummer, poststed, husnummer, husbokstav),
             Kontaktinformasjon("$landskode $nummer", null),
             Identifikator(idType, folkeregisteridentifikator),
-            1658242074
+            1658242074000
         )
         val output: Bruker = brukerService.getBruker()
         assertEquals(expectedOutput, output)
