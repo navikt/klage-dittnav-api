@@ -74,7 +74,7 @@ no.nav.security.jwt:
           audience: ${PDL_SCOPE}
       klage-fss-proxy-onbehalfof:
         token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
-        grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+        grant-type: client_credentials
         scope: api://dev-fss.klage.klage-fss-proxy/.default
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
