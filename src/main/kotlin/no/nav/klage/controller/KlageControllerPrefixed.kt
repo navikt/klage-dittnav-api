@@ -1,11 +1,16 @@
 package no.nav.klage.controller
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
+import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.toHeartBeatServerSentEvent
+import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
@@ -17,8 +22,11 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import reactor.core.publisher.Flux
+import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.servlet.http.HttpServletResponse
@@ -30,7 +38,8 @@ import javax.servlet.http.HttpServletResponse
 class KlageControllerPrefixed(
     private val brukerService: BrukerService,
     private val klageService: KlageService,
-    private val vedleggService: VedleggService
+    private val vedleggService: VedleggService,
+    private val kafkaEventClient: KafkaEventClient,
 ) {
 
     companion object {
@@ -104,6 +113,23 @@ class KlageControllerPrefixed(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         return klageService.getJournalpostId(klageId, bruker)
+    }
+
+    @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun getEvents(
+        @PathVariable klageId: String
+    ): Flux<ServerSentEvent<JsonNode>> {
+        logger.debug("Journalpostid events called for klageId: $klageId")
+        //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
+        val heartbeatStream: Flux<ServerSentEvent<JsonNode>> = Flux.interval(Duration.ofSeconds(10))
+            .takeWhile { true }
+            .map { tick -> tick.toHeartBeatServerSentEvent() }
+
+        return kafkaEventClient.getEventPublisher()
+            .mapNotNull { event -> jsonToEvent(event.data()) }
+            .filter { it.klageId == klageId }
+            .mapNotNull { it.toServerSentEvent() }
+            .mergeWith(heartbeatStream)
     }
 
     @PostMapping

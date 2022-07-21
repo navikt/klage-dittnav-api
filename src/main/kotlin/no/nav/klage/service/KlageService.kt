@@ -1,22 +1,19 @@
 package no.nav.klage.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
-import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.Tema
+import no.nav.klage.domain.*
 import no.nav.klage.domain.exception.KlageIsFinalizedException
-import no.nav.klage.domain.getCompoundedNavn
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.vedtakFromDate
-import no.nav.slackposter.SlackClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -32,10 +29,10 @@ class KlageService(
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
     private val vedleggService: VedleggService,
-    private val slackClient: SlackClient,
     private val fileClient: FileClient,
     private val brukerService: BrukerService,
-    private val validationService: ValidationService
+    private val validationService: ValidationService,
+    private val kafkaInternalEventService: KafkaInternalEventService,
 ) {
 
     companion object {
@@ -43,7 +40,7 @@ class KlageService(
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
+        val objectMapper: ObjectMapper = jacksonObjectMapper()
     }
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
@@ -173,6 +170,19 @@ class KlageService(
         val klage = klageRepository.getKlageById(klageId)
         val updatedKlage = klage.copy(journalpostId = journalpostId)
         klageRepository.updateKlage(updatedKlage, false)
+        kafkaInternalEventService.publishEvent(
+            Event(
+                klageId = klageId.toString(),
+                name = "journalpostIdSet",
+                id = klageId.toString(),
+                data = objectMapper.writeValueAsString(
+                    JournalpostIdView(
+                        klageId = klageId.toString(),
+                        journalpostId = journalpostId
+                    )
+                ),
+            )
+        )
     }
 
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageView {

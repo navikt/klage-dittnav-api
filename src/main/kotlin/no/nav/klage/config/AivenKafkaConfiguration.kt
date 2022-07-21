@@ -4,14 +4,21 @@ import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
+import reactor.kafka.receiver.KafkaReceiver
+import reactor.kafka.receiver.ReceiverOptions
+import reactor.kafka.receiver.internals.ConsumerFactory
+import reactor.kafka.receiver.internals.DefaultKafkaReceiver
+import java.util.*
 
 @Configuration
 class AivenKafkaConfiguration(
@@ -22,7 +29,10 @@ class AivenKafkaConfiguration(
     @Value("\${KAFKA_CREDSTORE_PASSWORD}")
     private val kafkaCredstorePassword: String,
     @Value("\${KAFKA_KEYSTORE_PATH}")
-    private val kafkaKeystorePath: String
+    private val kafkaKeystorePath: String,
+    @Value("\${INTERNAL_EVENT_TOPIC}")
+    private val internalEventTopic: String
+
 ) {
 
     companion object {
@@ -42,6 +52,23 @@ class AivenKafkaConfiguration(
         ) + commonConfig()
 
         return KafkaTemplate(DefaultKafkaProducerFactory(config))
+    }
+
+    @Bean
+    fun kafkaEventReceiver(): KafkaReceiver<String, String> {
+        val uniqueIdPerInstance = UUID.randomUUID().toString()
+        val config = mapOf(
+            ConsumerConfig.GROUP_ID_CONFIG to "klage-dittnav-event-consumer-$uniqueIdPerInstance",
+            ConsumerConfig.CLIENT_ID_CONFIG to "klage-dittnav-event-client-$uniqueIdPerInstance",
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to true,
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+        ) + commonConfig()
+
+        return DefaultKafkaReceiver(
+            ConsumerFactory.INSTANCE,
+            ReceiverOptions.create<String, String>(config).subscription(listOf(internalEventTopic))
+        )
     }
 
     //Common

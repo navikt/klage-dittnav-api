@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         cluster: [dev, prod]
-        topic: [privat-klage-mottatt-v1]
+        topic: [privat-klage-mottatt-v1, klage-dittnav-api-internal-events.v1]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
