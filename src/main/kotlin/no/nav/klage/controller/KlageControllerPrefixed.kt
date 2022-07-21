@@ -7,6 +7,7 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.jsonToEvent
+import no.nav.klage.domain.klage.KlageInput
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.toHeartBeatServerSentEvent
@@ -169,6 +170,22 @@ class KlageControllerPrefixed(
             throw UpdateMismatchException("Id in klage does not match resource id")
         }
         klageService.updateKlage(klage, bruker)
+    }
+
+    @PutMapping()
+    fun createOrGetKlage(
+        @RequestBody klageInput: KlageInput,
+        response: HttpServletResponse
+    ): KlageView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Create or update klage for user is requested.")
+        secureLogger.debug(
+            "Create or update klage for user is requested. Fnr: {}, tema: {}",
+            bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            klageInput.tema
+        )
+
+        return klageService.getDraftOrCreateKlage(klageInput, bruker)
     }
 
     @DeleteMapping("/{klageId}")

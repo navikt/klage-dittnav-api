@@ -13,7 +13,6 @@ import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
@@ -117,6 +116,41 @@ class KlageService(
                 klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
     }
+
+    fun createKlage(input: KlageInput, bruker: Bruker): KlageView {
+        if (input.fullmaktsgiver != null) {
+            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
+        }
+
+        return klageRepository
+            .createKlage(input.toKlage(bruker))
+            .toKlageView(bruker)
+            .also {
+                val temaReport = if (input.isLonnskompensasjon()) {
+                    LOENNSKOMPENSASJON_GRAFANA_TEMA
+                } else {
+                    input.tema.toString()
+                }
+                klageAnkeMetrics.incrementKlagerInitialized(temaReport)
+            }
+    }
+    fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): KlageView {
+        val existingKlage = getLatestDraftKlageByParams(
+            bruker = bruker,
+            tema = input.tema,
+            internalSaksnummer = input.internalSaksnummer,
+            fullmaktsgiver = input.fullmaktsgiver,
+            titleKey = input.titleKey,
+            ytelse = input.ytelse,
+        )
+
+        return existingKlage ?: createKlage(
+            input = input,
+            bruker = bruker,
+        )
+    }
+
+
 
     fun updateKlage(klage: KlageView, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klage.id.toInt())
