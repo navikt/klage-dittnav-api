@@ -32,7 +32,7 @@ class FoerstesidegeneratorClient(
                         netsPostboks = "1400",
                         avsender = null,
                         bruker = Bruker(
-                            brukerId = "05906498040",
+                            brukerId = "10018210091",
                             brukerType = Brukertype.PERSON
                         ),
                         ukjentBrukerPersoninfo = null,
