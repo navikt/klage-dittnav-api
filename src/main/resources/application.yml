@@ -81,6 +81,7 @@ KABAL_API_BASE_URL: http://kabal-api
 KABAL_API_APP_NAME: kabal-api
 
 KAFKA_TOPIC: klage.privat-klage-mottatt-v1
+INTERNAL_EVENT_TOPIC: klage.klage-dittnav-api-internal-events.v1
 
 SERVICE_USER_USERNAME: srvklage-dittnav
 

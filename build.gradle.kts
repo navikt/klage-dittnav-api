@@ -72,6 +72,7 @@ dependencies {
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
     implementation("org.apache.tika:tika-core:$tikaVersion")
+    implementation("io.projectreactor.kafka:reactor-kafka")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
