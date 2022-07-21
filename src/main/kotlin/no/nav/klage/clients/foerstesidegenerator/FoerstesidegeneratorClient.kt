@@ -41,7 +41,7 @@ class FoerstesidegeneratorClient(
                         arkivtittel = "Klage/anke",
                         vedleggsliste = listOf("Annet"),
                         navSkjemaId = "NAV 90-00.08",
-                        overskriftstittel = null,
+                        overskriftstittel = "En tittel",
                         dokumentlisteFoersteside = listOf("NAV 90-00.08 Klage/anke", "Annet"),
                         foerstesidetype = Foerstesidetype.SKJEMA,
                         enhetsnummer = null,
