@@ -50,6 +50,11 @@ class KlageService(
         return klage.toKlageView(bruker, klage.status === KlageAnkeStatus.DRAFT)
     }
 
+    fun validateAccess(klageId: Int, bruker: Bruker)  {
+        val klage = klageRepository.getKlageById(klageId)
+        validationService.validateKlageAccess(klage, bruker)
+    }
+
     fun getDraftKlagerByFnr(bruker: Bruker): List<KlageView> {
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
         val klager = klageRepository.getDraftKlagerByFnr(fnr)

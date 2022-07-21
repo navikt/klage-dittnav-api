@@ -119,6 +119,12 @@ class KlageControllerPrefixed(
     fun getEvents(
         @PathVariable klageId: String
     ): Flux<ServerSentEvent<JsonNode>> {
+        val bruker = brukerService.getBruker()
+        kotlin.runCatching {
+            klageService.validateAccess(Integer.valueOf(klageId), bruker)
+        }.onFailure {
+            throw KlageNotFoundException()
+        }
         logger.debug("Journalpostid events called for klageId: $klageId")
         //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
         val heartbeatStream: Flux<ServerSentEvent<JsonNode>> = Flux.interval(Duration.ofSeconds(10))
