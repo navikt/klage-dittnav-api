@@ -214,14 +214,9 @@ class KlageService(
         kafkaInternalEventService.publishEvent(
             Event(
                 klageId = klageId.toString(),
-                name = "journalpostIdSet",
+                name = "journalpostId",
                 id = klageId.toString(),
-                data = objectMapper.writeValueAsString(
-                    JournalpostIdView(
-                        klageId = klageId.toString(),
-                        journalpostId = journalpostId
-                    )
-                ),
+                data = journalpostId,
             )
         )
     }
