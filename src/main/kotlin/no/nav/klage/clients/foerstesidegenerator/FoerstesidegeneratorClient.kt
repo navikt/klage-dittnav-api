@@ -1,6 +1,6 @@
 package no.nav.klage.clients.foerstesidegenerator
 
-import no.nav.klage.clients.foerstesidegenerator.domain.*
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getSecureLogger
 import org.springframework.http.HttpHeaders
@@ -19,47 +19,18 @@ class FoerstesidegeneratorClient(
         private val secureLogger = getSecureLogger()
     }
 
-    fun createFoersteside(): ByteArray {
-        runCatching {
-
-            val res = foerstesidegeneratorWebClient.post()
+    fun createFoersteside(foerstesideRequest: FoerstesideRequest): ByteArray {
+        val result = runCatching {
+            foerstesidegeneratorWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFSSProxyScope()}")
-                //Values (except fnr) taken from actual nav.no request test
-                .bodyValue(
-                    PostFoerstesideRequest(
-                        spraakkode = Spraakkode.NB,
-                        adresse = null,
-                        netsPostboks = "1400",
-                        avsender = null,
-                        bruker = Bruker(
-                            brukerId = "10018210091",
-                            brukerType = Brukertype.PERSON
-                        ),
-                        ukjentBrukerPersoninfo = null,
-                        tema = "DAG",
-                        behandlingstema = null,
-                        arkivtittel = "Klage/anke",
-                        vedleggsliste = listOf("Annet"),
-                        navSkjemaId = "NAV 90-00.08",
-                        overskriftstittel = "En tittel",
-                        dokumentlisteFoersteside = listOf("NAV 90-00.08 Klage/anke", "Annet"),
-                        foerstesidetype = Foerstesidetype.SKJEMA,
-                        enhetsnummer = null,
-                        arkivsak = null,
-                    )
-                )
+                .bodyValue(foerstesideRequest)
                 .retrieve()
-                .bodyToMono<PostFoerstesideResponse>()
-                .block() ?: throw RuntimeException("Null response when getting foersteside")
-
-            return res.foersteside
-
+                .bodyToMono<ByteArray>()
+                .block()
         }.onFailure {
             secureLogger.error("Could not fetch foersteside", it)
-            throw RuntimeException("Could not fetch foersteside")
+            throw RuntimeException("Could not fetch foersteside. See secure logs for more information.")
         }
-
-        error("?")
+        return result.getOrNull() ?: throw RuntimeException("Null response when getting foersteside")
     }
-
 }
