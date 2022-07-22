@@ -63,7 +63,7 @@ class PdlClient(
                 results = pdlWebClientThroughGateway.post()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken(useTokenX = false)}")
                     .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
-                    .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
+                    .bodyValue(hentPersonQuery(tokenUtil.getSubject(useTokenX = false)))
                     .retrieve()
                     .bodyToMono<HentPdlPersonResponse>()
                     .block() ?: throw RuntimeException("Person not found")
@@ -109,7 +109,7 @@ class PdlClient(
         var results = HentFullmektigResponse(null, null)
         secureLogger.debug(
             "Getting fullmektig info from PDL using service user token. User: {}, Requested person: {}",
-            tokenUtil.getSubject(), fnr
+            tokenUtil.getSubject(useTokenX = false), fnr
         )
         runCatching {
             retryPdl.executeFunction {
