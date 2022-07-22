@@ -60,7 +60,7 @@ class PdlClient(
 
         runCatching {
             retryPdl.executeFunction {
-                results = pdlWebClient.post()
+                results = pdlWebClientThroughGateway.post()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken()}")
                     .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
                     .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
