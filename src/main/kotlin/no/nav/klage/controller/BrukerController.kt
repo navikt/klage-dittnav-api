@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "bruker")
-@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
 class BrukerController(private val brukerService: BrukerService) {
     @GetMapping("/bruker")
     fun getBruker(): Bruker {
-        return brukerService.getBruker()
+        return brukerService.getBruker(useOboToken = false)
     }
 
     @GetMapping("/fullmaktsgiver/{tema}/{fnr}")

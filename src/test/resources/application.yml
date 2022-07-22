@@ -16,6 +16,9 @@ management:
     base-path: /internal
     exposure.include: health,prometheus
 
+LOGINSERVICE_IDPORTEN_DISCOVERY_URL: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
+LOGINSERVICE_IDPORTEN_AUDIENCE: klage-dittnav-api-client-id
+
 AZURE_APP_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
 AZURE_APP_CLIENT_ID: klage-dittnav-api-client-id
 AZURE_APP_CLIENT_SECRET: azure-app-client-secret
@@ -25,6 +28,10 @@ TOKEN_X_CLIENT_ID: klage-dittnav-api-client-id
 TOKEN_X_TOKEN_ENDPOINT: http://localhost:${mock-oauth2-server.port}/tokenx
 
 no.nav.security.jwt:
+  issuer.selvbetjening:
+    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
+    cookiename: selvbetjening-idtoken
   issuer.azuread:
     discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
     accepted_audience: ${AZURE_APP_CLIENT_ID}
@@ -74,6 +81,7 @@ PDL_APIKEY: test
 SLACK_URL: http://localhost
 SLACK_CHANNEL_ID: test
 
+PDL_BASE_URL_GW: https://localhost
 PDL_BASE_URL: https://localhost
 SECURITY_TOKEN_SERVICE_REST_URL: http://localhost
 PDL_SCOPE: dev-fss.pdl.pdl-api

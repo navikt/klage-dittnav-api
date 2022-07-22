@@ -34,9 +34,9 @@ class BrukerService(
 
     private val postDataDAO = PostDataDAO()
 
-    fun getBruker(): Bruker {
-        val personinfo = pdlClient.getPersonInfo()
-        return mapToBruker(personinfo)
+    fun getBruker(useOboToken: Boolean = true): Bruker {
+        val personinfo = pdlClient.getPersonInfo(useOboToken)
+        return mapToBruker(personinfo, useOboToken)
     }
 
     fun getFullmaktsgiver(tema: Tema, fnr: String): Bruker {
@@ -46,7 +46,7 @@ class BrukerService(
         } else throw FullmaktNotFoundException()
     }
 
-    fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
+    fun mapToBruker(personInfo: HentPdlPersonResponse, useIdPortenTokenForExpiry: Boolean = true): Bruker {
         if (personInfo.errors != null) {
             logger.warn("Errors from pdl: ${personInfo.errors}")
             if (personInfo.errors[0].extensions.code == "unauthenticated") {
@@ -71,7 +71,7 @@ class BrukerService(
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
             folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator(),
-            tokenExpires = getExpiryFromIdPortenToken(request.getHeader("idporten-token"))
+            tokenExpires = if (useIdPortenTokenForExpiry) getExpiryFromIdPortenToken(request.getHeader("idporten-token")) else tokenUtil.getSelvbetjeningExpiry()
         )
     }
 

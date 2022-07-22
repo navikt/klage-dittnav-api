@@ -4,7 +4,7 @@ allowed.origins:
   http://localhost:8080,
   http://localhost:3000
 
-
+PDL_BASE_URL_GW: https://api-gw-q1.oera.no/pdl-api/graphql
 PDL_BASE_URL: https://pdl-api.dev-fss-pub.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
 

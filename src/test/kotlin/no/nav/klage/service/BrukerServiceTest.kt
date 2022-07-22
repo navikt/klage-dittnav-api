@@ -348,9 +348,9 @@ internal class BrukerServiceTest {
 
     @Test
     fun `should convert from pdl format to Bruker object`() {
-        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponse
+        every { pdlClient.getPersonInfo(any()) } returns hentPdlPersonResponse
         every { postDataDAO.findPostData(any()).get().city } returns poststed
-        every { tokenUtil.getExpiry() } returns 1
+        every { tokenUtil.getSelvbetjeningExpiry() } returns 1
         every { request.getHeader(any()) } returns idPortenToken
         val expectedOutput = Bruker(
             Navn(fornavn, mellomnavn, etternavn),
@@ -365,8 +365,8 @@ internal class BrukerServiceTest {
 
     @Test
     fun `should throw exception when name is missing from PDL`() {
-        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithMissingNavn
-        every { tokenUtil.getExpiry() } returns 1
+        every { pdlClient.getPersonInfo(any()) } returns hentPdlPersonResponseWithMissingNavn
+        every { tokenUtil.getSelvbetjeningExpiry() } returns 1
 
         val exception = Assertions.assertThrows(IllegalStateException::class.java) {
             brukerService.getBruker()
@@ -377,8 +377,8 @@ internal class BrukerServiceTest {
 
     @Test
     fun `should receive poststed null when missing in pam-geograaphy`() {
-        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithWrongPostnummer
-        every { tokenUtil.getExpiry() } returns 1
+        every { pdlClient.getPersonInfo(any()) } returns hentPdlPersonResponseWithWrongPostnummer
+        every { tokenUtil.getSelvbetjeningExpiry() } returns 1
         every { request.getHeader(any()) } returns idPortenToken
 
         val output: Bruker = brukerService.getBruker()
@@ -390,8 +390,8 @@ internal class BrukerServiceTest {
 
     @Test
     fun `should throw exception when folkeregisteridentifikator is missing from PDL`() {
-        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithMissingFolkeregisteridentifikator
-        every { tokenUtil.getExpiry() } returns 1
+        every { pdlClient.getPersonInfo(any()) } returns hentPdlPersonResponseWithMissingFolkeregisteridentifikator
+        every { tokenUtil.getSelvbetjeningExpiry() } returns 1
 
         val exception = Assertions.assertThrows(IllegalStateException::class.java) {
             brukerService.getBruker()

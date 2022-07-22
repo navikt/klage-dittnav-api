@@ -17,11 +17,14 @@ class TokenUtil(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val issuer = "tokenx"
+        private val oldIssuer = "selvbetjening"
         private val secureLogger = getSecureLogger()
     }
 
-    fun getSubject(): String {
-        val token = ctxHolder.tokenValidationContext?.getClaims(issuer)
+    //TODO: Sjekk om det trengs to versjoner her.
+
+    fun getSubject(useTokenX: Boolean = true): String {
+        val token = ctxHolder.tokenValidationContext?.getClaims(if (useTokenX) issuer else oldIssuer)
 
         val subject =
             if (token?.get("pid") != null) {
@@ -35,8 +38,8 @@ class TokenUtil(
         return subject
     }
 
-    fun getToken(): String {
-        val token = ctxHolder.tokenValidationContext?.getJwtToken(issuer)?.tokenAsString
+    fun getToken(useTokenX: Boolean = true): String {
+        val token = ctxHolder.tokenValidationContext?.getJwtToken(if (useTokenX) issuer else oldIssuer)?.tokenAsString
         return checkNotNull(token) { "Token must be present" }
     }
 
@@ -47,7 +50,7 @@ class TokenUtil(
         return response.accessToken
     }
 
-    fun getExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
+    fun getSelvbetjeningExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(oldIssuer)?.expirationTime?.time
 
 }
 

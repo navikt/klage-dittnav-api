@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 class Application
 
+//TODO: EnableOAuth er nødvendig for ny, sjekk om kompatibelt med gammel.
 fun main() {
     runApplication<Application>()
 }

@@ -6,6 +6,7 @@ allowed.origins:
   https://klage-dittnav.nav.no,
   https://klage.nav.no
 
+PDL_BASE_URL_GW: https://api-gw.oera.no/pdl-api/graphql
 PDL_BASE_URL: https://pdl-api.prod-fss-pub.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw.oera.no/security-token-service/
 

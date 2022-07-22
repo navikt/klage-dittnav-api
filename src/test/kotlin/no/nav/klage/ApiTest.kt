@@ -57,8 +57,10 @@ class ApiTest {
         )
     }
 
+    //TODO: Lag tester for både gammel og ny, altså ulike endepunkter
+
     @Test
-    fun `kall på GET bruker med gyldig token gir forventet resultat`() {
+    fun `kall på GET api-bruker med gyldig token gir forventet resultat`() {
         mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
                 .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
@@ -67,7 +69,7 @@ class ApiTest {
     }
 
     @Test
-    fun `kall på GET bruker uten token gir forventet resultat`() {
+    fun `kall på GET api-bruker uten token gir forventet resultat`() {
         val response = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +80,7 @@ class ApiTest {
     }
 
     @Test
-    fun `kall på GET bruker med utgått token gir forventet resultat`() {
+    fun `kall på GET api-bruker med utgått token gir forventet resultat`() {
         val token = tokenxToken(fnr = FNR, expiry = -100)
 
         val response = mockMvc.perform(
@@ -92,11 +94,59 @@ class ApiTest {
     }
 
     @Test
-    fun `kall på GET bruker med feil audience i token gir forventet resultat`() {
+    fun `kall på GET api-bruker med feil audience i token gir forventet resultat`() {
         val token = tokenxToken(fnr = FNR, audience = "noeheltannet")
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
+    }
+
+    @Test
+    fun `kall på GET bruker med gyldig token gir forventet resultat`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/bruker")
+                .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
+    @Test
+    fun `kall på GET bruker uten token gir forventet resultat`() {
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/bruker")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        Assertions.assertEquals("No authorization header in request", problemOutput.detail)
+    }
+
+    @Test
+    fun `kall på GET bruker med utgått token gir forventet resultat`() {
+        val token = selvbetjeningToken(fnr = FNR, expiry = -100)
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/bruker")
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
+    }
+
+    @Test
+    fun `kall på GET bruker med feil audience i token gir forventet resultat`() {
+        val token = selvbetjeningToken(fnr = FNR, audience = "noeheltannet")
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/bruker")
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
@@ -122,6 +172,33 @@ class ApiTest {
         fnr: String,
         audience: String = "klage-dittnav-api-client-id",
         issuerId: String = "tokenx",
+        clientId: String = "klage-dittnav-client-id",
+        claims: Map<String, Any> = mapOf(
+            "acr" to "Level4",
+            "idp" to "idporten",
+            "client_id" to clientId,
+            "pid" to fnr,
+        ),
+        expiry: Long = 3600,
+    ): String {
+
+        return server.issueToken(
+            issuerId,
+            clientId,
+            DefaultOAuth2TokenCallback(
+                issuerId = issuerId,
+                subject = UUID.randomUUID().toString(),
+                audience = listOf(audience),
+                claims = claims,
+                expiry = expiry,
+            )
+        ).serialize()
+    }
+
+    fun selvbetjeningToken(
+        fnr: String,
+        audience: String = "klage-dittnav-api-client-id",
+        issuerId: String = "selvbetjening",
         clientId: String = "klage-dittnav-client-id",
         claims: Map<String, Any> = mapOf(
             "acr" to "Level4",

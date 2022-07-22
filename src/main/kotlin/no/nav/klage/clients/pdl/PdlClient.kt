@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class PdlClient(
     private val pdlWebClient: WebClient,
+    private val pdlWebClientThroughGateway: WebClient,
     private val tokenUtil: TokenUtil,
     private val stsClient: StsClient,
     private val slackClient: SlackClient,
@@ -28,12 +29,15 @@ class PdlClient(
         private val secureLogger = getSecureLogger()
     }
 
-    fun getPersonInfo(): HentPdlPersonResponse {
+    fun getPersonInfo(useOboToken: Boolean): HentPdlPersonResponse {
+        return if (useOboToken) getPersonInfo() else getPersonInfoThroughGateway()
+    }
+
+    private fun getPersonInfo(): HentPdlPersonResponse {
         var results = HentPdlPersonResponse(null, null)
 
         runCatching {
             retryPdl.executeFunction {
-
                 results = pdlWebClient.post()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithPdlScope()}")
                     .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
@@ -51,6 +55,30 @@ class PdlClient(
         return results
     }
 
+    private fun getPersonInfoThroughGateway(): HentPdlPersonResponse {
+        var results = HentPdlPersonResponse(null, null)
+
+        runCatching {
+            retryPdl.executeFunction {
+                results = pdlWebClient.post()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getToken()}")
+                    .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
+                    .bodyValue(hentPersonQuery(tokenUtil.getSubject()))
+                    .retrieve()
+                    .bodyToMono<HentPdlPersonResponse>()
+                    .block() ?: throw RuntimeException("Person not found")
+
+            }
+        }.onFailure {
+            slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+            secureLogger.error("PDL could not be reached", it)
+            throw RuntimeException("PDL could not be reached")
+        }
+
+        return results
+    }
+
+    //TODO: Usikker på om dette fungerer med TokenX, men all den tid vi ikke bruker fullmakt så kan det vente.
     fun getPersonInfoWithSystemUser(fnr: String): HentPdlPersonResponse {
         var results = HentPdlPersonResponse(null, null)
         secureLogger.debug(
@@ -60,7 +88,7 @@ class PdlClient(
         runCatching {
             retryPdl.executeFunction {
 
-                results = pdlWebClient.post()
+                results = pdlWebClientThroughGateway.post()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer ${stsClient.oidcToken()}")
                     .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
                     .bodyValue(hentPersonQuery(fnr))
@@ -86,7 +114,7 @@ class PdlClient(
         runCatching {
             retryPdl.executeFunction {
 
-                results = pdlWebClient.post()
+                results = pdlWebClientThroughGateway.post()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer ${stsClient.oidcToken()}")
                     .header("Nav-Consumer-Token", "Bearer ${stsClient.oidcToken()}")
                     .bodyValue(hentFullmektigQuery(fnr))
