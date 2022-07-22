@@ -3,6 +3,8 @@ package no.nav.klage.service
 import no.nav.klage.clients.KlageDittnavPdfgenClient
 import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.toPDFInput
 import org.apache.pdfbox.io.MemoryUsageSetting
@@ -35,11 +37,11 @@ class KlageDittnavPdfgenService(
 
     private fun OpenKlageInput.toFoerstesideRequest(): FoerstesideRequest {
         return FoerstesideRequest(
-            spraakkode = FoerstesideRequest.Spraakkode.NB,
+            spraakkode = Spraakkode.NB,
             netsPostboks = "1400", //always?
-            bruker = FoerstesideRequest.Bruker(
+            bruker = Bruker(
                 brukerId = foedselsnummer,
-                brukerType = FoerstesideRequest.Bruker.Brukertype.PERSON
+                brukerType = Brukertype.PERSON
             ),
             tema = tema.name,
             arkivtittel = "Klage/anke",
@@ -47,7 +49,7 @@ class KlageDittnavPdfgenService(
             navSkjemaId = "NAV 90-00.08",
             overskriftstittel = "En tittel", //what to put here?
             dokumentlisteFoersteside = listOf("NAV 90-00.08 Klage/anke", "Annet"),
-            foerstesidetype = FoerstesideRequest.Foerstesidetype.SKJEMA,
+            foerstesidetype = Foerstesidetype.SKJEMA,
         )
     }
 }
