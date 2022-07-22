@@ -8,7 +8,7 @@ allowed.origins:
 
 PDL_BASE_URL: https://pdl-api.prod-fss-pub.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw.oera.no/security-token-service/
-FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/foersteside
+FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/genererfoersteside
 
 PDL_SCOPE: prod-fss:pdl:pdl-api
 
