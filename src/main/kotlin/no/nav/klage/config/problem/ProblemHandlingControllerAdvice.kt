@@ -81,6 +81,13 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
+    fun handleAttachmentCouldNotBeConvertedException(
+        ex: AttachmentCouldNotBeConvertedException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
     fun handleAttachmentEncryptedException(
         ex: AttachmentEncryptedException,
         request: NativeWebRequest
