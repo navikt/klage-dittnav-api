@@ -9,5 +9,5 @@ envs:
   - name: JAVA_TOOL_OPTIONS
     value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   - name: JAVA_OPTS
-    value: "-Xms256m -Xmx512m"
+    value: "-Xms512m -Xmx4096m"
 kafka_pool: nav-dev

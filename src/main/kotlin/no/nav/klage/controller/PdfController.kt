@@ -37,7 +37,7 @@ class PdfController(
             input,
         )
 
-        val content = klageDittnavPdfgenService.createKlagePdf(input)
+        val content = klageDittnavPdfgenService.createKlagePdfWithFoersteside(input)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")

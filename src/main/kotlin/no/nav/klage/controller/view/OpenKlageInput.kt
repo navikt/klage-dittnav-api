@@ -21,4 +21,5 @@ data class OpenKlageInput (
     val tema: Tema,
     val checkboxesSelected: Set<CheckboxEnum>,
     val language: LanguageEnum = LanguageEnum.NB,
+    val hasVedlegg: Boolean
 )

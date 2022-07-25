@@ -81,20 +81,46 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
+    fun handleAttachmentCouldNotBeConvertedException(
+        ex: AttachmentCouldNotBeConvertedException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleAttachmentEncryptedException(
+        ex: AttachmentEncryptedException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleAttachmentHasVirusException(
+        ex: AttachmentHasVirusException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleAttachmentIsEmptyException(
+        ex: AttachmentIsEmptyException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
     fun handleMaxUploadSizeException(
         ex: MaxUploadSizeExceededException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> {
-        return create(Status.BAD_REQUEST, AttachmentTooLargeException(), request)
-    }
+    ): ResponseEntity<Problem> =
+        create(Status.REQUEST_ENTITY_TOO_LARGE, AttachmentTooLargeException(), request)
 
     @ExceptionHandler
     fun handleAttachmentTotalTooLargeException(
         ex: AttachmentTotalTooLargeException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> {
-        return create(Status.BAD_REQUEST, ex, request)
-    }
+    ): ResponseEntity<Problem> =
+        create(Status.REQUEST_ENTITY_TOO_LARGE, ex, request)
 
     @ExceptionHandler
     fun handleFullmaktNotFound(
