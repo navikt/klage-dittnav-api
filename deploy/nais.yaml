@@ -71,6 +71,7 @@ spec:
       rules:
         - application: klage-file-api
         - application: kabal-api
+        - application: klage-dittnav-pdfgen
         - application: clamav
           namespace: clamav
   envFrom:

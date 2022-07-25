@@ -57,8 +57,6 @@ class ApiTest {
         )
     }
 
-    //TODO: Lag tester for både gammel og ny, altså ulike endepunkter
-
     @Test
     fun `kall på GET api-bruker med gyldig token gir forventet resultat`() {
         mockMvc.perform(

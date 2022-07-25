@@ -101,6 +101,9 @@ KAFKA_CREDSTORE_PASSWORD: somepass
 KAFKA_KEYSTORE_PATH: somepath
 KAFKA_TOPIC: atopic
 
+KLAGE_DITTNAV_PDF_SERVICE_URL: http://localhost
+
 ALL_FULLMAKT_OMRAADER: "*"
 
+FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/foersteside
 INTERNAL_EVENT_TOPIC: atopic

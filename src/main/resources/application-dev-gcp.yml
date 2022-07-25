@@ -7,6 +7,7 @@ allowed.origins:
 PDL_BASE_URL_GW: https://api-gw-q1.oera.no/pdl-api/graphql
 PDL_BASE_URL: https://pdl-api.dev-fss-pub.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-service/
+FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/foersteside
 
 PDL_SCOPE: dev-fss:pdl:pdl-api
 
@@ -20,3 +21,5 @@ PDL_SCOPE: dev-fss:pdl:pdl-api
 
 DRAFT_CLEANUP_CRON: 0 0 14 * * FRI
 MAX_DRAFT_AGE_IN_DAYS: 90
+
+TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851

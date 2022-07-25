@@ -13,6 +13,7 @@ import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -116,6 +117,41 @@ class KlageService(
             }
     }
 
+    fun createKlage(input: KlageInput, bruker: Bruker): KlageView {
+        if (input.fullmaktsgiver != null) {
+            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
+        }
+
+        return klageRepository
+            .createKlage(input.toKlage(bruker))
+            .toKlageView(bruker)
+            .also {
+                val temaReport = if (input.isLonnskompensasjon()) {
+                    LOENNSKOMPENSASJON_GRAFANA_TEMA
+                } else {
+                    input.tema.toString()
+                }
+                klageAnkeMetrics.incrementKlagerInitialized(temaReport)
+            }
+    }
+    fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): KlageView {
+        val existingKlage = getLatestDraftKlageByParams(
+            bruker = bruker,
+            tema = input.tema,
+            internalSaksnummer = input.internalSaksnummer,
+            fullmaktsgiver = input.fullmaktsgiver,
+            titleKey = input.titleKey,
+            ytelse = input.ytelse,
+        )
+
+        return existingKlage ?: createKlage(
+            input = input,
+            bruker = bruker,
+        )
+    }
+
+
+
     fun updateKlage(klage: KlageView, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klage.id.toInt())
         validationService.checkKlageStatus(existingKlage)
@@ -178,14 +214,9 @@ class KlageService(
         kafkaInternalEventService.publishEvent(
             Event(
                 klageId = klageId.toString(),
-                name = "journalpostIdSet",
+                name = "journalpostId",
                 id = klageId.toString(),
-                data = objectMapper.writeValueAsString(
-                    JournalpostIdView(
-                        klageId = klageId.toString(),
-                        journalpostId = journalpostId
-                    )
-                ),
+                data = journalpostId,
             )
         )
     }
@@ -262,7 +293,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = klage.fritekst,
+                begrunnelse = sanitizeText(klage.fritekst),
                 identifikasjonstype = fullmaktsGiver.folkeregisteridentifikator.type,
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
@@ -284,7 +315,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = klage.fritekst,
+                begrunnelse = sanitizeText(klage.fritekst),
                 identifikasjonstype = bruker.folkeregisteridentifikator.type,
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,

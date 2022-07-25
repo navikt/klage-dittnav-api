@@ -52,5 +52,16 @@ class TokenUtil(
 
     fun getSelvbetjeningExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(oldIssuer)?.expirationTime?.time
 
+    fun getOnBehalfOfTokenWithKlageFSSProxyScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        secureLogger.debug("oboToken for klage-fss-proxy: {}", response.accessToken)
+        return response.accessToken
+    }
+
+    fun getExpiry(): Long? {
+        return ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
+    }
+
 }
 
