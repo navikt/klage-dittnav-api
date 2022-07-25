@@ -1,6 +1,5 @@
 package no.nav.klage.domain
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.codec.ServerSentEvent
 
@@ -16,15 +15,15 @@ fun jsonToEvent(json: String?): Event {
     return event
 }
 
-fun Event.toServerSentEvent(): ServerSentEvent<JsonNode> {
-    return ServerSentEvent.builder<JsonNode>()
+fun Event.toServerSentEvent(): ServerSentEvent<String> {
+    return ServerSentEvent.builder<String>()
         .id(klageId)
         .event(name)
-        .data(jacksonObjectMapper().readTree(data))
+        .data(data)
         .build()
 }
 
-fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<JsonNode> {
+fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> {
     return Event(
         klageId = "",
         name = "heartbeat-event-$this",

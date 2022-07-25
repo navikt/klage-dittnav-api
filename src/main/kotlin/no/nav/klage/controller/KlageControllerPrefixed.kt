@@ -1,6 +1,5 @@
 package no.nav.klage.controller
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.domain.Tema
@@ -119,7 +118,7 @@ class KlageControllerPrefixed(
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getEvents(
         @PathVariable klageId: String
-    ): Flux<ServerSentEvent<JsonNode>> {
+    ): Flux<ServerSentEvent<String>> {
         val bruker = brukerService.getBruker()
         kotlin.runCatching {
             klageService.validateAccess(Integer.valueOf(klageId), bruker)
@@ -128,7 +127,7 @@ class KlageControllerPrefixed(
         }
         logger.debug("Journalpostid events called for klageId: $klageId")
         //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
-        val heartbeatStream: Flux<ServerSentEvent<JsonNode>> = Flux.interval(Duration.ofSeconds(10))
+        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(10))
             .takeWhile { true }
             .map { tick -> tick.toHeartBeatServerSentEvent() }
 
