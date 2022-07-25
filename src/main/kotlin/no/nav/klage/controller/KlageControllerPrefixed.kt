@@ -165,7 +165,7 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (klage.id != klageId) {
+        if (klage.id.toString() != klageId) {
             throw UpdateMismatchException("Id in klage does not match resource id")
         }
         klageService.updateKlage(klage, bruker)
