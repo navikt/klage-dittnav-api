@@ -26,8 +26,8 @@ fun Event.toServerSentEvent(): ServerSentEvent<String> {
 fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> {
     return Event(
         klageId = "",
-        name = "heartbeat-event-$this",
-        id = "",
+        name = "heartbeat-event",
+        id = this.toString(),
         data = ""
     ).toServerSentEvent()
 }
