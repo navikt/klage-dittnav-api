@@ -18,6 +18,7 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -115,6 +116,7 @@ class KlageControllerPrefixed(
         return klageService.getJournalpostId(klageId.toInt(), bruker)
     }
 
+    @Unprotected
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getEvents(
         @PathVariable klageId: String
