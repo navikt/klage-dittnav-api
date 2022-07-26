@@ -136,6 +136,9 @@ class KlageControllerPrefixed(
             .filter { it.klageId == klageId }
             .mapNotNull { it.toServerSentEvent() }
             .mergeWith(heartbeatStream)
+            .also {
+                logger.debug("event stream debug: {}", it)
+            }
     }
 
     @PostMapping
