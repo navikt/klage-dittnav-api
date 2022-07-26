@@ -42,7 +42,7 @@ class KlageController(
 
     @GetMapping
     fun getKlager(): List<KlageView> {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Get klager for user is requested.")
         secureLogger.debug(
             "Get klager for user is requested. Fnr: {}",
@@ -62,7 +62,7 @@ class KlageController(
         @RequestParam fullmaktsgiver: String?,
         @RequestParam titleKey: TitleEnum?
     ): KlageView? {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Get draft klage for user is requested.")
         secureLogger.debug(
             "Get draft klage for user is requested. Fnr: {}, tema: {}",
@@ -83,7 +83,7 @@ class KlageController(
     fun getKlage(
         @PathVariable klageId: Int
     ): KlageView {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Get klage is requested. Id: {}", klageId)
         secureLogger.debug(
             "Get klage is requested. Id: {}, fnr: {}",
@@ -97,7 +97,7 @@ class KlageController(
     fun getJournalpostId(
         @PathVariable klageId: Int
     ): String? {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Get journalpost id is requested. KlageId: {}", klageId)
         secureLogger.debug(
             "Get journalpost id is requested. KlageId: {}, fnr: {}",
@@ -112,7 +112,7 @@ class KlageController(
     fun createKlage(
         @RequestBody klage: KlageView, response: HttpServletResponse
     ): KlageView {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Create klage is requested.")
         secureLogger.debug(
             "Create klage is requested for user with fnr {}.",
@@ -127,7 +127,7 @@ class KlageController(
         @RequestBody klage: KlageView,
         response: HttpServletResponse
     ) {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Update klage is requested. Id: {}", klageId)
         secureLogger.debug(
             "Update klage is requested. Id: {}, fnr: {}",
@@ -142,7 +142,7 @@ class KlageController(
 
     @DeleteMapping("/{klageId}")
     fun deleteKlage(@PathVariable klageId: Int) {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Delete klage is requested. Id: {}", klageId)
         secureLogger.debug(
             "Delete klage is requested. Id: {}, fnr: {}",
@@ -157,7 +157,7 @@ class KlageController(
     fun finalizeKlage(
         @PathVariable klageId: Int
     ): Map<String, String> {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Finalize klage is requested. Id: {}", klageId)
         secureLogger.debug(
             "Finalize klage is requested. Id: {}, fnr: {}",
@@ -177,7 +177,7 @@ class KlageController(
         @PathVariable klageId: Int,
         @RequestParam vedlegg: MultipartFile
     ): VedleggView {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Add vedlegg to klage is requested. KlageId: {}", klageId)
         secureLogger.debug(
             "Add Vedlegg to klage is requested. KlageId: {}, fnr: {} ",
@@ -193,7 +193,7 @@ class KlageController(
         @PathVariable klageId: Int,
         @PathVariable vedleggId: Int
     ) {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Delete vedlegg from klage is requested. KlageId: {}, VedleggId: {}", klageId, vedleggId)
         secureLogger.debug(
             "Delete vedlegg from klage is requested. KlageId: {}, vedleggId: {}, fnr: {} ",
@@ -212,7 +212,7 @@ class KlageController(
         @PathVariable klageId: Int,
         @PathVariable vedleggId: Int
     ): ResponseEntity<ByteArray> {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Get vedlegg to klage is requested. KlageId: {} - VedleggId: {}", klageId, vedleggId)
         secureLogger.debug(
             "Vedlegg from klage is requested. KlageId: {}, vedleggId: {}, fnr: {} ",
@@ -238,7 +238,7 @@ class KlageController(
     fun getKlagePdf(
         @PathVariable klageId: Int
     ): ResponseEntity<ByteArray> {
-        val bruker = brukerService.getBruker()
+        val bruker = brukerService.getBruker(useOboToken = false)
         logger.debug("Get klage pdf is requested. KlageId: {}", klageId)
         secureLogger.debug(
             "Get klage pdf is requested. KlageId: {}, fnr: {} ",

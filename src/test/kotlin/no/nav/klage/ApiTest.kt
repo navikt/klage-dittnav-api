@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.zalando.problem.Problem
 import org.zalando.problem.ProblemModule
 import java.util.*
-import kotlin.math.exp
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableMockOAuth2Server
@@ -59,9 +58,57 @@ class ApiTest {
     }
 
     @Test
-    fun `kall på GET bruker med gyldig token gir forventet resultat`() {
+    fun `kall på GET api-bruker med gyldig token gir forventet resultat`() {
         mockMvc.perform(
             MockMvcRequestBuilders.get("/api/bruker")
+                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
+    @Test
+    fun `kall på GET api-bruker uten token gir forventet resultat`() {
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/bruker")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        Assertions.assertEquals("No authorization header in request", problemOutput.detail)
+    }
+
+    @Test
+    fun `kall på GET api-bruker med utgått token gir forventet resultat`() {
+        val token = tokenxToken(fnr = FNR, expiry = -100)
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/bruker")
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
+    }
+
+    @Test
+    fun `kall på GET api-bruker med feil audience i token gir forventet resultat`() {
+        val token = tokenxToken(fnr = FNR, audience = "noeheltannet")
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/bruker")
+                .header("Authorization", "Bearer $token")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
+    }
+
+    @Test
+    fun `kall på GET bruker med gyldig token gir forventet resultat`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/bruker")
                 .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isOk)
@@ -70,7 +117,7 @@ class ApiTest {
     @Test
     fun `kall på GET bruker uten token gir forventet resultat`() {
         val response = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
+            MockMvcRequestBuilders.get("/bruker")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
         val mapper = jacksonObjectMapper().registerModule(ProblemModule())
@@ -83,7 +130,7 @@ class ApiTest {
         val token = selvbetjeningToken(fnr = FNR, expiry = -100)
 
         val response = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
+            MockMvcRequestBuilders.get("/bruker")
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
@@ -97,40 +144,13 @@ class ApiTest {
         val token = selvbetjeningToken(fnr = FNR, audience = "noeheltannet")
 
         val response = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
+            MockMvcRequestBuilders.get("/bruker")
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
         val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
-    }
-
-
-    @Test
-    fun `kall på token-x-endepunkt med riktig token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/test/protected")
-                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isOk)
-    }
-
-    @Test
-    fun `kall på token-x-endepunkt med feil token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/test/protected")
-                .header("Authorization", "Bearer ${selvbetjeningToken(fnr = FNR)}")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-    }
-
-    @Test
-    fun `kall på token-x-endepunkt uten token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/test/protected")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
     }
 
     @Test

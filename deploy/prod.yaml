@@ -1,8 +1,10 @@
 ingress: https://klage-dittnav-api.nav.no
 externalHosts:
   - api-gw.oera.no
+  - pdl-api.prod-fss-pub.nais.io
+  - klage-fss-proxy.dev-fss-pub.nais.io
 springProfile: prod-gcp
 envs:
   - name: JAVA_OPTS
-    value: "-Xms256m -Xmx512m"
+    value: "-Xms512m -Xmx4096m"
 kafka_pool: nav-prod

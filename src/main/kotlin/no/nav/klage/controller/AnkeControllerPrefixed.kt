@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse
 @Profile("local", "dev-gcp")
 @RestController
 @Tag(name = "anker-prefixed")
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/anker")
 class AnkeControllerPrefixed(
     private val brukerService: BrukerService,

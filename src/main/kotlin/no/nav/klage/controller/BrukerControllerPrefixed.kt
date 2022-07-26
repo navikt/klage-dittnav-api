@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "bruker-prefixed")
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api")
 class BrukerControllerPrefixed(private val brukerService: BrukerService) {
     @GetMapping("/bruker")

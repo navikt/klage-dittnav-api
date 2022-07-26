@@ -7,7 +7,7 @@ metadata:
     team: klage
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "100M"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "7200"
 spec:
   image: {{ image }}
   azure:
@@ -29,10 +29,10 @@ spec:
   resources:
     limits:
       cpu: 2000m
-      memory: 1024Mi
+      memory: 4096Mi
     requests:
-      cpu: 50m
-      memory: 512Mi
+      cpu: 2000m
+      memory: 4096Mi
   ingresses:
     - {{ingress}}
   replicas:
@@ -71,6 +71,7 @@ spec:
       rules:
         - application: klage-file-api
         - application: kabal-api
+        - application: klage-dittnav-pdfgen
         - application: clamav
           namespace: clamav
   envFrom:

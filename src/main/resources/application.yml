@@ -62,6 +62,28 @@ no.nav.security.jwt:
   issuer.tokenx:
     discoveryurl: ${TOKEN_X_WELL_KNOWN_URL}
     accepted_audience: ${TOKEN_X_CLIENT_ID}
+  client:
+    registration:
+      pdl-onbehalfof:
+        token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
+        grant_type: urn:ietf:params:oauth:grant-type:token-exchange
+        client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+        subject_token_type: urn:ietf:params:oauth:token-type:jwt
+        audience: ${PDL_SCOPE}
+        authentication:
+          client-id: ${TOKEN_X_CLIENT_ID}
+          client-jwk: ${TOKEN_X_PRIVATE_JWK}
+          client-auth-method: private_key_jwt
+        token-exchange:
+          audience: ${PDL_SCOPE}
+      klage-fss-proxy-onbehalfof:
+        token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: api://dev-fss.klage.klage-fss-proxy/.default
+        authentication:
+          client-id: ${AZURE_APP_CLIENT_ID}
+          client-jwk: ${AZURE_APP_JWK}
+          client-auth-method: private_key_jwt
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
@@ -84,6 +106,8 @@ KAFKA_TOPIC: klage.privat-klage-mottatt-v1
 INTERNAL_EVENT_TOPIC: klage.klage-dittnav-api-internal-events.v1
 
 SERVICE_USER_USERNAME: srvklage-dittnav
+
+KLAGE_DITTNAV_PDF_SERVICE_URL: http://klage-dittnav-pdfgen/api/v1/genpdf/klage-dittnav-pdfgen/
 
 logging:
   level:

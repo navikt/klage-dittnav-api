@@ -13,6 +13,7 @@ import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,6 +50,13 @@ class KlageService(
         validationService.validateKlageAccess(klage, bruker)
         return klage.toKlageView(bruker, klage.status === KlageAnkeStatus.DRAFT)
     }
+    //TODO: Rydd opp når gammel kontroller ikke lenger er i bruk
+    fun getKlageIdAsString(klageId: Int, bruker: Bruker): KlageViewIdAsString {
+        val klage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(klage, false)
+        validationService.validateKlageAccess(klage, bruker)
+        return klage.toKlageViewIdAsString(bruker, klage.status === KlageAnkeStatus.DRAFT)
+    }
 
     fun validateAccess(klageId: Int, bruker: Bruker)  {
         val klage = klageRepository.getKlageById(klageId)
@@ -59,6 +67,12 @@ class KlageService(
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
         val klager = klageRepository.getDraftKlagerByFnr(fnr)
         return klager.map { it.toKlageView(bruker) }
+    }
+    //TODO: Fjern etter at gammel kontroller ikke lenger er i bruk
+    fun getDraftKlagerByFnrIdAsString(bruker: Bruker): List<KlageViewIdAsString> {
+        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+        val klager = klageRepository.getDraftKlagerByFnr(fnr)
+        return klager.map { it.toKlageViewIdAsString(bruker) }
     }
 
     fun getLatestDraftKlageByParams(
@@ -90,6 +104,36 @@ class KlageService(
         }
         return null
     }
+    //TODO: Rydd opp når gammel kontroller er borte
+    fun getLatestDraftKlageByParamsIdAsString(
+        bruker: Bruker,
+        tema: Tema,
+        internalSaksnummer: String?,
+        fullmaktsgiver: String?,
+        titleKey: TitleEnum?,
+        ytelse: String?
+    ): KlageViewIdAsString? {
+        val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
+        var processedTitleKey = titleKey
+        if (ytelse == null && titleKey == null) {
+            processedTitleKey = TitleEnum.valueOf(tema.name)
+        } else if (ytelse != null && titleKey == null) {
+            processedTitleKey = TitleEnum.getTitleKeyFromNbTitle(ytelse)
+        }
+
+        val klage =
+            klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+                fnr,
+                tema,
+                internalSaksnummer,
+                processedTitleKey
+            )
+        if (klage != null) {
+            validationService.validateKlageAccess(klage, bruker)
+            return klage.toKlageViewIdAsString(bruker, true)
+        }
+        return null
+    }
 
     fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
         val klage = klageRepository.getKlageById(klageId)
@@ -115,9 +159,69 @@ class KlageService(
                 klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
     }
+    //TODO: Rydd opp når gammel kontroller er borte
+    fun createKlageIdAsString(klage: KlageViewIdAsString, bruker: Bruker): KlageViewIdAsString {
+        if (klage.fullmaktsgiver != null) {
+            brukerService.verifyFullmakt(klage.tema, klage.fullmaktsgiver)
+        }
+
+        return klageRepository
+            .createKlage(klage.toKlage(bruker, KlageAnkeStatus.DRAFT))
+            .toKlageViewIdAsString(bruker)
+            .also {
+                val temaReport = if (klage.isLonnskompensasjon()) {
+                    LOENNSKOMPENSASJON_GRAFANA_TEMA
+                } else {
+                    klage.tema.toString()
+                }
+                klageAnkeMetrics.incrementKlagerInitialized(temaReport)
+            }
+    }
+
+    fun createKlage(input: KlageInput, bruker: Bruker): KlageViewIdAsString {
+        if (input.fullmaktsgiver != null) {
+            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
+        }
+
+        return klageRepository
+            .createKlage(input.toKlage(bruker))
+            .toKlageViewIdAsString(bruker)
+            .also {
+                val temaReport = if (input.isLonnskompensasjon()) {
+                    LOENNSKOMPENSASJON_GRAFANA_TEMA
+                } else {
+                    input.tema.toString()
+                }
+                klageAnkeMetrics.incrementKlagerInitialized(temaReport)
+            }
+    }
+    fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): KlageViewIdAsString {
+        val existingKlage = getLatestDraftKlageByParamsIdAsString(
+            bruker = bruker,
+            tema = input.tema,
+            internalSaksnummer = input.internalSaksnummer,
+            fullmaktsgiver = input.fullmaktsgiver,
+            titleKey = input.titleKey,
+            ytelse = input.ytelse,
+        )
+
+        return existingKlage ?: createKlage(
+            input = input,
+            bruker = bruker,
+        )
+    }
 
     fun updateKlage(klage: KlageView, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klage.id)
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        klageRepository
+            .updateKlage(klage.toKlage(bruker))
+            .toKlageView(bruker, false)
+    }
+    //TODO: Rydd opp når gammel kontroller er borte
+    fun updateKlageIdAsString(klage: KlageViewIdAsString, bruker: Bruker) {
+        val existingKlage = klageRepository.getKlageById(klage.id.toInt())
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         klageRepository
@@ -178,23 +282,50 @@ class KlageService(
         kafkaInternalEventService.publishEvent(
             Event(
                 klageId = klageId.toString(),
-                name = "journalpostIdSet",
+                name = "journalpostId",
                 id = klageId.toString(),
-                data = objectMapper.writeValueAsString(
-                    JournalpostIdView(
-                        klageId = klageId.toString(),
-                        journalpostId = journalpostId
-                    )
-                ),
+                data = journalpostId,
             )
         )
     }
-
+//TODO: Rydd opp når gammel kontroller er borte
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageView {
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
             id!!,
+            fritekst,
+            tema,
+            status,
+            modifiedDateTime,
+            vedlegg.map {
+                if (expandVedleggToVedleggView) {
+                    vedleggService.expandVedleggToVedleggView(
+                        it,
+                        bruker
+                    )
+                } else {
+                    it.toVedleggView("")
+                }
+            },
+            journalpostId,
+            finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,
+            vedtakDate = vedtakDate,
+            checkboxesSelected = checkboxesSelected ?: emptySet(),
+            userSaksnummer = userSaksnummer,
+            internalSaksnummer = internalSaksnummer,
+            fullmaktsgiver = fullmektig?.let { foedselsnummer },
+            language = language,
+            titleKey = titleKey,
+            ytelse = titleKey.nb
+        )
+    }
+
+    fun Klage.toKlageViewIdAsString(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageViewIdAsString {
+        val modifiedDateTime =
+            ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
+        return KlageViewIdAsString(
+            id!!.toString(),
             fritekst,
             tema,
             status,
@@ -262,7 +393,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = klage.fritekst,
+                begrunnelse = sanitizeText(klage.fritekst),
                 identifikasjonstype = fullmaktsGiver.folkeregisteridentifikator.type,
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
@@ -284,7 +415,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = klage.fritekst,
+                begrunnelse = sanitizeText(klage.fritekst),
                 identifikasjonstype = bruker.folkeregisteridentifikator.type,
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,

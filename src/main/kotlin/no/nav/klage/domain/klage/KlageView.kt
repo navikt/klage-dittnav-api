@@ -32,10 +32,48 @@ data class KlageView(
     val ytelse: String?
 )
 
+data class KlageViewIdAsString(
+    val id: String,
+    val fritekst: String,
+    val tema: Tema,
+    val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
+    val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
+    val vedlegg: List<VedleggView> = listOf(),
+    val journalpostId: String? = null,
+    val finalizedDate: LocalDate? = null,
+    val vedtakDate: LocalDate? = null,
+    val checkboxesSelected: Set<CheckboxEnum>,
+    val userSaksnummer: String? = null,
+    val internalSaksnummer: String? = null,
+    val fullmaktsgiver: String? = null,
+    val language: LanguageEnum = LanguageEnum.NB,
+    val titleKey: TitleEnum?,
+    val ytelse: String?
+)
+
 fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
+
+fun KlageViewIdAsString.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
 
 fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
     id = id,
+    foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
+    fritekst = fritekst,
+    status = status,
+    tema = tema,
+    userSaksnummer = userSaksnummer,
+    vedlegg = vedlegg.map { it.toVedlegg() },
+    journalpostId = journalpostId,
+    vedtakDate = vedtakDate,
+    checkboxesSelected = checkboxesSelected,
+    internalSaksnummer = internalSaksnummer,
+    fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
+    language = language,
+    titleKey = parseTitleKey(titleKey, ytelse, tema)
+)
+
+fun KlageViewIdAsString.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
+    id = id.toInt(),
     foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
     fritekst = fritekst,
     status = status,
