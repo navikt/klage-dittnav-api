@@ -18,7 +18,6 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -116,20 +115,19 @@ class KlageControllerPrefixed(
         return klageService.getJournalpostId(klageId.toInt(), bruker)
     }
 
-    @Unprotected
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getEvents(
         @PathVariable klageId: String
     ): Flux<ServerSentEvent<String>> {
-//        val bruker = brukerService.getBruker()
-//        kotlin.runCatching {
-//            klageService.validateAccess(Integer.valueOf(klageId), bruker)
-//        }.onFailure {
-//            throw KlageNotFoundException()
-//        }
+        val bruker = brukerService.getBruker()
+        kotlin.runCatching {
+            klageService.validateAccess(Integer.valueOf(klageId), bruker)
+        }.onFailure {
+            throw KlageNotFoundException()
+        }
         logger.debug("Journalpostid events called for klageId: $klageId")
         //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
-        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(2))
+        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(10))
             .takeWhile { true }
             .map { tick -> tick.toHeartBeatServerSentEvent() }
 
