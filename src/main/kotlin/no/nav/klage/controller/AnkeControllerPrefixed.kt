@@ -1,6 +1,9 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.controller.view.DateInput
+import no.nav.klage.controller.view.EditedView
+import no.nav.klage.controller.view.StringInput
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.anke.NewAnkeRequest
@@ -134,6 +137,44 @@ class AnkeControllerPrefixed(
             throw UpdateMismatchException("Internal ref in anke does not match resource id")
         }
         ankeService.updateAnke(anke, bruker)
+    }
+
+    @PutMapping("/{ankeInternalSaksnummer}/fritekst")
+    fun updateFritekst(
+        @PathVariable ankeInternalSaksnummer: String,
+        @RequestBody input: StringInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke fritekst is requested. Id: {}", ankeInternalSaksnummer)
+        secureLogger.debug(
+            "Update anke fritekst is requested. Id: {}, fnr: {}",
+            ankeInternalSaksnummer,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateFritekst(ankeInternalSaksnummer, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
+    @PutMapping("/{ankeInternalSaksnummer}/vedtakdate")
+    fun updateVedtakDate(
+        @PathVariable ankeInternalSaksnummer: String,
+        @RequestBody input: DateInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke vedtakDate is requested. Id: {}", ankeInternalSaksnummer)
+        secureLogger.debug(
+            "Update anke vedtakDate is requested. Id: {}, fnr: {}",
+            ankeInternalSaksnummer,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateVedtakDate(ankeInternalSaksnummer, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
     }
 
     @DeleteMapping("/{ankeInternalSaksnummer}")

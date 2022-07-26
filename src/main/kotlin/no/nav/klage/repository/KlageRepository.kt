@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.or
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 @Repository
@@ -97,6 +98,56 @@ class KlageRepository {
             fromKlage(klage)
         }
         logger.debug("Klage successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateFritekst(id: String, fritekst: String): Klage {
+        logger.debug("Updating klage fritekst in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
+        klageFromDB.apply {
+            this.fritekst = fritekst
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage fritekst successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateUserSaksnummer(id: String, userSaksnummer: String?): Klage {
+        logger.debug("Updating klage userSaksnummer in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
+        klageFromDB.apply {
+            this.userSaksnummer = userSaksnummer
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage userSaksnummer successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateVedtakDate(id: String, vedtakDate: LocalDate?): Klage {
+        logger.debug("Updating klage vedtakDate in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
+        klageFromDB.apply {
+            this.vedtakDate = vedtakDate
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage vedtakDate successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
+    fun updateCheckboxesSelected(id: String, checkboxesSelected: Set<CheckboxEnum>?): Klage {
+        logger.debug("Updating klage checkboxesSelected in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
+        klageFromDB.apply {
+            checkboxesSelected?.let {
+                checkBoxesSelected = checkboxesSelected.joinToString(",") { x -> x.toString() }
+                this.modifiedByUser = Instant.now()
+            }
+        }
+
+        logger.debug("Klage checkboxesSelected successfully updated in db.")
         return klageFromDB.toKlage()
     }
 

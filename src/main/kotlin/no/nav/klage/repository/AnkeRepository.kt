@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.and
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -70,6 +71,31 @@ class AnkeRepository {
             fromAnke(anke)
         }
         logger.debug("Anke successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
+
+    fun updateFritekst(internalSaksnummer: String, fritekst: String): Anke {
+        logger.debug("Updating anke fritekst in db. Id: {}", internalSaksnummer)
+        val ankeFromDB = getAnkeToModify(internalSaksnummer)
+        ankeFromDB.apply {
+            this.fritekst = fritekst
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Anke fritekst successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
+    fun updateVedtakDate(internalSaksnummer: String, vedtakDate: LocalDate?): Anke {
+        logger.debug("Updating anke vedtakDate in db. Id: {}", internalSaksnummer)
+        val ankeFromDB = getAnkeToModify(internalSaksnummer)
+        ankeFromDB.apply {
+            this.vedtakDate = vedtakDate
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Anke vedtakDate successfully updated in db.")
         return ankeFromDB.toAnke()
     }
 
