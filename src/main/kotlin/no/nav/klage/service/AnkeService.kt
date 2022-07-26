@@ -10,13 +10,10 @@ import no.nav.klage.domain.anke.NewAnkeRequest
 import no.nav.klage.domain.anke.toAnke
 import no.nav.klage.domain.ankevedlegg.toAnkeVedleggView
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.domain.exception.AvailableAnkeNotFoundException
 import no.nav.klage.repository.AnkeRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 
 @Service
 @Transactional
@@ -72,6 +69,26 @@ class AnkeService(
         ankeRepository
             .updateAnke(anke.toAnke(bruker))
             .toAnkeView(bruker, false)
+    }
+
+    fun updateFritekst(ankeInternalSaksnummer: String, fritekst: String, bruker: Bruker): LocalDateTime {
+        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeInternalSaksnummer)
+        validationService.checkAnkeStatus(existingAnke)
+        validationService.validateAnkeAccess(existingAnke, bruker)
+        return ankeRepository
+            .updateFritekst(ankeInternalSaksnummer, fritekst)
+            .toAnkeView(bruker, false)
+            .modifiedByUser
+    }
+
+    fun updateVedtakDate(ankeInternalSaksnummer: String, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
+        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeInternalSaksnummer)
+        validationService.checkAnkeStatus(existingAnke)
+        validationService.validateAnkeAccess(existingAnke, bruker)
+        return ankeRepository
+            .updateVedtakDate(ankeInternalSaksnummer, vedtakDate)
+            .toAnkeView(bruker, false)
+            .modifiedByUser
     }
 
     fun getLatestDraftAnkeByParams(

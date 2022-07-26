@@ -17,10 +17,8 @@ import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
-import java.time.ZoneId
+import java.time.*
 import java.time.ZoneOffset.UTC
-import java.time.ZonedDateTime
 
 @Service
 @Transactional
@@ -50,6 +48,7 @@ class KlageService(
         validationService.validateKlageAccess(klage, bruker)
         return klage.toKlageView(bruker, klage.status === KlageAnkeStatus.DRAFT)
     }
+
     //TODO: Rydd opp når gammel kontroller ikke lenger er i bruk
     fun getKlageIdAsString(klageId: Int, bruker: Bruker): KlageViewIdAsString {
         val klage = klageRepository.getKlageById(klageId)
@@ -58,7 +57,7 @@ class KlageService(
         return klage.toKlageViewIdAsString(bruker, klage.status === KlageAnkeStatus.DRAFT)
     }
 
-    fun validateAccess(klageId: Int, bruker: Bruker)  {
+    fun validateAccess(klageId: Int, bruker: Bruker) {
         val klage = klageRepository.getKlageById(klageId)
         validationService.validateKlageAccess(klage, bruker)
     }
@@ -68,6 +67,7 @@ class KlageService(
         val klager = klageRepository.getDraftKlagerByFnr(fnr)
         return klager.map { it.toKlageView(bruker) }
     }
+
     //TODO: Fjern etter at gammel kontroller ikke lenger er i bruk
     fun getDraftKlagerByFnrIdAsString(bruker: Bruker): List<KlageViewIdAsString> {
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
@@ -104,6 +104,7 @@ class KlageService(
         }
         return null
     }
+
     //TODO: Rydd opp når gammel kontroller er borte
     fun getLatestDraftKlageByParamsIdAsString(
         bruker: Bruker,
@@ -159,6 +160,7 @@ class KlageService(
                 klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
     }
+
     //TODO: Rydd opp når gammel kontroller er borte
     fun createKlageIdAsString(klage: KlageViewIdAsString, bruker: Bruker): KlageViewIdAsString {
         if (klage.fullmaktsgiver != null) {
@@ -195,6 +197,7 @@ class KlageService(
                 klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
     }
+
     fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): KlageViewIdAsString {
         val existingKlage = getLatestDraftKlageByParamsIdAsString(
             bruker = bruker,
@@ -219,6 +222,7 @@ class KlageService(
             .updateKlage(klage.toKlage(bruker))
             .toKlageView(bruker, false)
     }
+
     //TODO: Rydd opp når gammel kontroller er borte
     fun updateKlageIdAsString(klage: KlageViewIdAsString, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klage.id.toInt())
@@ -227,6 +231,46 @@ class KlageService(
         klageRepository
             .updateKlage(klage.toKlage(bruker))
             .toKlageView(bruker, false)
+    }
+
+    fun updateFritekst(klageId: String, fritekst: String, bruker: Bruker): LocalDateTime {
+        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        return klageRepository
+            .updateFritekst(klageId, fritekst)
+            .toKlageView(bruker, false)
+            .modifiedByUser
+    }
+
+    fun updateUserSaksnummer(klageId: String, userSaksnummer: String?, bruker: Bruker): LocalDateTime {
+        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        return klageRepository
+            .updateUserSaksnummer(klageId, userSaksnummer)
+            .toKlageView(bruker, false)
+            .modifiedByUser
+    }
+
+    fun updateVedtakDate(klageId: String, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
+        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        return klageRepository
+            .updateVedtakDate(klageId, vedtakDate)
+            .toKlageView(bruker, false)
+            .modifiedByUser
+    }
+
+    fun updateCheckboxesSelected(klageId: String, checkboxesSelected: Set<CheckboxEnum>?, bruker: Bruker): LocalDateTime {
+        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        return klageRepository
+            .updateCheckboxesSelected(klageId, checkboxesSelected)
+            .toKlageView(bruker, false)
+            .modifiedByUser
     }
 
     fun deleteKlage(klageId: Int, bruker: Bruker) {
@@ -288,7 +332,8 @@ class KlageService(
             )
         )
     }
-//TODO: Rydd opp når gammel kontroller er borte
+
+    //TODO: Rydd opp når gammel kontroller er borte
     fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageView {
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
