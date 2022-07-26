@@ -28,6 +28,6 @@ fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> {
         klageId = "",
         name = "heartbeat-event-$this",
         id = "",
-        data = "{}"
+        data = ""
     ).toServerSentEvent()
 }
