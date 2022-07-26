@@ -10,14 +10,12 @@ data class Event (
     val data: String,
 )
 
-fun jsonToEvent(json: String?): Event {
-    val event = jacksonObjectMapper().readValue(json, Event::class.java)
-    return event
-}
+fun jsonToEvent(json: String?): Event =
+    jacksonObjectMapper().readValue(json, Event::class.java)
 
 fun Event.toServerSentEvent(): ServerSentEvent<String> {
     return ServerSentEvent.builder<String>()
-        .id(klageId)
+        .id(id)
         .event(name)
         .data(data)
         .build()
@@ -26,8 +24,8 @@ fun Event.toServerSentEvent(): ServerSentEvent<String> {
 fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> {
     return Event(
         klageId = "",
-        name = "heartbeat-event-$this",
-        id = "",
-        data = "{}"
+        name = "heartbeat-event",
+        id = this.toString(),
+        data = ""
     ).toServerSentEvent()
 }
