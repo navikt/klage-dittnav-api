@@ -7,7 +7,7 @@ import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageInput
-import no.nav.klage.domain.klage.KlageView
+import no.nav.klage.domain.klage.KlageViewIdAsString
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
@@ -49,14 +49,14 @@ class KlageControllerPrefixed(
     }
 
     @GetMapping
-    fun getKlager(): List<KlageView> {
+    fun getKlager(): List<KlageViewIdAsString> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klager for user is requested.")
         secureLogger.debug(
             "Get klager for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getDraftKlagerByFnr(bruker)
+        return klageService.getDraftKlagerByFnrIdAsString(bruker)
     }
 
     /**
@@ -69,7 +69,7 @@ class KlageControllerPrefixed(
         @RequestParam internalSaksnummer: String?,
         @RequestParam fullmaktsgiver: String?,
         @RequestParam titleKey: TitleEnum?
-    ): KlageView? {
+    ): KlageViewIdAsString? {
         val bruker = brukerService.getBruker()
         logger.debug("Get draft klage for user is requested.")
         secureLogger.debug(
@@ -77,7 +77,7 @@ class KlageControllerPrefixed(
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema
         )
-        return klageService.getLatestDraftKlageByParams(
+        return klageService.getLatestDraftKlageByParamsIdAsString(
             bruker,
             tema,
             internalSaksnummer,
@@ -90,7 +90,7 @@ class KlageControllerPrefixed(
     @GetMapping("/{klageId}")
     fun getKlage(
         @PathVariable klageId: String
-    ): KlageView {
+    ): KlageViewIdAsString {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -98,7 +98,7 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getKlage(klageId.toInt(), bruker)
+        return klageService.getKlageIdAsString(klageId.toInt(), bruker)
     }
 
     @GetMapping("/{klageId}/journalpostid")
@@ -144,21 +144,21 @@ class KlageControllerPrefixed(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlage(
-        @RequestBody klage: KlageView, response: HttpServletResponse
-    ): KlageView {
+        @RequestBody klage: KlageViewIdAsString, response: HttpServletResponse
+    ): KlageViewIdAsString {
         val bruker = brukerService.getBruker()
         logger.debug("Create klage is requested.")
         secureLogger.debug(
             "Create klage is requested for user with fnr {}.",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.createKlage(klage, bruker)
+        return klageService.createKlageIdAsString(klage, bruker)
     }
 
     @PutMapping("/{klageId}")
     fun updateKlage(
         @PathVariable klageId: String,
-        @RequestBody klage: KlageView,
+        @RequestBody klage: KlageViewIdAsString,
         response: HttpServletResponse
     ) {
         val bruker = brukerService.getBruker()
@@ -168,17 +168,17 @@ class KlageControllerPrefixed(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (klage.id.toString() != klageId) {
+        if (klage.id != klageId) {
             throw UpdateMismatchException("Id in klage does not match resource id")
         }
-        klageService.updateKlage(klage, bruker)
+        klageService.updateKlageIdAsString(klage, bruker)
     }
 
     @PutMapping()
     fun createOrGetKlage(
         @RequestBody klageInput: KlageInput,
         response: HttpServletResponse
-    ): KlageView {
+    ): KlageViewIdAsString {
         val bruker = brukerService.getBruker()
         logger.debug("Create or update klage for user is requested.")
         secureLogger.debug(
