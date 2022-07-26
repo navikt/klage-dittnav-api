@@ -17,7 +17,7 @@ fun jsonToEvent(json: String?): Event {
 
 fun Event.toServerSentEvent(): ServerSentEvent<String> {
     return ServerSentEvent.builder<String>()
-        .id(klageId)
+        .id(id)
         .event(name)
         .data(data)
         .build()

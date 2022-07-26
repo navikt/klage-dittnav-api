@@ -129,7 +129,7 @@ class KlageControllerPrefixed(
 //        }
         logger.debug("Journalpostid events called for klageId: $klageId")
         //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
-        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(10))
+        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(2))
             .takeWhile { true }
             .map { tick -> tick.toHeartBeatServerSentEvent() }
 
@@ -138,9 +138,6 @@ class KlageControllerPrefixed(
             .filter { it.klageId == klageId }
             .mapNotNull { it.toServerSentEvent() }
             .mergeWith(heartbeatStream)
-            .also {
-                logger.debug("event stream debug: {}", it)
-            }
     }
 
     @PostMapping
