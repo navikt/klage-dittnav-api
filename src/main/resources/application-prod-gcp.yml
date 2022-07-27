@@ -13,6 +13,7 @@ FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/gene
 
 PDL_SCOPE: prod-fss:pdl:pdl-api
 
+
 #These are read from the environment:
 #DB_HOST
 #DB_USERNAME
@@ -25,3 +26,6 @@ DRAFT_CLEANUP_CRON: 0 0 13 * * WED
 MAX_DRAFT_AGE_IN_DAYS: 60
 
 TENANT_ID: 62366534-1ec3-4962-8869-9b5535279d0b
+
+SAF_SELVBETJENING_BASE_URL: https://safselvbetjening.prod-fss-pub.nais.io
+SAF_SELVBETJENING_SCOPE: prod-fss:teamdokumenthandtering:safselvbetjening

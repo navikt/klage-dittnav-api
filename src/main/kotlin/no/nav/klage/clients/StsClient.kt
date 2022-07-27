@@ -5,6 +5,7 @@ import io.github.resilience4j.retry.Retry
 import no.nav.klage.domain.OidcToken
 import no.nav.klage.util.causeClass
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.rootCause
 import no.nav.slackposter.Severity
 import no.nav.slackposter.SlackClient
@@ -24,6 +25,7 @@ class StsClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     fun oidcToken(): String {

@@ -49,6 +49,12 @@ class TokenUtil(
         secureLogger.debug("oboToken for pdl: {}", response.accessToken)
         return response.accessToken
     }
+    fun getOnBehalfOfTokenWithSafSelvbetjeningScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["saf-selvbetjening-onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        secureLogger.debug("oboToken for saf-selvbetjening: {}", response.accessToken)
+        return response.accessToken
+    }
 
     fun getSelvbetjeningExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(oldIssuer)?.expirationTime?.time
 

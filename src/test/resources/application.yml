@@ -107,3 +107,6 @@ ALL_FULLMAKT_OMRAADER: "*"
 
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/foersteside
 INTERNAL_EVENT_TOPIC: atopic
+
+SAF_SELVBETJENING_BASE_URL: https://safselvbetjening.dev-fss-pub.nais.io
+SAF_SELVBETJENING_SCOPE: dev-fss:teamdokumenthandtering:safselvbetjening

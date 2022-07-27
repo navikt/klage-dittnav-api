@@ -51,6 +51,8 @@ class PdlClient(
             secureLogger.error("PDL could not be reached", it)
             throw RuntimeException("PDL could not be reached")
         }
+        //TODO: Fjern etter altair-testing.
+        secureLogger.debug("SafSelvbetjening token: ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}" )
 
         return results
     }

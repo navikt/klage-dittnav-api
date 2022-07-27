@@ -23,3 +23,6 @@ DRAFT_CLEANUP_CRON: 0 0 14 * * FRI
 MAX_DRAFT_AGE_IN_DAYS: 90
 
 TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
+
+SAF_SELVBETJENING_BASE_URL: https://safselvbetjening.dev-fss-pub.nais.io
+SAF_SELVBETJENING_SCOPE: dev-fss:teamdokumenthandtering:safselvbetjening
