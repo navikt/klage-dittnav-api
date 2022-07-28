@@ -47,7 +47,7 @@ class KlageDittnavPdfgenService(
             arkivtittel = "Klage/anke",
             vedleggsliste = if (hasVedlegg) listOf("Annet") else emptyList(),
             navSkjemaId = "NAV 90-00.08",
-            overskriftstittel = "En tittel", //what to put here?
+            overskriftstittel = "Klage/anke NAV 90-00.08",
             dokumentlisteFoersteside = listOf("NAV 90-00.08 Klage/anke", "Annet"),
             foerstesidetype = Foerstesidetype.SKJEMA,
         )
