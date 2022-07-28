@@ -115,7 +115,7 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Temporary compensation for self-employed and freelancers"
     ),
     NAV_LOVEN_14A(
-        "Vurdering av behov for bistand etter NAV loven § 14 a",
+        "Vurdering av behov for bistand etter NAV-loven § 14 a",
         "Assessment of need for assistance according to Section 14 a of the NAV Act"
     ),
     OKONOMISK_SOSIALHJELP("Økonomisk sosialhjelp", "Financial social assistance (Sosialhjelp)"),

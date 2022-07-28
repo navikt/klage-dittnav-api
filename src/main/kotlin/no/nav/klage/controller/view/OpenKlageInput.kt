@@ -16,7 +16,6 @@ data class OpenKlageInput (
     val fritekst: String,
     val userSaksnummer: String? = null,
     val vedtakDate: LocalDate?,
-    val ytelse: String,
     val titleKey: TitleEnum,
     val tema: Tema,
     val checkboxesSelected: Set<CheckboxEnum>,
