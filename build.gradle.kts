@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val exposedVersion = "0.21.1"
+val exposedVersion = "0.38.2"
 val mockkVersion = "1.12.5"
 val h2Version = "1.4.200"
 val pamGeographyVersion = "2.9"
