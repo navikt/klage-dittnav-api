@@ -9,10 +9,9 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-fun parseTitleKey(titleKey: TitleEnum?, ytelse: String?, tema: Tema): TitleEnum {
+fun parseTitleKey(titleKey: TitleEnum?, tema: Tema): TitleEnum {
     return when {
         titleKey != null -> titleKey
-        ytelse != null && TitleEnum.getTitleKeyFromNbTitle(ytelse) != null -> TitleEnum.getTitleKeyFromNbTitle(ytelse)!!
         else -> TitleEnum.valueOf(tema.name)
     }
 }

@@ -69,7 +69,7 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.
     internalSaksnummer = internalSaksnummer,
     fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
     language = language,
-    titleKey = parseTitleKey(titleKey, ytelse, tema)
+    titleKey = parseTitleKey(titleKey, tema)
 )
 
 fun KlageViewIdAsString.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
@@ -86,6 +86,6 @@ fun KlageViewIdAsString.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageA
     internalSaksnummer = internalSaksnummer,
     fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
     language = language,
-    titleKey = parseTitleKey(titleKey, ytelse, tema)
+    titleKey = parseTitleKey(titleKey, tema)
 )
 

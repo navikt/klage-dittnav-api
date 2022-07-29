@@ -112,14 +112,11 @@ class KlageService(
         internalSaksnummer: String?,
         fullmaktsgiver: String?,
         titleKey: TitleEnum?,
-        ytelse: String?
     ): KlageViewIdAsString? {
         val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
         var processedTitleKey = titleKey
-        if (ytelse == null && titleKey == null) {
+        if (titleKey == null) {
             processedTitleKey = TitleEnum.valueOf(tema.name)
-        } else if (ytelse != null && titleKey == null) {
-            processedTitleKey = TitleEnum.getTitleKeyFromNbTitle(ytelse)
         }
 
         val klage =
@@ -205,7 +202,6 @@ class KlageService(
             internalSaksnummer = input.internalSaksnummer,
             fullmaktsgiver = input.fullmaktsgiver,
             titleKey = input.titleKey,
-            ytelse = input.ytelse,
         )
 
         return existingKlage ?: createKlage(
