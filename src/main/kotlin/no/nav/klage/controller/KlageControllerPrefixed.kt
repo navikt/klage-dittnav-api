@@ -87,7 +87,6 @@ class KlageControllerPrefixed(
             internalSaksnummer,
             fullmaktsgiver,
             titleKey,
-            ytelse
         )
     }
 

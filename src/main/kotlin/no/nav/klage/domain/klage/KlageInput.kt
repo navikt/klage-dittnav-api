@@ -9,7 +9,6 @@ import no.nav.klage.util.parseTitleKey
 
 data class KlageInput (
     val tema: Tema,
-    val ytelse: String?,
     val internalSaksnummer: String?,
     val fullmaktsgiver: String?,
     val titleKey: TitleEnum?,
@@ -25,6 +24,6 @@ fun KlageInput.toKlage(bruker: Bruker): Klage {
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
         language = LanguageEnum.NB,
-        titleKey = parseTitleKey(titleKey, ytelse, tema)
+        titleKey = parseTitleKey(titleKey, tema)
     )
 }
