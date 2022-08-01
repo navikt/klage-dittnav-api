@@ -43,6 +43,15 @@ class TokenUtil(
         return checkNotNull(token) { "Token must be present" }
     }
 
+    fun isAuthenticated(): Boolean {
+        try {
+            getOnBehalfOfTokenWithPdlScope()
+        } catch (e: Exception) {
+            return false
+        }
+        return true
+    }
+
     fun getOnBehalfOfTokenWithPdlScope(): String {
         val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
