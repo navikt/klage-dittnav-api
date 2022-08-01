@@ -34,11 +34,11 @@ class BrukerControllerPrefixed(
     @Unprotected
     fun getAuthenticationStatus(): AuthenticationStatus {
         return AuthenticationStatus(
-            isAuthenticated = tokenUtil.isAuthenticated()
+            authenticated = tokenUtil.isAuthenticated()
         )
     }
 
     data class AuthenticationStatus(
-        val isAuthenticated: Boolean,
+        val authenticated: Boolean,
     )
 }
