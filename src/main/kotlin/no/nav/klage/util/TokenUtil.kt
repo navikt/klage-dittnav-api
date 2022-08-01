@@ -43,6 +43,11 @@ class TokenUtil(
         return checkNotNull(token) { "Token must be present" }
     }
 
+    fun isAuthenticated(): Boolean {
+        logger.debug("Checking token status: ${ctxHolder.tokenValidationContext?.getJwtToken(issuer)}")
+        return ctxHolder.tokenValidationContext?.getJwtToken(issuer)?.tokenAsString != null
+    }
+
     fun getOnBehalfOfTokenWithPdlScope(): String {
         val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
