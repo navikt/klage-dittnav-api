@@ -137,6 +137,13 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
+    fun handleInvalidIdent(
+        ex: InvalidIdentException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
     fun handleJwtTokenUnauthorizedException(
         ex: JwtTokenUnauthorizedException,
         request: NativeWebRequest

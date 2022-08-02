@@ -6,7 +6,9 @@ import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
 import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.toPDFInput
+import no.nav.klage.util.isValidFnrOrDnr
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.springframework.stereotype.Service
@@ -20,6 +22,9 @@ class KlageDittnavPdfgenService(
 ) {
 
     fun createKlagePdfWithFoersteside(input: OpenKlageInput): ByteArray {
+
+        validateIdent(input.foedselsnummer)
+
         val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput())
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
@@ -33,6 +38,12 @@ class KlageDittnavPdfgenService(
         merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly())
 
         return outputStream.toByteArray()
+    }
+
+    private fun validateIdent(foedselsnummer: String) {
+        if (!isValidFnrOrDnr(foedselsnummer)) {
+            throw InvalidIdentException()
+        }
     }
 
     private fun OpenKlageInput.toFoerstesideRequest(): FoerstesideRequest {
