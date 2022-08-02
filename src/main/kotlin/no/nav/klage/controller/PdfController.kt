@@ -41,7 +41,7 @@ class PdfController(
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage.pdf")
+        responseHeaders.add("Content-Disposition", "attachment; filename=" + "klage.pdf")
         return ResponseEntity(
             content,
             responseHeaders,
