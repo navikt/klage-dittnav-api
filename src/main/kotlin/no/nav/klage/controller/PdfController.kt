@@ -40,7 +40,7 @@ class PdfController(
         val content = klageDittnavPdfgenService.createKlagePdfWithFoersteside(input)
 
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.contentType = MediaType.valueOf("application/octet-stream")
         responseHeaders.add("Content-Disposition", "attachment; filename=" + "klage.pdf")
         return ResponseEntity(
             content,
