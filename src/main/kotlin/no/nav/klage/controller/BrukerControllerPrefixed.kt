@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.controller.view.AuthenticationStatus
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Tema
 import no.nav.klage.service.BrukerService
@@ -34,11 +35,9 @@ class BrukerControllerPrefixed(
     @Unprotected
     fun getAuthenticationStatus(): AuthenticationStatus {
         return AuthenticationStatus(
-            authenticated = tokenUtil.isAuthenticated()
+            authenticated = tokenUtil.isAuthenticated(),
+            tokenx = tokenUtil.isAuthenticated(),
+            selvbetjening = tokenUtil.isSelvbetjeningAuthenticated(),
         )
     }
-
-    data class AuthenticationStatus(
-        val authenticated: Boolean,
-    )
 }

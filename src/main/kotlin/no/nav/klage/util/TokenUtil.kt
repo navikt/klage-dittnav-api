@@ -1,16 +1,20 @@
 package no.nav.klage.util
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.exceptions.JwtTokenValidatorException
 import org.springframework.stereotype.Component
+import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 @Component
 class TokenUtil(
     private val ctxHolder: TokenValidationContextHolder,
     private val clientConfigurationProperties: ClientConfigurationProperties,
     private val oAuth2AccessTokenService: OAuth2AccessTokenService,
+    private val request: HttpServletRequest,
 ) {
 
     companion object {
@@ -34,7 +38,7 @@ class TokenUtil(
             } else {
                 throw JwtTokenValidatorException("pid/sub not found in token")
             }
-        
+
         return subject
     }
 
@@ -44,14 +48,26 @@ class TokenUtil(
     }
 
     fun isAuthenticated(): Boolean {
-        logger.debug("Checking token status: ${ctxHolder.tokenValidationContext?.getJwtToken(issuer)}")
-        return ctxHolder.tokenValidationContext?.getJwtToken(issuer)?.tokenAsString != null
+        ctxHolder.tokenValidationContext?.getJwtToken(issuer) ?: return false
+        //TODO: Finn en måte å bruke token-support på til dette.
+        if (getExpiryFromIdPortenToken(request.getHeader("idporten-token")) - 100000 < System.currentTimeMillis()) {
+            return false
+        }
+        return true
+    }
+
+    fun isSelvbetjeningAuthenticated(): Boolean {
+        ctxHolder.tokenValidationContext?.getJwtToken(oldIssuer) ?: return false
+        //TODO: Finn en måte å bruke token-support på til dette.
+        if (getSelvbetjeningExpiry()!!.minus(100000) < System.currentTimeMillis()) {
+            return false
+        }
+        return true
     }
 
     fun getOnBehalfOfTokenWithPdlScope(): String {
         val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        secureLogger.debug("oboToken for pdl: {}", response.accessToken)
         return response.accessToken
     }
 
@@ -60,12 +76,17 @@ class TokenUtil(
     fun getOnBehalfOfTokenWithKlageFSSProxyScope(): String {
         val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        secureLogger.debug("oboToken for klage-fss-proxy: {}", response.accessToken)
         return response.accessToken
     }
 
     fun getExpiry(): Long? {
         return ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
+    }
+
+    fun getExpiryFromIdPortenToken(token: String): Long {
+        val correctPartOfToken = Base64.getDecoder().decode(token.split(".")[1])
+        val value = jacksonObjectMapper().readTree(correctPartOfToken)
+        return value["exp"].asLong() * 1000
     }
 
 }
