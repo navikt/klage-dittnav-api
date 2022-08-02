@@ -1,6 +1,9 @@
 package no.nav.klage
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
+import no.nav.klage.controller.view.AuthenticationStatus
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.klage.domain.Navn
@@ -8,10 +11,7 @@ import no.nav.klage.service.BrukerService
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -43,8 +43,10 @@ class ApiTest {
 
     private val FNR = "12345678910"
 
+    val mapper = jacksonObjectMapper()
 
-    @BeforeEach
+
+    @BeforeAll
     fun beforeEach() {
         Mockito.`when`(brukerService.getBruker()).thenReturn(
             Bruker(
@@ -55,6 +57,7 @@ class ApiTest {
                 tokenExpires = null,
             )
         )
+        mapper.registerModule(ProblemModule())
     }
 
     @Test
@@ -72,7 +75,6 @@ class ApiTest {
             MockMvcRequestBuilders.get("/api/bruker")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No authorization header in request", problemOutput.detail)
     }
@@ -86,7 +88,6 @@ class ApiTest {
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
     }
@@ -100,7 +101,6 @@ class ApiTest {
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
     }
@@ -120,7 +120,6 @@ class ApiTest {
             MockMvcRequestBuilders.get("/bruker")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No authorization header in request", problemOutput.detail)
     }
@@ -134,7 +133,6 @@ class ApiTest {
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
     }
@@ -148,7 +146,6 @@ class ApiTest {
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val mapper = jacksonObjectMapper().registerModule(ProblemModule())
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
         Assertions.assertEquals("No valid token found in validation context", problemOutput.detail)
     }
@@ -164,6 +161,65 @@ class ApiTest {
     fun apiDocsLoads() {
         mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs?group=internal"))
             .andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
+    @Nested
+    inner class Authenticated {
+
+        @Test
+        fun `kall på GET authenticated uten token gir tokenx false`() {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/bruker/authenticated")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().response
+            val output = mapper.readValue(response.contentAsString, AuthenticationStatus::class.java)
+            assertFalse(output.tokenx)
+            assertFalse(output.selvbetjening)
+        }
+
+        @Test
+        fun `kall på GET authenticated med selvbetjeningstoken gir tokenx false og selvbetjening true`() {
+            val token = selvbetjeningToken(fnr = FNR)
+
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/bruker/authenticated")
+                    .header("Authorization", "Bearer $token")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().response
+            val output = mapper.readValue(response.contentAsString, AuthenticationStatus::class.java)
+            assertFalse(output.tokenx)
+            assertTrue(output.selvbetjening)
+        }
+
+        @Test
+        fun `kall på GET authenticated med tokenx-token gir tokenx true`() {
+            val token = tokenxToken(fnr = FNR)
+
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/bruker/authenticated")
+                    .header("Authorization", "Bearer $token")
+                    .header("idporten-token", "Bearer $token")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().response
+            val output = mapper.readValue(response.contentAsString, AuthenticationStatus::class.java)
+            assertTrue(output.tokenx)
+        }
+
+        @Test
+        fun `kall på GET authenticated med tokenx-token og utgått idportenToken gir tokenx false`() {
+            val token = tokenxToken(fnr = FNR)
+            val idportenToken = tokenxToken(fnr = FNR, expiry = 1)
+
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/bruker/authenticated")
+                    .header("Authorization", "Bearer $token")
+                    .header("idporten-token", "Bearer $idportenToken")
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().response
+            val output = mapper.readValue(response.contentAsString, AuthenticationStatus::class.java)
+            assertFalse(output.tokenx)
+            assertFalse(output.selvbetjening)
+        }
     }
 
     fun tokenxToken(

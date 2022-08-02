@@ -48,19 +48,26 @@ class TokenUtil(
     }
 
     fun isAuthenticated(): Boolean {
-        //TODO: Finn en måte å bruke token-support på til dette.
         ctxHolder.tokenValidationContext?.getJwtToken(issuer) ?: return false
+        //TODO: Finn en måte å bruke token-support på til dette.
         if (getExpiryFromIdPortenToken(request.getHeader("idporten-token")) - 100000 < System.currentTimeMillis()) {
             return false
         }
         return true
+    }
 
+    fun isSelvbetjeningAuthenticated(): Boolean {
+        ctxHolder.tokenValidationContext?.getJwtToken(oldIssuer) ?: return false
+        //TODO: Finn en måte å bruke token-support på til dette.
+        if (getSelvbetjeningExpiry()!!.minus(100000) < System.currentTimeMillis()) {
+            return false
+        }
+        return true
     }
 
     fun getOnBehalfOfTokenWithPdlScope(): String {
         val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        secureLogger.debug("oboToken for pdl: {}", response.accessToken)
         return response.accessToken
     }
 
@@ -69,7 +76,6 @@ class TokenUtil(
     fun getOnBehalfOfTokenWithKlageFSSProxyScope(): String {
         val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        secureLogger.debug("oboToken for klage-fss-proxy: {}", response.accessToken)
         return response.accessToken
     }
 
