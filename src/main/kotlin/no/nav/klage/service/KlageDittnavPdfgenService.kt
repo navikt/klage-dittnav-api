@@ -36,6 +36,10 @@ class KlageDittnavPdfgenService(
     }
 
     private fun OpenKlageInput.toFoerstesideRequest(): FoerstesideRequest {
+        val documentList = mutableListOf("NAV 90-00.08 Klage/anke")
+        if (hasVedlegg) {
+            documentList += "Vedlegg"
+        }
         return FoerstesideRequest(
             spraakkode = Spraakkode.NB,
             netsPostboks = "1400", //always?
@@ -45,10 +49,9 @@ class KlageDittnavPdfgenService(
             ),
             tema = tema.name,
             arkivtittel = "Klage/anke",
-            vedleggsliste = if (hasVedlegg) listOf("Annet") else emptyList(),
             navSkjemaId = "NAV 90-00.08",
             overskriftstittel = "Klage/anke NAV 90-00.08",
-            dokumentlisteFoersteside = listOf("NAV 90-00.08 Klage/anke", "Annet"),
+            dokumentlisteFoersteside = documentList,
             foerstesidetype = Foerstesidetype.SKJEMA,
         )
     }
