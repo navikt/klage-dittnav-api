@@ -38,6 +38,6 @@ class InternalController(
         logger.debug("Get journalpostId on klage is requested from an internal service. KlageId: {}", klageId)
         return JournalpostIdResponse(journalpostId = klageService.getJournalpostIdWithoutValidation(klageId))
     }
-}
 
-data class JournalpostIdResponse(val journalpostId: String?)
+    data class JournalpostIdResponse(val journalpostId: String?)
+}

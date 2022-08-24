@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Unprotected
 @Tag(name = "titles")
-@RequestMapping("/titles")
+@RequestMapping("/api/titles")
 class TitleController {
 
     @GetMapping

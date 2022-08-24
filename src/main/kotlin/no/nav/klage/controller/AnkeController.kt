@@ -1,6 +1,9 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.controller.view.DateInput
+import no.nav.klage.controller.view.EditedView
+import no.nav.klage.controller.view.StringInput
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.anke.NewAnkeRequest
@@ -27,8 +30,8 @@ import javax.servlet.http.HttpServletResponse
 @Profile("local", "dev-gcp")
 @RestController
 @Tag(name = "anker")
-@ProtectedWithClaims(issuer = "selvbetjening", claimMap = ["acr=Level4"])
-@RequestMapping("/anker")
+@ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
+@RequestMapping("/api/anker")
 class AnkeController(
     private val brukerService: BrukerService,
     private val ankeService: AnkeService,
@@ -45,7 +48,7 @@ class AnkeController(
     fun getAllAvailableAnkerForUser(
         @RequestParam tema: Tema? = null
     ): List<AvailableAnkeView> {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Get all available anke possibilities for user is requested.")
         secureLogger.debug(
             "Get all available anke possibilities for user is requested. Fnr: {}",
@@ -60,7 +63,7 @@ class AnkeController(
         @RequestParam ankeInternalSaksnummer: String,
         @RequestParam fullmaktsgiver: String?
     ): AnkeView {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Get draft anke for user is requested.")
         secureLogger.debug(
             "Get draft anke for user is requested. Fnr: {}",
@@ -77,7 +80,7 @@ class AnkeController(
     fun getAnke(
         @PathVariable ankeInternalSaksnummer: String
     ): AnkeView {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Get anke is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
             "Get anke is requested. Internal ref: {}, fnr: {}",
@@ -91,7 +94,7 @@ class AnkeController(
     fun getJournalpostId(
         @PathVariable ankeInternalSaksnummer: String
     ): String? {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Get journalpost id is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
             "Get journalpost id is requested. Internal ref: {}, fnr: {}",
@@ -107,7 +110,7 @@ class AnkeController(
         @RequestBody input: NewAnkeRequest,
         response: HttpServletResponse
     ): AnkeView {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Create anke is requested.")
         secureLogger.debug(
             "Create anke is requested for user with fnr {}, internal anke ref {}.",
@@ -123,7 +126,7 @@ class AnkeController(
         @RequestBody anke: AnkeView,
         response: HttpServletResponse
     ) {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Update anke is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
             "Update anke is requested. Internal ref: {}, fnr: {}",
@@ -136,9 +139,47 @@ class AnkeController(
         ankeService.updateAnke(anke, bruker)
     }
 
+    @PutMapping("/{ankeInternalSaksnummer}/fritekst")
+    fun updateFritekst(
+        @PathVariable ankeInternalSaksnummer: String,
+        @RequestBody input: StringInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke fritekst is requested. Id: {}", ankeInternalSaksnummer)
+        secureLogger.debug(
+            "Update anke fritekst is requested. Id: {}, fnr: {}",
+            ankeInternalSaksnummer,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateFritekst(ankeInternalSaksnummer, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
+    @PutMapping("/{ankeInternalSaksnummer}/vedtakdate")
+    fun updateVedtakDate(
+        @PathVariable ankeInternalSaksnummer: String,
+        @RequestBody input: DateInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke vedtakDate is requested. Id: {}", ankeInternalSaksnummer)
+        secureLogger.debug(
+            "Update anke vedtakDate is requested. Id: {}, fnr: {}",
+            ankeInternalSaksnummer,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateVedtakDate(ankeInternalSaksnummer, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
     @DeleteMapping("/{ankeInternalSaksnummer}")
     fun deleteAnke(@PathVariable ankeInternalSaksnummer: String) {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Delete anke is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
             "Delete anke is requested. Internal ref: {}, fnr: {}",
@@ -154,7 +195,7 @@ class AnkeController(
         @PathVariable ankeInternalSaksnummer: String
     ): HttpStatus {
         return HttpStatus.OK
-//        val bruker = brukerService.getBruker(useOboToken = false)
+//        val bruker = brukerService.getBruker()
 //        logger.debug("Finalize klage is requested. Id: {}", ankeId)
 //        secureLogger.debug(
 //            "Finalize klage is requested. Id: {}, fnr: {}",
@@ -174,7 +215,7 @@ class AnkeController(
         @PathVariable ankeInternalSaksnummer: String,
         @RequestParam vedlegg: MultipartFile
     ): AnkeVedleggView {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Add vedlegg to anke is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
             "Add vedlegg to anke is requested. Internal ref: {}, fnr: {} ",
@@ -190,12 +231,8 @@ class AnkeController(
         @PathVariable ankeInternalSaksnummer: String,
         @PathVariable vedleggId: Int
     ) {
-        val bruker = brukerService.getBruker(useOboToken = false)
-        logger.debug(
-            "Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}",
-            ankeInternalSaksnummer,
-            vedleggId
-        )
+        val bruker = brukerService.getBruker()
+        logger.debug("Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}", ankeInternalSaksnummer, vedleggId)
         secureLogger.debug(
             "Delete vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
             ankeInternalSaksnummer,
@@ -213,12 +250,8 @@ class AnkeController(
         @PathVariable ankeInternalSaksnummer: String,
         @PathVariable vedleggId: Int
     ): ResponseEntity<ByteArray> {
-        val bruker = brukerService.getBruker(useOboToken = false)
-        logger.debug(
-            "Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}",
-            ankeInternalSaksnummer,
-            vedleggId
-        )
+        val bruker = brukerService.getBruker()
+        logger.debug("Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}", ankeInternalSaksnummer, vedleggId)
         secureLogger.debug(
             "Vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
             ankeInternalSaksnummer,
@@ -243,7 +276,7 @@ class AnkeController(
     fun getAnkePdf(
         @PathVariable ankeInternalSaksnummer: String
     ): ResponseEntity<ByteArray> {
-        val bruker = brukerService.getBruker(useOboToken = false)
+        val bruker = brukerService.getBruker()
         logger.debug("Get anke pdf is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
             "Get anke pdf is requested. Internal ref: {}, fnr: {} ",
