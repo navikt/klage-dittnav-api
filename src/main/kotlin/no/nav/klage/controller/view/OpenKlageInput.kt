@@ -8,7 +8,6 @@ import no.nav.klage.domain.titles.TitleEnum
 import java.time.LocalDate
 
 data class OpenKlageInput (
-    //Legg inn validering? Undersøk om det bør være med i det hele tatt.
     val foedselsnummer: String,
     val navn: Navn,
     val adresse: String,
