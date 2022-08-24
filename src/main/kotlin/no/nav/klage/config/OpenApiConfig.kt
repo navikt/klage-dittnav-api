@@ -11,15 +11,6 @@ class OpenApiConfig {
     fun api(): GroupedOpenApi {
         return GroupedOpenApi.builder()
             .group("standard")
-            .pathsToMatch("/**")
-            .pathsToExclude("/api/**")
-            .build()
-    }
-
-    @Bean
-    fun prefixedApi(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-            .group("prefixed")
             .pathsToMatch("/api/**")
             .build()
     }

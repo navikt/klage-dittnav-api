@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Unprotected
 @Tag(name = "tema")
-@RequestMapping("/temaer")
+@RequestMapping("/api/temaer")
 class TemaController {
 
     companion object {
