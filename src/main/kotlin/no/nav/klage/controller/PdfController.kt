@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
@@ -27,8 +28,8 @@ class PdfController(
     }
 
     @ResponseBody
-    @PostMapping
-    fun createPdf(
+    @PostMapping("/klage")
+    fun createPdfForKlage(
         @RequestBody input: OpenKlageInput
     ): ResponseEntity<ByteArray> {
         logger.debug("Create klage pdf is requested.")
@@ -41,7 +42,30 @@ class PdfController(
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage.pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=klage.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
+    }
+
+    @ResponseBody
+    @PostMapping("/anke")
+    fun createPdfForAnke(
+        @RequestBody input: OpenAnkeInput
+    ): ResponseEntity<ByteArray> {
+        logger.debug("Create anke pdf is requested.")
+        secureLogger.debug(
+            "Create anke pdf is requested. Input: {} ",
+            input,
+        )
+
+        val content = klageDittnavPdfgenService.createAnkePdfWithFoersteside(input)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=anke.pdf")
         return ResponseEntity(
             content,
             responseHeaders,

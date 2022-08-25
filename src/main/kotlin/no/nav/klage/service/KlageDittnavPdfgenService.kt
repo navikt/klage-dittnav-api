@@ -5,6 +5,7 @@ import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
+import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.toPDFInput
@@ -22,18 +23,30 @@ class KlageDittnavPdfgenService(
 ) {
 
     fun createKlagePdfWithFoersteside(input: OpenKlageInput): ByteArray {
-
         validateIdent(input.foedselsnummer)
 
         val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput())
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
+        return mergeDocuments(foerstesidePDF, klagePDF)
+    }
+
+    fun createAnkePdfWithFoersteside(input: OpenAnkeInput): ByteArray {
+        validateIdent(input.foedselsnummer)
+
+        val ankePDF = klageDittnavPdfgenClient.getAnkePDF(input.toPDFInput())
+        val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
+
+        return mergeDocuments(foerstesidePDF = foerstesidePDF, klageAnkePDF = ankePDF)
+    }
+
+    private fun mergeDocuments(foerstesidePDF: ByteArray, klageAnkePDF: ByteArray): ByteArray {
         val merger = PDFMergerUtility()
         val outputStream = ByteArrayOutputStream()
         merger.destinationStream = outputStream
 
         merger.addSource(ByteArrayInputStream(foerstesidePDF))
-        merger.addSource(ByteArrayInputStream(klagePDF))
+        merger.addSource(ByteArrayInputStream(klageAnkePDF))
 
         merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly())
 
@@ -53,7 +66,7 @@ class KlageDittnavPdfgenService(
         }
         return FoerstesideRequest(
             spraakkode = Spraakkode.NB,
-            netsPostboks = "1400", //always?
+            netsPostboks = "1400", //always
             bruker = Bruker(
                 brukerId = foedselsnummer,
                 brukerType = Brukertype.PERSON
@@ -64,6 +77,28 @@ class KlageDittnavPdfgenService(
             overskriftstittel = "Klage/anke NAV 90-00.08",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = Foerstesidetype.SKJEMA,
+        )
+    }
+
+    private fun OpenAnkeInput.toFoerstesideRequest(): FoerstesideRequest {
+        val documentList = mutableListOf("NAV 90-00.08 Klage/anke")
+        if (hasVedlegg) {
+            documentList += "Vedlegg"
+        }
+        return FoerstesideRequest(
+            spraakkode = Spraakkode.NB,
+            netsPostboks = "1400", //always
+            bruker = Bruker(
+                brukerId = foedselsnummer,
+                brukerType = Brukertype.PERSON
+            ),
+            tema = tema.name,
+            arkivtittel = "Klage/anke",
+            navSkjemaId = "NAV 90-00.08",
+            overskriftstittel = "Klage/anke NAV 90-00.08",
+            dokumentlisteFoersteside = documentList,
+            foerstesidetype = Foerstesidetype.SKJEMA,
+            enhetsnummer = enhetsnummer,
         )
     }
 }
