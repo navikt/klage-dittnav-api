@@ -11,7 +11,7 @@ import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageInput
-import no.nav.klage.domain.klage.KlageViewIdAsString
+import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
@@ -53,14 +53,14 @@ class KlageController(
     }
 
     @GetMapping
-    fun getKlager(): List<KlageViewIdAsString> {
+    fun getKlager(): List<KlageView> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klager for user is requested.")
         secureLogger.debug(
             "Get klager for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getDraftKlagerByFnrIdAsString(bruker)
+        return klageService.getDraftKlagerByFnr(bruker)
     }
 
     /**
@@ -73,7 +73,7 @@ class KlageController(
         @RequestParam internalSaksnummer: String?,
         @RequestParam fullmaktsgiver: String?,
         @RequestParam titleKey: TitleEnum?
-    ): KlageViewIdAsString? {
+    ): KlageView? {
         val bruker = brukerService.getBruker()
         logger.debug("Get draft klage for user is requested.")
         secureLogger.debug(
@@ -81,7 +81,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema
         )
-        return klageService.getLatestDraftKlageByParamsIdAsString(
+        return klageService.getLatestDraftKlageByParams(
             bruker,
             tema,
             internalSaksnummer,
@@ -93,7 +93,7 @@ class KlageController(
     @GetMapping("/{klageId}")
     fun getKlage(
         @PathVariable klageId: String
-    ): KlageViewIdAsString {
+    ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -101,7 +101,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getKlageIdAsString(klageId.toInt(), bruker)
+        return klageService.getKlage(klageId.toInt(), bruker)
     }
 
     @GetMapping("/{klageId}/journalpostid")
@@ -144,21 +144,21 @@ class KlageController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlage(
-        @RequestBody klage: KlageViewIdAsString, response: HttpServletResponse
-    ): KlageViewIdAsString {
+        @RequestBody klage: KlageView, response: HttpServletResponse
+    ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Create klage is requested.")
         secureLogger.debug(
             "Create klage is requested for user with fnr {}.",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.createKlageIdAsString(klage, bruker)
+        return klageService.createKlage(klage, bruker)
     }
 
     @PutMapping("/{klageId}")
     fun updateKlage(
         @PathVariable klageId: String,
-        @RequestBody klage: KlageViewIdAsString,
+        @RequestBody klage: KlageView,
         response: HttpServletResponse
     ) {
         val bruker = brukerService.getBruker()
@@ -171,14 +171,14 @@ class KlageController(
         if (klage.id != klageId) {
             throw UpdateMismatchException("Id in klage does not match resource id")
         }
-        klageService.updateKlageIdAsString(klage, bruker)
+        klageService.updateKlage(klage, bruker)
     }
 
     @PutMapping()
     fun createOrGetKlage(
         @RequestBody klageInput: KlageInput,
         response: HttpServletResponse
-    ): KlageViewIdAsString {
+    ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Create or update klage for user is requested.")
         secureLogger.debug(

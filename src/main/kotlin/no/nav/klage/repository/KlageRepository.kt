@@ -26,12 +26,6 @@ class KlageRepository {
     @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
     private lateinit var maxDraftAgeInDays: String
 
-    fun getKlager(): List<Klage> {
-        return KlageDAO.find { Klager.status neq KlageAnkeStatus.DELETED.name }.map {
-            it.toKlage()
-        }
-    }
-
     fun getExpiredDraftKlager(): List<Klage> {
         val expiryDate = Instant.now().minus(maxDraftAgeInDays.toLong(), ChronoUnit.DAYS)
         return KlageDAO.find { Klager.status eq KlageAnkeStatus.DRAFT.name and Klager.modifiedByUser.less(expiryDate) }
@@ -42,14 +36,6 @@ class KlageRepository {
 
     fun getKlageById(id: Int): Klage {
         return KlageDAO.findById(id)?.toKlage() ?: throw KlageNotFoundException("Klage with id $id not found in db.")
-    }
-
-    fun getKlageByJournalpostId(journalpostId: String): Klage {
-        return KlageDAO.find { Klager.journalpostId eq journalpostId }.map { it.toKlage() }[0]
-    }
-
-    fun getKlagerByFnr(fnr: String): List<Klage> {
-        return KlageDAO.find { Klager.foedselsnummer eq fnr }.map { it.toKlage() }
     }
 
     fun getDraftKlagerByFnr(fnr: String): List<Klage> {
