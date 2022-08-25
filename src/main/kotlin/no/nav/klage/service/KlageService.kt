@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
+import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.*
 import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.klage.*
@@ -32,6 +33,7 @@ class KlageService(
     private val brukerService: BrukerService,
     private val validationService: ValidationService,
     private val kafkaInternalEventService: KafkaInternalEventService,
+    private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
 ) {
 
     companion object {
@@ -310,6 +312,16 @@ class KlageService(
         return fileClient.getKlageAnkeFile(existingKlage.journalpostId)
     }
 
+    fun createKlagePdfWithFoersteside(klageId: Int, bruker: Bruker): ByteArray? {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(existingKlage, false)
+        validationService.validateKlageAccess(existingKlage, bruker)
+
+        return klageDittnavPdfgenService.createKlagePdfWithFoersteside(
+            createPdfWithFoerstesideInput(existingKlage, bruker)
+        )
+    }
+
     fun getJournalpostIdWithoutValidation(klageId: Int): String? {
         val klage = klageRepository.getKlageById(klageId)
         return klage.journalpostId
@@ -469,5 +481,22 @@ class KlageService(
                 fullmektigFnr = null
             )
         }
+    }
+
+    fun createPdfWithFoerstesideInput(klage: Klage, bruker: Bruker): OpenKlageInput {
+        return OpenKlageInput(
+            foedselsnummer = klage.foedselsnummer,
+            navn = bruker.navn,
+            adresse = "",
+            telefonnummer = null,
+            fritekst = klage.fritekst,
+            userSaksnummer = klage.userSaksnummer,
+            vedtakDate = klage.vedtakDate,
+            titleKey = klage.titleKey,
+            tema = klage.tema,
+            checkboxesSelected = klage.checkboxesSelected,
+            language = klage.language,
+            hasVedlegg = klage.vedlegg.isNotEmpty(),
+        )
     }
 }

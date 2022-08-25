@@ -383,4 +383,29 @@ class KlageController(
             HttpStatus.OK
         )
     }
+
+    @ResponseBody
+    @GetMapping("/{klageId}/pdf/innsending")
+    fun getKlagePdfForPrint(
+        @PathVariable klageId: String
+    ): ResponseEntity<ByteArray> {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get klage pdf for print is requested. KlageId: {}", klageId)
+        secureLogger.debug(
+            "Get klage pdf for print is requested. KlageId: {}, fnr: {} ",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+
+        val content = klageService.createKlagePdfWithFoersteside(klageId.toInt(), bruker)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
+    }
 }

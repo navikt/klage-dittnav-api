@@ -17,7 +17,8 @@ data class OpenKlageInput (
     val vedtakDate: LocalDate?,
     val titleKey: TitleEnum,
     val tema: Tema,
-    val checkboxesSelected: Set<CheckboxEnum>,
+    val checkboxesSelected: Set<CheckboxEnum>? = null,
     val language: LanguageEnum = LanguageEnum.NB,
-    val hasVedlegg: Boolean
+    val hasVedlegg: Boolean,
+    val sendesIPosten: Boolean = true,
 )
