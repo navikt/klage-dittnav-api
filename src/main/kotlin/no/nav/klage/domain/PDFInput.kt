@@ -20,7 +20,7 @@ data class PDFInput (
     val dato: String,
     val ytelse: String,
     val userChoices: List<String>? = emptyList(),
-    val uinnlogget: Boolean = true,
+    val sendesIPosten: Boolean = true,
 )
 
 fun OpenKlageInput.toPDFInput(): PDFInput {
@@ -36,7 +36,8 @@ fun OpenKlageInput.toPDFInput(): PDFInput {
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
-        userChoices = checkboxesSelected?.map { x -> x.getFullText(language) }
+        userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
+        sendesIPosten = sendesIPosten,
     )
 }
 
