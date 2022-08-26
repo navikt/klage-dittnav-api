@@ -23,7 +23,8 @@ data class Klage(
     val internalSaksnummer: String? = null,
     val fullmektig: String? = null,
     val language: LanguageEnum,
-    val titleKey: TitleEnum
+    val titleKey: TitleEnum,
+    val hasVedlegg: Boolean,
 )
 
 fun Klage.isAccessibleToUser(usersIdentifikasjonsnummer: String) = klageAnkeIsAccessibleToUser(usersIdentifikasjonsnummer, foedselsnummer)

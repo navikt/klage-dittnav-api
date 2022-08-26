@@ -2,10 +2,7 @@ package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.clients.events.KafkaEventClient
-import no.nav.klage.controller.view.CheckboxesSelectedInput
-import no.nav.klage.controller.view.DateInput
-import no.nav.klage.controller.view.EditedView
-import no.nav.klage.controller.view.StringInput
+import no.nav.klage.controller.view.*
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
@@ -242,6 +239,25 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         val modifiedByUser = klageService.updateVedtakDate(klageId, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
+    @PutMapping("/{klageId}/hasvedlegg")
+    fun updateHasVedlegg(
+        @PathVariable klageId: String,
+        @RequestBody input: BooleanInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update klage hasVedlegg is requested. Id: {}", klageId)
+        secureLogger.debug(
+            "Update klage hasVedlegg is requested. Id: {}, fnr: {}",
+            klageId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = klageService.updateHasVedlegg(klageId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )

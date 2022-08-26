@@ -123,6 +123,18 @@ class KlageRepository {
         return klageFromDB.toKlage()
     }
 
+    fun updateHasVedlegg(id: String, hasVedlegg: Boolean): Klage {
+        logger.debug("Updating klage hasVedlegg in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
+        klageFromDB.apply {
+            this.hasVedlegg = hasVedlegg
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage hasVedlegg successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
     fun updateCheckboxesSelected(id: String, checkboxesSelected: Set<CheckboxEnum>?): Klage {
         logger.debug("Updating klage checkboxesSelected in db. Id: {}", id)
         val klageFromDB = getKlageToModify(id.toInt())
