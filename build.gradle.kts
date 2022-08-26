@@ -23,6 +23,7 @@ ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 repositories {
     mavenCentral()
+    maven("https://jcenter.bintray.com")
     maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/simple-slack-poster")
@@ -31,7 +32,7 @@ repositories {
             password = githubPassword
         }
     }
-    jcenter()
+    maven("https://jitpack.io")
 }
 
 plugins {
@@ -62,6 +63,8 @@ dependencies {
 
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
+
+    implementation("com.github.navikt:kabal-kodeverk:2022.08.25-21.01.38a9cab8294d")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")

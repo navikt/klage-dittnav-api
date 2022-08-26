@@ -27,4 +27,15 @@ class KlageDittnavPdfgenClient(
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("PDF could not be generated")
     }
+
+    fun getAnkePDF(input: PDFInput): ByteArray {
+        logger.debug("Creating PDF from anke.")
+        return klageDittnavPdfgenWebClient.post()
+            .uri { it.path("/anke").build() }
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(input)
+            .retrieve()
+            .bodyToMono<ByteArray>()
+            .block() ?: throw RuntimeException("PDF could not be generated")
+    }
 }

@@ -1,6 +1,8 @@
 package no.nav.klage.domain
 
+import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import java.time.LocalDate
@@ -12,8 +14,9 @@ data class PDFInput (
     val fornavn: String,
     val mellomnavn: String? = null,
     val etternavn: String,
-    val adresse: String,
-    val telefonnummer: String?,
+    val adresse: String? = null,
+    val telefonnummer: String? = null,
+    val enhetsnavn: String? = null,
     val vedtak: String,
     val begrunnelse: String,
     val saksnummer: String?,
@@ -38,6 +41,21 @@ fun OpenKlageInput.toPDFInput(): PDFInput {
         ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
         sendesIPosten = sendesIPosten,
+    )
+}
+
+fun OpenAnkeInput.toPDFInput(): PDFInput {
+    return PDFInput(
+        foedselsnummer = foedselsnummer,
+        fornavn = navn.fornavn,
+        mellomnavn = navn.mellomnavn,
+        etternavn = navn.etternavn,
+        vedtak = vedtakFromDate(vedtakDate) ?: "Ikke angitt",
+        begrunnelse = sanitizeText(fritekst),
+        saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
+        dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+        ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
+        enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse
     )
 }
 
