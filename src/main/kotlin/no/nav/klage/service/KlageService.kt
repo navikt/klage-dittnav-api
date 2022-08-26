@@ -304,7 +304,8 @@ class KlageService(
             fullmaktsgiver = fullmektig?.let { foedselsnummer },
             language = language,
             titleKey = titleKey,
-            ytelse = titleKey.nb
+            ytelse = titleKey.nb,
+            hasVedlegg = hasVedlegg,
         )
     }
 

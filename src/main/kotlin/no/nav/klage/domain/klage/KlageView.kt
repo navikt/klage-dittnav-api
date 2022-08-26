@@ -30,7 +30,7 @@ data class KlageView(
     val language: LanguageEnum = LanguageEnum.NB,
     val titleKey: TitleEnum?,
     val ytelse: String?,
-    val hasVedlegg: Boolean = false,
+    val hasVedlegg: Boolean,
 )
 
 fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
