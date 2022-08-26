@@ -2,6 +2,7 @@ package no.nav.klage.domain
 
 import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import java.time.LocalDate
@@ -54,7 +55,7 @@ fun OpenAnkeInput.toPDFInput(): PDFInput {
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
-        enhetsnavn = null //TODO Find from enum
+        enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse
     )
 }
 
