@@ -1,6 +1,6 @@
-package no.nav.klage.domain.ankevedlegg
+package no.nav.klage.domain.ankevedleggOLD
 
-data class AnkeVedleggView(
+data class AnkeVedleggOLDView(
     val tittel: String,
     val ref: String,
     val ankeInternalSaksnummer: String,
@@ -10,7 +10,7 @@ data class AnkeVedleggView(
     val content: String
 )
 
-fun AnkeVedleggView.toAnkeVedlegg() = AnkeVedlegg(
+fun AnkeVedleggOLDView.toAnkeVedlegg() = AnkeVedleggOLD(
     tittel = tittel,
     ref = ref,
     ankeInternalSaksnummer = ankeInternalSaksnummer,

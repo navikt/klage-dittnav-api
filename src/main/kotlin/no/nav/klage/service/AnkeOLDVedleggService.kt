@@ -3,10 +3,9 @@ package no.nav.klage.service
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.anke.Anke
-import no.nav.klage.domain.ankevedlegg.AnkeVedlegg
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggView
-import no.nav.klage.domain.ankevedlegg.toAnkeVedleggView
+import no.nav.klage.domain.ankeOLD.AnkeOLD
+import no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLDView
+import no.nav.klage.domain.ankevedleggOLD.toAnkeVedleggView
 import no.nav.klage.repository.AnkeRepository
 import no.nav.klage.repository.AnkeVedleggRepository
 import no.nav.klage.util.getLogger
@@ -19,7 +18,7 @@ import java.util.*
 
 @Service
 @Transactional
-class AnkeVedleggService(
+class AnkeOLDVedleggService(
     private val ankeVedleggRepository: AnkeVedleggRepository,
     private val ankeRepository: AnkeRepository,
     private val image2PDF: Image2PDF,
@@ -33,7 +32,7 @@ class AnkeVedleggService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addAnkeVedlegg(internalSaksnummer: String, vedlegg: MultipartFile, bruker: Bruker): AnkeVedlegg {
+    fun addAnkeVedlegg(internalSaksnummer: String, vedlegg: MultipartFile, bruker: Bruker): no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg {
         val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer)
         validationService.checkAnkeStatus(existingAnke)
         validationService.validateAnkeAccess(existingAnke, bruker)
@@ -68,7 +67,7 @@ class AnkeVedleggService(
         return fileClient.getVedleggFile(ankeVedlegg.ref)
     }
 
-    fun expandAnkeVedleggToAnkeVedleggView(ankeVedlegg: AnkeVedlegg, bruker: Bruker): AnkeVedleggView {
+    fun expandAnkeVedleggToAnkeVedleggView(ankeVedlegg: no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg, bruker: Bruker): AnkeVedleggOLDView {
         val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
         validationService.checkAnkeStatus(existingAnke, false)
         validationService.validateAnkeAccess(existingAnke, bruker)
@@ -76,5 +75,5 @@ class AnkeVedleggService(
         return ankeVedlegg.toAnkeVedleggView(Base64.getEncoder().encodeToString(content))
     }
 
-    private fun Anke.attachmentsTotalSize() = this.vedlegg.sumOf{ it.sizeInBytes }
+    private fun AnkeOLD.attachmentsTotalSize() = this.vedlegg.sumOf{ it.sizeInBytes }
 }

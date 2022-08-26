@@ -4,15 +4,13 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.EditedView
 import no.nav.klage.controller.view.StringInput
-import no.nav.klage.domain.Tema
-import no.nav.klage.domain.anke.AnkeView
-import no.nav.klage.domain.anke.NewAnkeRequest
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggView
-import no.nav.klage.domain.availableanke.AvailableAnkeView
+import no.nav.klage.domain.ankeOLD.AnkeOLDView
+import no.nav.klage.domain.ankeOLD.NewAnkeOLDRequest
+import no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLDView
 import no.nav.klage.domain.exception.AnkeNotFoundException
 import no.nav.klage.domain.exception.UpdateMismatchException
-import no.nav.klage.service.AnkeService
-import no.nav.klage.service.AnkeVedleggService
+import no.nav.klage.service.AnkeOLDService
+import no.nav.klage.service.AnkeOLDVedleggService
 import no.nav.klage.service.AvailableAnkeService
 import no.nav.klage.service.BrukerService
 import no.nav.klage.util.getLogger
@@ -31,11 +29,11 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 @Tag(name = "anker")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
-@RequestMapping("/api/anker")
-class AnkeController(
+@RequestMapping("/api/old/anker")
+class AnkeOLDController(
     private val brukerService: BrukerService,
-    private val ankeService: AnkeService,
-    private val ankeVedleggService: AnkeVedleggService,
+    private val ankeOLDService: AnkeOLDService,
+    private val ankeOLDVedleggService: AnkeOLDVedleggService,
     private val availableAnkeService: AvailableAnkeService
 ) {
     companion object {
@@ -44,32 +42,32 @@ class AnkeController(
         private val secureLogger = getSecureLogger()
     }
 
-    @GetMapping("/available")
-    fun getAllAvailableAnkerForUser(
-        @RequestParam tema: Tema? = null
-    ): List<AvailableAnkeView> {
-        val bruker = brukerService.getBruker()
-        logger.debug("Get all available anke possibilities for user is requested.")
-        secureLogger.debug(
-            "Get all available anke possibilities for user is requested. Fnr: {}",
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-
-        return availableAnkeService.getAllAvailableAnkeViewForUser(bruker, tema)
-    }
+//    @GetMapping("/available")
+//    fun getAllAvailableAnkerForUser(
+//        @RequestParam tema: Tema? = null
+//    ): List<AvailableAnkeView> {
+//        val bruker = brukerService.getBruker()
+//        logger.debug("Get all available anke possibilities for user is requested.")
+//        secureLogger.debug(
+//            "Get all available anke possibilities for user is requested. Fnr: {}",
+//            bruker.folkeregisteridentifikator.identifikasjonsnummer
+//        )
+//
+//        return availableAnkeService.getAllAvailableAnkeViewForUser(bruker, tema)
+//    }
 
     @GetMapping("/draft")
     fun getDraftAnkeByQuery(
         @RequestParam ankeInternalSaksnummer: String,
         @RequestParam fullmaktsgiver: String?
-    ): AnkeView {
+    ): AnkeOLDView {
         val bruker = brukerService.getBruker()
         logger.debug("Get draft anke for user is requested.")
         secureLogger.debug(
             "Get draft anke for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getLatestDraftAnkeByParams(
+        return ankeOLDService.getLatestDraftAnkeByParams(
             bruker,
             ankeInternalSaksnummer,
             fullmaktsgiver
@@ -79,7 +77,7 @@ class AnkeController(
     @GetMapping("/{ankeInternalSaksnummer}")
     fun getAnke(
         @PathVariable ankeInternalSaksnummer: String
-    ): AnkeView {
+    ): AnkeOLDView {
         val bruker = brukerService.getBruker()
         logger.debug("Get anke is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
@@ -87,7 +85,7 @@ class AnkeController(
             ankeInternalSaksnummer,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getAnke(ankeInternalSaksnummer, bruker)
+        return ankeOLDService.getAnke(ankeInternalSaksnummer, bruker)
     }
 
     @GetMapping("/{ankeInternalSaksnummer}/journalpostid")
@@ -101,15 +99,15 @@ class AnkeController(
             ankeInternalSaksnummer,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getJournalpostId(ankeInternalSaksnummer, bruker)
+        return ankeOLDService.getJournalpostId(ankeInternalSaksnummer, bruker)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createAnke(
-        @RequestBody input: NewAnkeRequest,
+        @RequestBody input: NewAnkeOLDRequest,
         response: HttpServletResponse
-    ): AnkeView {
+    ): AnkeOLDView {
         val bruker = brukerService.getBruker()
         logger.debug("Create anke is requested.")
         secureLogger.debug(
@@ -117,13 +115,13 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
             input.ankeInternalSaksnummer
         )
-        return ankeService.createAnke(input, bruker)
+        return ankeOLDService.createAnke(input, bruker)
     }
 
     @PutMapping("/{ankeInternalSaksnummer}")
     fun updateAnke(
         @PathVariable ankeInternalSaksnummer: String,
-        @RequestBody anke: AnkeView,
+        @RequestBody anke: AnkeOLDView,
         response: HttpServletResponse
     ) {
         val bruker = brukerService.getBruker()
@@ -136,7 +134,7 @@ class AnkeController(
         if (anke.ankeInternalSaksnummer != ankeInternalSaksnummer) {
             throw UpdateMismatchException("Internal ref in anke does not match resource id")
         }
-        ankeService.updateAnke(anke, bruker)
+        ankeOLDService.updateAnke(anke, bruker)
     }
 
     @PutMapping("/{ankeInternalSaksnummer}/fritekst")
@@ -152,7 +150,7 @@ class AnkeController(
             ankeInternalSaksnummer,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateFritekst(ankeInternalSaksnummer, input.value, bruker)
+        val modifiedByUser = ankeOLDService.updateFritekst(ankeInternalSaksnummer, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -171,7 +169,7 @@ class AnkeController(
             ankeInternalSaksnummer,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateVedtakDate(ankeInternalSaksnummer, input.value, bruker)
+        val modifiedByUser = ankeOLDService.updateVedtakDate(ankeInternalSaksnummer, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -186,7 +184,7 @@ class AnkeController(
             ankeInternalSaksnummer,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        ankeService.deleteAnke(ankeInternalSaksnummer, bruker)
+        ankeOLDService.deleteAnke(ankeInternalSaksnummer, bruker)
     }
 
     @PostMapping("/{ankeInternalSaksnummer}/finalize")
@@ -214,7 +212,7 @@ class AnkeController(
     fun addAnkeVedleggToAnke(
         @PathVariable ankeInternalSaksnummer: String,
         @RequestParam vedlegg: MultipartFile
-    ): AnkeVedleggView {
+    ): AnkeVedleggOLDView {
         val bruker = brukerService.getBruker()
         logger.debug("Add vedlegg to anke is requested. Internal ref: {}", ankeInternalSaksnummer)
         secureLogger.debug(
@@ -222,8 +220,8 @@ class AnkeController(
             ankeInternalSaksnummer,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryAnkeVedlegg = ankeVedleggService.addAnkeVedlegg(ankeInternalSaksnummer, vedlegg, bruker)
-        return ankeVedleggService.expandAnkeVedleggToAnkeVedleggView(temporaryAnkeVedlegg, bruker)
+        val temporaryAnkeVedlegg = ankeOLDVedleggService.addAnkeVedlegg(ankeInternalSaksnummer, vedlegg, bruker)
+        return ankeOLDVedleggService.expandAnkeVedleggToAnkeVedleggView(temporaryAnkeVedlegg, bruker)
     }
 
     @DeleteMapping("/{ankeInternalSaksnummer}/vedlegg/{vedleggId}")
@@ -239,7 +237,7 @@ class AnkeController(
             vedleggId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (!ankeVedleggService.deleteAnkeVedlegg(vedleggId, bruker)) {
+        if (!ankeOLDVedleggService.deleteAnkeVedlegg(vedleggId, bruker)) {
             throw AnkeNotFoundException("Attachment not found.")
         }
     }
@@ -259,7 +257,7 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = ankeVedleggService.getAnkeVedlegg(vedleggId, bruker)
+        val content = ankeOLDVedleggService.getAnkeVedlegg(vedleggId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
@@ -284,7 +282,7 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = ankeService.getAnkePdf(ankeInternalSaksnummer, bruker)
+        val content = ankeOLDService.getAnkePdf(ankeInternalSaksnummer, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
