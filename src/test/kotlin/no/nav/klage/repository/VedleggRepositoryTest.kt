@@ -68,7 +68,8 @@ class VedleggRepositoryTest {
         fritekst = "fritekst",
         tema = Tema.AAP,
         language = LanguageEnum.NB,
-        titleKey = TitleEnum.ALDERSPENSJON
+        titleKey = TitleEnum.ALDERSPENSJON,
+        hasVedlegg = false,
     )
 
     private val vedlegg1 =

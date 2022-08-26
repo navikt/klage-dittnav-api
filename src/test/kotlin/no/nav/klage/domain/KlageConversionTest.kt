@@ -187,6 +187,7 @@ class KlageConversionTest {
         tema = exampleTema,
         modifiedByUser = exampleModifiedByUser,
         language = LanguageEnum.NB,
-        titleKey = exampleTitleKey
+        titleKey = exampleTitleKey,
+        hasVedlegg = false,
     )
 }

@@ -29,7 +29,8 @@ data class KlageView(
     val fullmaktsgiver: String? = null,
     val language: LanguageEnum = LanguageEnum.NB,
     val titleKey: TitleEnum?,
-    val ytelse: String?
+    val ytelse: String?,
+    val hasVedlegg: Boolean = false,
 )
 
 fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
@@ -48,6 +49,7 @@ fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.
     internalSaksnummer = internalSaksnummer,
     fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
     language = language,
-    titleKey = parseTitleKey(titleKey, tema)
+    titleKey = parseTitleKey(titleKey, tema),
+    hasVedlegg = hasVedlegg,
 )
 
