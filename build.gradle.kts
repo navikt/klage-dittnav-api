@@ -23,6 +23,7 @@ ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 repositories {
     mavenCentral()
+    maven("https://jcenter.bintray.com")
     maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/simple-slack-poster")
