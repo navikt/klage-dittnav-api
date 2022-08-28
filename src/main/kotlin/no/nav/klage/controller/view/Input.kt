@@ -14,3 +14,7 @@ data class DateInput(
 data class CheckboxesSelectedInput(
     val value: Set<CheckboxEnum>
 )
+
+data class BooleanInput(
+    val value: Boolean
+)
