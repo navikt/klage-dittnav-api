@@ -5,7 +5,6 @@ import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
-import no.nav.klage.domain.exception.UpdateMismatchException
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageInput
 import no.nav.klage.domain.klage.KlageView
@@ -152,26 +151,7 @@ class KlageController(
         return klageService.createKlage(klage, bruker)
     }
 
-    @PutMapping("/{klageId}")
-    fun updateKlage(
-        @PathVariable klageId: String,
-        @RequestBody klage: KlageView,
-        response: HttpServletResponse
-    ) {
-        val bruker = brukerService.getBruker()
-        logger.debug("Update klage is requested. Id: {}", klageId)
-        secureLogger.debug(
-            "Update klage is requested. Id: {}, fnr: {}",
-            klageId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-        if (klage.id != klageId) {
-            throw UpdateMismatchException("Id in klage does not match resource id")
-        }
-        klageService.updateKlage(klage, bruker)
-    }
-
-    @PutMapping()
+    @PutMapping
     fun createOrGetKlage(
         @RequestBody klageInput: KlageInput,
         response: HttpServletResponse
