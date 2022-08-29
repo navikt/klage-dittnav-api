@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Profile("local", "dev-gcp")
 @RestController
-@Tag(name = "anker")
+@Tag(name = "anker-old")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/old/anker")
 class AnkeOLDController(
