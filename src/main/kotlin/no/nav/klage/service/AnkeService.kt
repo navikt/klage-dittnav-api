@@ -200,7 +200,7 @@ class AnkeService(
             tema = anke.tema,
             enhetsnummer = anke.enhetsnummer!!,//should already be validated
             language = anke.language,
-            hasVedlegg = true, //TODO
+            hasVedlegg = anke.hasVedlegg,
         )
     }
 
