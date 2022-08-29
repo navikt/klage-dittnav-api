@@ -10,7 +10,7 @@ import no.nav.klage.domain.ankeOLD.NewAnkeOLDRequest
 import no.nav.klage.domain.ankeOLD.toAnke
 import no.nav.klage.domain.ankevedleggOLD.toAnkeVedleggView
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.repository.AnkeRepository
+import no.nav.klage.repository.AnkeRepositoryOLD
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.*
@@ -18,7 +18,7 @@ import java.time.*
 @Service
 @Transactional
 class AnkeOLDService(
-    private val ankeRepository: AnkeRepository,
+    private val ankeRepositoryOLD: AnkeRepositoryOLD,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val fileClient: FileClient,
     private val brukerService: BrukerService,
@@ -32,15 +32,15 @@ class AnkeOLDService(
     }
 
     fun getAnke(internalSaksnummer: String, bruker: Bruker): AnkeOLDView {
-        val anke = ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer)
-        validationService.checkAnkeStatus(anke, false)
-        validationService.validateAnkeAccess(anke, bruker)
+        val anke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer)
+        validationService.checkAnkeStatusOLD(anke, false)
+        validationService.validateAnkeAccessOLD(anke, bruker)
         return anke.toAnkeView(bruker, anke.status === KlageAnkeStatus.DRAFT)
     }
 
     fun createAnke(input: NewAnkeOLDRequest, bruker: Bruker): AnkeOLDView {
         try {
-            val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(input.ankeInternalSaksnummer)
+            val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(input.ankeInternalSaksnummer)
             return existingAnke.toAnkeView(bruker)
         } catch (e: AnkeNotFoundException) {
             val availableAnke = availableAnkeService.getAvailableAnke(input.ankeInternalSaksnummer, bruker)
@@ -53,7 +53,7 @@ class AnkeOLDService(
                 language = input.language
             )
 
-            return ankeRepository
+            return ankeRepositoryOLD
                 .createAnke(ankeOLD)
                 .toAnkeView(bruker)
                 .also {
@@ -63,29 +63,29 @@ class AnkeOLDService(
     }
 
     fun updateAnke(anke: AnkeOLDView, bruker: Bruker) {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(anke.ankeInternalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        ankeRepository
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(anke.ankeInternalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
+        ankeRepositoryOLD
             .updateAnke(anke.toAnke(bruker))
             .toAnkeView(bruker, false)
     }
 
     fun updateFritekst(ankeInternalSaksnummer: String, fritekst: String, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeInternalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(ankeInternalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
+        return ankeRepositoryOLD
             .updateFritekst(ankeInternalSaksnummer, fritekst)
             .toAnkeView(bruker, false)
             .modifiedByUser
     }
 
     fun updateVedtakDate(ankeInternalSaksnummer: String, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeInternalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(ankeInternalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
+        return ankeRepositoryOLD
             .updateVedtakDate(ankeInternalSaksnummer, vedtakDate)
             .toAnkeView(bruker, false)
             .modifiedByUser
@@ -99,29 +99,29 @@ class AnkeOLDService(
         val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val anke =
-            ankeRepository.getLatestDraftAnkeByFnrAndInternalSaksnummer(
+            ankeRepositoryOLD.getLatestDraftAnkeByFnrAndInternalSaksnummer(
                 fnr,
                 internalSaksnummer
             )
         if (anke != null) {
-            validationService.validateAnkeAccess(anke, bruker)
+            validationService.validateAnkeAccessOLD(anke, bruker)
             return anke.toAnkeView(bruker, false)
         }
         throw AnkeNotFoundException()
     }
 
     fun getJournalpostId(internalSaksnummer: String, bruker: Bruker): String? {
-        val anke = ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer)
-        validationService.checkAnkeStatus(anke, false)
-        validationService.validateAnkeAccess(anke, bruker)
+        val anke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer)
+        validationService.checkAnkeStatusOLD(anke, false)
+        validationService.validateAnkeAccessOLD(anke, bruker)
         return anke.journalpostId
     }
 
     fun deleteAnke(internalSaksnummer: String, bruker: Bruker) {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        ankeRepository.deleteAnke(internalSaksnummer)
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
+        ankeRepositoryOLD.deleteAnke(internalSaksnummer)
     }
 
     fun AnkeOLD.toAnkeView(bruker: Bruker, expandAnkeVedleggToAnkeVedleggView: Boolean = true): AnkeOLDView {
@@ -152,9 +152,9 @@ class AnkeOLDService(
     }
 
     fun getAnkePdf(internalSaksnummer: String, bruker: Bruker): ByteArray {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke, false)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
         requireNotNull(existingAnke.journalpostId)
         return fileClient.getKlageAnkeFile(existingAnke.journalpostId)
     }

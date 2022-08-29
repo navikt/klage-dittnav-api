@@ -1,9 +1,13 @@
 package no.nav.klage.repository
 
+import no.nav.anke.domain.anke.AnkeDAO
+import no.nav.anke.domain.anke.Anker
+import no.nav.anke.domain.anke.fromAnke
+import no.nav.anke.domain.anke.toAnke
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.ankeOLD.*
+import no.nav.klage.domain.anke.Anke
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
 import org.springframework.beans.factory.annotation.Value
@@ -24,60 +28,45 @@ class AnkeRepository {
     @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
     private lateinit var maxDraftAgeInDays: String
 
-    fun getExpiredDraftAnker(): List<AnkeOLD> {
+    fun getExpiredDraftAnker(): List<Anke> {
         val expiryDate = Instant.now().minus(maxDraftAgeInDays.toLong(), ChronoUnit.DAYS)
-        return AnkeOLDDAO.find { Anker.status eq KlageAnkeStatus.DRAFT.name and Anker.modifiedByUser.less(expiryDate) }
+        return AnkeDAO.find { Anker.status eq KlageAnkeStatus.DRAFT.name and Anker.modifiedByUser.less(expiryDate) }
             .map {
                 it.toAnke()
             }
     }
 
-    fun getAnkeByInternalSaksnummer(internalSaksnummer: String): AnkeOLD {
-        val inputUUID = UUID.fromString(internalSaksnummer)
-        return AnkeOLDDAO.find {
-            Anker.internalSaksnummer eq inputUUID
-        }.firstOrNull()?.toAnke() ?: throw AnkeNotFoundException("Anke with internalSaksnummer $internalSaksnummer not found in db.")
+    fun getAnkeById(id: UUID): Anke {
+        return AnkeDAO.findById(id)?.toAnke() ?: throw AnkeNotFoundException("Anke with id $id not found in db.")
     }
 
-    fun getLatestDraftAnkeByFnrAndInternalSaksnummer(
+    fun getDraftAnkerByFnr(fnr: String): List<Anke> {
+        return AnkeDAO.find { Anker.foedselsnummer eq fnr and (Anker.status eq KlageAnkeStatus.DRAFT.toString()) }
+            .map { it.toAnke() }
+    }
+
+    fun getLatestDraftAnkeByFnrTitleKey(
         fnr: String,
-        internalSaksnummer: String
-    ): AnkeOLD? {
-        val inputUUID = UUID.fromString(internalSaksnummer)
-        return AnkeOLDDAO.find {
-            Anker.foedselsnummer eq fnr and (Anker.internalSaksnummer eq inputUUID) and (Anker.status eq KlageAnkeStatus.DRAFT.toString())
+        titleKey: TitleEnum
+    ): Anke? {
+        return AnkeDAO.find {
+            Anker.foedselsnummer eq fnr and (Anker.titleKey eq titleKey.name) and (Anker.status eq KlageAnkeStatus.DRAFT.toString())
         }.maxByOrNull { it.modifiedByUser }
             ?.toAnke()
     }
 
-    fun createAnke(ankeOLD: AnkeOLD): AnkeOLD {
+    fun createAnke(anke: Anke): Anke {
         logger.debug("Creating anke in db.")
-        return AnkeOLDDAO.new {
-            fromAnke(ankeOLD)
+        return AnkeDAO.new {
+            fromAnke(anke)
         }.toAnke().also {
             logger.debug("Anke successfully created in db. Id: {}", it.id)
         }
     }
 
-    fun updateAnke(ankeOLD: AnkeOLD, checkWritableOnceFields: Boolean = true): AnkeOLD {
-        logger.debug("Updating anke in db. Internal saksnummer: {}", ankeOLD.internalSaksnummer)
-        val ankeFromDB = getAnkeToModify(ankeOLD.internalSaksnummer)
-
-        if (checkWritableOnceFields && !ankeOLD.writableOnceFieldsMatch(ankeFromDB.toAnke())) {
-            throw AttemptedIllegalUpdateException()
-        }
-
-        ankeFromDB.apply {
-            fromAnke(ankeOLD)
-        }
-        logger.debug("Anke successfully updated in db.")
-        return ankeFromDB.toAnke()
-    }
-
-
-    fun updateFritekst(internalSaksnummer: String, fritekst: String): AnkeOLD {
-        logger.debug("Updating anke fritekst in db. Id: {}", internalSaksnummer)
-        val ankeFromDB = getAnkeToModify(internalSaksnummer)
+    fun updateFritekst(id: UUID, fritekst: String): Anke {
+        logger.debug("Updating anke fritekst in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
         ankeFromDB.apply {
             this.fritekst = fritekst
             this.modifiedByUser = Instant.now()
@@ -87,9 +76,33 @@ class AnkeRepository {
         return ankeFromDB.toAnke()
     }
 
-    fun updateVedtakDate(internalSaksnummer: String, vedtakDate: LocalDate?): AnkeOLD {
-        logger.debug("Updating anke vedtakDate in db. Id: {}", internalSaksnummer)
-        val ankeFromDB = getAnkeToModify(internalSaksnummer)
+    fun updateUserSaksnummer(id: UUID, userSaksnummer: String?): Anke {
+        logger.debug("Updating anke userSaksnummer in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
+        ankeFromDB.apply {
+            this.userSaksnummer = userSaksnummer
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Anke userSaksnummer successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
+    fun updateEnhetsnummer(id: UUID, enhetsnummer: String?): Anke {
+        logger.debug("Updating anke enhetsnummer in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
+        ankeFromDB.apply {
+            this.enhetsnummer = enhetsnummer
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Anke enhetsnummer successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
+    fun updateVedtakDate(id: UUID, vedtakDate: LocalDate?): Anke {
+        logger.debug("Updating anke vedtakDate in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
         ankeFromDB.apply {
             this.vedtakDate = vedtakDate
             this.modifiedByUser = Instant.now()
@@ -99,9 +112,9 @@ class AnkeRepository {
         return ankeFromDB.toAnke()
     }
 
-    fun deleteAnke(internalSaksnummer: String) {
-        logger.debug("Deleting anke in db. Internal saksnummer: {}", internalSaksnummer)
-        val ankeFromDB = getAnkeToModify(internalSaksnummer)
+    fun deleteAnke(id: UUID) {
+        logger.debug("Deleting anke in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
         ankeFromDB.apply {
             status = KlageAnkeStatus.DELETED.name
             modifiedByUser = Instant.now()
@@ -109,10 +122,7 @@ class AnkeRepository {
         logger.debug("Anke successfully marked as deleted in db.")
     }
 
-    private fun getAnkeToModify(internalSaksnummer: String): AnkeOLDDAO {
-        val inputUUID = UUID.fromString(internalSaksnummer)
-        return AnkeOLDDAO.find {
-            Anker.internalSaksnummer eq inputUUID
-        }.firstOrNull() ?: throw AnkeNotFoundException("Anke with internalSaksnummer $internalSaksnummer not found in db.")
+    private fun getAnkeToModify(id: UUID?): AnkeDAO {
+        return AnkeDAO.findById(checkNotNull(id)) ?: throw AnkeNotFoundException("Anke with id $id not found in db.")
     }
 }

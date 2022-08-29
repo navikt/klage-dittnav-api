@@ -2,7 +2,7 @@ package no.nav.klage.service
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
-import no.nav.klage.repository.AnkeRepository
+import no.nav.klage.repository.AnkeRepositoryOLD
 import no.nav.klage.repository.AnkeVedleggRepository
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 class DraftCleanupService(
     private val slackClient: SlackClient,
     private val klageRepository: KlageRepository,
-    private val ankeRepository: AnkeRepository,
+    private val ankeRepositoryOLD: AnkeRepositoryOLD,
     private val vedleggRepository: VedleggRepository,
     private val ankeVedleggRepository: AnkeVedleggRepository,
     private val fileClient: FileClient
@@ -87,7 +87,7 @@ class DraftCleanupService(
             }
         }
 
-        val oldAnkeDrafts = ankeRepository.getExpiredDraftAnker()
+        val oldAnkeDrafts = ankeRepositoryOLD.getExpiredDraftAnker()
         expiredAnker = oldAnkeDrafts.count()
         logger.debug("Found $expiredAnker expired draft nker")
         slackClient.postMessage("Fant $expiredAnker utgåtte draft-anker")
@@ -112,7 +112,7 @@ class DraftCleanupService(
                         )
                     }
                 }
-                ankeRepository.deleteAnke(it.internalSaksnummer)
+                ankeRepositoryOLD.deleteAnke(it.internalSaksnummer)
                 ankerSuccessfullyDeleted++
             }.onFailure { failure ->
                 logger.error("Could not clean up draft. See secure logs for details.")

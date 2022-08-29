@@ -11,3 +11,10 @@ class AnkeIsDeletedException(override val message: String = "Anke is deleted"): 
 class AnkeIsFinalizedException(override val message: String = "Anke is already finalized"): RuntimeException()
 
 class AvailableAnkeNotFoundException(override val message: String = "Available anke not found"): RuntimeException()
+
+class SectionedValidationErrorWithDetailsException(val title: String, val sections: List<ValidationSection>) :
+    RuntimeException()
+
+data class ValidationSection(val section: String, val properties: List<InvalidProperty>)
+
+data class InvalidProperty(val field: String, val reason: String)

@@ -12,7 +12,7 @@ data class AnkeOLD(
     var status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
-    val vedlegg: List<no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg> = listOf(),
+    val vedlegg: List<no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD> = listOf(),
     val journalpostId: String? = null,
     val vedtakDate: LocalDate? = null,
     val internalSaksnummer: String,

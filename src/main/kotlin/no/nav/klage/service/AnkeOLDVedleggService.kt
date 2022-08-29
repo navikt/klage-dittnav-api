@@ -6,7 +6,7 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.ankeOLD.AnkeOLD
 import no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLDView
 import no.nav.klage.domain.ankevedleggOLD.toAnkeVedleggView
-import no.nav.klage.repository.AnkeRepository
+import no.nav.klage.repository.AnkeRepositoryOLD
 import no.nav.klage.repository.AnkeVedleggRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
@@ -20,7 +20,7 @@ import java.util.*
 @Transactional
 class AnkeOLDVedleggService(
     private val ankeVedleggRepository: AnkeVedleggRepository,
-    private val ankeRepository: AnkeRepository,
+    private val ankeRepositoryOLD: AnkeRepositoryOLD,
     private val image2PDF: Image2PDF,
     private val attachmentValidator: AttachmentValidator,
     private val vedleggMetrics: VedleggMetrics,
@@ -32,28 +32,28 @@ class AnkeOLDVedleggService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addAnkeVedlegg(internalSaksnummer: String, vedlegg: MultipartFile, bruker: Bruker): no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
+    fun addAnkeVedlegg(internalSaksnummer: String, vedlegg: MultipartFile, bruker: Bruker): no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD {
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
         val timeStart = System.currentTimeMillis()
         vedleggMetrics.registerVedleggSize(vedlegg.bytes.size.toDouble())
         vedleggMetrics.incrementVedleggType(vedlegg.contentType ?: "unknown")
-        attachmentValidator.validateAttachment(vedlegg, ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer).attachmentsTotalSize())
+        attachmentValidator.validateAttachment(vedlegg, ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer).attachmentsTotalSize())
         //Convert attachment (if not already pdf)
         val convertedBytes = image2PDF.convert(vedlegg.bytes)
 
         val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, vedlegg.originalFilename!!)
-        return ankeVedleggRepository.storeAnkeVedlegg(ankeRepository.getAnkeByInternalSaksnummer(internalSaksnummer).id!!, vedlegg, vedleggIdInFileStore, internalSaksnummer).also {
+        return ankeVedleggRepository.storeAnkeVedlegg(ankeRepositoryOLD.getAnkeByInternalSaksnummer(internalSaksnummer).id!!, vedlegg, vedleggIdInFileStore, internalSaksnummer).also {
             vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
         }
     }
 
     fun deleteAnkeVedlegg(ankeVedleggId: Int, bruker: Bruker): Boolean {
         val ankeVedlegg = ankeVedleggRepository.getAnkeVedleggById(ankeVedleggId)
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
         val deletedInGCS = fileClient.deleteVedleggFile(ankeVedlegg.ref)
         ankeVedleggRepository.deleteAnkeVedlegg(ankeVedleggId)
         return deletedInGCS
@@ -61,16 +61,16 @@ class AnkeOLDVedleggService(
 
     fun getAnkeVedlegg(ankeVedleggId: Int, bruker: Bruker): ByteArray {
         val ankeVedlegg = ankeVedleggRepository.getAnkeVedleggById(ankeVedleggId)
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke, false)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
         return fileClient.getVedleggFile(ankeVedlegg.ref)
     }
 
-    fun expandAnkeVedleggToAnkeVedleggView(ankeVedlegg: no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg, bruker: Bruker): AnkeVedleggOLDView {
-        val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
+    fun expandAnkeVedleggToAnkeVedleggView(ankeVedlegg: no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD, bruker: Bruker): AnkeVedleggOLDView {
+        val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(ankeVedlegg.ankeInternalSaksnummer)
+        validationService.checkAnkeStatusOLD(existingAnke, false)
+        validationService.validateAnkeAccessOLD(existingAnke, bruker)
         val content = fileClient.getVedleggFile(ankeVedlegg.ref)
         return ankeVedlegg.toAnkeVedleggView(Base64.getEncoder().encodeToString(content))
     }

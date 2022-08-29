@@ -16,7 +16,7 @@ class AnkeVedleggRepository {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun storeAnkeVedlegg(ankeId: Int, vedlegg: MultipartFile, fileStorageId: String, internalSaksnummer: String): no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg {
+    fun storeAnkeVedlegg(ankeId: Int, vedlegg: MultipartFile, fileStorageId: String, internalSaksnummer: String): no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD {
         logger.debug("Storing ankeVedlegg metadata in db. AnkeId: {}", ankeId)
         return AnkeVedleggOLDDAO.new {
             this.tittel = vedlegg.originalFilename.toString()
@@ -30,7 +30,7 @@ class AnkeVedleggRepository {
         }
     }
 
-    fun getAnkeVedleggById(id: Int): no.nav.klage.domain.ankevedleggOLD.AnkeVedlegg {
+    fun getAnkeVedleggById(id: Int): no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD {
         logger.debug("Fetching ankeVedlegg metadata from db. VedleggId: {}", id)
         return AnkeVedleggOLDDAO.findById(id)?.toAnkeVedlegg() ?: throw AnkeNotFoundException("AnkeVedlegg not found")
     }

@@ -32,7 +32,7 @@ class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
 
 object Anker : UUIDTable("anke") {
     var foedselsnummer = text("foedselsnummer")
-    var fritekst = text("fritekst")
+    var fritekst = text("fritekst").nullable()
     var status = text("status")
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = text("tema")
