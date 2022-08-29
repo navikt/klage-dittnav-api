@@ -6,7 +6,6 @@ import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getFormattedLocalDateTime
-import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.parseTitleKey
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,9 +22,8 @@ data class AnkeView(
     val enhetsnummer: String? = null,
     val language: LanguageEnum = LanguageEnum.NB,
     val titleKey: TitleEnum?,
+    val hasVedlegg: Boolean,
 )
-
-fun AnkeView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
 
 fun AnkeView.toAnke(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Anke(
     id = UUID.fromString(id),
@@ -37,6 +35,7 @@ fun AnkeView.toAnke(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DR
     vedtakDate = vedtakDate,
     enhetsnummer = enhetsnummer,
     language = language,
-    titleKey = parseTitleKey(titleKey, tema)
+    titleKey = parseTitleKey(titleKey, tema),
+    hasVedlegg = hasVedlegg,
 )
 

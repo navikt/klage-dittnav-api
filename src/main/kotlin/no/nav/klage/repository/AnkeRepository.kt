@@ -112,6 +112,18 @@ class AnkeRepository {
         return ankeFromDB.toAnke()
     }
 
+    fun updateHasVedlegg(id: UUID, hasVedlegg: Boolean): Anke {
+        logger.debug("Updating anke hasVedlegg in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
+        ankeFromDB.apply {
+            this.hasVedlegg = hasVedlegg
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Anke hasVedlegg successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
     fun deleteAnke(id: UUID) {
         logger.debug("Deleting anke in db. Id: {}", id)
         val ankeFromDB = getAnkeToModify(id)

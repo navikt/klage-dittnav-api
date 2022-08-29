@@ -16,6 +16,6 @@ fun AnkeInput.toAnke(bruker: Bruker): Anke {
         foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
         tema = tema,
         language = LanguageEnum.NB,
-        titleKey = parseTitleKey(titleKey, tema)
+        titleKey = parseTitleKey(titleKey, tema),
     )
 }

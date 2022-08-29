@@ -56,7 +56,8 @@ fun AnkeDAO.toAnke(): Anke {
         vedtakDate = vedtakDate,
         enhetsnummer = enhetsnummer,
         language = getLanguageEnum(this.language),
-        titleKey = TitleEnum.valueOf(titleKey)
+        titleKey = TitleEnum.valueOf(titleKey),
+        hasVedlegg = hasVedlegg,
     )
 }
 

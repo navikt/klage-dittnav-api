@@ -19,6 +19,7 @@ data class Anke(
     val enhetsnummer: String? = null,
     val language: LanguageEnum,
     val titleKey: TitleEnum,
+    val hasVedlegg: Boolean = false,
 )
 
 fun Anke.isAccessibleToUser(usersIdentifikasjonsnummer: String) =

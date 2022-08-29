@@ -8,7 +8,10 @@ import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.anke.*
+import no.nav.klage.domain.anke.Anke
+import no.nav.klage.domain.anke.AnkeInput
+import no.nav.klage.domain.anke.AnkeView
+import no.nav.klage.domain.anke.toAnke
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
@@ -81,14 +84,6 @@ class AnkeService(
         return ankeRepository
             .createAnke(anke.toAnke(bruker, KlageAnkeStatus.DRAFT))
             .toAnkeView(bruker)
-            .also {
-                val temaReport = if (anke.isLonnskompensasjon()) {
-                    LOENNSKOMPENSASJON_GRAFANA_TEMA
-                } else {
-                    anke.tema.toString()
-                }
-                klageAnkeMetrics.incrementAnkerInitialized(temaReport)
-            }
     }
 
     fun createAnke(input: AnkeInput, bruker: Bruker): AnkeView {
@@ -149,6 +144,16 @@ class AnkeService(
             .modifiedByUser
     }
 
+    fun updateHasVedlegg(ankeId: UUID, hasVedlegg: Boolean, bruker: Bruker): LocalDateTime {
+        val existingAnke = ankeRepository.getAnkeById(ankeId)
+        validationService.checkAnkeStatus(existingAnke)
+        validationService.validateAnkeAccess(existingAnke, bruker)
+        return ankeRepository
+            .updateHasVedlegg(ankeId, hasVedlegg)
+            .toAnkeView(bruker, false)
+            .modifiedByUser
+    }
+
     fun deleteAnke(ankeId: UUID, bruker: Bruker) {
         val existingAnke = ankeRepository.getAnkeById(ankeId)
         validationService.checkAnkeStatus(existingAnke)
@@ -180,6 +185,7 @@ class AnkeService(
             userSaksnummer = userSaksnummer,
             language = language,
             titleKey = titleKey,
+            hasVedlegg = hasVedlegg,
         )
     }
 
@@ -197,4 +203,5 @@ class AnkeService(
             hasVedlegg = true, //TODO
         )
     }
+
 }

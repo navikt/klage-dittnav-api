@@ -2,6 +2,7 @@ package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.clients.events.KafkaEventClient
+import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.EditedView
 import no.nav.klage.controller.view.StringInput
@@ -162,6 +163,25 @@ class AnkeController(
         )
     }
 
+    @PutMapping("/{ankeId}/hasvedlegg")
+    fun updateHasVedlegg(
+        @PathVariable ankeId: UUID,
+        @RequestBody input: BooleanInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke hasvedlegg is requested. Id: {}", ankeId)
+        secureLogger.debug(
+            "Update anke hasvedlegg is requested. Id: {}, fnr: {}",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateHasVedlegg(ankeId, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
     @PutMapping("/{ankeId}/usersaksnummer")
     fun updateUserSaksnummer(
         @PathVariable ankeId: UUID,
@@ -201,7 +221,7 @@ class AnkeController(
     }
 
     @PutMapping("/{ankeId}/enhetsnummer")
-    fun updateVedtakDate(
+    fun updateEnhetsnummer(
         @PathVariable ankeId: UUID,
         @RequestBody input: StringInput,
         response: HttpServletResponse
