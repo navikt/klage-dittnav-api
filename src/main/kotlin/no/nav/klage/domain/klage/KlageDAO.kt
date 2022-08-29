@@ -32,6 +32,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var fullmektig by Klager.fullmektig
     var language by Klager.language
     var titleKey by Klager.titleKey
+    var hasVedlegg by Klager.hasVedlegg
 }
 
 object Klager : IntIdTable("klage") {
@@ -49,6 +50,7 @@ object Klager : IntIdTable("klage") {
     var fullmektig = varchar("fullmektig", 11).nullable()
     var language = text("language").nullable()
     var titleKey = text("title_key").nullable()
+    var hasVedlegg = bool("has_vedlegg").default(false)
 }
 
 fun KlageDAO.toKlage(): Klage {
@@ -67,7 +69,8 @@ fun KlageDAO.toKlage(): Klage {
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmektig,
         language = getLanguageEnum(this.language),
-        titleKey = getTitleEnum(this.titleKey, this.ytelse, this.tema)
+        titleKey = getTitleEnum(this.titleKey, this.ytelse, this.tema),
+        hasVedlegg = hasVedlegg,
     )
 }
 
@@ -92,4 +95,5 @@ fun KlageDAO.fromKlage(klage: Klage) {
     fullmektig = klage.fullmektig
     language = klage.language.name
     titleKey = klage.titleKey.name
+    hasVedlegg = klage.hasVedlegg
 }

@@ -186,6 +186,16 @@ class KlageService(
             .modifiedByUser
     }
 
+    fun updateHasVedlegg(klageId: String, hasVedlegg: Boolean, bruker: Bruker): LocalDateTime {
+        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        validationService.checkKlageStatus(existingKlage)
+        validationService.validateKlageAccess(existingKlage, bruker)
+        return klageRepository
+            .updateHasVedlegg(klageId, hasVedlegg)
+            .toKlageView(bruker, false)
+            .modifiedByUser
+    }
+
     fun updateCheckboxesSelected(klageId: String, checkboxesSelected: Set<CheckboxEnum>?, bruker: Bruker): LocalDateTime {
         val existingKlage = klageRepository.getKlageById(klageId.toInt())
         validationService.checkKlageStatus(existingKlage)
@@ -294,7 +304,8 @@ class KlageService(
             fullmaktsgiver = fullmektig?.let { foedselsnummer },
             language = language,
             titleKey = titleKey,
-            ytelse = titleKey.nb
+            ytelse = titleKey.nb,
+            hasVedlegg = hasVedlegg,
         )
     }
 
@@ -388,7 +399,7 @@ class KlageService(
             tema = klage.tema,
             checkboxesSelected = klage.checkboxesSelected,
             language = klage.language,
-            hasVedlegg = klage.vedlegg.isNotEmpty(),
+            hasVedlegg = klage.vedlegg.isNotEmpty() || klage.hasVedlegg,
         )
     }
 }

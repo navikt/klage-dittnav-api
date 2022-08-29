@@ -24,6 +24,7 @@ fun KlageInput.toKlage(bruker: Bruker): Klage {
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
         language = LanguageEnum.NB,
-        titleKey = parseTitleKey(titleKey, tema)
+        titleKey = parseTitleKey(titleKey, tema),
+        hasVedlegg = false,
     )
 }
