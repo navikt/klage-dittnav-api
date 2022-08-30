@@ -11,7 +11,7 @@ import java.time.LocalDate
 data class Klage(
     val id: Int? = null,
     val foedselsnummer: String,
-    val fritekst: String,
+    val fritekst: String? = null,
     var status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,

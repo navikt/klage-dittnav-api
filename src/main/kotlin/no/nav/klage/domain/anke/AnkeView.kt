@@ -4,37 +4,38 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggView
-import no.nav.klage.domain.ankevedlegg.toAnkeVedlegg
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getFormattedLocalDateTime
+import no.nav.klage.util.parseTitleKey
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 data class AnkeView(
-    val fritekst: String,
+    val id: String,
+    val fritekst: String?,
     val tema: Tema,
     val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
-    val vedlegg: List<AnkeVedleggView> = listOf(),
-    val journalpostId: String? = null,
-    val finalizedDate: LocalDate? = null,
     val vedtakDate: LocalDate? = null,
-    val ankeInternalSaksnummer: String,
-    val fullmaktsgiver: String? = null,
-    val language: LanguageEnum = LanguageEnum.NB
+    val userSaksnummer: String? = null,
+    val enhetsnummer: String? = null,
+    val language: LanguageEnum = LanguageEnum.NB,
+    val titleKey: TitleEnum?,
+    val hasVedlegg: Boolean,
 )
 
-
-
 fun AnkeView.toAnke(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Anke(
-    foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
+    id = UUID.fromString(id),
+    foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
     fritekst = fritekst,
     status = status,
     tema = tema,
-    vedlegg = vedlegg.map { it.toAnkeVedlegg() },
-    journalpostId = journalpostId,
+    userSaksnummer = userSaksnummer,
     vedtakDate = vedtakDate,
-    internalSaksnummer = ankeInternalSaksnummer,
-    fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
-    language = language
+    enhetsnummer = enhetsnummer,
+    language = language,
+    titleKey = parseTitleKey(titleKey, tema),
+    hasVedlegg = hasVedlegg,
 )
+

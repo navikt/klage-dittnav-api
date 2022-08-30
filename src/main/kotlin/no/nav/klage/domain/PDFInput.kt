@@ -32,8 +32,6 @@ fun OpenKlageInput.toPDFInput(): PDFInput {
         fornavn = navn.fornavn,
         mellomnavn = navn.mellomnavn,
         etternavn = navn.etternavn,
-        adresse = adresse,
-        telefonnummer = telefonnummer,
         vedtak = vedtakFromDate(vedtakDate) ?: "Ikke angitt",
         begrunnelse = sanitizeText(fritekst),
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),

@@ -2,14 +2,13 @@ package no.nav.klage.service
 
 import no.nav.klage.clients.KabalApiClient
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.availableanke.AvailableAnke
 import no.nav.klage.domain.availableanke.AvailableAnkeView
 import no.nav.klage.domain.availableanke.toAvailableAnkeView
 import no.nav.klage.domain.couldBeShownAsAvailableAnke
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.repository.AnkeRepository
+import no.nav.klage.repository.AnkeRepositoryOLD
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +17,7 @@ import java.util.*
 @Service
 @Transactional
 class AvailableAnkeService(
-    private val ankeRepository: AnkeRepository,
+    private val ankeRepositoryOLD: AnkeRepositoryOLD,
     private val kabalApiClient: KabalApiClient
 
 ) {
@@ -59,7 +58,7 @@ class AvailableAnkeService(
 
     private fun setCurrentStatus(availableAnke: AvailableAnke): AvailableAnke {
         return try {
-            val existingAnke = ankeRepository.getAnkeByInternalSaksnummer(availableAnke.internalSaksnummer)
+            val existingAnke = ankeRepositoryOLD.getAnkeByInternalSaksnummer(availableAnke.internalSaksnummer)
             availableAnke.copy(ankeStatus = existingAnke.status)
         } catch (e: AnkeNotFoundException) {
             availableAnke

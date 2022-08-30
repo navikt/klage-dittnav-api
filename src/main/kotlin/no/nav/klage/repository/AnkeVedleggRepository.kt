@@ -1,8 +1,7 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.anke.AnkeDAO
-import no.nav.klage.domain.ankevedlegg.AnkeVedlegg
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggDAO
+import no.nav.klage.domain.ankeOLD.AnkeOLDDAO
+import no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLDDAO
 import no.nav.klage.domain.exception.AnkeNotFoundException
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Repository
@@ -17,11 +16,11 @@ class AnkeVedleggRepository {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun storeAnkeVedlegg(ankeId: Int, vedlegg: MultipartFile, fileStorageId: String, internalSaksnummer: String): AnkeVedlegg {
+    fun storeAnkeVedlegg(ankeId: Int, vedlegg: MultipartFile, fileStorageId: String, internalSaksnummer: String): no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD {
         logger.debug("Storing ankeVedlegg metadata in db. AnkeId: {}", ankeId)
-        return AnkeVedleggDAO.new {
+        return AnkeVedleggOLDDAO.new {
             this.tittel = vedlegg.originalFilename.toString()
-            this.ankeId = AnkeDAO.findById(ankeId)!!
+            this.ankeId = AnkeOLDDAO.findById(ankeId)!!
             this.ref = fileStorageId
             this.contentType = vedlegg.contentType.toString()
             this.sizeInBytes = vedlegg.bytes.size
@@ -31,13 +30,13 @@ class AnkeVedleggRepository {
         }
     }
 
-    fun getAnkeVedleggById(id: Int): AnkeVedlegg {
+    fun getAnkeVedleggById(id: Int): no.nav.klage.domain.ankevedleggOLD.AnkeVedleggOLD {
         logger.debug("Fetching ankeVedlegg metadata from db. VedleggId: {}", id)
-        return AnkeVedleggDAO.findById(id)?.toAnkeVedlegg() ?: throw AnkeNotFoundException("AnkeVedlegg not found")
+        return AnkeVedleggOLDDAO.findById(id)?.toAnkeVedlegg() ?: throw AnkeNotFoundException("AnkeVedlegg not found")
     }
 
     fun deleteAnkeVedlegg(ankeVedleggId: Int) {
         logger.debug("Deleting ankeVedlegg metadata from db. AnkeVedleggId: {}", ankeVedleggId)
-        AnkeVedleggDAO.findById(ankeVedleggId)?.delete()
+        AnkeVedleggOLDDAO.findById(ankeVedleggId)?.delete()
     }
 }

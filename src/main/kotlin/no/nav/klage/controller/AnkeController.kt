@@ -1,33 +1,34 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.clients.events.KafkaEventClient
+import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.EditedView
 import no.nav.klage.controller.view.StringInput
-import no.nav.klage.domain.Tema
+import no.nav.klage.domain.anke.AnkeInput
 import no.nav.klage.domain.anke.AnkeView
-import no.nav.klage.domain.anke.NewAnkeRequest
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggView
-import no.nav.klage.domain.availableanke.AvailableAnkeView
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.domain.exception.UpdateMismatchException
+import no.nav.klage.domain.jsonToEvent
+import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.toHeartBeatServerSentEvent
+import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.service.AnkeService
-import no.nav.klage.service.AnkeVedleggService
-import no.nav.klage.service.AvailableAnkeService
 import no.nav.klage.service.BrukerService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
+import reactor.core.publisher.Flux
+import java.time.Duration
+import java.util.*
 import javax.servlet.http.HttpServletResponse
 
-@Profile("local", "dev-gcp")
 @RestController
 @Tag(name = "anker")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
@@ -35,260 +36,239 @@ import javax.servlet.http.HttpServletResponse
 class AnkeController(
     private val brukerService: BrukerService,
     private val ankeService: AnkeService,
-    private val ankeVedleggService: AnkeVedleggService,
-    private val availableAnkeService: AvailableAnkeService
+    private val kafkaEventClient: KafkaEventClient,
 ) {
+
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
     }
 
-    @GetMapping("/available")
-    fun getAllAvailableAnkerForUser(
-        @RequestParam tema: Tema? = null
-    ): List<AvailableAnkeView> {
+    @GetMapping
+    fun getAnker(): List<AnkeView> {
         val bruker = brukerService.getBruker()
-        logger.debug("Get all available anke possibilities for user is requested.")
+        logger.debug("Get anker for user is requested.")
         secureLogger.debug(
-            "Get all available anke possibilities for user is requested. Fnr: {}",
+            "Get anker for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-
-        return availableAnkeService.getAllAvailableAnkeViewForUser(bruker, tema)
+        return ankeService.getDraftAnkerByFnr(bruker)
     }
 
+    /**
+     * Get possible draft. Might be null.
+     */
     @GetMapping("/draft")
     fun getDraftAnkeByQuery(
-        @RequestParam ankeInternalSaksnummer: String,
-        @RequestParam fullmaktsgiver: String?
-    ): AnkeView {
+        @RequestParam titleKey: TitleEnum
+    ): AnkeView? {
         val bruker = brukerService.getBruker()
         logger.debug("Get draft anke for user is requested.")
         secureLogger.debug(
-            "Get draft anke for user is requested. Fnr: {}",
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
+            "Get draft anke for user is requested. Fnr: {}, titleKey: {}",
+            bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            titleKey
         )
         return ankeService.getLatestDraftAnkeByParams(
-            bruker,
-            ankeInternalSaksnummer,
-            fullmaktsgiver
+            bruker = bruker,
+            titleKey = titleKey,
         )
     }
 
-    @GetMapping("/{ankeInternalSaksnummer}")
+    @GetMapping("/{ankeId}")
     fun getAnke(
-        @PathVariable ankeInternalSaksnummer: String
+        @PathVariable ankeId: UUID
     ): AnkeView {
         val bruker = brukerService.getBruker()
-        logger.debug("Get anke is requested. Internal ref: {}", ankeInternalSaksnummer)
+        logger.debug("Get anke is requested. Id: {}", ankeId)
         secureLogger.debug(
-            "Get anke is requested. Internal ref: {}, fnr: {}",
-            ankeInternalSaksnummer,
+            "Get anke is requested. Id: {}, fnr: {}",
+            ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getAnke(ankeInternalSaksnummer, bruker)
+        return ankeService.getAnke(ankeId, bruker)
     }
 
-    @GetMapping("/{ankeInternalSaksnummer}/journalpostid")
-    fun getJournalpostId(
-        @PathVariable ankeInternalSaksnummer: String
-    ): String? {
+    @GetMapping("/{ankeId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun getEvents(
+        @PathVariable ankeId: UUID
+    ): Flux<ServerSentEvent<String>> {
         val bruker = brukerService.getBruker()
-        logger.debug("Get journalpost id is requested. Internal ref: {}", ankeInternalSaksnummer)
-        secureLogger.debug(
-            "Get journalpost id is requested. Internal ref: {}, fnr: {}",
-            ankeInternalSaksnummer,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-        return ankeService.getJournalpostId(ankeInternalSaksnummer, bruker)
+        kotlin.runCatching {
+            ankeService.validateAccess(ankeId, bruker)
+        }.onFailure {
+            throw AnkeNotFoundException()
+        }
+        logger.debug("Journalpostid events called for ankeId: $ankeId")
+        //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
+        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(10))
+            .takeWhile { true }
+            .map { tick -> tick.toHeartBeatServerSentEvent() }
+
+        return kafkaEventClient.getEventPublisher()
+            .mapNotNull { event -> jsonToEvent(event.data()) }
+                //TODO
+//            .filter { it.ankeId == ankeId }
+            .mapNotNull { it.toServerSentEvent() }
+            .mergeWith(heartbeatStream)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createAnke(
-        @RequestBody input: NewAnkeRequest,
-        response: HttpServletResponse
+        @RequestBody anke: AnkeView, response: HttpServletResponse
     ): AnkeView {
         val bruker = brukerService.getBruker()
         logger.debug("Create anke is requested.")
         secureLogger.debug(
-            "Create anke is requested for user with fnr {}, internal anke ref {}.",
-            bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            input.ankeInternalSaksnummer
-        )
-        return ankeService.createAnke(input, bruker)
-    }
-
-    @PutMapping("/{ankeInternalSaksnummer}")
-    fun updateAnke(
-        @PathVariable ankeInternalSaksnummer: String,
-        @RequestBody anke: AnkeView,
-        response: HttpServletResponse
-    ) {
-        val bruker = brukerService.getBruker()
-        logger.debug("Update anke is requested. Internal ref: {}", ankeInternalSaksnummer)
-        secureLogger.debug(
-            "Update anke is requested. Internal ref: {}, fnr: {}",
-            ankeInternalSaksnummer,
+            "Create anke is requested for user with fnr {}.",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (anke.ankeInternalSaksnummer != ankeInternalSaksnummer) {
-            throw UpdateMismatchException("Internal ref in anke does not match resource id")
-        }
-        ankeService.updateAnke(anke, bruker)
+        return ankeService.createAnke(anke, bruker)
     }
 
-    @PutMapping("/{ankeInternalSaksnummer}/fritekst")
+    @PutMapping
+    fun createOrGetAnke(
+        @RequestBody ankeInput: AnkeInput,
+        response: HttpServletResponse
+    ): AnkeView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Create or update anke for user is requested.")
+        secureLogger.debug(
+            "Create or update anke for user is requested. Fnr: {}, tema: {}",
+            bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            ankeInput.tema
+        )
+
+        return ankeService.getDraftOrCreateAnke(ankeInput, bruker)
+    }
+
+    @PutMapping("/{ankeId}/fritekst")
     fun updateFritekst(
-        @PathVariable ankeInternalSaksnummer: String,
+        @PathVariable ankeId: UUID,
         @RequestBody input: StringInput,
         response: HttpServletResponse
     ): EditedView {
         val bruker = brukerService.getBruker()
-        logger.debug("Update anke fritekst is requested. Id: {}", ankeInternalSaksnummer)
+        logger.debug("Update anke fritekst is requested. Id: {}", ankeId)
         secureLogger.debug(
             "Update anke fritekst is requested. Id: {}, fnr: {}",
-            ankeInternalSaksnummer,
+            ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateFritekst(ankeInternalSaksnummer, input.value, bruker)
+        val modifiedByUser = ankeService.updateFritekst(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
     }
 
-    @PutMapping("/{ankeInternalSaksnummer}/vedtakdate")
+    @PutMapping("/{ankeId}/hasvedlegg")
+    fun updateHasVedlegg(
+        @PathVariable ankeId: UUID,
+        @RequestBody input: BooleanInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke hasvedlegg is requested. Id: {}", ankeId)
+        secureLogger.debug(
+            "Update anke hasvedlegg is requested. Id: {}, fnr: {}",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateHasVedlegg(ankeId, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
+    @PutMapping("/{ankeId}/usersaksnummer")
+    fun updateUserSaksnummer(
+        @PathVariable ankeId: UUID,
+        @RequestBody input: StringInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke userSaksnummer is requested. Id: {}", ankeId)
+        secureLogger.debug(
+            "Update anke userSaksnummer is requested. Id: {}, fnr: {}",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateUserSaksnummer(ankeId, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
+    @PutMapping("/{ankeId}/vedtakdate")
     fun updateVedtakDate(
-        @PathVariable ankeInternalSaksnummer: String,
+        @PathVariable ankeId: UUID,
         @RequestBody input: DateInput,
         response: HttpServletResponse
     ): EditedView {
         val bruker = brukerService.getBruker()
-        logger.debug("Update anke vedtakDate is requested. Id: {}", ankeInternalSaksnummer)
+        logger.debug("Update anke vedtakDate is requested. Id: {}", ankeId)
         secureLogger.debug(
             "Update anke vedtakDate is requested. Id: {}, fnr: {}",
-            ankeInternalSaksnummer,
+            ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateVedtakDate(ankeInternalSaksnummer, input.value, bruker)
+        val modifiedByUser = ankeService.updateVedtakDate(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
     }
 
-    @DeleteMapping("/{ankeInternalSaksnummer}")
-    fun deleteAnke(@PathVariable ankeInternalSaksnummer: String) {
+    @PutMapping("/{ankeId}/enhetsnummer")
+    fun updateEnhetsnummer(
+        @PathVariable ankeId: UUID,
+        @RequestBody input: StringInput,
+        response: HttpServletResponse
+    ): EditedView {
         val bruker = brukerService.getBruker()
-        logger.debug("Delete anke is requested. Internal ref: {}", ankeInternalSaksnummer)
+        logger.debug("Update anke enhetsnummer is requested. Id: {}", ankeId)
         secureLogger.debug(
-            "Delete anke is requested. Internal ref: {}, fnr: {}",
-            ankeInternalSaksnummer,
+            "Update anke enhetsnummer is requested. Id: {}, fnr: {}",
+            ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        ankeService.deleteAnke(ankeInternalSaksnummer, bruker)
+        val modifiedByUser = ankeService.updateEnhetsnummer(ankeId, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
     }
 
-    @PostMapping("/{ankeInternalSaksnummer}/finalize")
-    @ResponseStatus(HttpStatus.OK)
-    fun finalizeAnke(
-        @PathVariable ankeInternalSaksnummer: String
-    ): HttpStatus {
-        return HttpStatus.OK
-//        val bruker = brukerService.getBruker()
-//        logger.debug("Finalize klage is requested. Id: {}", ankeId)
-//        secureLogger.debug(
-//            "Finalize klage is requested. Id: {}, fnr: {}",
-//            ankeId,
-//            bruker.folkeregisteridentifikator.identifikasjonsnummer
-//        )
-//        val finalizedInstant = klageService.finalizeKlage(ankeId, bruker)
-//        val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
-//        return mapOf(
-//            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
-//            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
-//        )
-    }
-
-    @PostMapping(value = ["/{ankeInternalSaksnummer}/vedlegg"], consumes = ["multipart/form-data"])
-    fun addAnkeVedleggToAnke(
-        @PathVariable ankeInternalSaksnummer: String,
-        @RequestParam vedlegg: MultipartFile
-    ): AnkeVedleggView {
+    @DeleteMapping("/{ankeId}")
+    fun deleteAnke(@PathVariable ankeId: UUID) {
         val bruker = brukerService.getBruker()
-        logger.debug("Add vedlegg to anke is requested. Internal ref: {}", ankeInternalSaksnummer)
+        logger.debug("Delete anke is requested. Id: {}", ankeId)
         secureLogger.debug(
-            "Add vedlegg to anke is requested. Internal ref: {}, fnr: {} ",
-            ankeInternalSaksnummer,
+            "Delete anke is requested. Id: {}, fnr: {}",
+            ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryAnkeVedlegg = ankeVedleggService.addAnkeVedlegg(ankeInternalSaksnummer, vedlegg, bruker)
-        return ankeVedleggService.expandAnkeVedleggToAnkeVedleggView(temporaryAnkeVedlegg, bruker)
-    }
-
-    @DeleteMapping("/{ankeInternalSaksnummer}/vedlegg/{vedleggId}")
-    fun deleteAnkeVedlegg(
-        @PathVariable ankeInternalSaksnummer: String,
-        @PathVariable vedleggId: Int
-    ) {
-        val bruker = brukerService.getBruker()
-        logger.debug("Delete vedlegg from anke is requested. Internal ref: {}, VedleggId: {}", ankeInternalSaksnummer, vedleggId)
-        secureLogger.debug(
-            "Delete vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
-            ankeInternalSaksnummer,
-            vedleggId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-        if (!ankeVedleggService.deleteAnkeVedlegg(vedleggId, bruker)) {
-            throw AnkeNotFoundException("Attachment not found.")
-        }
+        ankeService.deleteAnke(ankeId, bruker)
     }
 
     @ResponseBody
-    @GetMapping("/{ankeInternalSaksnummer}/vedlegg/{vedleggId}")
-    fun getAnkeVedleggFromAnke(
-        @PathVariable ankeInternalSaksnummer: String,
-        @PathVariable vedleggId: Int
+    @GetMapping("/{ankeId}/pdf/innsending")
+    fun getAnkePdfForPrint(
+        @PathVariable ankeId: UUID
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
-        logger.debug("Get vedlegg to anke is requested. Internal ref: {} - VedleggId: {}", ankeInternalSaksnummer, vedleggId)
+        logger.debug("Get anke pdf for print is requested. AnkeId: {}", ankeId)
         secureLogger.debug(
-            "Vedlegg from anke is requested. Internal ref: {}, vedleggId: {}, fnr: {} ",
-            ankeInternalSaksnummer,
-            vedleggId,
+            "Get anke pdf for print is requested. AnkeId: {}, fnr: {} ",
+            ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = ankeVedleggService.getAnkeVedlegg(vedleggId, bruker)
+        val content = ankeService.createAnkePdfWithFoersteside(ankeId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
-    }
-
-    @ResponseBody
-    @GetMapping("/{ankeInternalSaksnummer}/pdf")
-    fun getAnkePdf(
-        @PathVariable ankeInternalSaksnummer: String
-    ): ResponseEntity<ByteArray> {
-        val bruker = brukerService.getBruker()
-        logger.debug("Get anke pdf is requested. Internal ref: {}", ankeInternalSaksnummer)
-        secureLogger.debug(
-            "Get anke pdf is requested. Internal ref: {}, fnr: {} ",
-            ankeInternalSaksnummer,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-
-        val content = ankeService.getAnkePdf(ankeInternalSaksnummer, bruker)
-
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "klage.pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "anke.pdf")
         return ResponseEntity(
             content,
             responseHeaders,

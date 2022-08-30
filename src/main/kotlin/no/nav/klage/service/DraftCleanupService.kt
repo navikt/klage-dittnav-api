@@ -3,7 +3,6 @@ package no.nav.klage.service
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
 import no.nav.klage.repository.AnkeRepository
-import no.nav.klage.repository.AnkeVedleggRepository
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.util.causeClass
@@ -23,7 +22,6 @@ class DraftCleanupService(
     private val klageRepository: KlageRepository,
     private val ankeRepository: AnkeRepository,
     private val vedleggRepository: VedleggRepository,
-    private val ankeVedleggRepository: AnkeVedleggRepository,
     private val fileClient: FileClient
 ) {
 
@@ -40,18 +38,14 @@ class DraftCleanupService(
         logger.debug("Looking for expired draft klager")
         slackClient.postMessage("Ser etter utgåtte draft-klager")
 
-        var vedleggFilesSuccessfullyDeleted = 0
-        var vedleggSuccessfullyDeleted = 0
+        var klageVedleggFilesSuccessfullyDeleted = 0
+        var klageVedleggSuccessfullyDeleted = 0
         var klagerSuccessfullyDeleted = 0
-        var expiredKlager: Int
 
         var ankerSuccessfullyDeleted = 0
-        var ankeVedleggSuccessfullyDeleted = 0
-        var ankeVedleggFilesSuccessfullyDeleted = 0
-        var expiredAnker: Int
 
         val oldKlageDrafts = klageRepository.getExpiredDraftKlager()
-        expiredKlager = oldKlageDrafts.count()
+        val expiredKlager = oldKlageDrafts.count()
         logger.debug("Found $expiredKlager expired draft klager")
         slackClient.postMessage("Fant $expiredKlager utgåtte draft-klager")
 
@@ -62,10 +56,10 @@ class DraftCleanupService(
                     logger.debug("Cleaning up vedlegg ${it.id}")
                     kotlin.runCatching {
                         if (fileClient.deleteVedleggFile(vedlegg.ref)) {
-                            vedleggFilesSuccessfullyDeleted++
+                            klageVedleggFilesSuccessfullyDeleted++
                         }
                         vedlegg.id?.let { vedleggId -> vedleggRepository.deleteVedlegg(vedleggId) }
-                        vedleggSuccessfullyDeleted++
+                        klageVedleggSuccessfullyDeleted++
                     }.onFailure { failure ->
                         logger.error("Could not remove attachment ${vedlegg.id}. See secure logs for details.")
                         secureLogger.error("Failed to remove attachment", failure)
@@ -88,31 +82,14 @@ class DraftCleanupService(
         }
 
         val oldAnkeDrafts = ankeRepository.getExpiredDraftAnker()
-        expiredAnker = oldAnkeDrafts.count()
+        val expiredAnker = oldAnkeDrafts.count()
         logger.debug("Found $expiredAnker expired draft nker")
         slackClient.postMessage("Fant $expiredAnker utgåtte draft-anker")
 
         oldAnkeDrafts.forEach {
             logger.debug("Cleaning up expired draft anke ${it.id}")
             runCatching {
-                it.vedlegg.forEach { vedlegg ->
-                    logger.debug("Cleaning up ankevedlegg ${it.id}")
-                    kotlin.runCatching {
-                        if (fileClient.deleteVedleggFile(vedlegg.ref)) {
-                            ankeVedleggFilesSuccessfullyDeleted++
-                        }
-                        vedlegg.id?.let { vedleggId -> ankeVedleggRepository.deleteAnkeVedlegg(vedleggId) }
-                        ankeVedleggSuccessfullyDeleted++
-                    }.onFailure { failure ->
-                        logger.error("Could not remove attachment ${vedlegg.id}. See secure logs for details.")
-                        secureLogger.error("Failed to remove attachment", failure)
-                        slackClient.postMessage(
-                            "Kunne ikke fjerne vedlegg! " +
-                                    "(${causeClass(rootCause(failure))})", Severity.ERROR
-                        )
-                    }
-                }
-                ankeRepository.deleteAnke(it.internalSaksnummer)
+                ankeRepository.deleteAnke(it.id!!)
                 ankerSuccessfullyDeleted++
             }.onFailure { failure ->
                 logger.error("Could not clean up draft. See secure logs for details.")
@@ -125,13 +102,13 @@ class DraftCleanupService(
         }
 
         if (expiredAnker > 0) {
-            logger.debug("Removed $ankeVedleggFilesSuccessfullyDeleted files in file storage, $ankeVedleggSuccessfullyDeleted ankevedlegg in db and $ankerSuccessfullyDeleted draft anker in db")
-            slackClient.postMessage("Fjernet $ankeVedleggFilesSuccessfullyDeleted filer i GCP, $ankeVedleggSuccessfullyDeleted ankevedlegg i database og $ankerSuccessfullyDeleted draft-anker i database")
+            logger.debug("Removed $ankerSuccessfullyDeleted draft anker in db")
+            slackClient.postMessage("Fjernet $ankerSuccessfullyDeleted draft-anker i database")
         }
 
         if (expiredKlager > 0) {
-            logger.debug("Removed $vedleggFilesSuccessfullyDeleted files in file storage, $vedleggSuccessfullyDeleted vedlegg in db and $klagerSuccessfullyDeleted draft klager in db")
-            slackClient.postMessage("Fjernet $vedleggFilesSuccessfullyDeleted filer i GCP, $vedleggSuccessfullyDeleted vedlegg i database og $klagerSuccessfullyDeleted draft-klager i database")
+            logger.debug("Removed $klageVedleggFilesSuccessfullyDeleted files in file storage, $klageVedleggSuccessfullyDeleted vedlegg in db and $klagerSuccessfullyDeleted draft klager in db")
+            slackClient.postMessage("Fjernet $klageVedleggFilesSuccessfullyDeleted filer i GCP, $klageVedleggSuccessfullyDeleted vedlegg i database og $klagerSuccessfullyDeleted draft-klager i database")
         }
     }
 }

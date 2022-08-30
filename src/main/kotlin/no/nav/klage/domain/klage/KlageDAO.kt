@@ -37,7 +37,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
 
 object Klager : IntIdTable("klage") {
     var foedselsnummer = varchar("foedselsnummer", 11)
-    var fritekst = text("fritekst")
+    var fritekst = text("fritekst").nullable()
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)

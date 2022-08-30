@@ -5,6 +5,10 @@ import no.nav.klage.domain.anke.Anke
 import no.nav.klage.domain.anke.isAccessibleToUser
 import no.nav.klage.domain.anke.isDeleted
 import no.nav.klage.domain.anke.isFinalized
+import no.nav.klage.domain.ankeOLD.AnkeOLD
+import no.nav.klage.domain.ankeOLD.isAccessibleToUser
+import no.nav.klage.domain.ankeOLD.isDeleted
+import no.nav.klage.domain.ankeOLD.isFinalized
 import no.nav.klage.domain.exception.*
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.isAccessibleToUser
@@ -30,16 +34,22 @@ class ValidationService(
         }
     }
 
-    fun validateAnkeAccess(anke: Anke, bruker: Bruker) {
-        if (anke.fullmektig != null && anke.fullmektig == bruker.folkeregisteridentifikator.identifikasjonsnummer) {
-            val fullmaktsGiver = brukerService.getFullmaktsgiver(anke.tema, anke.foedselsnummer)
-            if (!anke.isAccessibleToUser(fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer)) {
+    fun validateAnkeAccessOLD(ankeOLD: AnkeOLD, bruker: Bruker) {
+        if (ankeOLD.fullmektig != null && ankeOLD.fullmektig == bruker.folkeregisteridentifikator.identifikasjonsnummer) {
+            val fullmaktsGiver = brukerService.getFullmaktsgiver(ankeOLD.tema, ankeOLD.foedselsnummer)
+            if (!ankeOLD.isAccessibleToUser(fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer)) {
                 throw AnkeNotFoundException()
             }
         } else {
-            if (!anke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            if (!ankeOLD.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
                 throw AnkeNotFoundException()
             }
+        }
+    }
+
+    fun validateAnkeAccess(anke: Anke, bruker: Bruker) {
+        if (!anke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw AnkeNotFoundException()
         }
     }
 
@@ -53,6 +63,16 @@ class ValidationService(
         }
     }
 
+    fun checkAnkeStatusOLD(ankeOLD: AnkeOLD, includeFinalized: Boolean = true) {
+        if (ankeOLD.isDeleted()) {
+            throw AnkeIsDeletedException()
+        }
+
+        if (includeFinalized && ankeOLD.isFinalized()) {
+            throw AnkeIsFinalizedException()
+        }
+    }
+
     fun checkAnkeStatus(anke: Anke, includeFinalized: Boolean = true) {
         if (anke.isDeleted()) {
             throw AnkeIsDeletedException()
@@ -61,5 +81,70 @@ class ValidationService(
         if (includeFinalized && anke.isFinalized()) {
             throw AnkeIsFinalizedException()
         }
+    }
+
+    fun validateKlage(klage: Klage) {
+        val validationErrors = mutableListOf<InvalidProperty>()
+
+        if (klage.fritekst == null) {
+            validationErrors += createMustBeFilledValidationError("fritekst")
+        }
+
+        val sectionList = mutableListOf<ValidationSection>()
+
+        if (validationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "klagedata",
+                    properties = validationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = sectionList
+            )
+        }
+
+    }
+
+    fun validateAnke(anke: Anke) {
+        val validationErrors = mutableListOf<InvalidProperty>()
+
+        if (anke.enhetsnummer == null) {
+            validationErrors += createMustBeFilledValidationError("enhetsnummer")
+        }
+
+        if (anke.fritekst == null) {
+            validationErrors += createMustBeFilledValidationError("fritekst")
+        }
+
+        val sectionList = mutableListOf<ValidationSection>()
+
+        if (validationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "ankedata",
+                    properties = validationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = sectionList
+            )
+        }
+
+    }
+
+    private fun createMustBeFilledValidationError(variableName: String): InvalidProperty {
+        return InvalidProperty(
+            field = variableName,
+            reason = "Må fylles ut."
+        )
     }
 }

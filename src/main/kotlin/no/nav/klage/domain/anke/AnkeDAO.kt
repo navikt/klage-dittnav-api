@@ -1,63 +1,63 @@
-package no.nav.klage.domain.anke
+package no.nav.anke.domain.anke
 
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggDAO
-import no.nav.klage.domain.ankevedlegg.AnkeVedleggene
+import no.nav.klage.domain.anke.Anke
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLanguageEnum
-import no.nav.klage.util.getTitleEnum
 import no.nav.klage.util.toStatus
 import no.nav.klage.util.toTema
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.UUIDEntity
+import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.`java-time`.date
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
 import java.util.*
 
-class AnkeDAO(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<AnkeDAO>(Anker)
+class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<AnkeDAO>(Anker)
 
     var foedselsnummer by Anker.foedselsnummer
     var fritekst by Anker.fritekst
     var status by Anker.status
     var modifiedByUser by Anker.modifiedByUser
     var tema by Anker.tema
-    val vedlegg by AnkeVedleggDAO referrersOn AnkeVedleggene.ankeId
-    var journalpostId by Anker.journalpostId
+    var userSaksnummer by Anker.userSaksnummer
     var vedtakDate by Anker.vedtakDate
-    var internalSaksnummer by Anker.internalSaksnummer
-    var fullmektig by Anker.fullmektig
+    var enhetsnummer by Anker.enhetsnummer
     var language by Anker.language
+    var titleKey by Anker.titleKey
+    var hasVedlegg by Anker.hasVedlegg
 }
 
-object Anker : IntIdTable("anke") {
-    var foedselsnummer = varchar("foedselsnummer", 11)
-    var fritekst = text("fritekst")
-    var status = varchar("status", 15)
+object Anker : UUIDTable("anke") {
+    var foedselsnummer = text("foedselsnummer")
+    var fritekst = text("fritekst").nullable()
+    var status = text("status")
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
-    var tema = varchar("tema", 3)
-    var journalpostId = varchar("journalpost_id", 50).nullable()
+    var tema = text("tema")
+    var userSaksnummer = text("user_saksnummer").nullable()
     var vedtakDate = date("vedtak_date").nullable()
-    var internalSaksnummer = uuid("internal_saksnummer")
-    var fullmektig = varchar("fullmektig", 11).nullable()
+    var enhetsnummer = text("enhetsnummer").nullable()
     var language = text("language").nullable()
+    var titleKey = text("title_key")
+    var hasVedlegg = bool("has_vedlegg").default(false)
 }
 
 fun AnkeDAO.toAnke(): Anke {
     return Anke(
-        id = id.toString().toInt(),
+        id = id.value,
         foedselsnummer = foedselsnummer,
         fritekst = fritekst,
         status = status.toStatus(),
         modifiedByUser = modifiedByUser,
         tema = tema.toTema(),
-        vedlegg = vedlegg.map { it.toAnkeVedlegg() },
-        journalpostId = journalpostId,
+        userSaksnummer = userSaksnummer,
         vedtakDate = vedtakDate,
-        internalSaksnummer = internalSaksnummer.toString(),
-        fullmektig = fullmektig,
-        language = getLanguageEnum(this.language)
+        enhetsnummer = enhetsnummer,
+        language = getLanguageEnum(this.language),
+        titleKey = TitleEnum.valueOf(titleKey),
+        hasVedlegg = hasVedlegg,
     )
 }
 
@@ -66,10 +66,11 @@ fun AnkeDAO.fromAnke(anke: Anke) {
     fritekst = anke.fritekst
     status = anke.status.name
     modifiedByUser = Instant.now()
-    anke.tema.let { tema = anke.tema.name }
-    anke.journalpostId?.let { journalpostId = it }
-    anke.vedtakDate?.let {vedtakDate = it }
-    internalSaksnummer = UUID.fromString(anke.internalSaksnummer)
-    fullmektig = anke.fullmektig
+    tema = anke.tema.name
+    userSaksnummer = anke.userSaksnummer
+    vedtakDate = anke.vedtakDate
+    enhetsnummer = anke.enhetsnummer
     language = anke.language.name
+    titleKey = anke.titleKey.name
+
 }

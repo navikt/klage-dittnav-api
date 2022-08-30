@@ -19,7 +19,6 @@ fun KlageInput.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonns
 fun KlageInput.toKlage(bruker: Bruker): Klage {
     return Klage(
         foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
-        fritekst = "",
         tema = tema,
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },

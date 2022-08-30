@@ -147,15 +147,6 @@ class KlageService(
         )
     }
 
-    fun updateKlage(klage: KlageView, bruker: Bruker) {
-        val existingKlage = klageRepository.getKlageById(klage.id.toInt())
-        validationService.checkKlageStatus(existingKlage)
-        validationService.validateKlageAccess(existingKlage, bruker)
-        klageRepository
-            .updateKlage(klage.toKlage(bruker))
-            .toKlageView(bruker, false)
-    }
-
     fun updateFritekst(klageId: String, fritekst: String, bruker: Bruker): LocalDateTime {
         val existingKlage = klageRepository.getKlageById(klageId.toInt())
         validationService.checkKlageStatus(existingKlage)
@@ -223,6 +214,7 @@ class KlageService(
         }
 
         validationService.validateKlageAccess(existingKlage, bruker)
+        validationService.validateKlage(existingKlage)
         existingKlage.status = KlageAnkeStatus.DONE
         val updatedKlage = klageRepository.updateKlage(existingKlage)
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, updatedKlage))
@@ -251,6 +243,7 @@ class KlageService(
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage, false)
         validationService.validateKlageAccess(existingKlage, bruker)
+        validationService.validateKlage(existingKlage)
 
         return klageDittnavPdfgenService.createKlagePdfWithFoersteside(
             createPdfWithFoerstesideInput(existingKlage, bruker)
@@ -281,7 +274,8 @@ class KlageService(
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
             id!!.toString(),
-            fritekst,
+            //TODO: Følg opp med FE, er det forskjell på klage og anke?
+            fritekst ?: "",
             tema,
             status,
             modifiedDateTime,
@@ -349,7 +343,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = sanitizeText(klage.fritekst),
+                begrunnelse = sanitizeText(klage.fritekst!!),
                 identifikasjonstype = fullmaktsGiver.folkeregisteridentifikator.type,
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
@@ -371,7 +365,7 @@ class KlageService(
                 telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
-                begrunnelse = sanitizeText(klage.fritekst),
+                begrunnelse = sanitizeText(klage.fritekst!!),
                 identifikasjonstype = bruker.folkeregisteridentifikator.type,
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
@@ -390,9 +384,7 @@ class KlageService(
         return OpenKlageInput(
             foedselsnummer = klage.foedselsnummer,
             navn = bruker.navn,
-            adresse = "",
-            telefonnummer = null,
-            fritekst = klage.fritekst,
+            fritekst = klage.fritekst!!,
             userSaksnummer = klage.userSaksnummer,
             vedtakDate = klage.vedtakDate,
             titleKey = klage.titleKey,
