@@ -274,7 +274,8 @@ class KlageService(
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
             id!!.toString(),
-            fritekst,
+            //TODO: Følg opp med FE, er det forskjell på klage og anke?
+            fritekst ?: "",
             tema,
             status,
             modifiedDateTime,
