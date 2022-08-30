@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.21.1"
-val mockkVersion = "1.12.5"
+val mockkVersion = "1.12.7"
 val h2Version = "1.4.200"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
@@ -64,7 +64,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
 
-    implementation("com.github.navikt:kabal-kodeverk:2022.08.25-21.01.38a9cab8294d")
+    implementation("com.github.navikt:kabal-kodeverk:2022.08.30-15.37.a3616d20dbd6")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
