@@ -83,6 +83,33 @@ class ValidationService(
         }
     }
 
+    fun validateKlage(klage: Klage) {
+        val validationErrors = mutableListOf<InvalidProperty>()
+
+        if (klage.fritekst == null) {
+            validationErrors += createMustBeFilledValidationError("fritekst")
+        }
+
+        val sectionList = mutableListOf<ValidationSection>()
+
+        if (validationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "klagedata",
+                    properties = validationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = sectionList
+            )
+        }
+
+    }
+
     fun validateAnke(anke: Anke) {
         val validationErrors = mutableListOf<InvalidProperty>()
 
