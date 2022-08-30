@@ -78,8 +78,8 @@ enum class TitleEnum(val nb: String, val en: String) {
     ARBEID("Arbeid", "Work"),
     ARBEIDSAVKLARINGSPENGER("Arbeidsavklaringspenger (AAP)", "Work assessment allowance (AAP)"),
     AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual early retirement pension (AFP)"),
-    AVTALEFESTET_PENSJON_SPK("Avtalefestet pensjon (AFP) fra Statens pensjonskasse", "Contractual early retirement pension (AFP) from the Norwegian Public Service Pension Fund (Statens pensjonskasse)"),
-    AVTALEFESTET_PENSJON_PRIVAT("Avtalefestet pensjon (AFP) i privat sektor", "Contractual early retirement pension (AFP) from private sector"),
+    AVTALEFESTET_PENSJON_SPK("Avtalefestet pensjon (AFP) fra Statens pensjonskasse", "Contractual early retirement pension (AFP) in the public sector"),
+    AVTALEFESTET_PENSJON_PRIVAT("Avtalefestet pensjon (AFP) i privat sektor", "Contractual early retirement pension (AFP) in the private sector"),
     BARNEBIDRAG_OG_BIDRAGSFORSKUDD(
         "Barnebidrag og bidragsforskudd",
         "Child support (Barnebidrag) and advance payments of child support (Bidragsforskudd)"
