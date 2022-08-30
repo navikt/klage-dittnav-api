@@ -13,7 +13,7 @@ val tikaVersion = "2.4.1"
 val springSleuthVersion = "3.0.4"
 val resilience4jVersion = "1.7.1"
 val problemSpringWebStartVersion = "0.26.2"
-val shedlockVersion = "4.39.0"
+val shedlockVersion = "4.41.0"
 val springDocVersion = "1.6.11"
 
 val githubUser: String by project
