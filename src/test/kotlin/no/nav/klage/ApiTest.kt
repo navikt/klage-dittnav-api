@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.zalando.problem.Problem
-import org.zalando.problem.ProblemModule
+import org.zalando.problem.jackson.ProblemModule
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
