@@ -12,7 +12,7 @@ val pdfboxVersion = "2.0.26"
 val tikaVersion = "2.4.1"
 val springSleuthVersion = "3.1.3"
 val resilience4jVersion = "1.7.1"
-val problemSpringWebStartVersion = "0.26.2"
+val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "4.41.0"
 val springDocVersion = "1.6.11"
 
