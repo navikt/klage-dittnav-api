@@ -4,7 +4,6 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.TitleEnum
-import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.parseTitleKey
 
 data class KlageInput (
@@ -13,8 +12,6 @@ data class KlageInput (
     val fullmaktsgiver: String?,
     val titleKey: TitleEnum?,
 )
-
-fun KlageInput.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
 
 fun KlageInput.toKlage(bruker: Bruker): Klage {
     return Klage(

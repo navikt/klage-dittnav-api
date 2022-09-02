@@ -1,15 +1,11 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.vedlegg.VedleggView
-import no.nav.klage.domain.vedlegg.toVedlegg
 import no.nav.klage.util.getFormattedLocalDateTime
-import no.nav.klage.util.klageAnkeIsLonnskompensasjon
-import no.nav.klage.util.parseTitleKey
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -32,24 +28,3 @@ data class KlageView(
     val ytelse: String?,
     val hasVedlegg: Boolean,
 )
-
-fun KlageView.isLonnskompensasjon(): Boolean = titleKey?.let { klageAnkeIsLonnskompensasjon(tema, it) } ?: false
-
-fun KlageView.toKlage(bruker: Bruker, status: KlageAnkeStatus = KlageAnkeStatus.DRAFT) = Klage(
-    id = id.toInt(),
-    foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
-    fritekst = fritekst,
-    status = status,
-    tema = tema,
-    userSaksnummer = userSaksnummer,
-    vedlegg = vedlegg.map { it.toVedlegg() },
-    journalpostId = journalpostId,
-    vedtakDate = vedtakDate,
-    checkboxesSelected = checkboxesSelected,
-    internalSaksnummer = internalSaksnummer,
-    fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
-    language = language,
-    titleKey = parseTitleKey(titleKey, tema),
-    hasVedlegg = hasVedlegg,
-)
-

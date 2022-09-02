@@ -6,6 +6,7 @@ import no.nav.klage.controller.view.*
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.jsonToEvent
+import no.nav.klage.domain.klage.KlageFullInput
 import no.nav.klage.domain.klage.KlageInput
 import no.nav.klage.domain.klage.KlageView
 import no.nav.klage.domain.titles.TitleEnum
@@ -140,7 +141,7 @@ class KlageController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlage(
-        @RequestBody klage: KlageView, response: HttpServletResponse
+        @RequestBody klage: KlageFullInput, response: HttpServletResponse
     ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Create klage is requested.")

@@ -96,37 +96,33 @@ class KlageService(
         return klage.journalpostId
     }
 
-    fun createKlage(klage: KlageView, bruker: Bruker): KlageView {
-        if (klage.fullmaktsgiver != null) {
-            brukerService.verifyFullmakt(klage.tema, klage.fullmaktsgiver)
+    fun createKlage(input: KlageFullInput, bruker: Bruker): KlageView {
+        val klage = input.toKlage(bruker)
+        return createKlage(klage, bruker)
+    }
+
+    fun createKlage(input: KlageInput, bruker: Bruker): KlageView {
+        val klage = input.toKlage(bruker)
+        return createKlage(klage, bruker)
+    }
+
+    private fun createKlage(
+        klage: Klage,
+        bruker: Bruker
+    ): KlageView {
+        if (klage.fullmektig != null) {
+            TODO()
+    //            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
         }
 
         return klageRepository
-            .createKlage(klage.toKlage(bruker, KlageAnkeStatus.DRAFT))
+            .createKlage(klage)
             .toKlageView(bruker)
             .also {
                 val temaReport = if (klage.isLonnskompensasjon()) {
                     LOENNSKOMPENSASJON_GRAFANA_TEMA
                 } else {
                     klage.tema.toString()
-                }
-                klageAnkeMetrics.incrementKlagerInitialized(temaReport)
-            }
-    }
-
-    fun createKlage(input: KlageInput, bruker: Bruker): KlageView {
-        if (input.fullmaktsgiver != null) {
-            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
-        }
-
-        return klageRepository
-            .createKlage(input.toKlage(bruker))
-            .toKlageView(bruker)
-            .also {
-                val temaReport = if (input.isLonnskompensasjon()) {
-                    LOENNSKOMPENSASJON_GRAFANA_TEMA
-                } else {
-                    input.tema.toString()
                 }
                 klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
