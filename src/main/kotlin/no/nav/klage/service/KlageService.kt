@@ -62,7 +62,7 @@ class KlageService(
         return klager.map { it.toKlageView(bruker) }
     }
 
-    fun getLatestDraftKlageByParams(
+    private fun getLatestDraftKlageByParams(
         bruker: Bruker,
         tema: Tema,
         internalSaksnummer: String?,

@@ -3,13 +3,11 @@ package no.nav.klage.controller
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
-import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageFullInput
 import no.nav.klage.domain.klage.KlageInput
 import no.nav.klage.domain.klage.KlageView
-import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.domain.vedlegg.VedleggView
@@ -58,33 +56,6 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         return klageService.getDraftKlagerByFnr(bruker)
-    }
-
-    /**
-     * Get possible draft. Might be null.
-     */
-    @GetMapping("/draft")
-    fun getDraftKlageByQuery(
-        @RequestParam tema: Tema,
-        @RequestParam ytelse: String?,
-        @RequestParam internalSaksnummer: String?,
-        @RequestParam fullmaktsgiver: String?,
-        @RequestParam titleKey: TitleEnum?
-    ): KlageView? {
-        val bruker = brukerService.getBruker()
-        logger.debug("Get draft klage for user is requested.")
-        secureLogger.debug(
-            "Get draft klage for user is requested. Fnr: {}, tema: {}",
-            bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            tema
-        )
-        return klageService.getLatestDraftKlageByParams(
-            bruker,
-            tema,
-            internalSaksnummer,
-            fullmaktsgiver,
-            titleKey,
-        )
     }
 
     @GetMapping("/{klageId}")

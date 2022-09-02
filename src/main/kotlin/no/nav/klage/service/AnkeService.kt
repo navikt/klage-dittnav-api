@@ -59,7 +59,7 @@ class AnkeService(
         return anker.map { it.toAnkeView(bruker) }
     }
 
-    fun getLatestDraftAnkeByParams(
+    private fun getLatestDraftAnkeByParams(
         bruker: Bruker,
         titleKey: TitleEnum,
     ): AnkeView? {

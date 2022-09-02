@@ -11,7 +11,6 @@ import no.nav.klage.domain.anke.AnkeInput
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.exception.AnkeNotFoundException
 import no.nav.klage.domain.jsonToEvent
-import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.service.AnkeService
@@ -57,26 +56,6 @@ class AnkeController(
         return ankeService.getDraftAnkerByFnr(bruker)
     }
 
-    /**
-     * Get possible draft. Might be null.
-     */
-    @GetMapping("/draft")
-    fun getDraftAnkeByQuery(
-        @RequestParam titleKey: TitleEnum
-    ): AnkeView? {
-        val bruker = brukerService.getBruker()
-        logger.debug("Get draft anke for user is requested.")
-        secureLogger.debug(
-            "Get draft anke for user is requested. Fnr: {}, titleKey: {}",
-            bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            titleKey
-        )
-        return ankeService.getLatestDraftAnkeByParams(
-            bruker = bruker,
-            titleKey = titleKey,
-        )
-    }
-
     @GetMapping("/{ankeId}")
     fun getAnke(
         @PathVariable ankeId: UUID
@@ -109,7 +88,7 @@ class AnkeController(
 
         return kafkaEventClient.getEventPublisher()
             .mapNotNull { event -> jsonToEvent(event.data()) }
-                //TODO
+            //TODO
 //            .filter { it.ankeId == ankeId }
             .mapNotNull { it.toServerSentEvent() }
             .mergeWith(heartbeatStream)
