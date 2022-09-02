@@ -23,10 +23,10 @@ data class PDFInput (
     val dato: String,
     val ytelse: String,
     val userChoices: List<String>? = emptyList(),
-    val sendesIPosten: Boolean = true,
+    val sendesIPosten: Boolean,
 )
 
-fun OpenKlageInput.toPDFInput(): PDFInput {
+fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
     return PDFInput(
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
@@ -42,7 +42,7 @@ fun OpenKlageInput.toPDFInput(): PDFInput {
     )
 }
 
-fun OpenAnkeInput.toPDFInput(): PDFInput {
+fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
     return PDFInput(
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
@@ -53,7 +53,8 @@ fun OpenAnkeInput.toPDFInput(): PDFInput {
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
-        enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse
+        enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse,
+        sendesIPosten = sendesIPosten,
     )
 }
 

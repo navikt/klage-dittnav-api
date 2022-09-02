@@ -25,7 +25,7 @@ class KlageDittnavPdfgenService(
     fun createKlagePdfWithFoersteside(input: OpenKlageInput): ByteArray {
         validateIdent(input.foedselsnummer)
 
-        val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput())
+        val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput(sendesIPosten = true))
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
         return mergeDocuments(foerstesidePDF, klagePDF)
@@ -34,7 +34,7 @@ class KlageDittnavPdfgenService(
     fun createAnkePdfWithFoersteside(input: OpenAnkeInput): ByteArray {
         validateIdent(input.foedselsnummer)
 
-        val ankePDF = klageDittnavPdfgenClient.getAnkePDF(input.toPDFInput())
+        val ankePDF = klageDittnavPdfgenClient.getAnkePDF(input.toPDFInput(sendesIPosten = true))
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
         return mergeDocuments(foerstesidePDF = foerstesidePDF, klageAnkePDF = ankePDF)

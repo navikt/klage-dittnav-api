@@ -18,11 +18,9 @@ data class OpenKlageInput (
     val checkboxesSelected: Set<CheckboxEnum>? = null,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
-    val sendesIPosten: Boolean = true,
 )
 
 data class OpenAnkeInput (
-    //Legg inn validering? Undersøk om det bør være med i det hele tatt.
     val foedselsnummer: String,
     val navn: Navn,
     val enhetsnummer: String,
@@ -33,5 +31,4 @@ data class OpenAnkeInput (
     val tema: Tema,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
-    val sendesIPosten: Boolean = true,
 )
