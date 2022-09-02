@@ -85,7 +85,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
-    implementation("no.nav.slackposter:simple-slack-poster:5")
+    implementation("no.nav.slackposter:simple-slack-poster:21")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
     implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
 
