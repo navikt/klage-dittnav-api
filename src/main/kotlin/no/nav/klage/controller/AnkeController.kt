@@ -6,6 +6,7 @@ import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.EditedView
 import no.nav.klage.controller.view.StringInput
+import no.nav.klage.domain.anke.AnkeFullInput
 import no.nav.klage.domain.anke.AnkeInput
 import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.exception.AnkeNotFoundException
@@ -117,7 +118,7 @@ class AnkeController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createAnke(
-        @RequestBody anke: AnkeView, response: HttpServletResponse
+        @RequestBody anke: AnkeFullInput, response: HttpServletResponse
     ): AnkeView {
         val bruker = brukerService.getBruker()
         logger.debug("Create anke is requested.")

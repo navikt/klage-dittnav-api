@@ -8,10 +8,7 @@ import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.anke.Anke
-import no.nav.klage.domain.anke.AnkeInput
-import no.nav.klage.domain.anke.AnkeView
-import no.nav.klage.domain.anke.toAnke
+import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
@@ -80,9 +77,9 @@ class AnkeService(
         return null
     }
 
-    fun createAnke(anke: AnkeView, bruker: Bruker): AnkeView {
+    fun createAnke(anke: AnkeFullInput, bruker: Bruker): AnkeView {
         return ankeRepository
-            .createAnke(anke.toAnke(bruker, KlageAnkeStatus.DRAFT))
+            .createAnke(anke.toAnke(bruker))
             .toAnkeView(bruker)
     }
 
