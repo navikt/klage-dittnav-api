@@ -17,6 +17,7 @@ data class KlageFullInput (
     val internalSaksnummer: String? = null,
     val fritekst: String?,
     val fullmaktsgiver: String? = null,
+    val hasVedlegg: Boolean,
 )
 
 fun KlageFullInput.toKlage(bruker: Bruker): Klage {
@@ -31,5 +32,6 @@ fun KlageFullInput.toKlage(bruker: Bruker): Klage {
         internalSaksnummer = internalSaksnummer,
         fritekst = fritekst,
         fullmektig = fullmaktsgiver?.let { bruker.folkeregisteridentifikator.identifikasjonsnummer },
+        hasVedlegg = hasVedlegg,
     )
 }
