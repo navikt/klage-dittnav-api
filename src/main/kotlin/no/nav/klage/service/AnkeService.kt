@@ -183,6 +183,7 @@ class AnkeService(
             language = language,
             titleKey = titleKey,
             hasVedlegg = hasVedlegg,
+            enhetsnummer = enhetsnummer,
         )
     }
 
