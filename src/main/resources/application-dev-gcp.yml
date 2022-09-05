@@ -10,6 +10,7 @@ SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-servic
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/genererfoersteside
 
 PDL_SCOPE: dev-fss:pdl:pdl-api
+FSS_CLUSTER: dev-fss
 
 #These are read from the environment:
 #DB_HOST
