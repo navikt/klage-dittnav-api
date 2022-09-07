@@ -1,7 +1,5 @@
 package no.nav.klage.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
@@ -41,14 +39,13 @@ class KlageService(
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        val objectMapper: ObjectMapper = jacksonObjectMapper()
     }
 
     fun getKlage(klageId: Int, bruker: Bruker): KlageView {
         val klage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(klage, false)
         validationService.validateKlageAccess(klage, bruker)
-        return klage.toKlageView(bruker, klage.status === KlageAnkeStatus.DRAFT)
+        return klage.toKlageView(bruker)
     }
 
     fun validateAccess(klageId: Int, bruker: Bruker) {
@@ -84,7 +81,7 @@ class KlageService(
             )
         if (klage != null) {
             validationService.validateKlageAccess(klage, bruker)
-            return klage.toKlageView(bruker, true)
+            return klage.toKlageView(bruker)
         }
         return null
     }
@@ -112,7 +109,7 @@ class KlageService(
     ): KlageView {
         if (klage.fullmektig != null) {
             TODO()
-    //            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
+            //            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
         }
 
         return klageRepository
@@ -149,7 +146,7 @@ class KlageService(
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
             .updateFritekst(klageId, fritekst)
-            .toKlageView(bruker, false)
+            .toKlageView(bruker)
             .modifiedByUser
     }
 
@@ -159,7 +156,7 @@ class KlageService(
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
             .updateUserSaksnummer(klageId, userSaksnummer)
-            .toKlageView(bruker, false)
+            .toKlageView(bruker)
             .modifiedByUser
     }
 
@@ -169,7 +166,7 @@ class KlageService(
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
             .updateVedtakDate(klageId, vedtakDate)
-            .toKlageView(bruker, false)
+            .toKlageView(bruker)
             .modifiedByUser
     }
 
@@ -179,17 +176,21 @@ class KlageService(
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
             .updateHasVedlegg(klageId, hasVedlegg)
-            .toKlageView(bruker, false)
+            .toKlageView(bruker)
             .modifiedByUser
     }
 
-    fun updateCheckboxesSelected(klageId: String, checkboxesSelected: Set<CheckboxEnum>?, bruker: Bruker): LocalDateTime {
+    fun updateCheckboxesSelected(
+        klageId: String,
+        checkboxesSelected: Set<CheckboxEnum>?,
+        bruker: Bruker
+    ): LocalDateTime {
         val existingKlage = klageRepository.getKlageById(klageId.toInt())
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
             .updateCheckboxesSelected(klageId, checkboxesSelected)
-            .toKlageView(bruker, false)
+            .toKlageView(bruker)
             .modifiedByUser
     }
 
@@ -265,7 +266,7 @@ class KlageService(
         )
     }
 
-    fun Klage.toKlageView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): KlageView {
+    fun Klage.toKlageView(bruker: Bruker): KlageView {
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
@@ -276,14 +277,7 @@ class KlageService(
             status,
             modifiedDateTime,
             vedlegg.map {
-                if (expandVedleggToVedleggView) {
-                    vedleggService.expandVedleggToVedleggView(
-                        it,
-                        bruker
-                    )
-                } else {
-                    it.toVedleggView("")
-                }
+                it.toVedleggView()
             },
             journalpostId,
             finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,

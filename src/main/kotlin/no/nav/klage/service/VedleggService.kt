@@ -15,7 +15,6 @@ import no.nav.klage.vedlegg.Image2PDF
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
 
 @Service
 @Transactional
@@ -73,8 +72,7 @@ class VedleggService(
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
         validationService.checkKlageStatus(existingKlage, false)
         validationService.validateKlageAccess(existingKlage, bruker)
-        val content = fileClient.getVedleggFile(vedlegg.ref)
-        return vedlegg.toVedleggView(Base64.getEncoder().encodeToString(content))
+        return vedlegg.toVedleggView()
     }
 
     private fun Klage.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
