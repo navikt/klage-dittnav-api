@@ -9,10 +9,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @Profile("dev-gcp")
 @RestController
@@ -40,5 +38,12 @@ class DevController(private val klageDittnavPdfgenService: KlageDittnavPdfgenSer
             responseHeaders,
             HttpStatus.OK
         )
+    }
+
+    @PostMapping(value = ["/internal/debugvedlegg"], consumes = ["multipart/form-data"])
+    fun addVedleggToKlage(
+        @RequestParam vedlegg: MultipartFile
+    ) {
+        logger.debug("received vedlegg to debug endpoint")
     }
 }
