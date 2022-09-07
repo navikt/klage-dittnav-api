@@ -60,7 +60,7 @@ class KlageDittnavPdfgenService(
     }
 
     private fun OpenKlageInput.toFoerstesideRequest(): FoerstesideRequest {
-        val documentList = mutableListOf("NAV 90-00.08 Klage/anke")
+        val documentList = mutableListOf("Klagen din")
         if (hasVedlegg) {
             documentList += "Vedlegg"
         }
@@ -81,7 +81,7 @@ class KlageDittnavPdfgenService(
     }
 
     private fun OpenAnkeInput.toFoerstesideRequest(): FoerstesideRequest {
-        val documentList = mutableListOf("NAV 90-00.08 Klage/anke")
+        val documentList = mutableListOf("Anken din")
         if (hasVedlegg) {
             documentList += "Vedlegg"
         }
