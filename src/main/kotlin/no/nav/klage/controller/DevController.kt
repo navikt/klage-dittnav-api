@@ -40,6 +40,7 @@ class DevController(private val klageDittnavPdfgenService: KlageDittnavPdfgenSer
         )
     }
 
+    @Unprotected
     @PostMapping(value = ["/internal/debugvedlegg"], consumes = ["multipart/form-data"])
     fun addVedleggToKlage(
         @RequestParam vedlegg: MultipartFile
