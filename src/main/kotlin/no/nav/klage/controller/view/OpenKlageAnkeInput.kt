@@ -35,7 +35,7 @@ data class OpenAnkeInput (
 
 data class OpenEttersendelseInput (
     val foedselsnummer: String,
-    val enhetsnummer: String,
+    val enhetsnummer: String?,
     val tema: Tema,
     val language: LanguageEnum = LanguageEnum.NB,
 )
