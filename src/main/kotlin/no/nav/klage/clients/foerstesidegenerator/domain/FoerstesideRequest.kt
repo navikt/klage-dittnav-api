@@ -21,6 +21,7 @@ data class FoerstesideRequest(
 ) {
 
     enum class Spraakkode {
+        //Don't think anything else is supported
         NB
     }
 
