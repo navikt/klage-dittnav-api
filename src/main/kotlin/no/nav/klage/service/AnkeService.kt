@@ -164,9 +164,18 @@ class AnkeService(
         validationService.validateAnkeAccess(existingAnke, bruker)
         validationService.validateAnke(existingAnke)
 
-        return klageDittnavPdfgenService.createAnkePdfWithFoersteside(
+        klageDittnavPdfgenService.createAnkePdfWithFoersteside(
             createPdfWithFoerstesideInput(existingAnke, bruker)
-        )
+        ).also {
+            setPdfDownloadedWithoutAccessValidation(ankeId, Instant.now())
+            return it
+        }
+    }
+
+    private fun setPdfDownloadedWithoutAccessValidation(ankeId: UUID, pdfDownloaded: Instant?) {
+        val existingAnke = ankeRepository.getAnkeById(ankeId)
+        validationService.checkAnkeStatus(existingAnke)
+        ankeRepository.updatePdfDownloaded(ankeId, pdfDownloaded)
     }
 
     fun Anke.toAnkeView(bruker: Bruker, expandVedleggToVedleggView: Boolean = true): AnkeView {

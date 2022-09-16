@@ -28,6 +28,7 @@ class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
     var language by Anker.language
     var titleKey by Anker.titleKey
     var hasVedlegg by Anker.hasVedlegg
+    var pdfDownloaded by Anker.pdfDownloaded
 }
 
 object Anker : UUIDTable("anke") {
@@ -42,6 +43,7 @@ object Anker : UUIDTable("anke") {
     var language = text("language").nullable()
     var titleKey = text("title_key")
     var hasVedlegg = bool("has_vedlegg").default(false)
+    var pdfDownloaded = timestamp("pdf_downloaded").nullable()
 }
 
 fun AnkeDAO.toAnke(): Anke {

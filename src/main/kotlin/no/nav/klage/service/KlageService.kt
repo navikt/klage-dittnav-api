@@ -242,9 +242,12 @@ class KlageService(
         validationService.validateKlageAccess(existingKlage, bruker)
         validationService.validateKlage(existingKlage)
 
-        return klageDittnavPdfgenService.createKlagePdfWithFoersteside(
+        klageDittnavPdfgenService.createKlagePdfWithFoersteside(
             createPdfWithFoerstesideInput(existingKlage, bruker)
-        )
+        ).also {
+            setPdfDownloadedWithoutAccessValidation(klageId, Instant.now())
+            return it
+        }
     }
 
     fun getJournalpostIdWithoutValidation(klageId: Int): String? {
@@ -264,6 +267,12 @@ class KlageService(
                 data = journalpostId,
             )
         )
+    }
+
+    private fun setPdfDownloadedWithoutAccessValidation(klageId: Int, pdfDownloaded: Instant?) {
+        val existingKlage = klageRepository.getKlageById(klageId)
+        validationService.checkKlageStatus(existingKlage)
+        klageRepository.updatePdfDownloaded(klageId.toString(), pdfDownloaded)
     }
 
     fun Klage.toKlageView(bruker: Bruker): KlageView {
