@@ -6,6 +6,7 @@ import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
 import no.nav.klage.controller.view.OpenAnkeInput
+import no.nav.klage.controller.view.OpenEttersendelseInput
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.toPDFInput
@@ -38,6 +39,11 @@ class KlageDittnavPdfgenService(
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
         return mergeDocuments(foerstesidePDF = foerstesidePDF, klageAnkePDF = ankePDF)
+    }
+
+    fun createFoerstesideForEttersendelse(input: OpenEttersendelseInput): ByteArray {
+        validateIdent(input.foedselsnummer)
+        return foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
     }
 
     private fun mergeDocuments(foerstesidePDF: ByteArray, klageAnkePDF: ByteArray): ByteArray {
@@ -98,6 +104,24 @@ class KlageDittnavPdfgenService(
             overskriftstittel = "Klage/anke NAV 90-00.08",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = Foerstesidetype.SKJEMA,
+            enhetsnummer = enhetsnummer,
+        )
+    }
+
+    private fun OpenEttersendelseInput.toFoerstesideRequest(): FoerstesideRequest {
+        return FoerstesideRequest(
+            spraakkode = Spraakkode.NB,
+            netsPostboks = "1400", //always
+            bruker = Bruker(
+                brukerId = foedselsnummer,
+                brukerType = Brukertype.PERSON
+            ),
+            tema = tema.name,
+            arkivtittel = "Ettersendelse til klage/anke",
+            navSkjemaId = "NAV 90-00.08",
+            overskriftstittel = "Ettersendelse til klage/anke NAV 90-00.08",
+            dokumentlisteFoersteside = listOf("Vedlegg"),
+            foerstesidetype = Foerstesidetype.ETTERSENDELSE,
             enhetsnummer = enhetsnummer,
         )
     }
