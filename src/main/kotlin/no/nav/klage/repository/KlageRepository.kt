@@ -111,6 +111,18 @@ class KlageRepository {
         return klageFromDB.toKlage()
     }
 
+    fun updatePdfDownloaded(id: String, pdfDownloaded: Instant?): Klage {
+        logger.debug("Updating klage pdfDownloaded in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
+        klageFromDB.apply {
+            this.pdfDownloaded = pdfDownloaded
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Klage pdfDownloaded successfully updated in db.")
+        return klageFromDB.toKlage()
+    }
+
     fun updateVedtakDate(id: String, vedtakDate: LocalDate?): Klage {
         logger.debug("Updating klage vedtakDate in db. Id: {}", id)
         val klageFromDB = getKlageToModify(id.toInt())

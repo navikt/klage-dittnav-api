@@ -33,6 +33,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var language by Klager.language
     var titleKey by Klager.titleKey
     var hasVedlegg by Klager.hasVedlegg
+    var pdfDownloaded by Klager.pdfDownloaded
 }
 
 object Klager : IntIdTable("klage") {
@@ -51,6 +52,7 @@ object Klager : IntIdTable("klage") {
     var language = text("language").nullable()
     var titleKey = text("title_key").nullable()
     var hasVedlegg = bool("has_vedlegg").default(false)
+    var pdfDownloaded = timestamp("pdf_downloaded").nullable()
 }
 
 fun KlageDAO.toKlage(): Klage {

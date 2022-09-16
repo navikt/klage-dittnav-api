@@ -88,6 +88,18 @@ class AnkeRepository {
         return ankeFromDB.toAnke()
     }
 
+    fun updatePdfDownloaded(id: UUID, pdfDownloaded: Instant?): Anke {
+        logger.debug("Updating anke pdfDownloaded in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
+        ankeFromDB.apply {
+            this.pdfDownloaded = pdfDownloaded
+            this.modifiedByUser = Instant.now()
+        }
+
+        logger.debug("Anke pdfDownloaded successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
     fun updateEnhetsnummer(id: UUID, enhetsnummer: String?): Anke {
         logger.debug("Updating anke enhetsnummer in db. Id: {}", id)
         val ankeFromDB = getAnkeToModify(id)
