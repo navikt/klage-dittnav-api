@@ -64,7 +64,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
 
-    implementation("com.github.navikt:kabal-kodeverk:2022.09.01-13.22.c4c215193ca5")
+    implementation("com.github.navikt:klage-kodeverk:1.0.4")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
