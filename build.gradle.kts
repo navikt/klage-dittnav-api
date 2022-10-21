@@ -14,7 +14,7 @@ val springSleuthVersion = "3.1.4"
 val resilience4jVersion = "1.7.1"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "4.42.0"
-val springDocVersion = "1.6.11"
+val springDocVersion = "1.6.12"
 
 val githubUser: String by project
 val githubPassword: String by project
