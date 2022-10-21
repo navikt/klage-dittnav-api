@@ -95,7 +95,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
     }
-    testImplementation("org.mockito:mockito-inline:4.8.0")
+    testImplementation("org.mockito:mockito-inline:4.8.1")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 
