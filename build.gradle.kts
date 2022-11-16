@@ -23,15 +23,7 @@ ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 repositories {
     mavenCentral()
-    maven("https://jcenter.bintray.com")
     maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
-    maven {
-        url = uri("https://maven.pkg.github.com/navikt/simple-slack-poster")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
-    }
     maven("https://jitpack.io")
 }
 
@@ -86,7 +78,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
-    implementation("no.nav.slackposter:simple-slack-poster:21")
+    implementation("com.github.navikt:simple-slack-poster:0.0.3")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
     implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
 
