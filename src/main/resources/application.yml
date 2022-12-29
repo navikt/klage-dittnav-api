@@ -14,6 +14,8 @@ spring:
     table: "schema_version"
     clean-on-validation-error: true
   sleuth:
+    propagation:
+      type: w3c,b3
     propagation-keys:
       - Nav-Callid
       - Nav-Consumer-Id
