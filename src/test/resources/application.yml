@@ -1,3 +1,5 @@
+navCallIdName: nav-callid
+
 spring:
   application:
     name: klage-dittnav-api
@@ -91,9 +93,6 @@ MAX_DRAFT_AGE_IN_DAYS: 180
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
-
-navCallId: Nav-Callid
-navConsumerId: Nav-Consumer-Id
 
 KAFKA_BROKERS: localhost
 KAFKA_TRUSTSTORE_PATH: somepath

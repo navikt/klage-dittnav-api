@@ -1,3 +1,5 @@
+navCallIdName: nav-callid
+
 spring:
   application:
     name: klage-dittnav-api
@@ -14,14 +16,13 @@ spring:
     table: "schema_version"
     clean-on-validation-error: true
   sleuth:
-    propagation-keys:
-      - Nav-Callid
-      - Nav-Consumer-Id
-    log:
-      slf4j:
-        whitelisted-mdc-keys:
-          - Nav-Callid
-          - Nav-Consumer-Id
+    propagation:
+      type: w3c,b3
+    baggage:
+      remote-fields:
+        - ${navCallIdName}
+      tag-fields:
+        - ${navCallIdName}
   servlet:
     multipart:
       #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
@@ -87,9 +88,6 @@ no.nav.security.jwt:
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
-
-navCallId: Nav-Callid
-navConsumerId: Nav-Consumer-Id
 
 ALL_FULLMAKT_OMRAADER: "*"
 

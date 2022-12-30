@@ -17,16 +17,10 @@ import javax.servlet.ServletResponse
 @Component
 @Profile("!local")
 @Order(-20)
-class CustomTraceFilter(private val tracer: Tracer) : GenericFilterBean() {
-
-    @Value("\${spring.application.name}")
-    lateinit var appName: String
-
-    @Value("\${navCallId}")
-    lateinit var navCallId: String
-
-    @Value("\${navConsumerId}")
-    lateinit var navConsumerId: String
+class CustomTraceFilter(
+    private val tracer: Tracer,
+    @Value("\${navCallIdName}") private val navCallIdName: String
+) : GenericFilterBean() {
 
     override fun doFilter(
         request: ServletRequest?, response: ServletResponse,
@@ -34,11 +28,8 @@ class CustomTraceFilter(private val tracer: Tracer) : GenericFilterBean() {
     ) {
         val currentSpan = tracer.currentSpan()
 
-        val navCallIdField = BaggageField.create(navCallId)
+        val navCallIdField = BaggageField.create(navCallIdName)
         navCallIdField.updateValue(tracer.currentSpan().context(), currentSpan.context().traceIdString())
-
-        val navConsumerIdField = BaggageField.create(navConsumerId)
-        navConsumerIdField.updateValue(tracer.currentSpan().context(), appName)
 
         chain.doFilter(request, response)
     }
