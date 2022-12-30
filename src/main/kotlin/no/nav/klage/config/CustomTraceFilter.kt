@@ -2,6 +2,7 @@ package no.nav.klage.config
 
 import brave.Tracer
 import brave.baggage.BaggageField
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -16,7 +17,10 @@ import javax.servlet.ServletResponse
 @Component
 @Profile("!local")
 @Order(-20)
-class CustomTraceFilter(private val tracer: Tracer) : GenericFilterBean() {
+class CustomTraceFilter(
+    private val tracer: Tracer,
+    @Value("\${navCallIdName}") private val navCallIdName: String
+) : GenericFilterBean() {
 
     override fun doFilter(
         request: ServletRequest?, response: ServletResponse,
@@ -24,7 +28,7 @@ class CustomTraceFilter(private val tracer: Tracer) : GenericFilterBean() {
     ) {
         val currentSpan = tracer.currentSpan()
 
-        val navCallIdField = BaggageField.create("nav-callid")
+        val navCallIdField = BaggageField.create(navCallIdName)
         navCallIdField.updateValue(tracer.currentSpan().context(), currentSpan.context().traceIdString())
 
         chain.doFilter(request, response)

@@ -1,3 +1,5 @@
+navCallIdName: nav-callid
+
 spring:
   application:
     name: klage-dittnav-api
@@ -18,9 +20,9 @@ spring:
       type: w3c,b3
     baggage:
       remote-fields:
-        - nav-callid
+        - ${navCallIdName}
       tag-fields:
-        - nav-callid
+        - ${navCallIdName}
   servlet:
     multipart:
       #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
