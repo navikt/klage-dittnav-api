@@ -1,3 +1,5 @@
+navCallIdName: nav-callid
+
 spring:
   application:
     name: klage-dittnav-api
