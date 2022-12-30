@@ -16,14 +16,11 @@ spring:
   sleuth:
     propagation:
       type: w3c,b3
-    propagation-keys:
-      - Nav-Callid
-      - Nav-Consumer-Id
-    log:
-      slf4j:
-        whitelisted-mdc-keys:
-          - Nav-Callid
-          - Nav-Consumer-Id
+    baggage:
+      remote-fields:
+        - nav-callid
+      tag-fields:
+        - nav-callid
   servlet:
     multipart:
       #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
@@ -89,9 +86,6 @@ no.nav.security.jwt:
 
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
-
-navCallId: Nav-Callid
-navConsumerId: Nav-Consumer-Id
 
 ALL_FULLMAKT_OMRAADER: "*"
 
