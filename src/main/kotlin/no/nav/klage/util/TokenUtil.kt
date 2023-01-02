@@ -1,13 +1,13 @@
 package no.nav.klage.util
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.exceptions.JwtTokenValidatorException
 import org.springframework.stereotype.Component
 import java.util.*
-import javax.servlet.http.HttpServletRequest
 
 @Component
 class TokenUtil(

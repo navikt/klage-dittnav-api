@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
 import no.nav.klage.domain.exception.KlageNotFoundException
@@ -28,7 +29,6 @@ import reactor.core.publisher.Flux
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @Tag(name = "klager")

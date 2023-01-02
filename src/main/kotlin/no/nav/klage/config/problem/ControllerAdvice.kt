@@ -3,21 +3,17 @@ package no.nav.klage.config.problem
 import no.nav.klage.domain.exception.*
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.multipart.MaxUploadSizeExceededException
-import org.zalando.problem.Problem
-import org.zalando.problem.Status
-import org.zalando.problem.spring.web.advice.AdviceTrait
-import org.zalando.problem.spring.web.advice.ProblemHandling
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 
-@ControllerAdvice
-class ProblemHandlingControllerAdvice : OurOwnExceptionAdviceTrait, ProblemHandling
-
-interface OurOwnExceptionAdviceTrait : AdviceTrait {
+@RestControllerAdvice
+class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -25,139 +21,146 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     }
 
     @ExceptionHandler
+    fun handleJwtTokenUnauthorizedException(
+        ex: JwtTokenUnauthorizedException,
+        request: NativeWebRequest
+    ): ProblemDetail {
+        val detail = if (ex.message == null) {
+            if (request.getHeader("Authorization") == null) {
+                logger.debug("Returning warning: No authorization header in request")
+                "No authorization header in request"
+            } else {
+                logger.debug("Returning warning: ${ex.cause?.message}")
+                ex.cause?.message ?: "No error message available"
+            }
+        } else ex.message ?: error("Message can't be null")
+
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail)
+    }
+
+    @ExceptionHandler
     fun handleKlageNotFound(
         ex: KlageNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleKlageIsDeleted(
         ex: KlageIsDeletedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
     fun handleKlageIsFinalized(
         ex: KlageIsFinalizedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
     fun handleAnkeNotFound(
         ex: AnkeNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleAnkeIsDeleted(
         ex: AnkeIsDeletedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
     fun handleAnkeIsFinalized(
         ex: AnkeIsFinalizedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
     fun handleAvailableAnkeNotFound(
         ex: AvailableAnkeNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleAttemptedIllegalUpdate(
         ex: AttemptedIllegalUpdateException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleAttachmentCouldNotBeConvertedException(
         ex: AttachmentCouldNotBeConvertedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleAttachmentEncryptedException(
         ex: AttachmentEncryptedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleAttachmentHasVirusException(
         ex: AttachmentHasVirusException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleAttachmentIsEmptyException(
         ex: AttachmentIsEmptyException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleMaxUploadSizeException(
         ex: MaxUploadSizeExceededException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.REQUEST_ENTITY_TOO_LARGE, AttachmentTooLargeException(), request)
+    ): ProblemDetail =
+        create(HttpStatus.PAYLOAD_TOO_LARGE, AttachmentTooLargeException())
 
     @ExceptionHandler
     fun handleAttachmentTotalTooLargeException(
         ex: AttachmentTotalTooLargeException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.REQUEST_ENTITY_TOO_LARGE, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
 
     @ExceptionHandler
     fun handleFullmaktNotFound(
         ex: FullmaktNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleUpdateMismatch(
         ex: UpdateMismatchException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleInvalidIdent(
         ex: InvalidIdentException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
-    @ExceptionHandler
-    fun handleJwtTokenUnauthorizedException(
-        ex: JwtTokenUnauthorizedException,
-        request: NativeWebRequest
-    ): ResponseEntity<Problem> {
-        val newException = if (ex.message == null) {
-            if (request.getHeader("Authorization") == null) {
-                logger.debug("Returning warning: No authorization header in request")
-                JwtTokenUnauthorizedException(msg = "No authorization header in request", cause = ex.cause)
-            } else {
-                logger.debug("Returning warning: ${ex.cause?.message}")
-                JwtTokenUnauthorizedException(msg = ex.cause?.message, cause = ex.cause)
-            }
-        } else ex
-
-        return create(Status.UNAUTHORIZED, newException, request)
+    private fun create(status: HttpStatus, ex: Exception): ProblemDetail {
+        val errorMessage = ex.message ?: "No error message available"
+        return ProblemDetail.forStatusAndDetail(status, errorMessage).apply {
+            title = errorMessage
+        }
     }
 }
