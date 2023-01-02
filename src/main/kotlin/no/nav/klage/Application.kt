@@ -7,7 +7,7 @@ import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
-@EnableJwtTokenValidation(ignore = ["org.springdoc"])
+@EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController"])
 @EnableOAuth2Client(cacheEnabled = true)
 @EnableScheduling
 class Application
