@@ -1,6 +1,7 @@
 package no.nav.klage.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.*
-import javax.servlet.http.HttpServletRequest
 
 @Service
 class BrukerService(

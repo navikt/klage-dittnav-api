@@ -1,10 +1,10 @@
 package no.nav.klage.clients.events
 
+import jakarta.annotation.PostConstruct
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Service
 import reactor.core.publisher.ConnectableFlux
 import reactor.kafka.receiver.KafkaReceiver
-import javax.annotation.PostConstruct
 
 @Service
 class KafkaEventClient(

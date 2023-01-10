@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.EditedView
 import no.nav.klage.controller.view.StringInput
@@ -23,7 +24,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import javax.servlet.http.HttpServletResponse
 
 @Profile("local", "dev-gcp")
 @RestController

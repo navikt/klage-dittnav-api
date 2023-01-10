@@ -5,16 +5,15 @@ val mockkVersion = "1.13.3"
 val h2Version = "2.1.214"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
-val tokenSupportVersion = "2.1.8"
+val tokenSupportVersion = "3.0.2"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "7.2"
 val pdfboxVersion = "2.0.27"
 val tikaVersion = "2.6.0"
-val springSleuthVersion = "3.1.5"
 val resilience4jVersion = "2.0.2"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "4.42.0"
-val springDocVersion = "1.6.14"
+val springDocVersion = "2.0.2"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -28,9 +27,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "1.7.22"
+    val kotlinVersion = "1.8.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "2.7.5"
+    id("org.springframework.boot") version "3.0.1"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
@@ -44,7 +43,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
+
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-tracing-bridge-brave")
 
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
 
@@ -59,7 +60,6 @@ dependencies {
 
     implementation("com.github.navikt:klage-kodeverk:v1.2.0")
 
-    implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
     implementation("ch.qos.logback:logback-access")
     implementation("org.codehaus.janino:janino")
@@ -79,8 +79,8 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
     implementation("com.github.navikt:simple-slack-poster:0.0.5")
-    implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
-    implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")

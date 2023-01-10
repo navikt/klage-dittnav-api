@@ -21,11 +21,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.zalando.problem.Problem
-import org.zalando.problem.jackson.ProblemModule
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,7 +46,6 @@ class ApiTest {
 
     val mapper = jacksonObjectMapper()
 
-
     @BeforeAll
     fun beforeEach() {
         Mockito.`when`(brukerService.getBruker()).thenReturn(
@@ -59,7 +57,6 @@ class ApiTest {
                 tokenExpires = null,
             )
         )
-        mapper.registerModule(ProblemModule())
     }
 
     @Test
@@ -77,7 +74,7 @@ class ApiTest {
             MockMvcRequestBuilders.get("/api/bruker")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
         assertEquals("No authorization header in request", problemOutput.detail)
     }
 
@@ -90,7 +87,7 @@ class ApiTest {
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
         assertEquals("No valid token found in validation context", problemOutput.detail)
     }
 
@@ -103,7 +100,7 @@ class ApiTest {
                 .header("Authorization", "Bearer $token")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, Problem::class.java)
+        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
         assertEquals("No valid token found in validation context", problemOutput.detail)
     }
 

@@ -3,6 +3,7 @@ package no.nav.klage.service
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.*
 import no.nav.klage.domain.Navn
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.LocalDate
-import javax.servlet.http.HttpServletRequest
 
 internal class BrukerServiceTest {
     private val pdlClient: PdlClient = mockk()

@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import java.time.Duration
 import java.util.*
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @Tag(name = "anker")
