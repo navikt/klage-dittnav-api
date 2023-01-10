@@ -78,7 +78,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
-    implementation("com.github.navikt:simple-slack-poster:0.0.5")
+    implementation("com.github.navikt:simple-slack-poster:0.0.6")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
