@@ -27,13 +27,15 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     ): ProblemDetail {
         val detail = if (ex.message == null) {
             if (request.getHeader("Authorization") == null) {
-                logger.debug("Returning warning: No authorization header in request")
+                secureLogger.debug("Returning warning: No authorization header in request")
                 "No authorization header in request"
             } else {
-                logger.debug("Returning warning: ${ex.cause?.message}")
+                secureLogger.debug("Returning warning: ${ex.cause?.message}")
                 ex.cause?.message ?: "No error message available"
             }
         } else ex.message ?: error("Message can't be null")
+
+        secureLogger.error("Exception thrown to client: ${HttpStatus.UNAUTHORIZED.reasonPhrase}, $detail", ex)
 
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail)
     }
