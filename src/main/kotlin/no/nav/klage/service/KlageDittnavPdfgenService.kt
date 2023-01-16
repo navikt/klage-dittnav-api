@@ -9,6 +9,7 @@ import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.controller.view.OpenEttersendelseInput
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.exception.InvalidIdentException
+import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.domain.toPDFInput
 import no.nav.klage.util.isValidFnrOrDnr
 import org.apache.pdfbox.io.MemoryUsageSetting
@@ -27,9 +28,11 @@ class KlageDittnavPdfgenService(
         validateIdent(input.foedselsnummer)
 
         val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput(sendesIPosten = true))
-        val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
-        return mergeDocuments(foerstesidePDF, klagePDF)
+        return if (input.titleKey != TitleEnum.LONNSGARANTI) {
+            val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
+            mergeDocuments(foerstesidePDF, klagePDF)
+        } else klagePDF
     }
 
     fun createAnkePdfWithFoersteside(input: OpenAnkeInput): ByteArray {
