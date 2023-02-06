@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.41.1"
-val mockkVersion = "1.13.3"
+val mockkVersion = "1.13.4"
 val h2Version = "2.1.214"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
@@ -9,7 +9,7 @@ val tokenSupportVersion = "3.0.2"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "7.2"
 val pdfboxVersion = "2.0.27"
-val tikaVersion = "2.6.0"
+val tikaVersion = "2.7.0"
 val resilience4jVersion = "2.0.2"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.1.0"
@@ -27,9 +27,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "1.8.0"
+    val kotlinVersion = "1.8.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.0.1"
+    id("org.springframework.boot") version "3.0.2"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
 
-    implementation("com.github.navikt:klage-kodeverk:v1.2.4")
+    implementation("com.github.navikt:klage-kodeverk:v1.2.13")
 
     implementation("ch.qos.logback:logback-classic")
     implementation("ch.qos.logback:logback-access")
@@ -87,7 +87,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
     }
-    testImplementation("org.mockito:mockito-inline:5.0.0")
+    testImplementation("org.mockito:mockito-inline:5.1.1")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 
