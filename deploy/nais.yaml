@@ -75,7 +75,7 @@ spec:
         - application: kabal-api
         - application: klage-dittnav-pdfgen
         - application: clamav
-          namespace: clamav
+          namespace: nais-system
   envFrom:
     - secret: srvklage-dittnav
     - secret: sts-apikey
