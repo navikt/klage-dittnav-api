@@ -93,7 +93,7 @@ ALL_FULLMAKT_OMRAADER: "*"
 
 KLAGE_FILE_API_APP_NAME: klage-file-api
 
-CLAM_AV_URL: http://clamav.clamav/scan
+CLAM_AV_URL: http://clamav.nais-system/scan
 
 FILE_BASE_URL: http://klage-file-api
 
