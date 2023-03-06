@@ -1,5 +1,6 @@
 package no.nav.klage.domain.anke
 
+import no.nav.klage.domain.klage.Klager
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLanguageEnum
 import no.nav.klage.util.toStatus
@@ -28,6 +29,7 @@ class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
     var titleKey by Anker.titleKey
     var hasVedlegg by Anker.hasVedlegg
     var pdfDownloaded by Anker.pdfDownloaded
+    var journalpostId by Klager.journalpostId
 }
 
 object Anker : UUIDTable("anke") {
@@ -43,6 +45,7 @@ object Anker : UUIDTable("anke") {
     var titleKey = text("title_key")
     var hasVedlegg = bool("has_vedlegg").default(false)
     var pdfDownloaded = timestamp("pdf_downloaded").nullable()
+    var journalpostId = varchar("journalpost_id", 50).nullable()
 }
 
 fun AnkeDAO.toAnke(): Anke {
@@ -59,6 +62,7 @@ fun AnkeDAO.toAnke(): Anke {
         language = getLanguageEnum(this.language),
         titleKey = TitleEnum.valueOf(titleKey),
         hasVedlegg = hasVedlegg,
+        journalpostId = journalpostId,
     )
 }
 
@@ -73,5 +77,6 @@ fun AnkeDAO.fromAnke(anke: Anke) {
     enhetsnummer = anke.enhetsnummer
     language = anke.language.name
     titleKey = anke.titleKey.name
+    journalpostId = anke.journalpostId
 
 }

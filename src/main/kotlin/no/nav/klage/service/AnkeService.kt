@@ -211,7 +211,8 @@ class AnkeService(
             titleKey = titleKey,
             hasVedlegg = hasVedlegg,
             enhetsnummer = enhetsnummer,
-            vedlegg = vedlegg.map { it.toVedleggView() }
+            vedlegg = vedlegg.map { it.toVedleggView() },
+            journalpostId = journalpostId,
         )
     }
 
@@ -238,9 +239,9 @@ class AnkeService(
     }
 
     fun setJournalpostIdWithoutValidation(ankeId: UUID, journalpostId: String) {
-        val klage = ankeRepository.getAnkeById(ankeId)
-        val updatedKlage = klage.copy(journalpostId = journalpostId)
-        ankeRepository.updateAnke(updatedKlage, false)
+        val anke = ankeRepository.getAnkeById(ankeId)
+        val updatedAnke = anke.copy(journalpostId = journalpostId)
+        ankeRepository.updateAnke(updatedAnke, false)
         kafkaInternalEventService.publishEvent(
             Event(
                 klageAnkeId = ankeId.toString(),

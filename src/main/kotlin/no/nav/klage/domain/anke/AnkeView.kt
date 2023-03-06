@@ -22,4 +22,5 @@ data class AnkeView(
     val titleKey: TitleEnum?,
     val hasVedlegg: Boolean,
     val vedlegg: List<VedleggView>,
+    val journalpostId: String?,
 )

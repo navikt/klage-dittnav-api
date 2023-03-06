@@ -279,16 +279,16 @@ class KlageService(
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
-            id!!.toString(),
+            id = id!!.toString(),
             //TODO: Følg opp med FE, er det forskjell på klage og anke?
-            fritekst ?: "",
-            tema,
-            status,
-            modifiedDateTime,
-            vedlegg.map {
+            fritekst = fritekst ?: "",
+            tema = tema,
+            status = status,
+            modifiedByUser = modifiedDateTime,
+            vedlegg = vedlegg.map {
                 it.toVedleggView()
             },
-            journalpostId,
+            journalpostId = journalpostId,
             finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,
             vedtakDate = vedtakDate,
             checkboxesSelected = checkboxesSelected ?: emptySet(),
