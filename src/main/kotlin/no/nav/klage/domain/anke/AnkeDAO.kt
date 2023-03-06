@@ -1,6 +1,5 @@
-package no.nav.anke.domain.anke
+package no.nav.klage.domain.anke
 
-import no.nav.klage.domain.anke.Anke
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLanguageEnum
 import no.nav.klage.util.toStatus

@@ -7,27 +7,27 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 
-class VedleggDAO(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<VedleggDAO>(Vedleggene)
+class KlagevedleggDAO(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<KlagevedleggDAO>(Klagevedleggene)
 
-    var tittel by Vedleggene.tittel
-    var ref by Vedleggene.ref
-    var contentType by Vedleggene.contentType
-    var sizeInBytes by Vedleggene.sizeInBytes
-    var klageId by KlageDAO referencedOn Vedleggene.klageId
+    var tittel by Klagevedleggene.tittel
+    var ref by Klagevedleggene.ref
+    var contentType by Klagevedleggene.contentType
+    var sizeInBytes by Klagevedleggene.sizeInBytes
+    var klage by KlageDAO referencedOn Klagevedleggene.klageId
 
-    fun toVedlegg(): Vedlegg =
-        Vedlegg(
+    fun toVedlegg(): Klagevedlegg =
+        Klagevedlegg(
             tittel = tittel,
             ref = ref,
-            klageId = klageId.id.value,
+            klageId = klage.id.value,
             id = id.value,
             contentType = contentType,
             sizeInBytes = sizeInBytes
         )
 }
 
-object Vedleggene : IntIdTable("vedlegg") {
+object Klagevedleggene : IntIdTable("klage_vedlegg") {
     val tittel = varchar("tittel", 250)
     val ref = varchar("ref", 500)
     val klageId = reference("klage_id", Klager)

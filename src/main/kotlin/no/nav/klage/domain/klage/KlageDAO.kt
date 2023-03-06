@@ -1,7 +1,7 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.vedlegg.VedleggDAO
-import no.nav.klage.domain.vedlegg.Vedleggene
+import no.nav.klage.domain.vedlegg.KlagevedleggDAO
+import no.nav.klage.domain.vedlegg.Klagevedleggene
 import no.nav.klage.util.getLanguageEnum
 import no.nav.klage.util.getTitleEnum
 import no.nav.klage.util.toStatus
@@ -24,7 +24,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var tema by Klager.tema
     var ytelse by Klager.ytelse
     var userSaksnummer by Klager.userSaksnummer
-    val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
+    val vedlegg by KlagevedleggDAO referrersOn Klagevedleggene.klageId
     var journalpostId by Klager.journalpostId
     var vedtakDate by Klager.vedtakDate
     var checkBoxesSelected by Klager.checkboxesSelected

@@ -104,7 +104,7 @@ class KlageController(
 
         return kafkaEventClient.getEventPublisher()
             .mapNotNull { event -> jsonToEvent(event.data()) }
-            .filter { it.klageId == klageId }
+            .filter { it.klageAnkeId == klageId }
             .mapNotNull { it.toServerSentEvent() }
             .mergeWith(heartbeatStream)
     }
@@ -278,7 +278,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryVedlegg = vedleggService.addVedlegg(klageId.toInt(), vedlegg, bruker)
+        val temporaryVedlegg = vedleggService.addKlagevedlegg(klageId.toInt(), vedlegg, bruker)
         return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
     }
 
@@ -295,7 +295,7 @@ class KlageController(
             vedleggId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (!vedleggService.deleteVedlegg(klageId.toInt(), vedleggId, bruker)) {
+        if (!vedleggService.deleteVedleggFromKlage(klageId.toInt(), vedleggId, bruker)) {
             throw KlageNotFoundException("Attachment not found.")
         }
     }
@@ -315,7 +315,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = vedleggService.getVedlegg(vedleggId, bruker)
+        val content = vedleggService.getVedleggFromKlage(vedleggId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")

@@ -5,7 +5,7 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.titles.TitleEnum
-import no.nav.klage.domain.vedlegg.VedleggDAO
+import no.nav.klage.domain.vedlegg.KlagevedleggDAO
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
@@ -45,7 +45,7 @@ class VedleggRepositoryTest {
         val vedleggExternalRef = "externalRef"
         val nyKlage = transaction {
             val klage = klageRepository.createKlage(klage1)
-            vedleggRepository.storeVedlegg(klage.id!!, vedlegg1, vedleggExternalRef)
+            vedleggRepository.storeKlagevedlegg(klage.id!!, vedlegg1, vedleggExternalRef)
             klageRepository.getKlageById(klage.id!!)
         }
 
@@ -58,7 +58,7 @@ class VedleggRepositoryTest {
     @AfterAll
     fun cleanup() {
         transaction {
-            VedleggDAO.all().forEach { x -> x.delete() }
+            KlagevedleggDAO.all().forEach { x -> x.delete() }
             KlageDAO.all().forEach { x -> x.delete() }
         }
     }

@@ -2,7 +2,7 @@ package no.nav.klage.kafka
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.klage.domain.klage.AggregatedKlage
+import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
@@ -23,9 +23,9 @@ class AivenKafkaProducer(
         private val secureLogger = getSecureLogger()
     }
 
-    fun sendToKafka(klage: AggregatedKlage) {
+    fun sendToKafka(klageAnkeToKafka: AggregatedKlageAnke) {
         logger.debug("Sending to Kafka topic: {}", topic)
-        val json = klage.toJson()
+        val json = klageAnkeToKafka.toJson()
         secureLogger.debug("Sending to Kafka topic: {}\npayload: {}", topic, json)
         runCatching {
             aivenKafkaTemplate.send(topic, json).get()
@@ -38,5 +38,5 @@ class AivenKafkaProducer(
         }
     }
 
-    fun AggregatedKlage.toJson(): String = jacksonObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(this)
+    fun AggregatedKlageAnke.toJson(): String = jacksonObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(this)
 }

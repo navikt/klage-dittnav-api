@@ -31,6 +31,8 @@ class DraftCleanupService(
         private val secureLogger = getSecureLogger()
     }
 
+    //TODO create for anke
+
     @Scheduled(cron = "\${DRAFT_CLEANUP_CRON}", zone = "Europe/Oslo")
     @SchedulerLock(name = "markOldDraftsAsDeleted")
     fun markOldDraftsAsDeleted() {
@@ -58,7 +60,7 @@ class DraftCleanupService(
                         if (fileClient.deleteVedleggFile(vedlegg.ref)) {
                             klageVedleggFilesSuccessfullyDeleted++
                         }
-                        vedlegg.id?.let { vedleggId -> vedleggRepository.deleteVedlegg(vedleggId) }
+                        vedlegg.id?.let { vedleggId -> vedleggRepository.deleteVedleggFromKlage(vedleggId) }
                         klageVedleggSuccessfullyDeleted++
                     }.onFailure { failure ->
                         logger.error("Could not remove attachment ${vedlegg.id}. See secure logs for details.")
