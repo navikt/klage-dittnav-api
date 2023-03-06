@@ -51,7 +51,7 @@ class InternalController(
         return JournalpostIdResponse(journalpostId = klageService.getJournalpostIdWithoutValidation(klageId))
     }
 
-    @GetMapping("/anker/{klageId}/journalpostid")
+    @GetMapping("/anker/{ankeId}/journalpostid")
     fun getJournalpostIdAnke(
         @PathVariable ankeId: UUID
     ): JournalpostIdResponse {
