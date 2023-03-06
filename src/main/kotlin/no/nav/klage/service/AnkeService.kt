@@ -13,6 +13,7 @@ import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
 import no.nav.klage.util.getLogger
@@ -210,6 +211,7 @@ class AnkeService(
             titleKey = titleKey,
             hasVedlegg = hasVedlegg,
             enhetsnummer = enhetsnummer,
+            vedlegg = vedlegg.map { it.toVedleggView() }
         )
     }
 
