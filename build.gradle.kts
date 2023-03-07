@@ -12,7 +12,7 @@ val pdfboxVersion = "2.0.27"
 val tikaVersion = "2.7.0"
 val resilience4jVersion = "2.0.2"
 val problemSpringWebStartVersion = "0.27.0"
-val shedlockVersion = "5.1.0"
+val shedlockVersion = "5.2.0"
 val springDocVersion = "2.0.2"
 
 val githubUser: String by project
