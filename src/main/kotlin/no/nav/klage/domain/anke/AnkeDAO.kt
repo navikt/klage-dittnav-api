@@ -1,6 +1,5 @@
 package no.nav.klage.domain.anke
 
-import no.nav.klage.domain.klage.Klager
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLanguageEnum
 import no.nav.klage.util.toStatus
@@ -29,7 +28,7 @@ class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
     var titleKey by Anker.titleKey
     var hasVedlegg by Anker.hasVedlegg
     var pdfDownloaded by Anker.pdfDownloaded
-    var journalpostId by Klager.journalpostId
+    var journalpostId by Anker.journalpostId
 }
 
 object Anker : UUIDTable("anke") {
