@@ -134,21 +134,6 @@ class KlageRepositoryTest {
     }
 
     @Test
-    fun `should get klage with titleKey based on ytelse in KlageDAO and titleKey in request`() {
-        transaction {
-            createDBEntryWithYtelse()
-
-            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                fnr,
-                exampleTema,
-                null,
-                exampleTitleKey
-            )
-            Assertions.assertEquals(exampleTitleKey, hentetKlage?.titleKey)
-        }
-    }
-
-    @Test
     fun `updateFritekst works as expected`() {
         transaction {
             createDBEntryWithYtelse()
@@ -236,7 +221,6 @@ class KlageRepositoryTest {
             status = draftStatus.name
             fritekst = exampleFritekst
             tema = exampleTema.name
-            ytelse = exampleTitleKey.nb
         }
     }
 
