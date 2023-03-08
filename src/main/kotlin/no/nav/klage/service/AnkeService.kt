@@ -86,7 +86,6 @@ class AnkeService(
     fun createAnke(input: AnkeFullInput, bruker: Bruker): AnkeView {
         val anke = input.toAnke(bruker)
         return createAnke(anke = anke, bruker = bruker)
-
     }
 
     fun createAnke(input: AnkeInput, bruker: Bruker): AnkeView {
