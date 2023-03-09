@@ -102,7 +102,7 @@ class AnkeService(
                 } else {
                     anke.tema.toString()
                 }
-                klageAnkeMetrics.incrementAnkerFinalized(temaReport)
+                klageAnkeMetrics.incrementAnkerInitialized(temaReport)
             }
     }
 
