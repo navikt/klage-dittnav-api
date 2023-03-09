@@ -221,6 +221,7 @@ class AnkeService(
             navn = bruker.navn,
             fritekst = anke.fritekst!!,//should already be validated
             userSaksnummer = anke.userSaksnummer,
+            internalSaksnummer = anke.internalSaksnummer,
             vedtakDate = anke.vedtakDate,
             titleKey = anke.titleKey,
             tema = anke.tema,

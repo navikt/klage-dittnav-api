@@ -34,7 +34,7 @@ fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
         etternavn = navn.etternavn,
         vedtak = vedtakFromDate(vedtakDate) ?: "Ikke angitt",
         begrunnelse = sanitizeText(fritekst),
-        saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
+        saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
@@ -50,7 +50,7 @@ fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
         etternavn = navn.etternavn,
         vedtak = vedtakFromDate(vedtakDate) ?: "Ikke angitt",
         begrunnelse = sanitizeText(fritekst),
-        saksnummer = sanitizeText(getSaksnummerString(userSaksnummer)),
+        saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse,
@@ -58,10 +58,13 @@ fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
     )
 }
 
-private fun getSaksnummerString(userSaksnummer: String? = null): String {
+private fun getSaksnummerString(userSaksnummer: String? = null, internalSaksnummer: String? = null): String {
     return when {
         userSaksnummer != null -> {
             "$userSaksnummer - Oppgitt av bruker"
+        }
+        internalSaksnummer != null -> {
+            "$internalSaksnummer - Hentet fra internt system"
         }
         else -> "Ikke angitt"
     }

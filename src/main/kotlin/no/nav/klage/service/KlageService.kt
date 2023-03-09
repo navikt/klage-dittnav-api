@@ -379,6 +379,7 @@ class KlageService(
             navn = bruker.navn,
             fritekst = klage.fritekst!!,
             userSaksnummer = klage.userSaksnummer,
+            internalSaksnummer = klage.internalSaksnummer,
             vedtakDate = klage.vedtakDate,
             titleKey = klage.titleKey,
             tema = klage.tema,
