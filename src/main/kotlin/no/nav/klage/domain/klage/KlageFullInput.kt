@@ -1,10 +1,9 @@
 package no.nav.klage.domain.klage
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.TitleEnum
-import no.nav.klage.util.parseTitleKey
 import java.time.LocalDate
 
 data class KlageFullInput (
@@ -23,8 +22,8 @@ data class KlageFullInput (
 fun KlageFullInput.toKlage(bruker: Bruker): Klage {
     return Klage(
         foedselsnummer = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer,
-        tema = tema,
-        titleKey = parseTitleKey(titleKey, tema),
+        tema = titleKey.getTema(),
+        titleKey = titleKey,
         checkboxesSelected = checkboxesSelected,
         userSaksnummer = userSaksnummer,
         language = language,
