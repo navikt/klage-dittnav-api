@@ -31,8 +31,6 @@ class DraftCleanupService(
         private val secureLogger = getSecureLogger()
     }
 
-    //TODO create for anke
-
     @Scheduled(cron = "\${DRAFT_CLEANUP_CRON}", zone = "Europe/Oslo")
     @SchedulerLock(name = "markOldDraftsAsDeleted")
     fun markOldDraftsAsDeleted() {
@@ -85,7 +83,7 @@ class DraftCleanupService(
 
         val oldAnkeDrafts = ankeRepository.getExpiredDraftAnker()
         val expiredAnker = oldAnkeDrafts.count()
-        logger.debug("Found $expiredAnker expired draft nker")
+        logger.debug("Found $expiredAnker expired draft anker")
         slackClient.postMessage("Fant $expiredAnker utgåtte draft-anker")
 
         oldAnkeDrafts.forEach {
