@@ -1,7 +1,7 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.vedlegg.VedleggDAO
-import no.nav.klage.domain.vedlegg.Vedleggene
+import no.nav.klage.domain.vedlegg.KlagevedleggDAO
+import no.nav.klage.domain.vedlegg.Klagevedleggene
 import no.nav.klage.util.getLanguageEnum
 import no.nav.klage.util.getTitleEnum
 import no.nav.klage.util.toStatus
@@ -22,9 +22,8 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var status by Klager.status
     var modifiedByUser by Klager.modifiedByUser
     var tema by Klager.tema
-    var ytelse by Klager.ytelse
     var userSaksnummer by Klager.userSaksnummer
-    val vedlegg by VedleggDAO referrersOn Vedleggene.klageId
+    val vedlegg by KlagevedleggDAO referrersOn Klagevedleggene.klageId
     var journalpostId by Klager.journalpostId
     var vedtakDate by Klager.vedtakDate
     var checkBoxesSelected by Klager.checkboxesSelected
@@ -42,7 +41,6 @@ object Klager : IntIdTable("klage") {
     var status = varchar("status", 15)
     var modifiedByUser = timestamp("modified_by_user").default(Instant.now())
     var tema = varchar("tema", 3)
-    var ytelse = varchar("ytelse", 300).nullable()
     var userSaksnummer = text("user_saksnummer").nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
     var vedtakDate = date("vedtak_date").nullable()
@@ -71,7 +69,7 @@ fun KlageDAO.toKlage(): Klage {
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmektig,
         language = getLanguageEnum(this.language),
-        titleKey = getTitleEnum(this.titleKey, this.ytelse, this.tema),
+        titleKey = getTitleEnum(this.titleKey, this.tema),
         hasVedlegg = hasVedlegg,
     )
 }

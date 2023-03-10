@@ -58,7 +58,7 @@ class DraftCleanupService(
                         if (fileClient.deleteVedleggFile(vedlegg.ref)) {
                             klageVedleggFilesSuccessfullyDeleted++
                         }
-                        vedlegg.id?.let { vedleggId -> vedleggRepository.deleteVedlegg(vedleggId) }
+                        vedlegg.id?.let { vedleggId -> vedleggRepository.deleteVedleggFromKlage(vedleggId) }
                         klageVedleggSuccessfullyDeleted++
                     }.onFailure { failure ->
                         logger.error("Could not remove attachment ${vedlegg.id}. See secure logs for details.")
@@ -83,7 +83,7 @@ class DraftCleanupService(
 
         val oldAnkeDrafts = ankeRepository.getExpiredDraftAnker()
         val expiredAnker = oldAnkeDrafts.count()
-        logger.debug("Found $expiredAnker expired draft nker")
+        logger.debug("Found $expiredAnker expired draft anker")
         slackClient.postMessage("Fant $expiredAnker utgåtte draft-anker")
 
         oldAnkeDrafts.forEach {

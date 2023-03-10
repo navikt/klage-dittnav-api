@@ -8,7 +8,6 @@ import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.or
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import java.time.Instant
@@ -51,13 +50,13 @@ class KlageRepository {
     ): Klage? {
         return KlageDAO.find {
             if (titleKey == null && internalSaksnummer.isNullOrBlank()) {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and Klager.titleKey.isNull() and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             } else if (titleKey == null) {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse.isNull() and Klager.titleKey.isNull()) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and Klager.titleKey.isNull() and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             } else if (internalSaksnummer.isNullOrBlank()) {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.titleKey eq titleKey.name) and (Klager.internalSaksnummer.isNull()) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             } else {
-                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.ytelse eq titleKey.nb or (Klager.titleKey eq titleKey.name)) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
+                Klager.foedselsnummer eq fnr and (Klager.tema eq tema.name) and (Klager.titleKey eq titleKey.name) and (Klager.internalSaksnummer eq internalSaksnummer) and (Klager.status eq KlageAnkeStatus.DRAFT.toString())
             }
         }.maxByOrNull { it.modifiedByUser }
             ?.toKlage()

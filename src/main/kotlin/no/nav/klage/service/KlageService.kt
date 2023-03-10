@@ -45,7 +45,7 @@ class KlageService(
         val klage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(klage, false)
         validationService.validateKlageAccess(klage, bruker)
-        return klage.toKlageView(bruker)
+        return klage.toKlageView(bruker = bruker)
     }
 
     fun validateAccess(klageId: Int, bruker: Bruker) {
@@ -261,7 +261,7 @@ class KlageService(
         klageRepository.updateKlage(updatedKlage, false)
         kafkaInternalEventService.publishEvent(
             Event(
-                klageId = klageId.toString(),
+                klageAnkeId = klageId.toString(),
                 name = "journalpostId",
                 id = klageId.toString(),
                 data = journalpostId,
@@ -279,16 +279,16 @@ class KlageService(
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
-            id!!.toString(),
+            id = id!!.toString(),
             //TODO: Følg opp med FE, er det forskjell på klage og anke?
-            fritekst ?: "",
-            tema,
-            status,
-            modifiedDateTime,
-            vedlegg.map {
+            fritekst = fritekst ?: "",
+            tema = tema,
+            status = status,
+            modifiedByUser = modifiedDateTime,
+            vedlegg = vedlegg.map {
                 it.toVedleggView()
             },
-            journalpostId,
+            journalpostId = journalpostId,
             finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,
             vedtakDate = vedtakDate,
             checkboxesSelected = checkboxesSelected ?: emptySet(),
@@ -326,55 +326,49 @@ class KlageService(
     private fun createAggregatedKlage(
         bruker: Bruker,
         klage: Klage
-    ): AggregatedKlage {
+    ): AggregatedKlageAnke {
         val vedtak = vedtakFromDate(klage.vedtakDate)
         val fullmektigKlage = klage.fullmektig != null
 
         if (fullmektigKlage) {
             val fullmaktsGiver = brukerService.getFullmaktsgiver(klage.tema, klage.foedselsnummer)
 
-            return AggregatedKlage(
-                id = klage.id!!,
+            return AggregatedKlageAnke(
+                id = klage.id!!.toString(),
                 fornavn = fullmaktsGiver.navn.fornavn,
                 mellomnavn = fullmaktsGiver.navn.mellomnavn ?: "",
                 etternavn = fullmaktsGiver.navn.etternavn,
-                adresse = fullmaktsGiver.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
-                telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
                 begrunnelse = sanitizeText(klage.fritekst!!),
-                identifikasjonstype = fullmaktsGiver.folkeregisteridentifikator.type,
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
                 ytelse = klage.titleKey.nb,
-                vedlegg = klage.vedlegg,
+                vedlegg = klage.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
                 userChoices = klage.checkboxesSelected?.map { x -> x.getFullText(klage.language) },
                 userSaksnummer = klage.userSaksnummer,
                 internalSaksnummer = klage.internalSaksnummer,
-                fullmektigNavn = bruker.getCompoundedNavn(),
-                fullmektigFnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+                klageAnkeType = AggregatedKlageAnke.KlageAnkeType.KLAGE,
+                enhetsnummer = null,
             )
         } else {
-            return AggregatedKlage(
-                id = klage.id!!,
+            return AggregatedKlageAnke(
+                id = klage.id!!.toString(),
                 fornavn = bruker.navn.fornavn,
                 mellomnavn = bruker.navn.mellomnavn ?: "",
                 etternavn = bruker.navn.etternavn,
-                adresse = bruker.adresse?.toKlageskjemaString() ?: "Ukjent adresse",
-                telefon = bruker.kontaktinformasjon?.telefonnummer ?: "",
                 vedtak = vedtak ?: "",
                 dato = ZonedDateTime.ofInstant(klage.modifiedByUser, UTC).toLocalDate(),
                 begrunnelse = sanitizeText(klage.fritekst!!),
-                identifikasjonstype = bruker.folkeregisteridentifikator.type,
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
                 ytelse = klage.titleKey.nb,
-                vedlegg = klage.vedlegg,
+                vedlegg = klage.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
                 userChoices = klage.checkboxesSelected?.map { x -> x.getFullText(klage.language) },
                 userSaksnummer = klage.userSaksnummer,
                 internalSaksnummer = klage.internalSaksnummer,
-                fullmektigNavn = null,
-                fullmektigFnr = null
+                klageAnkeType = AggregatedKlageAnke.KlageAnkeType.KLAGE,
+                enhetsnummer = null,
             )
         }
     }
@@ -385,6 +379,7 @@ class KlageService(
             navn = bruker.navn,
             fritekst = klage.fritekst!!,
             userSaksnummer = klage.userSaksnummer,
+            internalSaksnummer = klage.internalSaksnummer,
             vedtakDate = klage.vedtakDate,
             titleKey = klage.titleKey,
             tema = klage.tema,

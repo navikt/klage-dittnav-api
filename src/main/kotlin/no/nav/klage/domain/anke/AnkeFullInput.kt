@@ -13,8 +13,8 @@ data class AnkeFullInput(
     val userSaksnummer: String? = null,
     val language: LanguageEnum = LanguageEnum.NB,
     val vedtakDate: LocalDate? = null,
+    val internalSaksnummer: String? = null,
     val fritekst: String?,
-    val fullmaktsgiver: String? = null,
     val enhetsnummer: String? = null,
     val hasVedlegg: Boolean,
 )
@@ -26,6 +26,7 @@ fun AnkeFullInput.toAnke(bruker: Bruker) = Anke(
     userSaksnummer = userSaksnummer,
     language = language,
     vedtakDate = vedtakDate,
+    internalSaksnummer = internalSaksnummer,
     fritekst = fritekst,
     enhetsnummer = enhetsnummer,
     hasVedlegg = hasVedlegg,

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.codec.ServerSentEvent
 
 data class Event (
-    val klageId: String,
+    val klageAnkeId: String,
     val name: String,
     val id: String,
     val data: String,
@@ -23,7 +23,7 @@ fun Event.toServerSentEvent(): ServerSentEvent<String> {
 
 fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> {
     return Event(
-        klageId = "",
+        klageAnkeId = "",
         name = "heartbeat-event",
         id = this.toString(),
         data = ""

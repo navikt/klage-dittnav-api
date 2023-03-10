@@ -14,8 +14,10 @@ import no.nav.klage.domain.exception.AnkeNotFoundException
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
+import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.service.AnkeService
 import no.nav.klage.service.BrukerService
+import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -25,8 +27,11 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import java.time.Duration
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
@@ -36,6 +41,7 @@ import java.util.*
 class AnkeController(
     private val brukerService: BrukerService,
     private val ankeService: AnkeService,
+    private val vedleggService: VedleggService,
     private val kafkaEventClient: KafkaEventClient,
 ) {
 
@@ -70,6 +76,20 @@ class AnkeController(
         return ankeService.getAnke(ankeId, bruker)
     }
 
+    @GetMapping("/{ankeId}/journalpostid")
+    fun getJournalpostId(
+        @PathVariable ankeId: UUID
+    ): String? {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get journalpost id is requested. AnkeId: {}", ankeId)
+        secureLogger.debug(
+            "Get journalpost id is requested. AnkeId: {}, fnr: {}",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        return ankeService.getJournalpostId(ankeId, bruker)
+    }
+
     @GetMapping("/{ankeId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getEvents(
         @PathVariable ankeId: UUID
@@ -88,8 +108,7 @@ class AnkeController(
 
         return kafkaEventClient.getEventPublisher()
             .mapNotNull { event -> jsonToEvent(event.data()) }
-            //TODO
-//            .filter { it.ankeId == ankeId }
+            .filter { it.klageAnkeId == ankeId.toString() }
             .mapNotNull { it.toServerSentEvent() }
             .mergeWith(heartbeatStream)
     }
@@ -143,25 +162,6 @@ class AnkeController(
         )
     }
 
-    @PutMapping("/{ankeId}/hasvedlegg")
-    fun updateHasVedlegg(
-        @PathVariable ankeId: UUID,
-        @RequestBody input: BooleanInput,
-        response: HttpServletResponse
-    ): EditedView {
-        val bruker = brukerService.getBruker()
-        logger.debug("Update anke hasvedlegg is requested. Id: {}", ankeId)
-        secureLogger.debug(
-            "Update anke hasvedlegg is requested. Id: {}, fnr: {}",
-            ankeId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-        val modifiedByUser = ankeService.updateHasVedlegg(ankeId, input.value, bruker)
-        return EditedView(
-            modifiedByUser = modifiedByUser
-        )
-    }
-
     @PutMapping("/{ankeId}/usersaksnummer")
     fun updateUserSaksnummer(
         @PathVariable ankeId: UUID,
@@ -200,6 +200,25 @@ class AnkeController(
         )
     }
 
+    @PutMapping("/{ankeId}/hasvedlegg")
+    fun updateHasVedlegg(
+        @PathVariable ankeId: UUID,
+        @RequestBody input: BooleanInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Update anke hasvedlegg is requested. Id: {}", ankeId)
+        secureLogger.debug(
+            "Update anke hasvedlegg is requested. Id: {}, fnr: {}",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = ankeService.updateHasVedlegg(ankeId, input.value, bruker)
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
     @PutMapping("/{ankeId}/enhetsnummer")
     fun updateEnhetsnummer(
         @PathVariable ankeId: UUID,
@@ -229,6 +248,121 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
         ankeService.deleteAnke(ankeId, bruker)
+    }
+
+    @PostMapping("/{ankeId}/finalize")
+    @ResponseStatus(HttpStatus.OK)
+    fun finalizeAnke(
+        @PathVariable ankeId: UUID
+    ): Map<String, String> {
+        val bruker = brukerService.getBruker()
+        logger.debug("Finalize anke is requested. Id: {}", ankeId)
+        secureLogger.debug(
+            "Finalize anke is requested. Id: {}, fnr: {}",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val finalizedInstant = ankeService.finalizeAnke(ankeId = ankeId, bruker = bruker)
+        val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
+        return mapOf(
+            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
+            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+        )
+    }
+
+    @PostMapping(value = ["/{ankeId}/vedlegg"], consumes = ["multipart/form-data"])
+    fun addVedleggToAnke(
+        @PathVariable ankeId: UUID,
+        @RequestParam vedlegg: MultipartFile
+    ): VedleggView {
+        val bruker = brukerService.getBruker()
+        logger.debug("Add vedlegg to klage is requested. AnkeId: {}", ankeId)
+        secureLogger.debug(
+            "Add Vedlegg to anke is requested. AnkeId: {}, fnr: {} ",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val temporaryVedlegg = vedleggService.addAnkevedlegg(ankeId = ankeId, vedlegg = vedlegg, bruker = bruker)
+        return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
+    }
+
+    @DeleteMapping("/{ankeId}/vedlegg/{vedleggId}")
+    fun deleteVedlegg(
+        @PathVariable ankeId: UUID,
+        @PathVariable vedleggId: Int
+    ) {
+        val bruker = brukerService.getBruker()
+        logger.debug(
+            "Delete vedlegg from anke is requested. AnkeId: {}, VedleggId: {}",
+            ankeId,
+            vedleggId
+        )
+        secureLogger.debug(
+            "Delete vedlegg from anke is requested. AnkeId: {}, vedleggId: {}, fnr: {} ",
+            ankeId,
+            vedleggId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        if (!vedleggService.deleteVedleggFromAnke(ankeId = ankeId, vedleggId = vedleggId, bruker = bruker)) {
+            //TODO is there a reason for this choice of exception?
+            throw AnkeNotFoundException("Attachment not found.")
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/{ankeId}/vedlegg/{vedleggId}")
+    fun getVedleggFromAnke(
+        @PathVariable ankeId: UUID,
+        @PathVariable vedleggId: Int
+    ): ResponseEntity<ByteArray> {
+        val bruker = brukerService.getBruker()
+        logger.debug(
+            "Get vedlegg to anke is requested. AnkeId: {} - VedleggId: {}",
+            ankeId,
+            vedleggId
+        )
+        secureLogger.debug(
+            "Vedlegg from anke is requested. AnkeId: {}, vedleggId: {}, fnr: {} ",
+            ankeId,
+            vedleggId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+
+        val content = vedleggService.getVedleggFromAnke(vedleggId, bruker)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
+    }
+
+    @ResponseBody
+    @GetMapping("/{ankeId}/pdf")
+    fun getAnkePdf(
+        @PathVariable ankeId: UUID
+    ): ResponseEntity<ByteArray> {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get anke pdf is requested. KlageId: {}", ankeId)
+        secureLogger.debug(
+            "Get anke-pdf is requested. AnkeId: {}, fnr: {} ",
+            ankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+
+        val content = ankeService.getAnkePdf(ankeId = ankeId, bruker = bruker)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "anke.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
     }
 
     @ResponseBody

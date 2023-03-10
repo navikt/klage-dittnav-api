@@ -48,14 +48,10 @@ fun getLanguageEnum(input: String?): LanguageEnum {
     }
 }
 
-fun getTitleEnum(titleKey: String?, ytelse: String?, tema: String): TitleEnum {
+fun getTitleEnum(titleKey: String?, tema: String): TitleEnum {
     return when (titleKey) {
         null -> {
-            if (ytelse != null && TitleEnum.getTitleKeyFromNbTitle(ytelse) != null) {
-                TitleEnum.getTitleKeyFromNbTitle(ytelse)!!
-            } else {
-                TitleEnum.valueOf(tema)
-            }
+            TitleEnum.valueOf(tema)
         }
         else -> {
             TitleEnum.valueOf(titleKey)

@@ -9,6 +9,7 @@ import no.nav.klage.util.parseTitleKey
 data class AnkeInput(
     val tema: Tema,
     val titleKey: TitleEnum,
+    val internalSaksnummer: String?,
 )
 
 fun AnkeInput.toAnke(bruker: Bruker): Anke {
@@ -17,5 +18,6 @@ fun AnkeInput.toAnke(bruker: Bruker): Anke {
         tema = tema,
         language = LanguageEnum.NB,
         titleKey = parseTitleKey(titleKey, tema),
+        internalSaksnummer = internalSaksnummer,
     )
 }

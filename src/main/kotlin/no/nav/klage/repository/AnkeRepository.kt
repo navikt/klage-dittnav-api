@@ -1,12 +1,9 @@
 package no.nav.klage.repository
 
-import no.nav.anke.domain.anke.AnkeDAO
-import no.nav.anke.domain.anke.Anker
-import no.nav.anke.domain.anke.fromAnke
-import no.nav.anke.domain.anke.toAnke
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.anke.Anke
+import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.exception.AnkeNotFoundException
+import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
 import no.nav.klage.domain.titles.TitleEnum
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
@@ -148,5 +145,20 @@ class AnkeRepository {
 
     private fun getAnkeToModify(id: UUID?): AnkeDAO {
         return AnkeDAO.findById(checkNotNull(id)) ?: throw AnkeNotFoundException("Anke with id $id not found in db.")
+    }
+
+    fun updateAnke(anke: Anke, checkWritableOnceFields: Boolean = true): Anke {
+        logger.debug("Updating anke in db. Id: {}", anke.id)
+        val ankeFromDB = getAnkeToModify(anke.id)
+
+        if (checkWritableOnceFields && !anke.writableOnceFieldsMatch(ankeFromDB.toAnke())) {
+            throw AttemptedIllegalUpdateException()
+        }
+
+        ankeFromDB.apply {
+            fromAnke(anke)
+        }
+        logger.debug("Anke successfully updated in db.")
+        return ankeFromDB.toAnke()
     }
 }

@@ -4,6 +4,7 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.util.getFormattedLocalDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,4 +21,6 @@ data class AnkeView(
     val language: LanguageEnum = LanguageEnum.NB,
     val titleKey: TitleEnum?,
     val hasVedlegg: Boolean,
+    val vedlegg: List<VedleggView>,
+    val journalpostId: String?,
 )

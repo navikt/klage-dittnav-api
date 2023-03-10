@@ -1,7 +1,8 @@
-package no.nav.anke.domain.anke
+package no.nav.klage.domain.anke
 
-import no.nav.klage.domain.anke.Anke
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.vedlegg.AnkevedleggDAO
+import no.nav.klage.domain.vedlegg.Ankevedleggene
 import no.nav.klage.util.getLanguageEnum
 import no.nav.klage.util.toStatus
 import no.nav.klage.util.toTema
@@ -23,8 +24,11 @@ class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
     var modifiedByUser by Anker.modifiedByUser
     var tema by Anker.tema
     var userSaksnummer by Anker.userSaksnummer
+    val vedlegg by AnkevedleggDAO referrersOn Ankevedleggene.ankeId
+    var journalpostId by Anker.journalpostId
     var vedtakDate by Anker.vedtakDate
     var enhetsnummer by Anker.enhetsnummer
+    var internalSaksnummer by Anker.internalSaksnummer
     var language by Anker.language
     var titleKey by Anker.titleKey
     var hasVedlegg by Anker.hasVedlegg
@@ -40,10 +44,12 @@ object Anker : UUIDTable("anke") {
     var userSaksnummer = text("user_saksnummer").nullable()
     var vedtakDate = date("vedtak_date").nullable()
     var enhetsnummer = text("enhetsnummer").nullable()
+    var internalSaksnummer = text("internal_saksnummer").nullable()
     var language = text("language").nullable()
     var titleKey = text("title_key")
     var hasVedlegg = bool("has_vedlegg").default(false)
     var pdfDownloaded = timestamp("pdf_downloaded").nullable()
+    var journalpostId = varchar("journalpost_id", 50).nullable()
 }
 
 fun AnkeDAO.toAnke(): Anke {
@@ -57,9 +63,12 @@ fun AnkeDAO.toAnke(): Anke {
         userSaksnummer = userSaksnummer,
         vedtakDate = vedtakDate,
         enhetsnummer = enhetsnummer,
+        internalSaksnummer = internalSaksnummer,
         language = getLanguageEnum(this.language),
         titleKey = TitleEnum.valueOf(titleKey),
         hasVedlegg = hasVedlegg,
+        journalpostId = journalpostId,
+        vedlegg = vedlegg.map { it.toVedlegg() },
     )
 }
 
@@ -72,7 +81,9 @@ fun AnkeDAO.fromAnke(anke: Anke) {
     userSaksnummer = anke.userSaksnummer
     vedtakDate = anke.vedtakDate
     enhetsnummer = anke.enhetsnummer
+    internalSaksnummer = anke.internalSaksnummer
     language = anke.language.name
     titleKey = anke.titleKey.name
-
+    journalpostId = anke.journalpostId
+    hasVedlegg = anke.hasVedlegg
 }

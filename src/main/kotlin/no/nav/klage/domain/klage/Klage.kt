@@ -2,7 +2,7 @@ package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.*
 import no.nav.klage.domain.titles.TitleEnum
-import no.nav.klage.domain.vedlegg.Vedlegg
+import no.nav.klage.domain.vedlegg.Klagevedlegg
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
 import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import java.time.Instant
@@ -16,7 +16,7 @@ data class Klage(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val userSaksnummer: String? = null,
-    val vedlegg: List<Vedlegg> = listOf(),
+    val vedlegg: List<Klagevedlegg> = listOf(),
     val journalpostId: String? = null,
     val vedtakDate: LocalDate? = null,
     val checkboxesSelected: Set<CheckboxEnum>? = null,

@@ -2,7 +2,9 @@ package no.nav.klage.domain.anke
 
 import no.nav.klage.domain.*
 import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.vedlegg.Ankevedlegg
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -15,16 +17,30 @@ data class Anke(
     val modifiedByUser: Instant? = Instant.now(),
     val tema: Tema,
     val userSaksnummer: String? = null,
+    val internalSaksnummer: String? = null,
+    val vedlegg: List<Ankevedlegg> = listOf(),
     val vedtakDate: LocalDate? = null,
     val enhetsnummer: String? = null,
     val language: LanguageEnum,
     val titleKey: TitleEnum,
     val hasVedlegg: Boolean = false,
+    val journalpostId: String? = null,
 )
 
 fun Anke.isAccessibleToUser(usersIdentifikasjonsnummer: String) =
     klageAnkeIsAccessibleToUser(usersIdentifikasjonsnummer, foedselsnummer)
 
+fun Anke.isLonnskompensasjon() = klageAnkeIsLonnskompensasjon(tema, titleKey)
+
 fun Anke.isFinalized() = status.isFinalized()
 
 fun Anke.isDeleted() = status.isDeleted()
+
+fun Anke.writableOnceFieldsMatch(existingAnke: Anke): Boolean {
+    return id == existingAnke.id &&
+            foedselsnummer == existingAnke.foedselsnummer &&
+            tema == existingAnke.tema &&
+            titleKey == existingAnke.titleKey &&
+            journalpostId == existingAnke.journalpostId &&
+            internalSaksnummer == existingAnke.internalSaksnummer
+}

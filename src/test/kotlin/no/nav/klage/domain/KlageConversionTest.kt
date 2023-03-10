@@ -19,8 +19,6 @@ class KlageConversionTest {
     private val exampleFnr = "12345678910"
     private val exampleFritekst = "fritekst"
     private val exampleTema = Tema.FOR
-    private val exampleYtelse = "Alderspensjon"
-    private val exampleYtelse2 = "Barnepensjon"
     private val exampleModifiedByUser = Instant.parse("2020-11-12T09:35:39.727803600Z")
     private val exampleStatus = KlageAnkeStatus.DRAFT
     private val exampleTitleKey = TitleEnum.ALDERSPENSJON
@@ -69,25 +67,6 @@ class KlageConversionTest {
 
         @Nested
         inner class TitleKey {
-            @Test
-            fun `should populate titleKey in Klage based on ytelse and no titleKey in KlageDAO`() {
-                val expectedOutput = templateKlage
-
-                transaction {
-                    val inputKlageDAO = KlageDAO.new {
-                        foedselsnummer = exampleFnr
-                        status = exampleStatus.name
-                        fritekst = exampleFritekst
-                        tema = exampleTema.name
-                        ytelse = exampleYtelse
-                        language = LanguageEnum.NB.name
-                    }
-
-                    val result = inputKlageDAO.toKlage().copy(id = exampleId, modifiedByUser = exampleModifiedByUser)
-
-                    assertEquals(expectedOutput, result)
-                }
-            }
 
             @Test
             fun `should populate titleKey in Klage based on no ytelse and titleKey in KlageDAO`() {
@@ -120,7 +99,6 @@ class KlageConversionTest {
                         fritekst = exampleFritekst
                         tema = exampleTema.name
                         language = LanguageEnum.NB.name
-                        ytelse = exampleYtelse2
                         titleKey = exampleTitleKey.name
                     }
 
