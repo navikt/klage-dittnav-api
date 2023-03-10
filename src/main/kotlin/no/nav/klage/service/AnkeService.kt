@@ -229,6 +229,7 @@ class AnkeService(
             enhetsnummer = anke.enhetsnummer!!,//should already be validated
             language = anke.language,
             hasVedlegg = anke.hasVedlegg,
+            titleKey = anke.innsendingsytelse,
         )
     }
 

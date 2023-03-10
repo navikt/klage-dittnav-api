@@ -382,6 +382,7 @@ class KlageService(
             checkboxesSelected = klage.checkboxesSelected,
             language = klage.language,
             hasVedlegg = klage.vedlegg.isNotEmpty() || klage.hasVedlegg,
+            titleKey = klage.innsendingsytelse,
         )
     }
 }
