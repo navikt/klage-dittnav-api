@@ -2,8 +2,7 @@ package no.nav.klage.domain.klage
 
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.Tema
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.util.getFormattedLocalDateTime
 import java.time.LocalDate
@@ -12,7 +11,6 @@ import java.time.LocalDateTime
 data class KlageView(
     val id: String,
     val fritekst: String?,
-    val tema: Tema,
     val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
     val vedlegg: List<VedleggView> = listOf(),
@@ -24,7 +22,7 @@ data class KlageView(
     val internalSaksnummer: String? = null,
     val fullmaktsgiver: String? = null,
     val language: LanguageEnum = LanguageEnum.NB,
-    val titleKey: TitleEnum?,
-    val ytelse: String?,
+    val titleKey: Innsendingsytelse,
+    val innsendingsytelse: Innsendingsytelse,
     val hasVedlegg: Boolean,
 )

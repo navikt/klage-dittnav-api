@@ -4,7 +4,7 @@ import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.KlagevedleggDAO
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
@@ -68,7 +68,7 @@ class VedleggRepositoryTest {
         fritekst = "fritekst",
         tema = Tema.AAP,
         language = LanguageEnum.NB,
-        titleKey = TitleEnum.ALDERSPENSJON,
+        innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
         hasVedlegg = false,
     )
 

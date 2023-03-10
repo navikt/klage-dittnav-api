@@ -3,7 +3,7 @@ package no.nav.klage.repository
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.KlageDAO
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
 import org.h2.jdbcx.JdbcConnectionPool
@@ -22,15 +22,15 @@ class KlageRepositoryTest {
     private val fnr = "12345678910"
     private val draftStatus = KlageAnkeStatus.DRAFT
     private val exampleTema = Tema.AAP
-    private val exampleTitleKey = TitleEnum.ARBEIDSAVKLARINGSPENGER
+    private val exampleInnsendingsytelse = Innsendingsytelse.ARBEIDSAVKLARINGSPENGER
     private val exampleInternalSaksnummer = "123456"
     private val exampleModifiedByUser = Instant.parse("2020-11-12T09:35:39.727803600Z")
     private val exampleModifiedByUser2 = exampleModifiedByUser.plusSeconds(100)
 
-    private val titleKeyAndInternalSaksnummer = "titleKey and internalSaksnummer"
-    private val titleKeyAndNoInternalSaksnummer = "titleKey and no internalSaksnummer"
-    private val noTitleKeyAndInternalSaksnummer = "no titleKey and internalSaksnummer"
-    private val noTitleKeyAndNoInternalSaksnummer = "no titleKey and no internalSaksnummer"
+    private val innsendingsytelseAndInternalSaksnummer = "innsendingsytelse and internalSaksnummer"
+    private val innsendingsytelseAndNoInternalSaksnummer = "innsendingsytelse and no internalSaksnummer"
+    private val noInnsendingsytelseAndInternalSaksnummer = "no innsendingsytelse and internalSaksnummer"
+    private val noInnsendingsytelseAndNoInternalSaksnummer = "no innsendingsytelse and no internalSaksnummer"
 
     private lateinit var klageRepository: KlageRepository
     private lateinit var datasource: DataSource
@@ -58,62 +58,32 @@ class KlageRepositoryTest {
     }
 
     @Test
-    fun `should get correct klage based on internalSaksnummer and titleKey`() {
+    fun `should get correct klage based on internalSaksnummer and innsendingsytelse`() {
         transaction {
             createDBEntries()
 
-            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+            val hentetKlage = klageRepository.getLatestKlageDraft(
                 fnr,
                 exampleTema,
                 exampleInternalSaksnummer,
-                exampleTitleKey
+                exampleInnsendingsytelse
             )
-            Assertions.assertEquals(titleKeyAndInternalSaksnummer, hentetKlage?.fritekst)
+            Assertions.assertEquals(innsendingsytelseAndInternalSaksnummer, hentetKlage?.fritekst)
         }
     }
 
     @Test
-    fun `should get correct klage based on internalSaksnummer and no titleKey`() {
+    fun `should get correct klage based on no internalSaksnummer and innsendingsytelse`() {
         transaction {
             createDBEntries()
 
-            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                fnr,
-                exampleTema,
-                exampleInternalSaksnummer,
-                null
+            val hentetKlage = klageRepository.getLatestKlageDraft(
+                fnr = fnr,
+                tema = exampleTema,
+                internalSaksnummer = null,
+                innsendingsytelse = exampleInnsendingsytelse
             )
-            Assertions.assertEquals(noTitleKeyAndInternalSaksnummer, hentetKlage?.fritekst)
-        }
-    }
-
-    @Test
-    fun `should get correct klage based on no internalSaksnummer and titleKey`() {
-        transaction {
-            createDBEntries()
-
-            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                fnr,
-                exampleTema,
-                null,
-                exampleTitleKey
-            )
-            Assertions.assertEquals(titleKeyAndNoInternalSaksnummer, hentetKlage?.fritekst)
-        }
-    }
-
-    @Test
-    fun `should get correct klage based on no internalSaksnummer and no titleKey`() {
-        transaction {
-            createDBEntries()
-
-            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                fnr,
-                exampleTema,
-                null,
-                null
-            )
-            Assertions.assertEquals(noTitleKeyAndNoInternalSaksnummer, hentetKlage?.fritekst)
+            Assertions.assertEquals(innsendingsytelseAndNoInternalSaksnummer, hentetKlage?.fritekst)
         }
     }
 
@@ -123,11 +93,11 @@ class KlageRepositoryTest {
             createTwoSimilarEntries()
 
 
-            val hentetKlage = klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
+            val hentetKlage = klageRepository.getLatestKlageDraft(
                 fnr,
                 exampleTema,
                 exampleInternalSaksnummer,
-                exampleTitleKey
+                exampleInnsendingsytelse
             )
             Assertions.assertEquals(exampleFritekst2, hentetKlage?.fritekst)
         }
@@ -146,7 +116,6 @@ class KlageRepositoryTest {
         }
     }
 
-
     @AfterAll
     fun cleanupAfter() {
         transaction {
@@ -154,14 +123,13 @@ class KlageRepositoryTest {
         }
     }
 
-
     private fun createTwoSimilarEntries() {
         KlageDAO.new {
             foedselsnummer = fnr
             status = draftStatus.name
             fritekst = exampleFritekst
             tema = exampleTema.name
-            titleKey = exampleTitleKey.name
+            innsendingsytelse = exampleInnsendingsytelse.name
             internalSaksnummer = exampleInternalSaksnummer
             modifiedByUser = exampleModifiedByUser
         }
@@ -171,47 +139,30 @@ class KlageRepositoryTest {
             status = draftStatus.name
             fritekst = exampleFritekst2
             tema = exampleTema.name
-            titleKey = exampleTitleKey.name
+            innsendingsytelse = exampleInnsendingsytelse.name
             internalSaksnummer = exampleInternalSaksnummer
             modifiedByUser = exampleModifiedByUser2
         }
     }
 
     private fun createDBEntries() {
-        //titleKey and internalSaksnummer
+        //innsendingsytelse and internalSaksnummer
         KlageDAO.new {
             foedselsnummer = fnr
             status = draftStatus.name
-            fritekst = titleKeyAndInternalSaksnummer
+            fritekst = innsendingsytelseAndInternalSaksnummer
             tema = exampleTema.name
-            titleKey = exampleTitleKey.name
+            innsendingsytelse = exampleInnsendingsytelse.name
             internalSaksnummer = exampleInternalSaksnummer
         }
 
-        //titleKey and no internalSaksnummer
+        //innsendingsytelse and no internalSaksnummer
         KlageDAO.new {
             foedselsnummer = fnr
             status = draftStatus.name
-            fritekst = titleKeyAndNoInternalSaksnummer
+            fritekst = innsendingsytelseAndNoInternalSaksnummer
             tema = exampleTema.name
-            titleKey = exampleTitleKey.name
-        }
-
-        //no titleKey and internalSaksnummer
-        KlageDAO.new {
-            foedselsnummer = fnr
-            status = draftStatus.name
-            fritekst = noTitleKeyAndInternalSaksnummer
-            tema = exampleTema.name
-            internalSaksnummer = exampleInternalSaksnummer
-        }
-
-        //no titleKey and no internalSaksnummer
-        KlageDAO.new {
-            foedselsnummer = fnr
-            status = draftStatus.name
-            fritekst = noTitleKeyAndNoInternalSaksnummer
-            tema = exampleTema.name
+            innsendingsytelse = exampleInnsendingsytelse.name
         }
     }
 
@@ -221,6 +172,7 @@ class KlageRepositoryTest {
             status = draftStatus.name
             fritekst = exampleFritekst
             tema = exampleTema.name
+            innsendingsytelse = exampleInnsendingsytelse.name
         }
     }
 

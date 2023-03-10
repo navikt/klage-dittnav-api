@@ -1,7 +1,7 @@
 package no.nav.klage.util
 
 import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import org.springframework.core.convert.converter.Converter
 import java.util.*
 
@@ -15,10 +15,10 @@ class StringToLanguageEnumConverter : Converter<String?, LanguageEnum?> {
     }
 }
 
-class StringToTitleEnumConverter : Converter<String?, TitleEnum?> {
-    override fun convert(source: String): TitleEnum {
+class StringToTitleEnumConverter : Converter<String?, Innsendingsytelse?> {
+    override fun convert(source: String): Innsendingsytelse {
         if (source != null) {
-            return TitleEnum.valueOf(source.uppercase(Locale.getDefault()))
+            return Innsendingsytelse.valueOf(source.uppercase(Locale.getDefault()))
         } else {
             throw RuntimeException("error")
         }

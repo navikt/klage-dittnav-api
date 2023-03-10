@@ -3,18 +3,11 @@ package no.nav.klage.util
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-
-fun parseTitleKey(titleKey: TitleEnum?, tema: Tema): TitleEnum {
-    return when {
-        titleKey != null -> titleKey
-        else -> TitleEnum.valueOf(tema.name)
-    }
-}
 
 fun getFormattedLocalDateTime(): LocalDateTime =
     ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Europe/Oslo")).toLocalDateTime()
@@ -34,8 +27,8 @@ fun String.toStatus() = try {
     KlageAnkeStatus.DRAFT
 }
 
-fun klageAnkeIsLonnskompensasjon(tema: Tema, titleKey: TitleEnum): Boolean =
-    tema == Tema.DAG && titleKey == TitleEnum.LONNSKOMPENSASJON
+fun klageAnkeIsLonnskompensasjon(tema: Tema, innsendingsytelse: Innsendingsytelse): Boolean =
+    tema == Tema.DAG && innsendingsytelse == Innsendingsytelse.LONNSKOMPENSASJON
 
 fun getLanguageEnum(input: String?): LanguageEnum {
     return when (input) {
@@ -48,13 +41,17 @@ fun getLanguageEnum(input: String?): LanguageEnum {
     }
 }
 
-fun getTitleEnum(titleKey: String?, tema: String): TitleEnum {
-    return when (titleKey) {
-        null -> {
-            TitleEnum.valueOf(tema)
+// For compatability when we change from titleKey to innsendingsytelse
+fun getInnsendingsytelse(titleKey: Innsendingsytelse?, innsendingsytelse: Innsendingsytelse?): Innsendingsytelse {
+    return when {
+        titleKey != null -> {
+            titleKey
         }
-        else -> {
-            TitleEnum.valueOf(titleKey)
+
+        innsendingsytelse != null -> {
+            innsendingsytelse
         }
+
+        else -> error("innsendingsytelse or titleKey must be set")
     }
 }

@@ -4,7 +4,7 @@ import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Navn
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.CheckboxEnum
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import java.time.LocalDate
 
 data class OpenKlageInput (
@@ -14,7 +14,7 @@ data class OpenKlageInput (
     val userSaksnummer: String? = null,
     val internalSaksnummer: String? = null,
     val vedtakDate: LocalDate?,
-    val titleKey: TitleEnum,
+    val innsendingsytelse: Innsendingsytelse,
     val tema: Tema,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
     val language: LanguageEnum = LanguageEnum.NB,
@@ -29,7 +29,7 @@ data class OpenAnkeInput (
     val userSaksnummer: String? = null,
     val internalSaksnummer: String? = null,
     val vedtakDate: LocalDate?,
-    val titleKey: TitleEnum,
+    val innsendingsytelse: Innsendingsytelse,
     val tema: Tema,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,

@@ -3,7 +3,6 @@ package no.nav.klage.domain.availableanke
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.Utfall
-import no.nav.klage.domain.titles.TitleEnum
 import java.time.LocalDate
 
 data class AvailableAnkeView(

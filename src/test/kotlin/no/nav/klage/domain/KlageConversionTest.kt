@@ -1,7 +1,7 @@
 package no.nav.klage.domain
 
 import no.nav.klage.domain.klage.*
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.repository.KlageRepository
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.configuration.ClassicConfiguration
@@ -21,7 +21,7 @@ class KlageConversionTest {
     private val exampleTema = Tema.FOR
     private val exampleModifiedByUser = Instant.parse("2020-11-12T09:35:39.727803600Z")
     private val exampleStatus = KlageAnkeStatus.DRAFT
-    private val exampleTitleKey = TitleEnum.ALDERSPENSJON
+    private val exampleInnsendingsytelse = Innsendingsytelse.ALDERSPENSJON
 
     private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"
 
@@ -66,10 +66,10 @@ class KlageConversionTest {
         }
 
         @Nested
-        inner class TitleKey {
+        inner class Innsendingsytelse {
 
             @Test
-            fun `should populate titleKey in Klage based on no ytelse and titleKey in KlageDAO`() {
+            fun `should populate innsendingsytelse in Klage based on no ytelse and innsendingsytelse in KlageDAO`() {
                 val expectedOutput = templateKlage
 
                 transaction {
@@ -79,7 +79,7 @@ class KlageConversionTest {
                         fritekst = exampleFritekst
                         tema = exampleTema.name
                         language = LanguageEnum.NB.name
-                        titleKey = exampleTitleKey.name
+                        innsendingsytelse = exampleInnsendingsytelse.name
                     }
 
                     val result = inputKlageDAO.toKlage().copy(id = exampleId, modifiedByUser = exampleModifiedByUser)
@@ -89,7 +89,7 @@ class KlageConversionTest {
             }
 
             @Test
-            fun `should populate correct titleKey in Klage based on wrong ytelse and titleKey in KlageDAO`() {
+            fun `should populate correct innsendingsytelse in Klage based on wrong ytelse and innsendingsytelse in KlageDAO`() {
                 val expectedOutput = templateKlage
 
                 transaction {
@@ -99,7 +99,7 @@ class KlageConversionTest {
                         fritekst = exampleFritekst
                         tema = exampleTema.name
                         language = LanguageEnum.NB.name
-                        titleKey = exampleTitleKey.name
+                        innsendingsytelse = exampleInnsendingsytelse.name
                     }
 
                     val result = inputKlageDAO.toKlage().copy(id = exampleId, modifiedByUser = exampleModifiedByUser)
@@ -147,7 +147,7 @@ class KlageConversionTest {
                 fritekst = klageInDB.fritekst
                 tema = klageInDB.tema.name
                 checkBoxesSelected = checkboxesSelectedString
-                titleKey = klageInDB.titleKey.name
+                innsendingsytelse = klageInDB.innsendingsytelse.name
             }
 
             val result = inputKlageDAO.toKlage().copy(id = exampleId, modifiedByUser = exampleModifiedByUser)
@@ -165,7 +165,7 @@ class KlageConversionTest {
         tema = exampleTema,
         modifiedByUser = exampleModifiedByUser,
         language = LanguageEnum.NB,
-        titleKey = exampleTitleKey,
+        innsendingsytelse = exampleInnsendingsytelse,
         hasVedlegg = false,
     )
 }

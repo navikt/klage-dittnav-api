@@ -2,9 +2,8 @@ package no.nav.klage.domain.titles
 
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import java.util.*
 
-enum class TitleEnum(val nb: String, val en: String) {
+enum class Innsendingsytelse(val nb: String, val en: String) {
     AAP("Arbeidsavklaringspenger", "Work assessment allowance (AAP)"),
     AAR("Aa-registeret", "Aa register"),
     AGR("Ajourhold - Grunnopplysninger", "Ajourhold - Grunnopplysninger"),
@@ -76,9 +75,7 @@ enum class TitleEnum(val nb: String, val en: String) {
     YRK("Yrkesskade / Menerstatning", "Occupational injury / Menerstatning"),
 
     ALDERSPENSJON("Alderspensjon", "Old-age pension"),
-    ARBEID("Arbeid", "Work"),
     ARBEIDSAVKLARINGSPENGER("Arbeidsavklaringspenger (AAP)", "Work assessment allowance (AAP)"),
-    AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual early retirement pension (AFP)"),
     AVTALEFESTET_PENSJON_SPK("Avtalefestet pensjon (AFP) fra Statens pensjonskasse", "Contractual early retirement pension (AFP) in the public sector"),
     AVTALEFESTET_PENSJON_PRIVAT("Avtalefestet pensjon (AFP) i privat sektor", "Contractual early retirement pension (AFP) in the private sector"),
     BARNEBIDRAG_OG_BIDRAGSFORSKUDD(
@@ -94,10 +91,6 @@ enum class TitleEnum(val nb: String, val en: String) {
     EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support (Ektefellebidrag)"),
     ENGANGSSTONAD("Engangsstønad", "Lump-sum grant (Engangsstønad)"),
     ENSLIG_MOR_ELLER_FAR("Enslig mor eller far", "Single mother or father"),
-    FORELDREPENGER_GENERELL(
-        "Foreldrepenger, engangsstønad og svangerskapspenger",
-        "Parental benefit (Foreldrepenger), lump-sum grant (Engangsstønad) and pregnancy benefit (Svangerskapspenger)"
-    ),
     FORELDREPENGER("Foreldrepenger", "Parental benefit (Foreldrepenger)"),
     GJENLEVENDE(
         "Pensjon til gjenlevende ektefelle eller samboer",
@@ -122,12 +115,9 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Assessment of need for assistance according to Section 14 a of the NAV Act"
     ),
     OKONOMISK_SOSIALHJELP("Økonomisk sosialhjelp", "Financial social assistance (Sosialhjelp)"),
-    OMSORGSPENGER("Omsorgspenger", "Care benefit"),
     OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Upbringing support (Oppfostringsbidrag)"),
     OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
     OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
-    OPPLAERINGSPENGER("Opplæringspenger", "Training allowance"),
-    PLEIEPENGER("Pleiepenger", "Attendance allowance"),
     SUPPLERENDE_STONAD(
         "Supplerende stønad til personer over 67 år med kort botid i Norge",
         "Supplementary benefit for persons over 67 who have only lived a short period of time in Norway"
@@ -145,17 +135,7 @@ enum class TitleEnum(val nb: String, val en: String) {
     TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Benefits to former family caregivers"),
     TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "Benefits (Tiltakspenger) while participating in employment schemes"),
     UFORETRYGD("Uføretrygd", "Disability benefit (Uføretrygd)"),
-    YRKESSKADE("Yrkesskade", "Occupational injury (Yrkesskade)"),
-    FEIL("Her har det skjedd noe feil.", "Error");
-
-    companion object {
-        private val map = TitleEnum.values().associateBy(TitleEnum::nb)
-        fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse.replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(
-                Locale.getDefault()
-            ) else it.toString()
-        }]
-    }
+    YRKESSKADE("Yrkesskade", "Occupational injury (Yrkesskade)");
 
     fun getChosenTitle(language: LanguageEnum): String {
         return when (language) {
@@ -242,9 +222,7 @@ enum class TitleEnum(val nb: String, val en: String) {
             YRA -> Tema.YRA
             YRK -> Tema.YRK
             ALDERSPENSJON -> Tema.PEN
-            ARBEID -> TODO()
             ARBEIDSAVKLARINGSPENGER -> Tema.AAP
-            AVTALEFESTET_PENSJON -> TODO()
             AVTALEFESTET_PENSJON_SPK -> Tema.PEN
             AVTALEFESTET_PENSJON_PRIVAT -> Tema.PEN
             BARNEBIDRAG_OG_BIDRAGSFORSKUDD -> Tema.BID
@@ -257,7 +235,6 @@ enum class TitleEnum(val nb: String, val en: String) {
             EKTEFELLEBIDRAG -> Tema.BID
             ENGANGSSTONAD -> Tema.FOR
             ENSLIG_MOR_ELLER_FAR -> Tema.ENF
-            FORELDREPENGER_GENERELL -> TODO()
             FORELDREPENGER -> Tema.FOR
             GJENLEVENDE -> Tema.PEN
             GRAVFERDSSTONAD -> Tema.GRA
@@ -269,13 +246,9 @@ enum class TitleEnum(val nb: String, val en: String) {
             LONNSKOMPENSASJON -> Tema.DAG
             MIDLERTIDIG_KOMPENSASJON -> Tema.GEN
             NAV_LOVEN_14A -> Tema.OPP
-            OKONOMISK_SOSIALHJELP -> TODO()
-            OMSORGSPENGER -> TODO()
             OPPFOSTRINGSBIDRAG -> Tema.BID
             OPPHOLD_ELLER_ARBEID_I_NORGE -> Tema.MED
             OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE -> Tema.MED
-            OPPLAERINGSPENGER -> TODO()
-            PLEIEPENGER -> TODO()
             SUPPLERENDE_STONAD -> Tema.SUP
             SUPPLERENDE_STONAD_UFORE_FLYKTNINGER -> Tema.SUP
             SVANGERSKAPSPENGER -> Tema.FOR
@@ -285,7 +258,7 @@ enum class TitleEnum(val nb: String, val en: String) {
             TILTAKSPENGER -> Tema.IND
             UFORETRYGD -> Tema.UFO
             YRKESSKADE -> Tema.YRK
-            FEIL -> TODO()
+            OKONOMISK_SOSIALHJELP -> TODO()
         }
     }
 }

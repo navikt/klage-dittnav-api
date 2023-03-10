@@ -1,6 +1,6 @@
 package no.nav.klage.domain.anke
 
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.AnkevedleggDAO
 import no.nav.klage.domain.vedlegg.Ankevedleggene
 import no.nav.klage.util.getLanguageEnum
@@ -30,7 +30,7 @@ class AnkeDAO(id: EntityID<UUID>) : UUIDEntity(id) {
     var enhetsnummer by Anker.enhetsnummer
     var internalSaksnummer by Anker.internalSaksnummer
     var language by Anker.language
-    var titleKey by Anker.titleKey
+    var innsendingsytelse by Anker.innsendingsytelse
     var hasVedlegg by Anker.hasVedlegg
     var pdfDownloaded by Anker.pdfDownloaded
 }
@@ -46,7 +46,7 @@ object Anker : UUIDTable("anke") {
     var enhetsnummer = text("enhetsnummer").nullable()
     var internalSaksnummer = text("internal_saksnummer").nullable()
     var language = text("language").nullable()
-    var titleKey = text("title_key")
+    var innsendingsytelse = text("innsendingsytelse")
     var hasVedlegg = bool("has_vedlegg").default(false)
     var pdfDownloaded = timestamp("pdf_downloaded").nullable()
     var journalpostId = varchar("journalpost_id", 50).nullable()
@@ -65,7 +65,7 @@ fun AnkeDAO.toAnke(): Anke {
         enhetsnummer = enhetsnummer,
         internalSaksnummer = internalSaksnummer,
         language = getLanguageEnum(this.language),
-        titleKey = TitleEnum.valueOf(titleKey),
+        innsendingsytelse = Innsendingsytelse.valueOf(innsendingsytelse),
         hasVedlegg = hasVedlegg,
         journalpostId = journalpostId,
         vedlegg = vedlegg.map { it.toVedlegg() },
@@ -83,7 +83,7 @@ fun AnkeDAO.fromAnke(anke: Anke) {
     enhetsnummer = anke.enhetsnummer
     internalSaksnummer = anke.internalSaksnummer
     language = anke.language.name
-    titleKey = anke.titleKey.name
+    innsendingsytelse = anke.innsendingsytelse.name
     journalpostId = anke.journalpostId
     hasVedlegg = anke.hasVedlegg
 }

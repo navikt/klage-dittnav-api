@@ -1,9 +1,9 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.KlagevedleggDAO
 import no.nav.klage.domain.vedlegg.Klagevedleggene
 import no.nav.klage.util.getLanguageEnum
-import no.nav.klage.util.getTitleEnum
 import no.nav.klage.util.toStatus
 import no.nav.klage.util.toTema
 import org.jetbrains.exposed.dao.IntEntity
@@ -30,7 +30,7 @@ class KlageDAO(id: EntityID<Int>) : IntEntity(id) {
     var internalSaksnummer by Klager.internalSaksnummer
     var fullmektig by Klager.fullmektig
     var language by Klager.language
-    var titleKey by Klager.titleKey
+    var innsendingsytelse by Klager.innsendingsytelse
     var hasVedlegg by Klager.hasVedlegg
     var pdfDownloaded by Klager.pdfDownloaded
 }
@@ -48,7 +48,7 @@ object Klager : IntIdTable("klage") {
     var internalSaksnummer = text("internal_saksnummer").nullable()
     var fullmektig = varchar("fullmektig", 11).nullable()
     var language = text("language").nullable()
-    var titleKey = text("title_key").nullable()
+    var innsendingsytelse = text("innsendingsytelse")
     var hasVedlegg = bool("has_vedlegg").default(false)
     var pdfDownloaded = timestamp("pdf_downloaded").nullable()
 }
@@ -69,7 +69,7 @@ fun KlageDAO.toKlage(): Klage {
         internalSaksnummer = internalSaksnummer,
         fullmektig = fullmektig,
         language = getLanguageEnum(this.language),
-        titleKey = getTitleEnum(this.titleKey, this.tema),
+        innsendingsytelse = Innsendingsytelse.valueOf(innsendingsytelse),
         hasVedlegg = hasVedlegg,
     )
 }
@@ -94,6 +94,6 @@ fun KlageDAO.fromKlage(klage: Klage) {
     internalSaksnummer = klage.internalSaksnummer
     fullmektig = klage.fullmektig
     language = klage.language.name
-    titleKey = klage.titleKey.name
+    innsendingsytelse = klage.innsendingsytelse.name
     hasVedlegg = klage.hasVedlegg
 }
