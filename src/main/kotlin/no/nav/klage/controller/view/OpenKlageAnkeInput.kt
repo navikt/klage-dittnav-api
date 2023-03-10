@@ -16,7 +16,7 @@ data class OpenKlageInput (
     val vedtakDate: LocalDate?,
     val titleKey: Innsendingsytelse?,
     val innsendingsytelse: Innsendingsytelse?,
-    val tema: Tema,
+    val tema: Tema?,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
@@ -32,7 +32,7 @@ data class OpenAnkeInput (
     val vedtakDate: LocalDate?,
     val titleKey: Innsendingsytelse?,
     val innsendingsytelse: Innsendingsytelse?,
-    val tema: Tema,
+    val tema: Tema?,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
 )
@@ -40,6 +40,7 @@ data class OpenAnkeInput (
 data class OpenEttersendelseInput (
     val foedselsnummer: String,
     val enhetsnummer: String?,
-    val tema: Tema,
+    val tema: Tema?,
+    val innsendingsytelse: Innsendingsytelse?,
     val language: LanguageEnum = LanguageEnum.NB,
 )
