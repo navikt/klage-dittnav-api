@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Unprotected
 @Tag(name = "titles")
-@RequestMapping("/api/titles")
-class TitleController {
+@RequestMapping("/api/titles", "/api/innsendingsytelser")
+class InnsendingsytelseTitleController {
 
     @GetMapping
-    fun getTitles(): MutableMap<String, Innsendingsytelse.TitleInAllLanguages> {
+    fun getTitles(): Map<String, Innsendingsytelse.TitleInAllLanguages> {
         val output = mutableMapOf<String, Innsendingsytelse.TitleInAllLanguages>()
 
         Innsendingsytelse.values().forEach {
@@ -27,7 +27,7 @@ class TitleController {
     }
 
     @GetMapping("/{language}")
-    fun getTitlesFromLanguage(@PathVariable language: LanguageEnum): MutableMap<String, String> {
+    fun getTitlesForLanguage(@PathVariable language: LanguageEnum): Map<String, String> {
         val output = mutableMapOf<String, String>()
 
         Innsendingsytelse.values().forEach {

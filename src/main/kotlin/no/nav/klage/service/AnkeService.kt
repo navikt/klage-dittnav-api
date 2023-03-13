@@ -213,6 +213,7 @@ class AnkeService(
             vedlegg = vedlegg.map { it.toVedleggView() },
             journalpostId = journalpostId,
             titleKey = innsendingsytelse,
+            tema = innsendingsytelse.getTema(),
         )
     }
 

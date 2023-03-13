@@ -2,6 +2,7 @@ package no.nav.klage.domain.anke
 
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.util.getFormattedLocalDateTime
@@ -22,4 +23,5 @@ data class AnkeView(
     val hasVedlegg: Boolean,
     val vedlegg: List<VedleggView>,
     val journalpostId: String?,
+    val tema: Tema,
 )
