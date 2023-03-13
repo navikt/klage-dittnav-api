@@ -29,8 +29,6 @@ class KlageRepositoryTest {
 
     private val innsendingsytelseAndInternalSaksnummer = "innsendingsytelse and internalSaksnummer"
     private val innsendingsytelseAndNoInternalSaksnummer = "innsendingsytelse and no internalSaksnummer"
-    private val noInnsendingsytelseAndInternalSaksnummer = "no innsendingsytelse and internalSaksnummer"
-    private val noInnsendingsytelseAndNoInternalSaksnummer = "no innsendingsytelse and no internalSaksnummer"
 
     private lateinit var klageRepository: KlageRepository
     private lateinit var datasource: DataSource

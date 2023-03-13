@@ -114,7 +114,6 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
         "Vurdering av behov for bistand etter NAV-loven § 14 a",
         "Assessment of need for assistance according to Section 14 a of the NAV Act"
     ),
-    OKONOMISK_SOSIALHJELP("Økonomisk sosialhjelp", "Financial social assistance (Sosialhjelp)"),
     OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Upbringing support (Oppfostringsbidrag)"),
     OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
     OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
@@ -258,7 +257,6 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
             TILTAKSPENGER -> Tema.IND
             UFORETRYGD -> Tema.UFO
             YRKESSKADE -> Tema.YRK
-            OKONOMISK_SOSIALHJELP -> TODO()
         }
     }
 }
