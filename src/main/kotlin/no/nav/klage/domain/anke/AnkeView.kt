@@ -16,6 +16,7 @@ data class AnkeView(
     val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
     val vedtakDate: LocalDate? = null,
     val userSaksnummer: String? = null,
+    val internalSaksnummer: String?,
     val enhetsnummer: String? = null,
     val language: LanguageEnum = LanguageEnum.NB,
     val titleKey: Innsendingsytelse,

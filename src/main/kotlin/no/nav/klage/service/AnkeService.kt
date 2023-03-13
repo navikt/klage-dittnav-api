@@ -214,6 +214,7 @@ class AnkeService(
             journalpostId = journalpostId,
             titleKey = innsendingsytelse,
             tema = innsendingsytelse.getTema(),
+            internalSaksnummer = internalSaksnummer,
         )
     }
 
