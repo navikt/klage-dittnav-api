@@ -295,6 +295,7 @@ class KlageService(
             titleKey = innsendingsytelse,
             innsendingsytelse = innsendingsytelse,
             hasVedlegg = hasVedlegg,
+            tema = innsendingsytelse.getTema(),
         )
     }
 
