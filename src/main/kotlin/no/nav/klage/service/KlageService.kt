@@ -7,7 +7,7 @@ import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.*
 import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.klage.*
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
@@ -64,20 +64,16 @@ class KlageService(
         tema: Tema,
         internalSaksnummer: String?,
         fullmaktsgiver: String?,
-        titleKey: TitleEnum?,
+        innsendingsytelse: Innsendingsytelse,
     ): KlageView? {
         val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
-        var processedTitleKey = titleKey
-        if (titleKey == null) {
-            processedTitleKey = TitleEnum.valueOf(tema.name)
-        }
 
         val klage =
-            klageRepository.getLatestDraftKlageByFnrTemaInternalSaksnummerTitleKey(
-                fnr,
-                tema,
-                internalSaksnummer,
-                processedTitleKey
+            klageRepository.getLatestKlageDraft(
+                fnr = fnr,
+                tema = tema,
+                internalSaksnummer = internalSaksnummer,
+                innsendingsytelse = innsendingsytelse,
             )
         if (klage != null) {
             validationService.validateKlageAccess(klage, bruker)
@@ -126,12 +122,13 @@ class KlageService(
     }
 
     fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): KlageView {
+        val klage = input.toKlage(bruker)
         val existingKlage = getLatestDraftKlageByParams(
             bruker = bruker,
-            tema = input.tema,
-            internalSaksnummer = input.internalSaksnummer,
-            fullmaktsgiver = input.fullmaktsgiver,
-            titleKey = input.titleKey,
+            tema = klage.tema,
+            internalSaksnummer = klage.internalSaksnummer,
+            fullmaktsgiver = null,
+            innsendingsytelse = klage.innsendingsytelse,
         )
 
         return existingKlage ?: createKlage(
@@ -282,7 +279,6 @@ class KlageService(
             id = id!!.toString(),
             //TODO: Følg opp med FE, er det forskjell på klage og anke?
             fritekst = fritekst ?: "",
-            tema = tema,
             status = status,
             modifiedByUser = modifiedDateTime,
             vedlegg = vedlegg.map {
@@ -296,9 +292,10 @@ class KlageService(
             internalSaksnummer = internalSaksnummer,
             fullmaktsgiver = fullmektig?.let { foedselsnummer },
             language = language,
-            titleKey = titleKey,
-            ytelse = titleKey.nb,
+            titleKey = innsendingsytelse,
+            innsendingsytelse = innsendingsytelse,
             hasVedlegg = hasVedlegg,
+            tema = innsendingsytelse.getTema(),
         )
     }
 
@@ -308,7 +305,7 @@ class KlageService(
         } else {
             klage.tema.toString()
         }
-        klageAnkeMetrics.incrementKlagerFinalizedTitle(klage.titleKey)
+        klageAnkeMetrics.incrementKlagerFinalizedTitle(klage.innsendingsytelse)
         klageAnkeMetrics.incrementKlagerFinalized(temaReport)
         klageAnkeMetrics.incrementKlagerGrunn(temaReport, klage.checkboxesSelected ?: emptySet())
         if (klage.fullmektig != null) {
@@ -343,7 +340,7 @@ class KlageService(
                 begrunnelse = sanitizeText(klage.fritekst!!),
                 identifikasjonsnummer = fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
-                ytelse = klage.titleKey.nb,
+                ytelse = klage.innsendingsytelse.nb,
                 vedlegg = klage.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
                 userChoices = klage.checkboxesSelected?.map { x -> x.getFullText(klage.language) },
                 userSaksnummer = klage.userSaksnummer,
@@ -362,7 +359,7 @@ class KlageService(
                 begrunnelse = sanitizeText(klage.fritekst!!),
                 identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
                 tema = klage.tema.name,
-                ytelse = klage.titleKey.nb,
+                ytelse = klage.innsendingsytelse.nb,
                 vedlegg = klage.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
                 userChoices = klage.checkboxesSelected?.map { x -> x.getFullText(klage.language) },
                 userSaksnummer = klage.userSaksnummer,
@@ -381,11 +378,12 @@ class KlageService(
             userSaksnummer = klage.userSaksnummer,
             internalSaksnummer = klage.internalSaksnummer,
             vedtakDate = klage.vedtakDate,
-            titleKey = klage.titleKey,
+            innsendingsytelse = klage.innsendingsytelse,
             tema = klage.tema,
             checkboxesSelected = klage.checkboxesSelected,
             language = klage.language,
             hasVedlegg = klage.vedlegg.isNotEmpty() || klage.hasVedlegg,
+            titleKey = klage.innsendingsytelse,
         )
     }
 }

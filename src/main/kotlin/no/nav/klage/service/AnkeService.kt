@@ -12,7 +12,7 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.exception.KlageIsFinalizedException
 import no.nav.klage.domain.klage.AggregatedKlageAnke
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
@@ -67,14 +67,14 @@ class AnkeService(
 
     private fun getLatestDraftAnkeByParams(
         bruker: Bruker,
-        titleKey: TitleEnum,
+        innsendingsytelse: Innsendingsytelse,
     ): AnkeView? {
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val anke =
-            ankeRepository.getLatestDraftAnkeByFnrTitleKey(
-                fnr,
-                titleKey
+            ankeRepository.getLatestAnkeDraft(
+                fnr = fnr,
+                innsendingsytelse = innsendingsytelse
             )
         if (anke != null) {
             validationService.validateAnkeAccess(anke, bruker)
@@ -107,9 +107,10 @@ class AnkeService(
     }
 
     fun getDraftOrCreateAnke(input: AnkeInput, bruker: Bruker): AnkeView {
+        val anke = input.toAnke(bruker)
         val existingAnke = getLatestDraftAnkeByParams(
             bruker = bruker,
-            titleKey = input.titleKey,
+            innsendingsytelse = anke.innsendingsytelse,
         )
 
         return existingAnke ?: createAnke(
@@ -201,17 +202,19 @@ class AnkeService(
         return AnkeView(
             id = id.toString(),
             fritekst = fritekst,
-            tema = tema,
             status = status,
             modifiedByUser = modifiedDateTime,
             vedtakDate = vedtakDate,
             userSaksnummer = userSaksnummer,
             language = language,
-            titleKey = titleKey,
+            innsendingsytelse = innsendingsytelse,
             hasVedlegg = hasVedlegg,
             enhetsnummer = enhetsnummer,
             vedlegg = vedlegg.map { it.toVedleggView() },
             journalpostId = journalpostId,
+            titleKey = innsendingsytelse,
+            tema = innsendingsytelse.getTema(),
+            internalSaksnummer = internalSaksnummer,
         )
     }
 
@@ -223,11 +226,12 @@ class AnkeService(
             userSaksnummer = anke.userSaksnummer,
             internalSaksnummer = anke.internalSaksnummer,
             vedtakDate = anke.vedtakDate,
-            titleKey = anke.titleKey,
+            innsendingsytelse = anke.innsendingsytelse,
             tema = anke.tema,
             enhetsnummer = anke.enhetsnummer!!,//should already be validated
             language = anke.language,
-            hasVedlegg = anke.hasVedlegg,
+            hasVedlegg = anke.vedlegg.isNotEmpty() || anke.hasVedlegg,
+            titleKey = anke.innsendingsytelse,
         )
     }
 
@@ -315,7 +319,7 @@ class AnkeService(
             begrunnelse = sanitizeText(anke.fritekst!!),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema = anke.tema.name,
-            ytelse = anke.titleKey.nb,
+            ytelse = anke.innsendingsytelse.nb,
             vedlegg = anke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
             userSaksnummer = anke.userSaksnummer,
             internalSaksnummer = anke.internalSaksnummer,

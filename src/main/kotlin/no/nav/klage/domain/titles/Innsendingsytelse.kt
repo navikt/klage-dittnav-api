@@ -1,9 +1,9 @@
 package no.nav.klage.domain.titles
 
 import no.nav.klage.domain.LanguageEnum
-import java.util.*
+import no.nav.klage.domain.Tema
 
-enum class TitleEnum(val nb: String, val en: String) {
+enum class Innsendingsytelse(val nb: String, val en: String) {
     AAP("Arbeidsavklaringspenger", "Work assessment allowance (AAP)"),
     AAR("Aa-registeret", "Aa register"),
     AGR("Ajourhold - Grunnopplysninger", "Ajourhold - Grunnopplysninger"),
@@ -75,9 +75,7 @@ enum class TitleEnum(val nb: String, val en: String) {
     YRK("Yrkesskade / Menerstatning", "Occupational injury / Menerstatning"),
 
     ALDERSPENSJON("Alderspensjon", "Old-age pension"),
-    ARBEID("Arbeid", "Work"),
     ARBEIDSAVKLARINGSPENGER("Arbeidsavklaringspenger (AAP)", "Work assessment allowance (AAP)"),
-    AVTALEFESTET_PENSJON("Avtalefestet pensjon (AFP)", "Contractual early retirement pension (AFP)"),
     AVTALEFESTET_PENSJON_SPK("Avtalefestet pensjon (AFP) fra Statens pensjonskasse", "Contractual early retirement pension (AFP) in the public sector"),
     AVTALEFESTET_PENSJON_PRIVAT("Avtalefestet pensjon (AFP) i privat sektor", "Contractual early retirement pension (AFP) in the private sector"),
     BARNEBIDRAG_OG_BIDRAGSFORSKUDD(
@@ -93,10 +91,6 @@ enum class TitleEnum(val nb: String, val en: String) {
     EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support (Ektefellebidrag)"),
     ENGANGSSTONAD("Engangsstønad", "Lump-sum grant (Engangsstønad)"),
     ENSLIG_MOR_ELLER_FAR("Enslig mor eller far", "Single mother or father"),
-    FORELDREPENGER_GENERELL(
-        "Foreldrepenger, engangsstønad og svangerskapspenger",
-        "Parental benefit (Foreldrepenger), lump-sum grant (Engangsstønad) and pregnancy benefit (Svangerskapspenger)"
-    ),
     FORELDREPENGER("Foreldrepenger", "Parental benefit (Foreldrepenger)"),
     GJENLEVENDE(
         "Pensjon til gjenlevende ektefelle eller samboer",
@@ -120,13 +114,9 @@ enum class TitleEnum(val nb: String, val en: String) {
         "Vurdering av behov for bistand etter NAV-loven § 14 a",
         "Assessment of need for assistance according to Section 14 a of the NAV Act"
     ),
-    OKONOMISK_SOSIALHJELP("Økonomisk sosialhjelp", "Financial social assistance (Sosialhjelp)"),
-    OMSORGSPENGER("Omsorgspenger", "Care benefit"),
     OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Upbringing support (Oppfostringsbidrag)"),
     OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
     OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
-    OPPLAERINGSPENGER("Opplæringspenger", "Training allowance"),
-    PLEIEPENGER("Pleiepenger", "Attendance allowance"),
     SUPPLERENDE_STONAD(
         "Supplerende stønad til personer over 67 år med kort botid i Norge",
         "Supplementary benefit for persons over 67 who have only lived a short period of time in Norway"
@@ -144,17 +134,7 @@ enum class TitleEnum(val nb: String, val en: String) {
     TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Benefits to former family caregivers"),
     TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "Benefits (Tiltakspenger) while participating in employment schemes"),
     UFORETRYGD("Uføretrygd", "Disability benefit (Uføretrygd)"),
-    YRKESSKADE("Yrkesskade", "Occupational injury (Yrkesskade)"),
-    FEIL("Her har det skjedd noe feil.", "Error");
-
-    companion object {
-        private val map = TitleEnum.values().associateBy(TitleEnum::nb)
-        fun getTitleKeyFromNbTitle(ytelse: String) = map[ytelse.replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(
-                Locale.getDefault()
-            ) else it.toString()
-        }]
-    }
+    YRKESSKADE("Yrkesskade", "Occupational injury (Yrkesskade)");
 
     fun getChosenTitle(language: LanguageEnum): String {
         return when (language) {
@@ -173,5 +153,110 @@ enum class TitleEnum(val nb: String, val en: String) {
             this.nb,
             this.en
         )
+    }
+
+    fun getTema(): Tema {
+        return when(this) {
+            AAP -> Tema.AAP
+            AAR -> Tema.AAR
+            AGR -> Tema.AGR
+            BAR -> Tema.BAR
+            BID -> Tema.BID
+            BII -> Tema.BII
+            BIL -> Tema.BIL
+            DAG -> Tema.DAG
+            ENF -> Tema.ENF
+            ERS -> Tema.ERS
+            FAR -> Tema.FAR
+            FEI -> Tema.FEI
+            FOR -> Tema.FOR
+            FOS -> Tema.FOS
+            FRI -> Tema.FRI
+            FUL -> Tema.FUL
+            GEN -> Tema.GEN
+            GRA -> Tema.GRA
+            GRU -> Tema.GRU
+            HEL -> Tema.HEL
+            HJE -> Tema.HJE
+            IAR -> Tema.IAR
+            IND -> Tema.IND
+            KLA -> Tema.KLA
+            KNA -> Tema.KNA
+            KOM -> Tema.KOM
+            KON -> Tema.KON
+            KTR -> Tema.KTR
+            LGA -> Tema.LGA
+            MED -> Tema.MED
+            MOB -> Tema.MOB
+            MOT -> Tema.MOT
+            OKO -> Tema.OKO
+            OMS -> Tema.OMS
+            OPA -> Tema.OPA
+            OPP -> Tema.OPP
+            OVR -> Tema.OVR
+            PEN -> Tema.PEN
+            PER -> Tema.PER
+            REH -> Tema.REH
+            REK -> Tema.REK
+            RPO -> Tema.RPO
+            RVE -> Tema.RVE
+            SAA -> Tema.SAA
+            SAK -> Tema.SAK
+            SAP -> Tema.SAP
+            SER -> Tema.SER
+            SIK -> Tema.SIK
+            STO -> Tema.STO
+            SUP -> Tema.SUP
+            SYK -> Tema.SYK
+            SYM -> Tema.SYM
+            TIL -> Tema.TIL
+            TRK -> Tema.TRK
+            TRY -> Tema.TRY
+            TSO -> Tema.TSO
+            TSR -> Tema.TSR
+            UFM -> Tema.UFM
+            UFO -> Tema.UFO
+            UKJ -> Tema.UKJ
+            VEN -> Tema.VEN
+            YRA -> Tema.YRA
+            YRK -> Tema.YRK
+            ALDERSPENSJON -> Tema.PEN
+            ARBEIDSAVKLARINGSPENGER -> Tema.AAP
+            AVTALEFESTET_PENSJON_SPK -> Tema.PEN
+            AVTALEFESTET_PENSJON_PRIVAT -> Tema.PEN
+            BARNEBIDRAG_OG_BIDRAGSFORSKUDD -> Tema.BID
+            BARNEPENSJON -> Tema.PEN
+            BARNETRYGD -> Tema.BAR
+            BILSTONAD -> Tema.BIL
+            DAGPENGER -> Tema.DAG
+            DAGPENGER_FERIEPENGER -> Tema.DAG
+            DAGPENGER_TILBAKEBETALING_FORSKUDD -> Tema.DAG
+            EKTEFELLEBIDRAG -> Tema.BID
+            ENGANGSSTONAD -> Tema.FOR
+            ENSLIG_MOR_ELLER_FAR -> Tema.ENF
+            FORELDREPENGER -> Tema.FOR
+            GJENLEVENDE -> Tema.PEN
+            GRAVFERDSSTONAD -> Tema.GRA
+            GRUNN_OG_HJELPESTONAD -> Tema.GRU
+            HJELPEMIDLER -> Tema.HJE
+            KONTANTSTOTTE -> Tema.KON
+            KRIGSPENSJON -> Tema.PEN
+            LONNSGARANTI -> Tema.GEN
+            LONNSKOMPENSASJON -> Tema.DAG
+            MIDLERTIDIG_KOMPENSASJON -> Tema.GEN
+            NAV_LOVEN_14A -> Tema.OPP
+            OPPFOSTRINGSBIDRAG -> Tema.BID
+            OPPHOLD_ELLER_ARBEID_I_NORGE -> Tema.MED
+            OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE -> Tema.MED
+            SUPPLERENDE_STONAD -> Tema.SUP
+            SUPPLERENDE_STONAD_UFORE_FLYKTNINGER -> Tema.SUP
+            SVANGERSKAPSPENGER -> Tema.FOR
+            SYKDOM_I_FAMILIEN -> Tema.OMS
+            SYKEPENGER -> Tema.SYK
+            TIDLIGERE_FAMILIEPLEIER -> Tema.PEN
+            TILTAKSPENGER -> Tema.IND
+            UFORETRYGD -> Tema.UFO
+            YRKESSKADE -> Tema.YRK
+        }
     }
 }

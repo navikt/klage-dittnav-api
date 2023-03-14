@@ -1,7 +1,7 @@
 package no.nav.klage.domain.anke
 
 import no.nav.klage.domain.*
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.Ankevedlegg
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
 import no.nav.klage.util.klageAnkeIsLonnskompensasjon
@@ -22,7 +22,7 @@ data class Anke(
     val vedtakDate: LocalDate? = null,
     val enhetsnummer: String? = null,
     val language: LanguageEnum,
-    val titleKey: TitleEnum,
+    val innsendingsytelse: Innsendingsytelse,
     val hasVedlegg: Boolean = false,
     val journalpostId: String? = null,
 )
@@ -30,7 +30,7 @@ data class Anke(
 fun Anke.isAccessibleToUser(usersIdentifikasjonsnummer: String) =
     klageAnkeIsAccessibleToUser(usersIdentifikasjonsnummer, foedselsnummer)
 
-fun Anke.isLonnskompensasjon() = klageAnkeIsLonnskompensasjon(tema, titleKey)
+fun Anke.isLonnskompensasjon() = klageAnkeIsLonnskompensasjon(tema = tema, innsendingsytelse = innsendingsytelse)
 
 fun Anke.isFinalized() = status.isFinalized()
 
@@ -40,7 +40,7 @@ fun Anke.writableOnceFieldsMatch(existingAnke: Anke): Boolean {
     return id == existingAnke.id &&
             foedselsnummer == existingAnke.foedselsnummer &&
             tema == existingAnke.tema &&
-            titleKey == existingAnke.titleKey &&
+            innsendingsytelse == existingAnke.innsendingsytelse &&
             journalpostId == existingAnke.journalpostId &&
             internalSaksnummer == existingAnke.internalSaksnummer
 }

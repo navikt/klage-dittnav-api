@@ -4,7 +4,7 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.exception.AnkeNotFoundException
 import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and
 import org.springframework.beans.factory.annotation.Value
@@ -42,12 +42,12 @@ class AnkeRepository {
             .map { it.toAnke() }
     }
 
-    fun getLatestDraftAnkeByFnrTitleKey(
+    fun getLatestAnkeDraft(
         fnr: String,
-        titleKey: TitleEnum
+        innsendingsytelse: Innsendingsytelse
     ): Anke? {
         return AnkeDAO.find {
-            Anker.foedselsnummer eq fnr and (Anker.titleKey eq titleKey.name) and (Anker.status eq KlageAnkeStatus.DRAFT.toString())
+            Anker.foedselsnummer eq fnr and (Anker.innsendingsytelse eq innsendingsytelse.name) and (Anker.status eq KlageAnkeStatus.DRAFT.toString())
         }.maxByOrNull { it.modifiedByUser }
             ?.toAnke()
     }

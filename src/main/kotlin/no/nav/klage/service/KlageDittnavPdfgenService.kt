@@ -9,7 +9,7 @@ import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.controller.view.OpenEttersendelseInput
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.exception.InvalidIdentException
-import no.nav.klage.domain.titles.TitleEnum
+import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.toPDFInput
 import no.nav.klage.util.isValidFnrOrDnr
 import org.apache.pdfbox.io.MemoryUsageSetting
@@ -29,7 +29,7 @@ class KlageDittnavPdfgenService(
 
         val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput(sendesIPosten = true))
 
-        return if (input.titleKey != TitleEnum.LONNSGARANTI) {
+        return if (input.innsendingsytelse != Innsendingsytelse.LONNSGARANTI) {
             val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
             mergeDocuments(foerstesidePDF, klagePDF)
         } else klagePDF
@@ -69,6 +69,7 @@ class KlageDittnavPdfgenService(
     }
 
     private fun OpenKlageInput.toFoerstesideRequest(): FoerstesideRequest {
+        val innsendingsytelse = innsendingsytelse ?: titleKey ?: error("innsendingsytelse or titleKey must be set")
         val documentList = mutableListOf("Klagen din")
         if (hasVedlegg) {
             documentList += "Vedlegg"
@@ -80,16 +81,17 @@ class KlageDittnavPdfgenService(
                 brukerId = foedselsnummer,
                 brukerType = Brukertype.PERSON
             ),
-            tema = tema.name,
-            arkivtittel = "Klage/anke",
-            navSkjemaId = "NAV 90-00.08",
-            overskriftstittel = "Klage/anke NAV 90-00.08",
+            tema = innsendingsytelse.getTema().name,
+            arkivtittel = "Klage",
+            navSkjemaId = "NAV 90-00.08 K",
+            overskriftstittel = "Klage NAV 90-00.08 K",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = Foerstesidetype.SKJEMA,
         )
     }
 
     private fun OpenAnkeInput.toFoerstesideRequest(): FoerstesideRequest {
+        val innsendingsytelse = innsendingsytelse ?: titleKey ?: error("innsendingsytelse or titleKey must be set")
         val documentList = mutableListOf("Anken din")
         if (hasVedlegg) {
             documentList += "Vedlegg"
@@ -101,10 +103,10 @@ class KlageDittnavPdfgenService(
                 brukerId = foedselsnummer,
                 brukerType = Brukertype.PERSON
             ),
-            tema = tema.name,
-            arkivtittel = "Klage/anke",
-            navSkjemaId = "NAV 90-00.08",
-            overskriftstittel = "Klage/anke NAV 90-00.08",
+            tema = innsendingsytelse.getTema().name,
+            arkivtittel = "Anke",
+            navSkjemaId = "NAV 90-00.08 A",
+            overskriftstittel = "Anke NAV 90-00.08 A",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = Foerstesidetype.SKJEMA,
             enhetsnummer = enhetsnummer,
@@ -112,6 +114,7 @@ class KlageDittnavPdfgenService(
     }
 
     private fun OpenEttersendelseInput.toFoerstesideRequest(): FoerstesideRequest {
+        val tema = innsendingsytelse?.getTema() ?: (tema ?: error("innsendingsytelse or tema must be set"))
         return FoerstesideRequest(
             spraakkode = Spraakkode.NB,
             netsPostboks = "1400", //always

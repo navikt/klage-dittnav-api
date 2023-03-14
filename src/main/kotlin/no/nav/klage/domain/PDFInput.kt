@@ -27,6 +27,7 @@ data class PDFInput (
 )
 
 fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
+    val innsendingsytelse = innsendingsytelse ?: titleKey ?: error("innsendingsytelse or titleKey must be set")
     return PDFInput(
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
@@ -36,13 +37,14 @@ fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
         begrunnelse = sanitizeText(fritekst),
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
+        ytelse = innsendingsytelse.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
         sendesIPosten = sendesIPosten,
     )
 }
 
 fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
+    val innsendingsytelse = innsendingsytelse ?: titleKey ?: error("innsendingsytelse or titleKey must be set")
     return PDFInput(
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
@@ -52,7 +54,7 @@ fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
         begrunnelse = sanitizeText(fritekst),
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        ytelse = titleKey.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
+        ytelse = innsendingsytelse.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse,
         sendesIPosten = sendesIPosten,
     )
