@@ -43,7 +43,7 @@ data class KlageFullInput (
     val language: LanguageEnum = LanguageEnum.NB,
     val vedtakDate: LocalDate? = null,
     val internalSaksnummer: String? = null,
-    val fritekst: String?,
+    val fritekst: String = "",
     val fullmaktsgiver: String? = null,
     val hasVedlegg: Boolean,
 ) {

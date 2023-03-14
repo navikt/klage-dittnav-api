@@ -33,7 +33,7 @@ data class AnkeFullInput(
     val language: LanguageEnum = LanguageEnum.NB,
     val vedtakDate: LocalDate? = null,
     val internalSaksnummer: String? = null,
-    val fritekst: String?,
+    val fritekst: String = "",
     val enhetsnummer: String? = null,
     val hasVedlegg: Boolean,
 ) {
