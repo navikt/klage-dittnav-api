@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 
 data class KlageView(
     val id: String,
-    val fritekst: String?,
+    val fritekst: String,
     val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
     val vedlegg: List<VedleggView> = listOf(),

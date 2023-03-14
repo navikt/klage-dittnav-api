@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 
 data class AnkeView(
     val id: String,
-    val fritekst: String?,
+    val fritekst: String,
     val status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
     val modifiedByUser: LocalDateTime = getFormattedLocalDateTime(),
     val vedtakDate: LocalDate? = null,

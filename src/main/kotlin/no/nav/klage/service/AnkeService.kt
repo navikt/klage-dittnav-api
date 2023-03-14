@@ -201,7 +201,7 @@ class AnkeService(
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return AnkeView(
             id = id.toString(),
-            fritekst = fritekst,
+            fritekst = fritekst ?: "",
             status = status,
             modifiedByUser = modifiedDateTime,
             vedtakDate = vedtakDate,
