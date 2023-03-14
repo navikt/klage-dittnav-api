@@ -230,7 +230,7 @@ class AnkeService(
             tema = anke.tema,
             enhetsnummer = anke.enhetsnummer!!,//should already be validated
             language = anke.language,
-            hasVedlegg = anke.hasVedlegg,
+            hasVedlegg = anke.vedlegg.isNotEmpty() || anke.hasVedlegg,
             titleKey = anke.innsendingsytelse,
         )
     }
