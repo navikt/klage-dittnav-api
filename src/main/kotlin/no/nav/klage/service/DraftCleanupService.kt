@@ -2,6 +2,7 @@ package no.nav.klage.service
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
+import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.repository.AnkeRepository
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.VedleggRepository
@@ -69,7 +70,7 @@ class DraftCleanupService(
                         )
                     }
                 }
-                it.id?.let { klageId -> klageRepository.deleteKlage(klageId) }
+                it.id.let { klageId -> klageRepository.updateStatus(klageId.toString(), KlageAnkeStatus.DELETED)}
                 klagerSuccessfullyDeleted++
             }.onFailure { failure ->
                 logger.error("Could not clean up draft. See secure logs for details.")
@@ -89,7 +90,7 @@ class DraftCleanupService(
         oldAnkeDrafts.forEach {
             logger.debug("Cleaning up expired draft anke ${it.id}")
             runCatching {
-                ankeRepository.deleteAnke(it.id!!)
+                ankeRepository.updateStatus(it.id, KlageAnkeStatus.DELETED)
                 ankerSuccessfullyDeleted++
             }.onFailure { failure ->
                 logger.error("Could not clean up draft. See secure logs for details.")

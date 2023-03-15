@@ -1,9 +1,10 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.Tema
+import no.nav.klage.domain.*
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
+import no.nav.klage.domain.klage.KlageFullInput
+import no.nav.klage.domain.klage.KlageInput
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.KlagevedleggDAO
 import org.flywaydb.core.Flyway
@@ -41,12 +42,27 @@ class VedleggRepositoryTest {
     }
 
     @Test
-    fun `stores klage with vedlegg`() {
+    fun `stores klage with vedlegg from KlageInput`() {
         val vedleggExternalRef = "externalRef"
         val nyKlage = transaction {
-            val klage = klageRepository.createKlage(klage1)
-            vedleggRepository.storeKlagevedlegg(klage.id!!, vedlegg1, vedleggExternalRef)
-            klageRepository.getKlageById(klage.id!!)
+            val klage = klageRepository.createKlage(klageInput, bruker)
+            vedleggRepository.storeKlagevedlegg(klage.id, vedlegg1, vedleggExternalRef)
+            klageRepository.getKlageById(klage.id.toString())
+        }
+
+        Assertions.assertFalse(nyKlage.vedlegg.isEmpty())
+        val vedlegg = nyKlage.vedlegg[0]
+
+        Assertions.assertEquals(vedleggExternalRef, vedlegg.ref)
+    }
+
+    @Test
+    fun `stores klage with vedlegg from KlageFullInput`() {
+        val vedleggExternalRef = "externalRef"
+        val nyKlage = transaction {
+            val klage = klageRepository.createKlage(klageFullInput, bruker)
+            vedleggRepository.storeKlagevedlegg(klage.id, vedlegg1, vedleggExternalRef)
+            klageRepository.getKlageById(klage.id.toString())
         }
 
         Assertions.assertFalse(nyKlage.vedlegg.isEmpty())
@@ -62,14 +78,29 @@ class VedleggRepositoryTest {
             KlageDAO.all().forEach { x -> x.delete() }
         }
     }
+    
+    private val klageInput = KlageInput(
+        internalSaksnummer = null, 
+        innsendingsytelse = Innsendingsytelse.ARBEIDSAVKLARINGSPENGER
+    )
 
-    private val klage1 = Klage(
-        foedselsnummer = "123455667",
-        fritekst = "fritekst",
-        tema = Tema.AAP,
+    private val klageFullInput = KlageFullInput(
+        internalSaksnummer = null,
+        innsendingsytelse = Innsendingsytelse.ARBEIDSAVKLARINGSPENGER,
+        checkboxesSelected = setOf(),
+        userSaksnummer = null,
         language = LanguageEnum.NB,
-        innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
-        hasVedlegg = false,
+        vedtakDate = null,
+        fritekst = "",
+        hasVedlegg = false
+    )
+    
+    private val bruker = Bruker(
+        navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
+        adresse = null,
+        kontaktinformasjon = null,
+        folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
+        tokenExpires = null
     )
 
     private val vedlegg1 =

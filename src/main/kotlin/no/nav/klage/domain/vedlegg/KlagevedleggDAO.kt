@@ -20,7 +20,7 @@ class KlagevedleggDAO(id: EntityID<Int>) : IntEntity(id) {
         Klagevedlegg(
             tittel = tittel,
             ref = ref,
-            klageId = klage.id.value,
+            klageId = klage.id.value.toString(),
             id = id.value,
             contentType = contentType,
             sizeInBytes = sizeInBytes

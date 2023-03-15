@@ -1,5 +1,8 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.KlageAnkeStatus
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.KlagevedleggDAO
 import no.nav.klage.domain.vedlegg.Klagevedleggene
@@ -55,7 +58,7 @@ object Klager : IntIdTable("klage") {
 
 fun KlageDAO.toKlage(): Klage {
     return Klage(
-        id = id.toString().toInt(),
+        id = id.toString(),
         foedselsnummer = foedselsnummer,
         fritekst = fritekst,
         status = status.toStatus(),
@@ -81,19 +84,36 @@ fun String.toCheckboxEnumSet() =
         this.split(",").map { x -> CheckboxEnum.valueOf(x) }.toSet()
     }
 
-fun KlageDAO.fromKlage(klage: Klage) {
-    foedselsnummer = klage.foedselsnummer
-    fritekst = klage.fritekst
-    status = klage.status.name
+fun KlageDAO.fromKlageFullInput(klageFullInput: KlageFullInput, bruker: Bruker) {
+    foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+    fritekst = klageFullInput.fritekst
+    status = KlageAnkeStatus.DRAFT.name
     modifiedByUser = Instant.now()
-    tema = klage.tema.name
-    userSaksnummer = klage.userSaksnummer
-    klage.journalpostId?.let { journalpostId = it }
-    vedtakDate = klage.vedtakDate
-    klage.checkboxesSelected?.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
-    internalSaksnummer = klage.internalSaksnummer
-    fullmektig = klage.fullmektig
-    language = klage.language.name
-    innsendingsytelse = klage.innsendingsytelse.name
-    hasVedlegg = klage.hasVedlegg
+    tema = klageFullInput.innsendingsytelse.toTema().name
+    userSaksnummer = klageFullInput.userSaksnummer
+    journalpostId = null
+    vedtakDate = klageFullInput.vedtakDate
+    klageFullInput.checkboxesSelected.let { checkBoxesSelected = it.joinToString(",") { x -> x.toString() } }
+    internalSaksnummer = klageFullInput.internalSaksnummer
+    fullmektig = null
+    language = klageFullInput.language.name
+    innsendingsytelse = klageFullInput.innsendingsytelse.name
+    hasVedlegg = klageFullInput.hasVedlegg
+}
+
+fun KlageDAO.fromKlageInput(klageInput: KlageInput, bruker: Bruker) {
+    foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+    fritekst = null
+    status = KlageAnkeStatus.DRAFT.name
+    modifiedByUser = Instant.now()
+    tema = klageInput.innsendingsytelse.toTema().name
+    userSaksnummer = null
+    journalpostId = null
+    vedtakDate = null
+    checkBoxesSelected = null
+    internalSaksnummer = klageInput.internalSaksnummer
+    fullmektig = null
+    language = LanguageEnum.NB.name
+    innsendingsytelse = klageInput.innsendingsytelse.name
+    hasVedlegg = false
 }

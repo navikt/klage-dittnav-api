@@ -135,9 +135,9 @@ class AnkeController(
         val bruker = brukerService.getBruker()
         logger.debug("Create or update anke for user is requested.")
         secureLogger.debug(
-            "Create or update anke for user is requested. Fnr: {}, tema: {}",
+            "Create or update anke for user is requested. Fnr: {}, innsendingsytelse: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            ankeInput.tema
+            ankeInput.innsendingsytelse
         )
 
         return ankeService.getDraftOrCreateAnke(ankeInput, bruker)

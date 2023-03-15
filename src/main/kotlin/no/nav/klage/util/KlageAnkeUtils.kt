@@ -27,31 +27,17 @@ fun String.toStatus() = try {
     KlageAnkeStatus.DRAFT
 }
 
-fun klageAnkeIsLonnskompensasjon(tema: Tema, innsendingsytelse: Innsendingsytelse): Boolean =
-    tema == Tema.DAG && innsendingsytelse == Innsendingsytelse.LONNSKOMPENSASJON
+fun klageAnkeIsLonnskompensasjon(innsendingsytelse: Innsendingsytelse): Boolean =
+    innsendingsytelse == Innsendingsytelse.LONNSKOMPENSASJON
 
 fun getLanguageEnum(input: String?): LanguageEnum {
     return when (input) {
         null -> {
             LanguageEnum.NB
         }
+
         else -> {
             LanguageEnum.valueOf(input)
         }
-    }
-}
-
-// For compatability when we change from titleKey to innsendingsytelse
-fun getInnsendingsytelse(titleKey: Innsendingsytelse?, innsendingsytelse: Innsendingsytelse?): Innsendingsytelse {
-    return when {
-        titleKey != null -> {
-            titleKey
-        }
-
-        innsendingsytelse != null -> {
-            innsendingsytelse
-        }
-
-        else -> error("innsendingsytelse or titleKey must be set")
     }
 }

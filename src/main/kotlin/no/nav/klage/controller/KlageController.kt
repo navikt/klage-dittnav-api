@@ -69,7 +69,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getKlage(klageId.toInt(), bruker)
+        return klageService.getKlage(klageId, bruker)
     }
 
     @GetMapping("/{klageId}/journalpostid")
@@ -83,7 +83,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getJournalpostId(klageId.toInt(), bruker)
+        return klageService.getJournalpostId(klageId, bruker)
     }
 
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
@@ -92,7 +92,7 @@ class KlageController(
     ): Flux<ServerSentEvent<String>> {
         val bruker = brukerService.getBruker()
         kotlin.runCatching {
-            klageService.validateAccess(Integer.valueOf(klageId), bruker)
+            klageService.validateAccess(klageId, bruker)
         }.onFailure {
             throw KlageNotFoundException()
         }
@@ -131,9 +131,9 @@ class KlageController(
         val bruker = brukerService.getBruker()
         logger.debug("Create or update klage for user is requested.")
         secureLogger.debug(
-            "Create or update klage for user is requested. Fnr: {}, tema: {}",
+            "Create or update klage for user is requested. Fnr: {}, innsendingsytelse: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            klageInput.tema
+            klageInput.innsendingsytelse
         )
 
         return klageService.getDraftOrCreateKlage(klageInput, bruker)
@@ -243,7 +243,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        klageService.deleteKlage(klageId.toInt(), bruker)
+        klageService.deleteKlage(klageId, bruker)
     }
 
     @PostMapping("/{klageId}/finalize")
@@ -258,7 +258,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val finalizedInstant = klageService.finalizeKlage(klageId.toInt(), bruker)
+        val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
         val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
         return mapOf(
             "finalizedDate" to zonedDateTime.toLocalDate().toString(),
@@ -278,7 +278,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryVedlegg = vedleggService.addKlagevedlegg(klageId.toInt(), vedlegg, bruker)
+        val temporaryVedlegg = vedleggService.addKlagevedlegg(klageId, vedlegg, bruker)
         return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
     }
 
@@ -295,7 +295,7 @@ class KlageController(
             vedleggId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (!vedleggService.deleteVedleggFromKlage(klageId.toInt(), vedleggId, bruker)) {
+        if (!vedleggService.deleteVedleggFromKlage(klageId, vedleggId, bruker)) {
             throw KlageNotFoundException("Attachment not found.")
         }
     }
@@ -340,7 +340,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = klageService.getKlagePdf(klageId.toInt(), bruker)
+        val content = klageService.getKlagePdf(klageId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
@@ -365,7 +365,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = klageService.createKlagePdfWithFoersteside(klageId.toInt(), bruker)
+        val content = klageService.createKlagePdfWithFoersteside(klageId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")

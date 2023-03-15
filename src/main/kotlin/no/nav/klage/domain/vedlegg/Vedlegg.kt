@@ -11,7 +11,7 @@ abstract class Vedlegg(
 )
 
 class Klagevedlegg(
-    val klageId: Int,
+    val klageId: String,
     tittel: String,
     ref: String,
     contentType: String,

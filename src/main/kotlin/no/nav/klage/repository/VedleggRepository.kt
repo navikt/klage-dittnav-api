@@ -20,11 +20,11 @@ class VedleggRepository {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun storeKlagevedlegg(klageId: Int, vedlegg: MultipartFile, fileStorageId: String): Klagevedlegg {
+    fun storeKlagevedlegg(klageId: String, vedlegg: MultipartFile, fileStorageId: String): Klagevedlegg {
         logger.debug("Storing vedlegg metadata in db. KlageId: {}", klageId)
         return KlagevedleggDAO.new {
             this.tittel = vedlegg.originalFilename.toString()
-            this.klage = KlageDAO.findById(klageId)!!
+            this.klage = KlageDAO.findById(klageId.toInt())!!
             this.ref = fileStorageId
             this.contentType = vedlegg.contentType.toString()
             this.sizeInBytes = vedlegg.bytes.size
