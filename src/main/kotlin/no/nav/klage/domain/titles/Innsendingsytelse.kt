@@ -86,6 +86,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
     BARNETRYGD("Barnetrygd", "Child benefit (Barnetrygd)"),
     BILSTONAD("Stønad til bil og spesialutstyr til kjøretøy", "Vehicle and special equipment for vehicles benefit"),
     DAGPENGER("Dagpenger", "Unemployment benefits (Dagpenger)"),
+    //TODO: Fjern når vi ikke lenger har noen drafts, ca. 16. mai 2023.
     DAGPENGER_FERIEPENGER("Feriepenger av dagpenger", "Holiday pay and unemployment benefits (Feriepenger av dagpenger)"),
     DAGPENGER_TILBAKEBETALING_FORSKUDD("Tilbakebetaling av forskudd på dagpenger", "Repayment of advance payment of unemployment benefits (Tilbakebetaling av forskudd på dagpenger)"),
     EKTEFELLEBIDRAG("Ektefellebidrag", "Spousal support (Ektefellebidrag)"),
@@ -155,7 +156,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
         )
     }
 
-    fun getTema(): Tema {
+    fun toTema(): Tema {
         return when(this) {
             AAP -> Tema.AAP
             AAR -> Tema.AAR

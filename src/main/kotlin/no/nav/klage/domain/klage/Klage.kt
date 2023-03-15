@@ -9,37 +9,25 @@ import java.time.Instant
 import java.time.LocalDate
 
 data class Klage(
-    val id: Int? = null,
+    val id: String,
     val foedselsnummer: String,
-    val fritekst: String? = null,
-    var status: KlageAnkeStatus = KlageAnkeStatus.DRAFT,
-    val modifiedByUser: Instant? = Instant.now(),
+    val fritekst: String?,
+    var status: KlageAnkeStatus,
+    val modifiedByUser: Instant?,
     val tema: Tema,
-    val userSaksnummer: String? = null,
-    val vedlegg: List<Klagevedlegg> = listOf(),
-    val journalpostId: String? = null,
-    val vedtakDate: LocalDate? = null,
-    val checkboxesSelected: Set<CheckboxEnum>? = null,
-    val internalSaksnummer: String? = null,
-    val fullmektig: String? = null,
+    val userSaksnummer: String?,
+    val vedlegg: List<Klagevedlegg>,
+    val journalpostId: String?,
+    val vedtakDate: LocalDate?,
+    val checkboxesSelected: Set<CheckboxEnum>?,
+    val internalSaksnummer: String?,
+    val fullmektig: String?,
     val language: LanguageEnum,
     val innsendingsytelse: Innsendingsytelse,
-    val hasVedlegg: Boolean = false,
+    val hasVedlegg: Boolean,
 )
 
 fun Klage.isAccessibleToUser(usersIdentifikasjonsnummer: String) = klageAnkeIsAccessibleToUser(usersIdentifikasjonsnummer, foedselsnummer)
 fun Klage.isFinalized() = status.isFinalized()
 fun Klage.isDeleted() = status.isDeleted()
-fun Klage.isLonnskompensasjon() = klageAnkeIsLonnskompensasjon(tema, innsendingsytelse)
-
-
-fun Klage.writableOnceFieldsMatch(existingKlage: Klage): Boolean {
-    return id == existingKlage.id &&
-            foedselsnummer == existingKlage.foedselsnummer &&
-            tema == existingKlage.tema &&
-            innsendingsytelse == existingKlage.innsendingsytelse &&
-            journalpostId == existingKlage.journalpostId &&
-            internalSaksnummer == existingKlage.internalSaksnummer &&
-            fullmektig == existingKlage.fullmektig
-}
 

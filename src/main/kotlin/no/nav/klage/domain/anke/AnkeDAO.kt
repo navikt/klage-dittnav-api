@@ -1,5 +1,8 @@
 package no.nav.klage.domain.anke
 
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.KlageAnkeStatus
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.AnkevedleggDAO
 import no.nav.klage.domain.vedlegg.Ankevedleggene
@@ -86,4 +89,36 @@ fun AnkeDAO.fromAnke(anke: Anke) {
     innsendingsytelse = anke.innsendingsytelse.name
     journalpostId = anke.journalpostId
     hasVedlegg = anke.hasVedlegg
+}
+
+fun AnkeDAO.fromAnkeFullInput(ankeFullInput: AnkeFullInput, bruker: Bruker) {
+    foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+    fritekst = ankeFullInput.fritekst
+    status = KlageAnkeStatus.DRAFT.name
+    modifiedByUser = Instant.now()
+    tema = ankeFullInput.innsendingsytelse.toTema().name
+    userSaksnummer = ankeFullInput.userSaksnummer
+    journalpostId = null
+    vedtakDate = ankeFullInput.vedtakDate
+    enhetsnummer = ankeFullInput.enhetsnummer
+    internalSaksnummer = ankeFullInput.internalSaksnummer
+    language = ankeFullInput.language.name
+    innsendingsytelse = ankeFullInput.innsendingsytelse.name
+    hasVedlegg = ankeFullInput.hasVedlegg
+}
+
+fun AnkeDAO.fromAnkeInput(ankeInput: AnkeInput, bruker: Bruker) {
+    foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+    fritekst = null
+    status = KlageAnkeStatus.DRAFT.name
+    modifiedByUser = Instant.now()
+    tema = ankeInput.innsendingsytelse.toTema().name
+    userSaksnummer = null
+    journalpostId = null
+    vedtakDate = null
+    enhetsnummer = null
+    internalSaksnummer = ankeInput.internalSaksnummer
+    language = LanguageEnum.NB.name
+    innsendingsytelse = ankeInput.innsendingsytelse.name
+    hasVedlegg = false
 }

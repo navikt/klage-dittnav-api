@@ -27,7 +27,6 @@ data class PDFInput (
 )
 
 fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
-    val innsendingsytelse = innsendingsytelse ?: titleKey ?: error("innsendingsytelse or titleKey must be set")
     return PDFInput(
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
@@ -44,7 +43,6 @@ fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
 }
 
 fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
-    val innsendingsytelse = innsendingsytelse ?: titleKey ?: error("innsendingsytelse or titleKey must be set")
     return PDFInput(
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,

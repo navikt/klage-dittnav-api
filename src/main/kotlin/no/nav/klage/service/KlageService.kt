@@ -12,6 +12,7 @@ import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
@@ -41,14 +42,14 @@ class KlageService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun getKlage(klageId: Int, bruker: Bruker): KlageView {
+    fun getKlage(klageId: String, bruker: Bruker): KlageView {
         val klage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(klage, false)
         validationService.validateKlageAccess(klage, bruker)
         return klage.toKlageView(bruker = bruker)
     }
 
-    fun validateAccess(klageId: Int, bruker: Bruker) {
+    fun validateAccess(klageId: String, bruker: Bruker) {
         val klage = klageRepository.getKlageById(klageId)
         validationService.validateKlageAccess(klage, bruker)
     }
@@ -63,10 +64,9 @@ class KlageService(
         bruker: Bruker,
         tema: Tema,
         internalSaksnummer: String?,
-        fullmaktsgiver: String?,
         innsendingsytelse: Innsendingsytelse,
     ): KlageView? {
-        val fnr = fullmaktsgiver ?: bruker.folkeregisteridentifikator.identifikasjonsnummer
+        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val klage =
             klageRepository.getLatestKlageDraft(
@@ -82,53 +82,45 @@ class KlageService(
         return null
     }
 
-    fun getJournalpostId(klageId: Int, bruker: Bruker): String? {
+    fun getJournalpostId(klageId: String, bruker: Bruker): String? {
         val klage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(klage, false)
         validationService.validateKlageAccess(klage, bruker)
         return klage.journalpostId
     }
 
-    fun createKlage(input: KlageFullInput, bruker: Bruker): KlageView {
-        val klage = input.toKlage(bruker)
-        return createKlage(klage, bruker)
-    }
-
-    fun createKlage(input: KlageInput, bruker: Bruker): KlageView {
-        val klage = input.toKlage(bruker)
-        return createKlage(klage, bruker)
-    }
-
-    private fun createKlage(
-        klage: Klage,
-        bruker: Bruker
-    ): KlageView {
-        if (klage.fullmektig != null) {
-            TODO()
-            //            brukerService.verifyFullmakt(input.tema, input.fullmaktsgiver)
-        }
-
-        return klageRepository
-            .createKlage(klage)
-            .toKlageView(bruker)
+    private fun createKlageViewAndUpdateMetrics(input: Klage, bruker: Bruker): KlageView {
+        return input.toKlageView(bruker)
             .also {
-                val temaReport = if (klage.isLonnskompensasjon()) {
+                val temaReport = if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
                     LOENNSKOMPENSASJON_GRAFANA_TEMA
                 } else {
-                    klage.tema.toString()
+                    input.innsendingsytelse.toTema().toString()
                 }
                 klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             }
     }
 
+    fun createKlage(input: KlageFullInput, bruker: Bruker): KlageView {
+        return createKlageViewAndUpdateMetrics(
+            input = klageRepository.createKlage(klageFullInput = input, bruker = bruker),
+            bruker = bruker
+        )
+    }
+
+    fun createKlage(input: KlageInput, bruker: Bruker): KlageView {
+        return createKlageViewAndUpdateMetrics(
+            input = klageRepository.createKlage(klageInput = input, bruker = bruker),
+            bruker = bruker
+        )
+    }
+
     fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): KlageView {
-        val klage = input.toKlage(bruker)
         val existingKlage = getLatestDraftKlageByParams(
             bruker = bruker,
-            tema = klage.tema,
-            internalSaksnummer = klage.internalSaksnummer,
-            fullmaktsgiver = null,
-            innsendingsytelse = klage.innsendingsytelse,
+            tema = input.innsendingsytelse.toTema(),
+            internalSaksnummer = input.internalSaksnummer,
+            innsendingsytelse = input.innsendingsytelse,
         )
 
         return existingKlage ?: createKlage(
@@ -138,7 +130,7 @@ class KlageService(
     }
 
     fun updateFritekst(klageId: String, fritekst: String, bruker: Bruker): LocalDateTime {
-        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
@@ -148,7 +140,7 @@ class KlageService(
     }
 
     fun updateUserSaksnummer(klageId: String, userSaksnummer: String?, bruker: Bruker): LocalDateTime {
-        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
@@ -158,7 +150,7 @@ class KlageService(
     }
 
     fun updateVedtakDate(klageId: String, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
-        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
@@ -168,7 +160,7 @@ class KlageService(
     }
 
     fun updateHasVedlegg(klageId: String, hasVedlegg: Boolean, bruker: Bruker): LocalDateTime {
-        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
@@ -182,7 +174,7 @@ class KlageService(
         checkboxesSelected: Set<CheckboxEnum>?,
         bruker: Bruker
     ): LocalDateTime {
-        val existingKlage = klageRepository.getKlageById(klageId.toInt())
+        val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
         return klageRepository
@@ -191,14 +183,14 @@ class KlageService(
             .modifiedByUser
     }
 
-    fun deleteKlage(klageId: Int, bruker: Bruker) {
+    fun deleteKlage(klageId: String, bruker: Bruker) {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
-        klageRepository.deleteKlage(klageId)
+        klageRepository.updateStatus(klageId, KlageAnkeStatus.DELETED)
     }
 
-    fun finalizeKlage(klageId: Int, bruker: Bruker): Instant {
+    fun finalizeKlage(klageId: String, bruker: Bruker): Instant {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage, false)
 
@@ -209,15 +201,15 @@ class KlageService(
 
         validationService.validateKlageAccess(existingKlage, bruker)
         validationService.validateKlage(existingKlage)
-        existingKlage.status = KlageAnkeStatus.DONE
-        val updatedKlage = klageRepository.updateKlage(existingKlage)
+
+        val updatedKlage = klageRepository.updateStatus(klageId, KlageAnkeStatus.DONE)
+
         kafkaProducer.sendToKafka(createAggregatedKlage(bruker, updatedKlage))
         registerFinalizedMetrics(updatedKlage)
 
-        val klageIdAsString = klageId.toString()
         logger.debug(
             "Klage {} med tema {} er sendt inn{}",
-            klageIdAsString,
+            klageId,
             existingKlage.tema.name,
             (if (existingKlage.fullmektig.isNullOrEmpty()) "." else " med fullmakt.")
         )
@@ -225,7 +217,7 @@ class KlageService(
         return updatedKlage.modifiedByUser ?: throw KlageIsFinalizedException("No modified date after finalize klage")
     }
 
-    fun getKlagePdf(klageId: Int, bruker: Bruker): ByteArray {
+    fun getKlagePdf(klageId: String, bruker: Bruker): ByteArray {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage, false)
         validationService.validateKlageAccess(existingKlage, bruker)
@@ -233,7 +225,7 @@ class KlageService(
         return fileClient.getKlageAnkeFile(existingKlage.journalpostId)
     }
 
-    fun createKlagePdfWithFoersteside(klageId: Int, bruker: Bruker): ByteArray? {
+    fun createKlagePdfWithFoersteside(klageId: String, bruker: Bruker): ByteArray? {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage, false)
         validationService.validateKlageAccess(existingKlage, bruker)
@@ -247,37 +239,34 @@ class KlageService(
         }
     }
 
-    fun getJournalpostIdWithoutValidation(klageId: Int): String? {
+    fun getJournalpostIdWithoutValidation(klageId: String): String? {
         val klage = klageRepository.getKlageById(klageId)
         return klage.journalpostId
     }
 
-    fun setJournalpostIdWithoutValidation(klageId: Int, journalpostId: String) {
-        val klage = klageRepository.getKlageById(klageId)
-        val updatedKlage = klage.copy(journalpostId = journalpostId)
-        klageRepository.updateKlage(updatedKlage, false)
+    fun setJournalpostIdWithoutValidation(klageId: String, journalpostId: String) {
+        klageRepository.updateJournalpostId(klageId, journalpostId)
         kafkaInternalEventService.publishEvent(
             Event(
-                klageAnkeId = klageId.toString(),
+                klageAnkeId = klageId,
                 name = "journalpostId",
-                id = klageId.toString(),
+                id = klageId,
                 data = journalpostId,
             )
         )
     }
 
-    private fun setPdfDownloadedWithoutAccessValidation(klageId: Int, pdfDownloaded: Instant?) {
+    private fun setPdfDownloadedWithoutAccessValidation(klageId: String, pdfDownloaded: Instant?) {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
-        klageRepository.updatePdfDownloaded(klageId.toString(), pdfDownloaded)
+        klageRepository.updatePdfDownloaded(klageId, pdfDownloaded)
     }
 
     fun Klage.toKlageView(bruker: Bruker): KlageView {
         val modifiedDateTime =
             ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
         return KlageView(
-            id = id!!.toString(),
-            //TODO: Følg opp med FE, er det forskjell på klage og anke?
+            id = id.toString(),
             fritekst = fritekst ?: "",
             status = status,
             modifiedByUser = modifiedDateTime,
@@ -292,15 +281,13 @@ class KlageService(
             internalSaksnummer = internalSaksnummer,
             fullmaktsgiver = fullmektig?.let { foedselsnummer },
             language = language,
-            titleKey = innsendingsytelse,
             innsendingsytelse = innsendingsytelse,
             hasVedlegg = hasVedlegg,
-            tema = innsendingsytelse.getTema(),
         )
     }
 
     private fun registerFinalizedMetrics(klage: Klage) {
-        val temaReport = if (klage.isLonnskompensasjon()) {
+        val temaReport = if (klageAnkeIsLonnskompensasjon(klage.innsendingsytelse)) {
             LOENNSKOMPENSASJON_GRAFANA_TEMA
         } else {
             klage.tema.toString()
@@ -331,7 +318,7 @@ class KlageService(
             val fullmaktsGiver = brukerService.getFullmaktsgiver(klage.tema, klage.foedselsnummer)
 
             return AggregatedKlageAnke(
-                id = klage.id!!.toString(),
+                id = klage.id.toString(),
                 fornavn = fullmaktsGiver.navn.fornavn,
                 mellomnavn = fullmaktsGiver.navn.mellomnavn ?: "",
                 etternavn = fullmaktsGiver.navn.etternavn,
@@ -350,7 +337,7 @@ class KlageService(
             )
         } else {
             return AggregatedKlageAnke(
-                id = klage.id!!.toString(),
+                id = klage.id.toString(),
                 fornavn = bruker.navn.fornavn,
                 mellomnavn = bruker.navn.mellomnavn ?: "",
                 etternavn = bruker.navn.etternavn,
@@ -379,11 +366,9 @@ class KlageService(
             internalSaksnummer = klage.internalSaksnummer,
             vedtakDate = klage.vedtakDate,
             innsendingsytelse = klage.innsendingsytelse,
-            tema = klage.tema,
             checkboxesSelected = klage.checkboxesSelected,
             language = klage.language,
             hasVedlegg = klage.vedlegg.isNotEmpty() || klage.hasVedlegg,
-            titleKey = klage.innsendingsytelse,
         )
     }
 }

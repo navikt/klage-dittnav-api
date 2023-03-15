@@ -17,6 +17,7 @@ import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
@@ -83,34 +84,36 @@ class AnkeService(
         return null
     }
 
-    fun createAnke(input: AnkeFullInput, bruker: Bruker): AnkeView {
-        val anke = input.toAnke(bruker)
-        return createAnke(anke = anke, bruker = bruker)
-    }
-
-    fun createAnke(input: AnkeInput, bruker: Bruker): AnkeView {
-        val anke = input.toAnke(bruker)
-        return createAnke(anke = anke, bruker = bruker)
-    }
-
-    private fun createAnke(anke: Anke, bruker: Bruker): AnkeView {
-        return ankeRepository.createAnke(anke)
-            .toAnkeView(bruker)
+    private fun createAnkeViewAndUpdateMetrics(input: Anke, bruker: Bruker): AnkeView {
+        return input.toAnkeView(bruker)
             .also {
-                val temaReport = if (anke.isLonnskompensasjon()) {
+                val temaReport = if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
                     LOENNSKOMPENSASJON_GRAFANA_TEMA
                 } else {
-                    anke.tema.toString()
+                    input.innsendingsytelse.toTema().toString()
                 }
                 klageAnkeMetrics.incrementAnkerInitialized(temaReport)
             }
     }
 
+    fun createAnke(input: AnkeFullInput, bruker: Bruker): AnkeView {
+        return createAnkeViewAndUpdateMetrics(
+            input = ankeRepository.createAnke(ankeFullInput = input, bruker = bruker),
+            bruker = bruker
+        )
+    }
+
+    fun createAnke(input: AnkeInput, bruker: Bruker): AnkeView {
+        return createAnkeViewAndUpdateMetrics(
+            input = ankeRepository.createAnke(ankeInput = input, bruker = bruker),
+            bruker = bruker
+        )
+    }
+
     fun getDraftOrCreateAnke(input: AnkeInput, bruker: Bruker): AnkeView {
-        val anke = input.toAnke(bruker)
         val existingAnke = getLatestDraftAnkeByParams(
             bruker = bruker,
-            innsendingsytelse = anke.innsendingsytelse,
+            innsendingsytelse = input.innsendingsytelse,
         )
 
         return existingAnke ?: createAnke(
@@ -173,7 +176,7 @@ class AnkeService(
         val existingAnke = ankeRepository.getAnkeById(ankeId)
         validationService.checkAnkeStatus(existingAnke)
         validationService.validateAnkeAccess(existingAnke, bruker)
-        ankeRepository.deleteAnke(ankeId)
+        ankeRepository.updateStatus(ankeId, KlageAnkeStatus.DELETED)
     }
 
     fun createAnkePdfWithFoersteside(ankeId: UUID, bruker: Bruker): ByteArray? {
@@ -212,8 +215,7 @@ class AnkeService(
             enhetsnummer = enhetsnummer,
             vedlegg = vedlegg.map { it.toVedleggView() },
             journalpostId = journalpostId,
-            titleKey = innsendingsytelse,
-            tema = innsendingsytelse.getTema(),
+            finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,
             internalSaksnummer = internalSaksnummer,
         )
     }
@@ -227,11 +229,9 @@ class AnkeService(
             internalSaksnummer = anke.internalSaksnummer,
             vedtakDate = anke.vedtakDate,
             innsendingsytelse = anke.innsendingsytelse,
-            tema = anke.tema,
             enhetsnummer = anke.enhetsnummer!!,//should already be validated
             language = anke.language,
             hasVedlegg = anke.vedlegg.isNotEmpty() || anke.hasVedlegg,
-            titleKey = anke.innsendingsytelse,
         )
     }
 
@@ -243,9 +243,7 @@ class AnkeService(
     }
 
     fun setJournalpostIdWithoutValidation(ankeId: UUID, journalpostId: String) {
-        val anke = ankeRepository.getAnkeById(ankeId)
-        val updatedAnke = anke.copy(journalpostId = journalpostId)
-        ankeRepository.updateAnke(updatedAnke, false)
+        ankeRepository.updateJournalpostId(ankeId, journalpostId)
         kafkaInternalEventService.publishEvent(
             Event(
                 klageAnkeId = ankeId.toString(),
@@ -270,15 +268,15 @@ class AnkeService(
 
         validationService.validateAnkeAccess(existingAnke, bruker)
         validationService.validateAnke(existingAnke)
-        existingAnke.status = KlageAnkeStatus.DONE
-        val updatedAnke = ankeRepository.updateAnke(existingAnke)
+
+        val updatedAnke = ankeRepository.updateStatus(ankeId, KlageAnkeStatus.DONE)
         kafkaProducer.sendToKafka(createAggregatedAnke(bruker, updatedAnke))
         registerFinalizedMetrics(updatedAnke)
 
-        val klageIdAsString = ankeId.toString()
+        val ankeIdAsString = ankeId.toString()
         logger.debug(
             "Anke {} med tema {} er sendt inn",
-            klageIdAsString,
+            ankeIdAsString,
             existingAnke.tema.name,
         )
 
@@ -287,7 +285,7 @@ class AnkeService(
     }
 
     private fun registerFinalizedMetrics(anke: Anke) {
-        val temaReport = if (anke.isLonnskompensasjon()) {
+        val temaReport = if (klageAnkeIsLonnskompensasjon(anke.innsendingsytelse)) {
             LOENNSKOMPENSASJON_GRAFANA_TEMA
         } else {
             anke.tema.toString()
@@ -310,7 +308,7 @@ class AnkeService(
         val vedtak = vedtakFromDate(anke.vedtakDate)
 
         return AggregatedKlageAnke(
-            id = anke.id!!.toString(),
+            id = anke.id.toString(),
             fornavn = bruker.navn.fornavn,
             mellomnavn = bruker.navn.mellomnavn ?: "",
             etternavn = bruker.navn.etternavn,

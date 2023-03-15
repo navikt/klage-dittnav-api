@@ -38,7 +38,7 @@ class VedleggService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addKlagevedlegg(klageId: Int, vedlegg: MultipartFile, bruker: Bruker): Klagevedlegg {
+    fun addKlagevedlegg(klageId: String, vedlegg: MultipartFile, bruker: Bruker): Klagevedlegg {
         val existingKlage = klageRepository.getKlageById(klageId)
         validationService.checkKlageStatus(existingKlage)
         validationService.validateKlageAccess(existingKlage, bruker)
@@ -76,7 +76,7 @@ class VedleggService(
         }
     }
 
-    fun deleteVedleggFromKlage(klageId: Int, vedleggId: Int, bruker: Bruker): Boolean {
+    fun deleteVedleggFromKlage(klageId: String, vedleggId: Int, bruker: Bruker): Boolean {
         val vedlegg = vedleggRepository.getKlagevedleggById(vedleggId)
         val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
         validationService.checkKlageStatus(existingKlage)

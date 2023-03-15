@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.exception.AnkeNotFoundException
@@ -52,10 +53,19 @@ class AnkeRepository {
             ?.toAnke()
     }
 
-    fun createAnke(anke: Anke): Anke {
+    fun createAnke(ankeFullInput: AnkeFullInput, bruker: Bruker): Anke {
         logger.debug("Creating anke in db.")
         return AnkeDAO.new {
-            fromAnke(anke)
+            fromAnkeFullInput(ankeFullInput = ankeFullInput, bruker = bruker)
+        }.toAnke().also {
+            logger.debug("Anke successfully created in db. Id: {}", it.id)
+        }
+    }
+
+    fun createAnke(ankeInput: AnkeInput, bruker: Bruker): Anke {
+        logger.debug("Creating anke in db.")
+        return AnkeDAO.new {
+            fromAnkeInput(ankeInput = ankeInput, bruker = bruker)
         }.toAnke().also {
             logger.debug("Anke successfully created in db. Id: {}", it.id)
         }
@@ -133,32 +143,30 @@ class AnkeRepository {
         return ankeFromDB.toAnke()
     }
 
-    fun deleteAnke(id: UUID) {
-        logger.debug("Deleting anke in db. Id: {}", id)
-        val ankeFromDB = getAnkeToModify(id)
-        ankeFromDB.apply {
-            status = KlageAnkeStatus.DELETED.name
-            modifiedByUser = Instant.now()
-        }
-        logger.debug("Anke successfully marked as deleted in db.")
-    }
-
     private fun getAnkeToModify(id: UUID?): AnkeDAO {
         return AnkeDAO.findById(checkNotNull(id)) ?: throw AnkeNotFoundException("Anke with id $id not found in db.")
     }
 
-    fun updateAnke(anke: Anke, checkWritableOnceFields: Boolean = true): Anke {
-        logger.debug("Updating anke in db. Id: {}", anke.id)
-        val ankeFromDB = getAnkeToModify(anke.id)
-
-        if (checkWritableOnceFields && !anke.writableOnceFieldsMatch(ankeFromDB.toAnke())) {
-            throw AttemptedIllegalUpdateException()
-        }
-
+    fun updateJournalpostId(id: UUID, journalpostId: String): Anke {
+        logger.debug("Updating anke journalpostId in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
         ankeFromDB.apply {
-            fromAnke(anke)
+            this.journalpostId = journalpostId
+            this.modifiedByUser = Instant.now()
         }
-        logger.debug("Anke successfully updated in db.")
+
+        logger.debug("Anke journalpostId successfully updated in db.")
+        return ankeFromDB.toAnke()
+    }
+
+    fun updateStatus(id: UUID, newStatus: KlageAnkeStatus): Anke {
+        logger.debug("Updating anke status in db. Id: {}", id)
+        val ankeFromDB = getAnkeToModify(id)
+        ankeFromDB.apply {
+            status = newStatus.name
+            modifiedByUser = Instant.now()
+        }
+        logger.debug("Anke status successfully updated db.")
         return ankeFromDB.toAnke()
     }
 }

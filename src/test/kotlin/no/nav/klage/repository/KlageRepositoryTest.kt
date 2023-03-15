@@ -107,8 +107,8 @@ class KlageRepositoryTest {
             createDBEntryWithYtelse()
 
             val klage = klageRepository.getDraftKlagerByFnr(fnr)[0]
-            klageRepository.updateFritekst(klage.id!!.toString(), exampleFritekst2)
-            val output = klageRepository.getKlageById(klage.id!!).fritekst
+            klageRepository.updateFritekst(klage.id.toString(), exampleFritekst2)
+            val output = klageRepository.getKlageById(klage.id.toString()).fritekst
 
             Assertions.assertEquals(exampleFritekst2, output)
         }

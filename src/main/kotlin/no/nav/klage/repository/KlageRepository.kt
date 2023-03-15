@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
@@ -33,8 +34,8 @@ class KlageRepository {
             }
     }
 
-    fun getKlageById(id: Int): Klage {
-        return KlageDAO.findById(id)?.toKlage() ?: throw KlageNotFoundException("Klage with id $id not found in db.")
+    fun getKlageById(id: String): Klage {
+        return KlageDAO.findById(id.toInt())?.toKlage() ?: throw KlageNotFoundException("Klage with id $id not found in db.")
     }
 
     fun getDraftKlagerByFnr(fnr: String): List<Klage> {
@@ -58,27 +59,33 @@ class KlageRepository {
             ?.toKlage()
     }
 
-    fun createKlage(klage: Klage): Klage {
+    fun createKlage(klageFullInput: KlageFullInput, bruker: Bruker): Klage {
         logger.debug("Creating klage in db.")
         return KlageDAO.new {
-            fromKlage(klage)
+            fromKlageFullInput(klageFullInput = klageFullInput, bruker = bruker)
         }.toKlage().also {
             logger.debug("Klage successfully created in db. Id: {}", it.id)
         }
     }
 
-    fun updateKlage(klage: Klage, checkWritableOnceFields: Boolean = true): Klage {
-        logger.debug("Updating klage in db. Id: {}", klage.id)
-        val klageFromDB = getKlageToModify(klage.id)
-
-        if (checkWritableOnceFields && !klage.writableOnceFieldsMatch(klageFromDB.toKlage())) {
-            throw AttemptedIllegalUpdateException()
+    fun createKlage(klageInput: KlageInput, bruker: Bruker): Klage {
+        logger.debug("Creating klage in db.")
+        return KlageDAO.new {
+            fromKlageInput(klageInput = klageInput, bruker = bruker)
+        }.toKlage().also {
+            logger.debug("Klage successfully created in db. Id: {}", it.id)
         }
+    }
 
+    fun updateJournalpostId(id: String, journalpostId: String): Klage {
+        logger.debug("Updating klage journalpostId in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
         klageFromDB.apply {
-            fromKlage(klage)
+            this.journalpostId = journalpostId
+            this.modifiedByUser = Instant.now()
         }
-        logger.debug("Klage successfully updated in db.")
+
+        logger.debug("Klage journalpostId successfully updated in db.")
         return klageFromDB.toKlage()
     }
 
@@ -156,14 +163,15 @@ class KlageRepository {
         return klageFromDB.toKlage()
     }
 
-    fun deleteKlage(id: Int) {
-        logger.debug("Deleting klage in db. Id: {}", id)
-        val klageFromDB = getKlageToModify(id)
+    fun updateStatus(id: String, newStatus: KlageAnkeStatus): Klage {
+        logger.debug("Updating klage status in db. Id: {}", id)
+        val klageFromDB = getKlageToModify(id.toInt())
         klageFromDB.apply {
-            status = KlageAnkeStatus.DELETED.name
+            status = newStatus.name
             modifiedByUser = Instant.now()
         }
-        logger.debug("Klage successfully marked as deleted in db.")
+        logger.debug("Klage status successfully updated db.")
+        return klageFromDB.toKlage()
     }
 
     private fun getKlageToModify(id: Int?): KlageDAO {
