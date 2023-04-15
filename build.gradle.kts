@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.41.1"
-val mockkVersion = "1.13.4"
+val mockkVersion = "1.13.5"
 val h2Version = "2.1.214"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
-val tokenSupportVersion = "3.0.8"
+val tokenSupportVersion = "3.0.10"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "7.3"
 val pdfboxVersion = "2.0.27"
@@ -13,7 +13,7 @@ val tikaVersion = "2.7.0"
 val resilience4jVersion = "2.0.2"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.2.0"
-val springDocVersion = "2.0.4"
+val springDocVersion = "2.1.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -27,9 +27,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "1.8.10"
+    val kotlinVersion = "1.8.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.0.4"
+    id("org.springframework.boot") version "3.0.5"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
 
-    implementation("com.github.navikt:klage-kodeverk:v1.2.19")
+    implementation("com.github.navikt:klage-kodeverk:1.2.21")
 
     implementation("ch.qos.logback:logback-classic")
     implementation("ch.qos.logback:logback-access")
