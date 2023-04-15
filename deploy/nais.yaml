@@ -54,9 +54,11 @@ spec:
   webproxy: true
   tokenx:
     enabled: true
-  {{#if ingress}}
+  {{#if ingresses}}
   ingresses:
+  {{#each ingresses as |ingress|}}
     - {{ingress}}
+  {{/each}}
   {{/if}}
   accessPolicy:
     inbound:

@@ -132,15 +132,6 @@ Dette bruker vi til å vise stats i Grafana.
 ### NAIS/GCP
 Appen + db kjører i GCP. For å få dette til har vi fulgt guider fra https://doc.nais.io/
 
-De viktigste punktene for å kjøre i GCP kontra on-prem:
-
-I "application".yaml:
-* Spesifisere hvilket namespace appen skal kjøre i (til forskjell fra on-prem der alt kjører i default). For oss er det samme som team-navn (klage).
-* Angi riktig(e) ingress(er). For oss (i dev) er dette: https://klage-dittnav-api.dev-gcp.nais.io  
-
-I "Github workflow".yml:
-* Angi riktig cluster: f.eks.: dev-gcp
-
 #### Hvordan sette opp Postgres
 https://doc.nais.io/gcp/postgres
 
