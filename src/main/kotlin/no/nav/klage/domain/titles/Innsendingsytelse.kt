@@ -133,6 +133,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
     ),
     SYKEPENGER("Sykepenger", "Sickness benefit (Sykepenger)"),
     TIDLIGERE_FAMILIEPLEIER("Ytelser til tidligere familiepleier", "Benefits to former family caregivers"),
+    TILLEGGSSTONADER("Tilleggsstønader", "Supplemental benefits"),
     TILTAKSPENGER("Tiltakspenger for arbeidsmarkedstiltak", "Benefits (Tiltakspenger) while participating in employment schemes"),
     UFORETRYGD("Uføretrygd", "Disability benefit (Uføretrygd)"),
     YRKESSKADE("Yrkesskade", "Occupational injury (Yrkesskade)");
@@ -255,6 +256,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
             SYKDOM_I_FAMILIEN -> Tema.OMS
             SYKEPENGER -> Tema.SYK
             TIDLIGERE_FAMILIEPLEIER -> Tema.PEN
+            TILLEGGSSTONADER -> Tema.TSO
             TILTAKSPENGER -> Tema.IND
             UFORETRYGD -> Tema.UFO
             YRKESSKADE -> Tema.YRK
