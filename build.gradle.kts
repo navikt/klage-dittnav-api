@@ -58,7 +58,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
 
-    implementation("com.github.navikt:klage-kodeverk:1.2.22")
+    implementation("com.github.navikt:klage-kodeverk:1.2.23")
 
     implementation("ch.qos.logback:logback-classic")
     implementation("ch.qos.logback:logback-access")
