@@ -1,5 +1,4 @@
 ingresses:
-  - https://klage-dittnav-api.dev.nav.no
   - https://klage-dittnav-api.intern.dev.nav.no
 externalHosts:
   - api-gw-q1.oera.no
