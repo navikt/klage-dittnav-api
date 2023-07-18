@@ -15,7 +15,7 @@ val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.5.0"
 val springDocVersion = "2.1.0"
 val kodeverkVersion = "1.5.5"
-val simpleSlackPosterVersion = "1"
+val simpleSlackPosterVersion = "0.1.4"
 
 val githubUser: String by project
 val githubPassword: String by project
