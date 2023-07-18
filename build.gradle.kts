@@ -14,6 +14,8 @@ val resilience4jVersion = "2.1.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.5.0"
 val springDocVersion = "2.1.0"
+val kodeverkVersion = "1.5.5"
+val simpleSlackPosterVersion = "1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -23,7 +25,6 @@ ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 repositories {
     mavenCentral()
     maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
-    maven("https://jitpack.io")
 }
 
 plugins {
@@ -58,7 +59,7 @@ dependencies {
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
     implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
 
-    implementation("com.github.navikt:klage-kodeverk:v1.4.0")
+    implementation("no.nav.klage:klage-kodeverk:$kodeverkVersion")
 
     implementation("ch.qos.logback:logback-classic")
     implementation("ch.qos.logback:logback-access")
@@ -78,7 +79,7 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
-    implementation("com.github.navikt:simple-slack-poster:0.1.0")
+    implementation("no.nav.slackposter:simple-slack-poster:$simpleSlackPosterVersion")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
