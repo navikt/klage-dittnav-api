@@ -15,9 +15,4 @@ class WebConfig : WebMvcConfigurer {
         registry.addConverter(StringToLanguageEnumConverter())
         registry.addConverter(StringToTitleEnumConverter())
     }
-
-    override fun configurePathMatch(configurer: PathMatchConfigurer) {
-        //TODO: Test annen variant
-        configurer.setUseTrailingSlashMatch(true)
-    }
 }
