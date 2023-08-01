@@ -17,6 +17,7 @@ class WebConfig : WebMvcConfigurer {
     }
 
     override fun configurePathMatch(configurer: PathMatchConfigurer) {
+        //TODO: Test annen variant
         configurer.setUseTrailingSlashMatch(true)
     }
 }

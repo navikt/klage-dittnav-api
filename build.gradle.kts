@@ -12,10 +12,11 @@ val pdfboxVersion = "2.0.29"
 val tikaVersion = "2.8.0"
 val resilience4jVersion = "2.1.0"
 val problemSpringWebStartVersion = "0.27.0"
-val shedlockVersion = "5.5.0"
+val shedlockVersion = "5.6.0"
 val springDocVersion = "2.1.0"
 val kodeverkVersion = "1.5.5"
 val simpleSlackPosterVersion = "0.1.4"
+val mockitoInlineVersion = "5.2.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -30,7 +31,7 @@ repositories {
 plugins {
     val kotlinVersion = "1.9.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.1.1"
+    id("org.springframework.boot") version "3.1.2"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
@@ -88,7 +89,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
     }
-    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("org.mockito:mockito-inline:$mockitoInlineVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 
@@ -97,6 +98,8 @@ idea {
         isDownloadJavadoc = true
     }
 }
+
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 tasks.withType<KotlinCompile> {
     kotlinOptions{
