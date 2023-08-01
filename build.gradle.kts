@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val exposedVersion = "0.41.1"
+val exposedVersion = "0.42.0"
 val mockkVersion = "1.13.5"
 val h2Version = "2.2.220"
 val pamGeographyVersion = "2.9"
@@ -12,7 +12,7 @@ val pdfboxVersion = "2.0.29"
 val tikaVersion = "2.8.0"
 val resilience4jVersion = "2.1.0"
 val problemSpringWebStartVersion = "0.27.0"
-val shedlockVersion = "5.5.0"
+val shedlockVersion = "5.6.0"
 val springDocVersion = "2.1.0"
 val kodeverkVersion = "1.5.5"
 val simpleSlackPosterVersion = "0.1.4"
@@ -30,7 +30,7 @@ repositories {
 plugins {
     val kotlinVersion = "1.9.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.1.1"
+    id("org.springframework.boot") version "3.1.2"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
