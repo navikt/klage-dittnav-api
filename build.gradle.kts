@@ -1,19 +1,19 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val exposedVersion = "0.41.1"
-val mockkVersion = "1.13.5"
+val exposedVersion = "0.42.1"
+val mockkVersion = "1.13.7"
 val h2Version = "2.2.220"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
-val tokenSupportVersion = "3.1.0"
+val tokenSupportVersion = "3.1.3"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "7.4"
-val pdfboxVersion = "2.0.29"
+val pdfboxVersion = "3.0.0"
 val tikaVersion = "2.8.0"
 val resilience4jVersion = "2.1.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.6.0"
-val springDocVersion = "2.1.0"
+val springDocVersion = "2.2.0"
 val kodeverkVersion = "1.5.5"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
@@ -29,9 +29,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "1.9.0"
+    val kotlinVersion = "1.9.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.1.2"
+    id("org.springframework.boot") version "3.1.3"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
