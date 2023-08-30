@@ -1,7 +1,9 @@
 package no.nav.klage.repository
 
-import no.nav.klage.domain.*
-import no.nav.klage.domain.klage.Klage
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.Identifikator
+import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.Navn
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageFullInput
 import no.nav.klage.domain.klage.KlageInput

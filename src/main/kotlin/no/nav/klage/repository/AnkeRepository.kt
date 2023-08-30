@@ -4,7 +4,6 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.anke.*
 import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.util.getLogger
 import org.jetbrains.exposed.sql.and

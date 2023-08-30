@@ -3,7 +3,6 @@ package no.nav.klage.repository
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.exception.AttemptedIllegalUpdateException
 import no.nav.klage.domain.exception.KlageNotFoundException
 import no.nav.klage.domain.klage.*
 import no.nav.klage.domain.titles.Innsendingsytelse

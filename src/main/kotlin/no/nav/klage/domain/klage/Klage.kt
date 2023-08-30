@@ -4,7 +4,6 @@ import no.nav.klage.domain.*
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.vedlegg.Klagevedlegg
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
-import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import java.time.Instant
 import java.time.LocalDate
 

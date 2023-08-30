@@ -27,7 +27,6 @@ class KlageService(
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
-    private val vedleggService: VedleggService,
     private val fileClient: FileClient,
     private val brukerService: BrukerService,
     private val validationService: ValidationService,
