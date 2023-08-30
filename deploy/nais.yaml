@@ -51,7 +51,7 @@ spec:
             envVarPrefix: DB
   secureLogs:
     enabled: true
-  webproxy: true
+  webproxy: false
   tokenx:
     enabled: true
   {{#if ingresses}}
