@@ -10,8 +10,8 @@ allowed.origins:
 #Token validation
 no.nav.security.jwt:
   issuer.selvbetjening:
-    discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
-    accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
+    discoveryurl: ${IDPORTEN_WELL_KNOWN_URL}
+    accepted_audience: ${IDPORTEN_CLIENT_ID}
     cookiename: selvbetjening-idtoken
   issuer.azuread:
     discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
