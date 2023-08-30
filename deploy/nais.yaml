@@ -51,7 +51,7 @@ spec:
             envVarPrefix: DB
   secureLogs:
     enabled: true
-  webproxy: false
+  webproxy: true
   tokenx:
     enabled: true
   {{#if ingresses}}
@@ -84,7 +84,6 @@ spec:
     - secret: pdl-apikey
     - secret: slack-url
     - secret: slack-channel-id
-    - configmap: loginservice-idporten
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
