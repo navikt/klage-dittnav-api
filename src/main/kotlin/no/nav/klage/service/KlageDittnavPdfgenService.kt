@@ -12,7 +12,9 @@ import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.toPDFInput
 import no.nav.klage.util.isValidFnrOrDnr
+import org.apache.pdfbox.io.IOUtils
 import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.springframework.stereotype.Service
 import java.io.ByteArrayInputStream
@@ -54,10 +56,10 @@ class KlageDittnavPdfgenService(
         val outputStream = ByteArrayOutputStream()
         merger.destinationStream = outputStream
 
-        merger.addSource(ByteArrayInputStream(foerstesidePDF))
-        merger.addSource(ByteArrayInputStream(klageAnkePDF))
+        merger.addSource(RandomAccessReadBuffer(foerstesidePDF))
+        merger.addSource(RandomAccessReadBuffer(klageAnkePDF))
 
-        merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly())
+        merger.mergeDocuments(IOUtils.createMemoryOnlyStreamCache())
 
         return outputStream.toByteArray()
     }

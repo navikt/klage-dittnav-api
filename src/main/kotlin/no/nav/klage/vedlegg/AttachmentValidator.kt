@@ -3,6 +3,8 @@ package no.nav.klage.vedlegg
 import no.nav.klage.clients.clamav.ClamAvClient
 import no.nav.klage.domain.exception.*
 import no.nav.klage.util.getLogger
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException
 import org.apache.tika.Tika
@@ -59,7 +61,7 @@ class AttachmentValidator(
 
     private fun MultipartFile.isEncrypted(): Boolean {
         return try {
-            val temp: PDDocument = PDDocument.load(this.bytes)
+            val temp: PDDocument = Loader.loadPDF(RandomAccessReadBuffer(this.bytes))
             temp.close()
             false
         } catch (ipe: InvalidPasswordException) {
