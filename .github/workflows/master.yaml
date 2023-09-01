@@ -10,6 +10,9 @@ on:
 
 jobs:
   deploy_to_dev:
+    permissions:
+      contents: read
+      id-token: write
     name: Dev
     uses: ./.github/workflows/deploy-to-dev.yaml
     secrets:
@@ -17,6 +20,9 @@ jobs:
       NAIS_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
 
   deploy_to_prod:
+    permissions:
+      contents: read
+      id-token: write
     name: Prod
     needs: deploy_to_dev
     uses: ./.github/workflows/deploy-to-prod.yaml
