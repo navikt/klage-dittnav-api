@@ -1,18 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val exposedVersion = "0.43.0"
-val mockkVersion = "1.13.7"
-val h2Version = "2.2.220"
+val exposedVersion = "0.44.0"
+val mockkVersion = "1.13.8"
+val h2Version = "2.2.224"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
-val tokenSupportVersion = "3.1.5"
+val tokenSupportVersion = "3.1.7"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "7.4"
 val pdfboxVersion = "3.0.0"
 val tikaVersion = "2.9.0"
 val resilience4jVersion = "2.1.0"
 val problemSpringWebStartVersion = "0.27.0"
-val shedlockVersion = "5.7.0"
+val shedlockVersion = "5.8.0"
 val springDocVersion = "2.2.0"
 val kodeverkVersion = "1.5.5"
 val simpleSlackPosterVersion = "0.1.4"
@@ -31,7 +31,7 @@ repositories {
 plugins {
     val kotlinVersion = "1.9.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.1.3"
+    id("org.springframework.boot") version "3.1.4"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     idea
 }
@@ -46,10 +46,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.11")
-    implementation("org.apache.tomcat.embed:tomcat-embed-el:10.1.11")
-    implementation("org.apache.tomcat:tomcat-annotations-api:10.1.11")
-    implementation("org.apache.tomcat.embed:tomcat-embed-websocket:10.1.11")
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.14")
+    implementation("org.apache.tomcat.embed:tomcat-embed-el:10.1.14")
+    implementation("org.apache.tomcat:tomcat-annotations-api:10.1.14")
+    implementation("org.apache.tomcat.embed:tomcat-embed-websocket:10.1.14")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
