@@ -42,10 +42,10 @@ spec:
     path: /internal/prometheus
   gcp:
     sqlInstances:
-      - tier: db-custom-2-7680
+      - tier: {{db_tier}}
         diskAutoresize: true
-        highAvailability: true
-        type: POSTGRES_11
+        highAvailability: {{db_high_availability}}
+        type: {{db_type}}
         databases:
           - name: klage
             envVarPrefix: DB
