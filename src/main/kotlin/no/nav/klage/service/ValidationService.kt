@@ -5,10 +5,6 @@ import no.nav.klage.domain.anke.Anke
 import no.nav.klage.domain.anke.isAccessibleToUser
 import no.nav.klage.domain.anke.isDeleted
 import no.nav.klage.domain.anke.isFinalized
-import no.nav.klage.domain.ankeOLD.AnkeOLD
-import no.nav.klage.domain.ankeOLD.isAccessibleToUser
-import no.nav.klage.domain.ankeOLD.isDeleted
-import no.nav.klage.domain.ankeOLD.isFinalized
 import no.nav.klage.domain.exception.*
 import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.isAccessibleToUser
@@ -34,19 +30,6 @@ class ValidationService(
         }
     }
 
-    fun validateAnkeAccessOLD(ankeOLD: AnkeOLD, bruker: Bruker) {
-        if (ankeOLD.fullmektig != null && ankeOLD.fullmektig == bruker.folkeregisteridentifikator.identifikasjonsnummer) {
-            val fullmaktsGiver = brukerService.getFullmaktsgiver(ankeOLD.tema, ankeOLD.foedselsnummer)
-            if (!ankeOLD.isAccessibleToUser(fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer)) {
-                throw AnkeNotFoundException()
-            }
-        } else {
-            if (!ankeOLD.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
-                throw AnkeNotFoundException()
-            }
-        }
-    }
-
     fun validateAnkeAccess(anke: Anke, bruker: Bruker) {
         if (!anke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
             throw AnkeNotFoundException()
@@ -60,16 +43,6 @@ class ValidationService(
 
         if (includeFinalized && klage.isFinalized()) {
             throw KlageIsFinalizedException()
-        }
-    }
-
-    fun checkAnkeStatusOLD(ankeOLD: AnkeOLD, includeFinalized: Boolean = true) {
-        if (ankeOLD.isDeleted()) {
-            throw AnkeIsDeletedException()
-        }
-
-        if (includeFinalized && ankeOLD.isFinalized()) {
-            throw AnkeIsFinalizedException()
         }
     }
 
