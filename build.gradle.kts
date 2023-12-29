@@ -46,11 +46,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
-    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.17")
-    implementation("org.apache.tomcat.embed:tomcat-embed-el:10.1.17")
-    implementation("org.apache.tomcat:tomcat-annotations-api:10.1.17")
-    implementation("org.apache.tomcat.embed:tomcat-embed-websocket:10.1.17")
-
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
 
