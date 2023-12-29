@@ -125,13 +125,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
-    fun handleMaxUploadSizeException(
-        ex: MaxUploadSizeExceededException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.PAYLOAD_TOO_LARGE, AttachmentTooLargeException())
-
-    @ExceptionHandler
     fun handleAttachmentTotalTooLargeException(
         ex: AttachmentTotalTooLargeException,
         request: NativeWebRequest
