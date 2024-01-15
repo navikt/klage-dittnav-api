@@ -12,6 +12,7 @@ enum class Tema(val beskrivelse: String) {
     DAG	("Dagpenger"),
     ENF	("Enslig forsørger"),
     ERS	("Erstatning"),
+    EYB ("Barnepensjon"),
     FAR	("Farskap"),
     FEI	("Feilutbetaling"),
     FOR	("Foreldre- og svangerskapspenger"),

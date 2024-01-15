@@ -228,7 +228,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
             AVTALEFESTET_PENSJON_SPK -> Tema.PEN
             AVTALEFESTET_PENSJON_PRIVAT -> Tema.PEN
             BARNEBIDRAG_OG_BIDRAGSFORSKUDD -> Tema.BID
-            BARNEPENSJON -> Tema.PEN
+            BARNEPENSJON -> Tema.EYB
             BARNETRYGD -> Tema.BAR
             BILSTONAD -> Tema.BIL
             DAGPENGER -> Tema.DAG
