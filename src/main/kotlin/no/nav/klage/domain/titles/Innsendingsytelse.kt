@@ -118,6 +118,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
     OPPFOSTRINGSBIDRAG("Oppfostringsbidrag", "Upbringing support (Oppfostringsbidrag)"),
     OPPHOLD_ELLER_ARBEID_I_NORGE("Opphold eller arbeid i Norge", "Residence or work in Norway"),
     OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE("Opphold eller arbeid utenfor Norge", "Residence or work outside Norway"),
+    OMSTILLINGSSTOENAD("Omstillingsstønad", "Adjustment allowance (Omstillingsstønad)"),
     REISEKOSTNADER_VED_SAMVAER("Reisekostnader ved samvær", "Travel costs for visits"),
     SUPPLERENDE_STONAD(
         "Supplerende stønad til personer over 67 år med kort botid i Norge",
@@ -251,6 +252,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
             OPPFOSTRINGSBIDRAG -> Tema.BID
             OPPHOLD_ELLER_ARBEID_I_NORGE -> Tema.MED
             OPPHOLD_ELLER_ARBEID_UTENFOR_NORGE -> Tema.MED
+            OMSTILLINGSSTOENAD -> Tema.EYO
             REISEKOSTNADER_VED_SAMVAER -> Tema.BID
             SUPPLERENDE_STONAD -> Tema.SUP
             SUPPLERENDE_STONAD_UFORE_FLYKTNINGER -> Tema.SUP
