@@ -5,9 +5,7 @@ import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
-import no.nav.klage.controller.view.OpenAnkeInput
-import no.nav.klage.controller.view.OpenEttersendelseInput
-import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.controller.view.*
 import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.toPDFInput
@@ -29,7 +27,7 @@ class KlageDittnavPdfgenService(
     fun createKlagePdfWithFoersteside(input: OpenKlageInput): ByteArray {
         validateIdent(input.foedselsnummer)
 
-        val klagePDF = klageDittnavPdfgenClient.getKlagePDF(input.toPDFInput(sendesIPosten = true))
+        val klagePDF = klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput(sendesIPosten = true))
 
         return if (input.innsendingsytelse != Innsendingsytelse.LONNSGARANTI) {
             val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
@@ -40,7 +38,7 @@ class KlageDittnavPdfgenService(
     fun createAnkePdfWithFoersteside(input: OpenAnkeInput): ByteArray {
         validateIdent(input.foedselsnummer)
 
-        val ankePDF = klageDittnavPdfgenClient.getAnkePDF(input.toPDFInput(sendesIPosten = true))
+        val ankePDF = klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput(sendesIPosten = true))
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
 
         return mergeDocuments(foerstesidePDF = foerstesidePDF, klageAnkePDF = ankePDF)

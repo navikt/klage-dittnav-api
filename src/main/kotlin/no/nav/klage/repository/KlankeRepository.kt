@@ -2,22 +2,24 @@ package no.nav.klage.repository
 
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.jpa.Anke
 import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.titles.Innsendingsytelse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 import java.util.*
 
-interface AnkeRepository : JpaRepository<Anke, UUID> {
+interface KlankeRepository : JpaRepository<Klanke, UUID> {
 
-    fun findByFoedselsnummerAndStatus(fnr: String, status: KlageAnkeStatus): List<Anke>
+    fun findByFoedselsnummerAndStatus(fnr: String, status: KlageAnkeStatus): List<Klanke>
 
-    fun getLatestAnkeDraft(
+    fun getLatestKlankeDraft(
         fnr: String,
         tema: Tema,
         internalSaksnummer: String?,
         innsendingsytelse: Innsendingsytelse
-    ): Anke? {
+    ): Klanke? {
         return findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
             .filter {
                 if (internalSaksnummer != null) {
@@ -27,4 +29,7 @@ interface AnkeRepository : JpaRepository<Anke, UUID> {
                 }
             }.maxByOrNull { it.modifiedByUser!! }
     }
+
+    fun findByStatusAndModifiedByUserLessThan(status: KlageAnkeStatus, modifiedByUser: LocalDateTime): List<Klanke>
+
 }

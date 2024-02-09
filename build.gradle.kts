@@ -14,7 +14,7 @@ val resilience4jVersion = "2.2.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.10.2"
 val springDocVersion = "2.3.0"
-val kodeverkVersion = "1.5.5"
+val kodeverkVersion = "1.7.28"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
 
@@ -33,6 +33,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.springframework.boot") version "3.2.1"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
     idea
 }
 
@@ -45,6 +46,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
@@ -53,8 +55,6 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
-    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.postgresql:postgresql")
 
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")

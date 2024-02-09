@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 data class PDFInput (
+    val type: String,
     val foedselsnummer: String,
     val fornavn: String,
     val mellomnavn: String? = null,
@@ -28,6 +29,7 @@ data class PDFInput (
 
 fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
     return PDFInput(
+        type = "klage",
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
         mellomnavn = navn.mellomnavn,
@@ -44,6 +46,7 @@ fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
 
 fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
     return PDFInput(
+        type = "anke",
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
         mellomnavn = navn.mellomnavn,
@@ -53,7 +56,7 @@ fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = innsendingsytelse.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
-        enhetsnavn = Enhet.values().find { it.navn == enhetsnummer }?.beskrivelse,
+        enhetsnavn = Enhet.entries.find { it.navn == enhetsnummer }?.beskrivelse,
         sendesIPosten = sendesIPosten,
     )
 }

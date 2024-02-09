@@ -1,7 +1,6 @@
 package no.nav.klage.repository
 
 import no.nav.klage.domain.*
-import no.nav.klage.domain.klage.Klage
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageFullInput
 import no.nav.klage.domain.klage.KlageInput
@@ -22,13 +21,13 @@ class VedleggRepositoryTest {
     private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"
 
     private lateinit var vedleggRepository: VedleggRepository
-    private lateinit var klageRepository: KlageRepository
+    private lateinit var klageRepository: OldKlageRepository
     private lateinit var datasource: DataSource
 
     @BeforeAll
     fun initDb() {
         vedleggRepository = VedleggRepository()
-        klageRepository = KlageRepository()
+        klageRepository = OldKlageRepository()
 
         datasource = JdbcConnectionPool.create(jdbcUrl, "sa", "")
         val statement = datasource.connection.createStatement()

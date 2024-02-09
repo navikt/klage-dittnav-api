@@ -14,7 +14,7 @@ import java.time.Instant
 import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class KlageRepositoryTest {
+class OldOldKlageRepositoryTest {
     private val jdbcUrl = "jdbc:h2:mem:test_mem;MODE=PostgreSQL"
 
     private val exampleFritekst = "fritekst"
@@ -30,12 +30,12 @@ class KlageRepositoryTest {
     private val innsendingsytelseAndInternalSaksnummer = "innsendingsytelse and internalSaksnummer"
     private val innsendingsytelseAndNoInternalSaksnummer = "innsendingsytelse and no internalSaksnummer"
 
-    private lateinit var klageRepository: KlageRepository
+    private lateinit var klageRepository: OldKlageRepository
     private lateinit var datasource: DataSource
 
     @BeforeAll
     fun initDb() {
-        klageRepository = KlageRepository()
+        klageRepository = OldKlageRepository()
 
         datasource = JdbcConnectionPool.create(jdbcUrl, "sa", "")
         val statement = datasource.connection.createStatement()

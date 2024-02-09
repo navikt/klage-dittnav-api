@@ -1,14 +1,15 @@
-package no.nav.klage.domain.klage
+package no.nav.klage.controller.view
 
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
-import no.nav.klage.domain.vedlegg.VedleggView
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 data class KlageView(
-    val id: String,
+    val id: UUID,
     val fritekst: String,
     val status: KlageAnkeStatus,
     val modifiedByUser: LocalDateTime,
@@ -19,7 +20,6 @@ data class KlageView(
     val checkboxesSelected: Set<CheckboxEnum>,
     val userSaksnummer: String?,
     val internalSaksnummer: String?,
-    val fullmaktsgiver: String?,
     val language: LanguageEnum,
     val innsendingsytelse: Innsendingsytelse,
     val hasVedlegg: Boolean,

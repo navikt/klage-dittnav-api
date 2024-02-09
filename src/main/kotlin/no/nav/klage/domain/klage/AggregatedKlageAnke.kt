@@ -18,7 +18,7 @@ data class AggregatedKlageAnke(
     val internalSaksnummer: String?,
     val klageAnkeType: KlageAnkeType,
     //klage specific
-    val userChoices: List<String>? = emptyList(),
+    val userChoices: List<String>?,
     //anke specific
     val enhetsnummer: String?,
 ) {

@@ -5,6 +5,7 @@ import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
+
 @Component
 class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
 
@@ -15,7 +16,6 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         private const val COUNTER_KLAGER_FINALIZED = "klager_finalized"
         private const val COUNTER_KLAGER_INITIALIZED = "klager_initialized"
         private const val COUNTER_KLAGER_FINALIZED_GRUNN = "klager_finalized_grunn"
-        private const val COUNTER_KLAGER_FINALIZED_FULLMAKT = "klager_finalized_fullmakt"
         private const val COUNTER_KLAGER_OPTIONAL_SAKSNUMMER = "klager_optional_saksnummer"
         private const val COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO = "klager_optional_vedtaksdato"
         private const val COUNTER_KLAGER_FINALIZED_TITLE = "klager_finalized_title"
@@ -40,21 +40,13 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         }
     }
 
-    fun incrementKlagerGrunn(ytelse: String, checkboxesSelected: Set<CheckboxEnum>) {
+    fun incrementKlagerGrunn(ytelse: String, checkboxesSelected: List<CheckboxEnum>) {
         try {
             checkboxesSelected.forEach {
                 meterRegistry.counter(COUNTER_KLAGER_FINALIZED_GRUNN, "ytelse", ytelse, "grunn", it.name).increment()
             }
         } catch (e: Exception) {
             logger.warn("incrementKlagerGrunn failed", e)
-        }
-    }
-
-    fun incrementFullmakt(ytelse: String) {
-        try {
-            meterRegistry.counter(COUNTER_KLAGER_FINALIZED_FULLMAKT, "ytelse", ytelse).increment()
-        } catch (e: Exception) {
-            logger.warn("incrementFullmakt failed", e)
         }
     }
 

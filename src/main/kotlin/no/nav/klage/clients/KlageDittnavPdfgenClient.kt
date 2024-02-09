@@ -17,10 +17,10 @@ class KlageDittnavPdfgenClient(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun getKlagePDF(input: PDFInput): ByteArray {
-        logger.debug("Creating PDF from klage.")
+    fun getKlageAnkePDF(input: PDFInput): ByteArray {
+        logger.debug("Creating PDF for ${input.type}.")
         return klageDittnavPdfgenWebClient.post()
-            .uri { it.path("/klage").build() }
+            .uri { it.path("/klageanke").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
             .retrieve()
@@ -28,10 +28,10 @@ class KlageDittnavPdfgenClient(
             .block() ?: throw RuntimeException("PDF could not be generated")
     }
 
-    fun getAnkePDF(input: PDFInput): ByteArray {
-        logger.debug("Creating PDF from anke.")
+    fun getEttersendelsePDF(input: PDFInput): ByteArray {
+        logger.debug("Creating PDF for ettersendelse for ${input.type}")
         return klageDittnavPdfgenWebClient.post()
-            .uri { it.path("/anke").build() }
+            .uri { it.path("/ettersendelse").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
             .retrieve()

@@ -5,13 +5,12 @@ import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
 import no.nav.klage.domain.exception.KlageNotFoundException
-import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageFullInput
 import no.nav.klage.domain.klage.KlageInput
-import no.nav.klage.domain.klage.KlageView
-import no.nav.klage.domain.toHeartBeatServerSentEvent
-import no.nav.klage.domain.toServerSentEvent
-import no.nav.klage.domain.vedlegg.VedleggView
+import no.nav.klage.controller.view.KlageView
+import no.nav.klage.controller.view.VedleggView
+import no.nav.klage.domain.*
+import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.KlageService
 import no.nav.klage.service.VedleggService
@@ -27,8 +26,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import java.time.Duration
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.util.UUID
 
 @RestController
 @Tag(name = "klager")
@@ -55,12 +53,15 @@ class KlageController(
             "Get klager for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getDraftKlagerByFnr(bruker)
+        return klageService.getDraftKlankerByFnr(bruker).map {
+            it as Klage
+            it.toKlageView()
+        }
     }
 
     @GetMapping("/{klageId}")
     fun getKlage(
-        @PathVariable klageId: String
+        @PathVariable klageId: UUID
     ): KlageView {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage is requested. Id: {}", klageId)
@@ -69,12 +70,12 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getKlage(klageId, bruker)
+        return (klageService.getKlanke(klageId, bruker) as Klage).toKlageView()
     }
 
     @GetMapping("/{klageId}/journalpostid")
     fun getJournalpostId(
-        @PathVariable klageId: String
+        @PathVariable klageId: UUID
     ): String? {
         val bruker = brukerService.getBruker()
         logger.debug("Get journalpost id is requested. KlageId: {}", klageId)
@@ -88,7 +89,7 @@ class KlageController(
 
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getEvents(
-        @PathVariable klageId: String
+        @PathVariable klageId: UUID
     ): Flux<ServerSentEvent<String>> {
         val bruker = brukerService.getBruker()
         kotlin.runCatching {
@@ -104,7 +105,7 @@ class KlageController(
 
         return kafkaEventClient.getEventPublisher()
             .mapNotNull { event -> jsonToEvent(event.data()) }
-            .filter { it.klageAnkeId == klageId }
+            .filter { it.klageAnkeId == klageId.toString() }
             .mapNotNull { it.toServerSentEvent() }
             .mergeWith(heartbeatStream)
     }
@@ -120,7 +121,7 @@ class KlageController(
             "Create klage is requested for user with fnr {}.",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.createKlage(klage, bruker)
+        return klageService.createKlage(klage, bruker).toKlageView()
     }
 
     @PutMapping
@@ -136,12 +137,12 @@ class KlageController(
             klageInput.innsendingsytelse
         )
 
-        return klageService.getDraftOrCreateKlage(klageInput, bruker)
+        return klageService.getDraftOrCreateKlage(klageInput, bruker).toKlageView()
     }
 
     @PutMapping("/{klageId}/fritekst")
     fun updateFritekst(
-        @PathVariable klageId: String,
+        @PathVariable klageId: UUID,
         @RequestBody input: StringInput,
         response: HttpServletResponse
     ): EditedView {
@@ -160,7 +161,7 @@ class KlageController(
 
     @PutMapping("/{klageId}/usersaksnummer")
     fun updateUserSaksnummer(
-        @PathVariable klageId: String,
+        @PathVariable klageId: UUID,
         @RequestBody input: StringInput,
         response: HttpServletResponse
     ): EditedView {
@@ -179,7 +180,7 @@ class KlageController(
 
     @PutMapping("/{klageId}/vedtakdate")
     fun updateVedtakDate(
-        @PathVariable klageId: String,
+        @PathVariable klageId: UUID,
         @RequestBody input: DateInput,
         response: HttpServletResponse
     ): EditedView {
@@ -198,7 +199,7 @@ class KlageController(
 
     @PutMapping("/{klageId}/hasvedlegg")
     fun updateHasVedlegg(
-        @PathVariable klageId: String,
+        @PathVariable klageId: UUID,
         @RequestBody input: BooleanInput,
         response: HttpServletResponse
     ): EditedView {
@@ -217,7 +218,7 @@ class KlageController(
 
     @PutMapping("/{klageId}/checkboxesselected")
     fun updateCheckboxesSelected(
-        @PathVariable klageId: String,
+        @PathVariable klageId: UUID,
         @RequestBody input: CheckboxesSelectedInput,
         response: HttpServletResponse
     ): EditedView {
@@ -235,7 +236,7 @@ class KlageController(
     }
 
     @DeleteMapping("/{klageId}")
-    fun deleteKlage(@PathVariable klageId: String) {
+    fun deleteKlage(@PathVariable klageId: UUID) {
         val bruker = brukerService.getBruker()
         logger.debug("Delete klage is requested. Id: {}", klageId)
         secureLogger.debug(
@@ -243,13 +244,13 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        klageService.deleteKlage(klageId, bruker)
+        klageService.deleteKlanke(klankeId = klageId, bruker = bruker)
     }
 
     @PostMapping("/{klageId}/finalize")
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlage(
-        @PathVariable klageId: String
+        @PathVariable klageId: UUID
     ): Map<String, String> {
         val bruker = brukerService.getBruker()
         logger.debug("Finalize klage is requested. Id: {}", klageId)
@@ -258,17 +259,16 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val finalizedInstant = klageService.finalizeKlage(klageId, bruker)
-        val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
+        val finalizedLocalDateTime = klageService.finalizeKlage(klageId, bruker)
         return mapOf(
-            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
-            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+            "finalizedDate" to finalizedLocalDateTime.toLocalDate().toString(),
+            "modifiedByUser" to finalizedLocalDateTime.toString()
         )
     }
 
     @PostMapping(value = ["/{klageId}/vedlegg"], consumes = ["multipart/form-data"])
     fun addVedleggToKlage(
-        @PathVariable klageId: String,
+        @PathVariable klageId: UUID,
         @RequestParam vedlegg: MultipartFile
     ): VedleggView {
         val bruker = brukerService.getBruker()
@@ -278,14 +278,17 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryVedlegg = vedleggService.addKlagevedlegg(klageId, vedlegg, bruker)
-        return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
+        return vedleggService.addKlagevedlegg(
+            klageId = klageId,
+            multipart = vedlegg,
+            bruker = bruker
+        ).toVedleggView()
     }
 
     @DeleteMapping("/{klageId}/vedlegg/{vedleggId}")
     fun deleteVedlegg(
-        @PathVariable klageId: String,
-        @PathVariable vedleggId: Int
+        @PathVariable klageId: UUID,
+        @PathVariable vedleggId: UUID
     ) {
         val bruker = brukerService.getBruker()
         logger.debug("Delete vedlegg from klage is requested. KlageId: {}, VedleggId: {}", klageId, vedleggId)
@@ -303,8 +306,8 @@ class KlageController(
     @ResponseBody
     @GetMapping("/{klageId}/vedlegg/{vedleggId}")
     fun getVedleggFromKlage(
-        @PathVariable klageId: String,
-        @PathVariable vedleggId: Int
+        @PathVariable klageId: UUID,
+        @PathVariable vedleggId: UUID
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
         logger.debug("Get vedlegg to klage is requested. KlageId: {} - VedleggId: {}", klageId, vedleggId)
@@ -315,7 +318,7 @@ class KlageController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = vedleggService.getVedleggFromKlage(vedleggId, bruker)
+        val content = vedleggService.getVedleggFromKlage(klageId, vedleggId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
@@ -330,7 +333,7 @@ class KlageController(
     @ResponseBody
     @GetMapping("/{klageId}/pdf")
     fun getKlagePdf(
-        @PathVariable klageId: String
+        @PathVariable klageId: UUID
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage pdf is requested. KlageId: {}", klageId)
@@ -355,7 +358,7 @@ class KlageController(
     @ResponseBody
     @GetMapping("/{klageId}/pdf/innsending")
     fun getKlagePdfForPrint(
-        @PathVariable klageId: String
+        @PathVariable klageId: UUID
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klage pdf for print is requested. KlageId: {}", klageId)
@@ -376,4 +379,5 @@ class KlageController(
             HttpStatus.OK
         )
     }
+
 }

@@ -1,9 +1,9 @@
-package no.nav.klage.domain.anke
+package no.nav.klage.controller.view
 
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
-import no.nav.klage.domain.vedlegg.VedleggView
+import no.nav.klage.controller.view.VedleggView
 import java.time.LocalDate
 import java.time.LocalDateTime
 

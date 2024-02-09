@@ -3,18 +3,14 @@ package no.nav.klage.controller
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
-import no.nav.klage.controller.view.BooleanInput
-import no.nav.klage.controller.view.DateInput
-import no.nav.klage.controller.view.EditedView
-import no.nav.klage.controller.view.StringInput
+import no.nav.klage.controller.view.*
 import no.nav.klage.domain.anke.AnkeFullInput
 import no.nav.klage.domain.anke.AnkeInput
-import no.nav.klage.domain.anke.AnkeView
 import no.nav.klage.domain.exception.AnkeNotFoundException
+import no.nav.klage.domain.jpa.Anke
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
-import no.nav.klage.domain.vedlegg.VedleggView
 import no.nav.klage.service.AnkeService
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.VedleggService
@@ -59,7 +55,10 @@ class AnkeController(
             "Get anker for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getDraftAnkerByFnr(bruker)
+        return ankeService.getDraftKlankerByFnr(bruker).map {
+            it as Anke
+            it.toAnkeView()
+        }
     }
 
     @GetMapping("/{ankeId}")
@@ -73,7 +72,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getAnke(ankeId, bruker)
+        return (ankeService.getKlanke(ankeId, bruker) as Anke).toAnkeView()
     }
 
     @GetMapping("/{ankeId}/journalpostid")
@@ -100,7 +99,7 @@ class AnkeController(
         }.onFailure {
             throw AnkeNotFoundException()
         }
-        logger.debug("Journalpostid events called for ankeId: $ankeId")
+        logger.debug("Journalpostid events called for ankeId: {}", ankeId)
         //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
         val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(10))
             .takeWhile { true }
@@ -124,7 +123,7 @@ class AnkeController(
             "Create anke is requested for user with fnr {}.",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.createAnke(anke, bruker)
+        return ankeService.createAnke(anke, bruker).toAnkeView()
     }
 
     @PutMapping
@@ -140,7 +139,7 @@ class AnkeController(
             ankeInput.innsendingsytelse
         )
 
-        return ankeService.getDraftOrCreateAnke(ankeInput, bruker)
+        return ankeService.getDraftOrCreateAnke(ankeInput, bruker).toAnkeView()
     }
 
     @PutMapping("/{ankeId}/fritekst")
@@ -247,7 +246,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        ankeService.deleteAnke(ankeId, bruker)
+        ankeService.deleteKlanke(ankeId, bruker)
     }
 
     @PostMapping("/{ankeId}/finalize")
@@ -262,11 +261,10 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val finalizedInstant = ankeService.finalizeAnke(ankeId = ankeId, bruker = bruker)
-        val zonedDateTime = ZonedDateTime.ofInstant(finalizedInstant, ZoneId.of("Europe/Oslo"))
+        val finalizedLocalDateTime = ankeService.finalizeAnke(ankeId = ankeId, bruker = bruker)
         return mapOf(
-            "finalizedDate" to zonedDateTime.toLocalDate().toString(),
-            "modifiedByUser" to zonedDateTime.toLocalDateTime().toString()
+            "finalizedDate" to finalizedLocalDateTime.toLocalDate().toString(),
+            "modifiedByUser" to finalizedLocalDateTime.toString()
         )
     }
 
@@ -282,14 +280,17 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val temporaryVedlegg = vedleggService.addAnkevedlegg(ankeId = ankeId, vedlegg = vedlegg, bruker = bruker)
-        return vedleggService.expandVedleggToVedleggView(temporaryVedlegg, bruker)
+        return vedleggService.addAnkevedlegg(
+            ankeId = ankeId,
+            multipart = vedlegg,
+            bruker = bruker
+        ).toVedleggView()
     }
 
     @DeleteMapping("/{ankeId}/vedlegg/{vedleggId}")
     fun deleteVedlegg(
         @PathVariable ankeId: UUID,
-        @PathVariable vedleggId: Int
+        @PathVariable vedleggId: UUID
     ) {
         val bruker = brukerService.getBruker()
         logger.debug(
@@ -313,7 +314,7 @@ class AnkeController(
     @GetMapping("/{ankeId}/vedlegg/{vedleggId}")
     fun getVedleggFromAnke(
         @PathVariable ankeId: UUID,
-        @PathVariable vedleggId: Int
+        @PathVariable vedleggId: UUID
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
         logger.debug(
@@ -328,7 +329,7 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = vedleggService.getVedleggFromAnke(vedleggId, bruker)
+        val content = vedleggService.getVedleggFromAnke(ankeId = ankeId, vedleggId = vedleggId, bruker = bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")

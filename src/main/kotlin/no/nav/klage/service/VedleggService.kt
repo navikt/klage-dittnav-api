@@ -3,15 +3,12 @@ package no.nav.klage.service
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.anke.Anke
-import no.nav.klage.domain.klage.Klage
-import no.nav.klage.domain.vedlegg.Ankevedlegg
-import no.nav.klage.domain.vedlegg.Klagevedlegg
-import no.nav.klage.domain.vedlegg.VedleggView
-import no.nav.klage.domain.vedlegg.toVedleggView
+import no.nav.klage.domain.jpa.Anke
+import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.jpa.Vedlegg
+import no.nav.klage.controller.view.VedleggView
 import no.nav.klage.repository.AnkeRepository
 import no.nav.klage.repository.KlageRepository
-import no.nav.klage.repository.VedleggRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
 import no.nav.klage.vedlegg.Image2PDF
@@ -23,7 +20,6 @@ import java.util.*
 @Service
 @Transactional
 class VedleggService(
-    private val vedleggRepository: VedleggRepository,
     private val klageRepository: KlageRepository,
     private val image2PDF: Image2PDF,
     private val attachmentValidator: AttachmentValidator,
@@ -38,92 +34,115 @@ class VedleggService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addKlagevedlegg(klageId: String, vedlegg: MultipartFile, bruker: Bruker): Klagevedlegg {
-        val existingKlage = klageRepository.getKlageById(klageId)
-        validationService.checkKlageStatus(existingKlage)
-        validationService.validateKlageAccess(existingKlage, bruker)
+    fun addKlagevedlegg(klageId: UUID, multipart: MultipartFile, bruker: Bruker): Vedlegg {
+        val existingKlage = klageRepository.findById(klageId).get()
+        validationService.checkKlankeStatus(existingKlage)
+        validationService.validateKlankeAccess(existingKlage, bruker)
         val timeStart = System.currentTimeMillis()
-        vedleggMetrics.registerVedleggSize(vedlegg.bytes.size.toDouble())
-        vedleggMetrics.incrementVedleggType(vedlegg.contentType ?: "unknown")
-        attachmentValidator.validateAttachment(vedlegg, klageRepository.getKlageById(klageId).attachmentsTotalSize())
+        vedleggMetrics.registerVedleggSize(multipart.bytes.size.toDouble())
+        vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
+        attachmentValidator.validateAttachment(multipart, existingKlage.attachmentsTotalSize())
         //Convert attachment (if not already pdf)
-        val convertedBytes = image2PDF.convert(vedlegg.bytes)
+        val convertedBytes = image2PDF.convert(multipart.bytes)
 
-        val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, vedlegg.originalFilename!!)
-        return vedleggRepository.storeKlagevedlegg(klageId, vedlegg, vedleggIdInFileStore).also {
-            vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
-        }
-    }
+        val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, multipart.originalFilename!!)
 
-    fun addAnkevedlegg(ankeId: UUID, vedlegg: MultipartFile, bruker: Bruker): Ankevedlegg {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        val timeStart = System.currentTimeMillis()
-        vedleggMetrics.registerVedleggSize(vedlegg.bytes.size.toDouble())
-        vedleggMetrics.incrementVedleggType(vedlegg.contentType ?: "unknown")
-        attachmentValidator.validateAttachment(vedlegg, ankeRepository.getAnkeById(ankeId).attachmentsTotalSize())
-        //Convert attachment (if not already pdf)
-        val convertedBytes = image2PDF.convert(vedlegg.bytes)
-
-        val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, vedlegg.originalFilename!!)
-        return vedleggRepository.storeAnkevedlegg(
-            ankeId = ankeId,
-            vedlegg = vedlegg,
-            fileStorageId = vedleggIdInFileStore
+        val vedleggToSave = Vedlegg(
+            tittel = multipart.originalFilename.toString(),
+            ref = vedleggIdInFileStore,
+            contentType = multipart.contentType.toString(),
+            sizeInBytes = multipart.bytes.size,
+        )
+        existingKlage.vedlegg.add(
+            vedleggToSave
         ).also {
             vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
         }
+        return vedleggToSave
     }
 
-    fun deleteVedleggFromKlage(klageId: String, vedleggId: Int, bruker: Bruker): Boolean {
-        val vedlegg = vedleggRepository.getKlagevedleggById(vedleggId)
-        val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
-        validationService.checkKlageStatus(existingKlage)
-        validationService.validateKlageAccess(existingKlage, bruker)
-        val deletedInGCS = fileClient.deleteVedleggFile(vedlegg.ref)
-        vedleggRepository.deleteVedleggFromKlage(vedleggId)
-        return deletedInGCS
+    fun addAnkevedlegg(ankeId: UUID, multipart: MultipartFile, bruker: Bruker): Vedlegg {
+        val existingAnke = ankeRepository.findById(ankeId).get()
+        validationService.checkKlankeStatus(existingAnke)
+        validationService.validateKlankeAccess(existingAnke, bruker)
+        val timeStart = System.currentTimeMillis()
+        vedleggMetrics.registerVedleggSize(multipart.bytes.size.toDouble())
+        vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
+        attachmentValidator.validateAttachment(multipart, existingAnke.attachmentsTotalSize())
+        //Convert attachment (if not already pdf)
+        val convertedBytes = image2PDF.convert(multipart.bytes)
+
+        val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, multipart.originalFilename!!)
+        val vedleggToSave = Vedlegg(
+            tittel = multipart.originalFilename.toString(),
+            ref = vedleggIdInFileStore,
+            contentType = multipart.contentType.toString(),
+            sizeInBytes = multipart.bytes.size,
+        )
+        existingAnke.vedlegg.add(
+            vedleggToSave
+        ).also {
+            vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
+        }
+        return vedleggToSave
     }
 
-    fun deleteVedleggFromAnke(ankeId: UUID, vedleggId: Int, bruker: Bruker): Boolean {
-        val vedlegg = vedleggRepository.getAnkevedleggById(vedleggId)
-        val existingAnke = ankeRepository.getAnkeById(vedlegg.ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        val deletedInGCS = fileClient.deleteVedleggFile(vedlegg.ref)
-        vedleggRepository.deleteVedleggFromAnke(vedleggId)
-        return deletedInGCS
+    fun deleteVedleggFromKlage(klageId: UUID, vedleggId: UUID, bruker: Bruker): Boolean {
+        val existingKlage = klageRepository.findById(klageId).get()
+        validationService.checkKlankeStatus(existingKlage)
+        validationService.validateKlankeAccess(existingKlage, bruker)
+
+        val vedlegg = existingKlage.vedlegg.find { it.id == vedleggId }
+
+        if (vedlegg != null) {
+            return fileClient.deleteVedleggFile(vedlegg.ref)
+        } else {
+            logger.error("No vedlegg found with this id: $vedleggId")
+            return false
+        }
     }
 
-    fun getVedleggFromKlage(vedleggId: Int, bruker: Bruker): ByteArray {
-        val vedlegg = vedleggRepository.getKlagevedleggById(vedleggId)
-        val existingKlage = klageRepository.getKlageById(vedlegg.klageId)
-        validationService.checkKlageStatus(existingKlage, false)
-        validationService.validateKlageAccess(existingKlage, bruker)
-        return fileClient.getVedleggFile(vedlegg.ref)
+    fun deleteVedleggFromAnke(ankeId: UUID, vedleggId: UUID, bruker: Bruker): Boolean {
+        val existingAnke = ankeRepository.findById(ankeId).get()
+        validationService.checkKlankeStatus(existingAnke)
+        validationService.validateKlankeAccess(existingAnke, bruker)
+
+        val vedlegg = existingAnke.vedlegg.find { it.id == vedleggId }
+
+        if (vedlegg != null) {
+            return fileClient.deleteVedleggFile(vedlegg.ref)
+        } else {
+            logger.error("No vedlegg found with this id: $vedleggId")
+            return false
+        }
     }
 
-    fun getVedleggFromAnke(vedleggId: Int, bruker: Bruker): ByteArray {
-        val vedlegg = vedleggRepository.getAnkevedleggById(vedleggId)
-        val existingAnke = ankeRepository.getAnkeById(vedlegg.ankeId)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return fileClient.getVedleggFile(vedlegg.ref)
+    fun getVedleggFromKlage(klageId: UUID, vedleggId: UUID, bruker: Bruker): ByteArray {
+        val existingKlage = klageRepository.findById(klageId).get()
+        validationService.checkKlankeStatus(existingKlage, false)
+        validationService.validateKlankeAccess(existingKlage, bruker)
+
+        val vedlegg = existingKlage.vedlegg.find { it.id == vedleggId }
+
+        if (vedlegg != null) {
+            return fileClient.getVedleggFile(vedlegg.ref)
+        } else {
+            throw RuntimeException("No vedlegg found with this id: $vedleggId")
+        }
     }
 
-    fun expandVedleggToVedleggView(klagevedlegg: Klagevedlegg, bruker: Bruker): VedleggView {
-        val existingKlage = klageRepository.getKlageById(klagevedlegg.klageId)
-        validationService.checkKlageStatus(existingKlage, false)
-        validationService.validateKlageAccess(existingKlage, bruker)
-        return klagevedlegg.toVedleggView()
-    }
+    fun getVedleggFromAnke(ankeId: UUID, vedleggId: UUID, bruker: Bruker): ByteArray {
+        val existingAnke = ankeRepository.findById(ankeId).get()
+        validationService.checkKlankeStatus(existingAnke, false)
+        validationService.validateKlankeAccess(existingAnke, bruker)
 
-    fun expandVedleggToVedleggView(ankevedlegg: Ankevedlegg, bruker: Bruker): VedleggView {
-        val existingAnke = ankeRepository.getAnkeById(ankevedlegg.ankeId)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankevedlegg.toVedleggView()
+        val vedlegg = existingAnke.vedlegg.find { it.id == vedleggId }
+
+        if (vedlegg != null) {
+            return fileClient.getVedleggFile(vedlegg.ref)
+        } else {
+            throw RuntimeException("No vedlegg found with this id: $vedleggId")
+        }
     }
 
     private fun Klage.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
