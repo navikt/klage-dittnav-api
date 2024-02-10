@@ -17,6 +17,7 @@ val springDocVersion = "2.3.0"
 val kodeverkVersion = "1.7.28"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
+val testContainersVersion = "1.19.3"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -83,6 +84,10 @@ dependencies {
     implementation("no.nav.slackposter:simple-slack-poster:$simpleSlackPosterVersion")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
+
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")

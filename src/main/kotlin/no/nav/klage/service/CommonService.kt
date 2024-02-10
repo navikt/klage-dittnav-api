@@ -48,7 +48,7 @@ abstract class CommonService(
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val klanke =
-            klankeRepository.getLatestKlankeDraft(
+            getLatestKlankeDraft(
                 fnr = fnr,
                 tema = tema,
                 internalSaksnummer = internalSaksnummer,
@@ -58,6 +58,22 @@ abstract class CommonService(
             validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)
             klanke
         } else null
+    }
+
+    private fun getLatestKlankeDraft(
+        fnr: String,
+        tema: Tema,
+        internalSaksnummer: String?,
+        innsendingsytelse: Innsendingsytelse
+    ): Klanke? {
+        return klankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
+            .filter {
+                if (internalSaksnummer != null) {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                } else {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                }
+            }.maxByOrNull { it.modifiedByUser }
     }
 
     fun getJournalpostId(klankeId: UUID, bruker: Bruker): String? {
@@ -73,7 +89,7 @@ abstract class CommonService(
         existingKlanke.fritekst = fritekst
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun updateUserSaksnummer(klankeId: UUID, userSaksnummer: String?, bruker: Bruker): LocalDateTime {
@@ -82,7 +98,7 @@ abstract class CommonService(
         existingKlanke.userSaksnummer = userSaksnummer
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun updateVedtakDate(klankeId: UUID, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
@@ -91,7 +107,7 @@ abstract class CommonService(
         existingKlanke.vedtakDate = vedtakDate
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun updateJournalpostId(klankeId: UUID, journalpostId: String, bruker: Bruker): LocalDateTime {
@@ -100,7 +116,7 @@ abstract class CommonService(
         existingKlanke.journalpostId = journalpostId
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun updateJournalpostIdWithoutValidation(klankeId: UUID, journalpostId: String): LocalDateTime {
@@ -109,7 +125,7 @@ abstract class CommonService(
         existingKlanke.journalpostId = journalpostId
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     private fun getAndValidateAccess(klankeId: UUID, bruker: Bruker): Klanke {
@@ -125,7 +141,7 @@ abstract class CommonService(
         existingKlanke.hasVedlegg = hasVedlegg
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun updateStatus(klankeId: UUID, status: KlageAnkeStatus, bruker: Bruker): LocalDateTime {
@@ -134,7 +150,7 @@ abstract class CommonService(
         existingKlanke.status = status
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun updateStatusWithoutValidation(klankeId: UUID, status: KlageAnkeStatus): LocalDateTime {
@@ -143,7 +159,7 @@ abstract class CommonService(
         existingKlanke.status = status
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlanke.modifiedByUser!!
+        return existingKlanke.modifiedByUser
     }
 
     fun deleteKlanke(klankeId: UUID, bruker: Bruker) {
@@ -151,13 +167,6 @@ abstract class CommonService(
 
         existingKlanke.status = KlageAnkeStatus.DELETED
         existingKlanke.modifiedByUser = LocalDateTime.now()
-    }
-
-    fun getKlankePdf(klankeId: UUID, bruker: Bruker): ByteArray {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
-
-        requireNotNull(existingKlanke.journalpostId)
-        return fileClient.getKlageAnkeFile(existingKlanke.journalpostId!!)
     }
 
     fun getJournalpostIdWithoutValidation(klankeId: UUID): String? {

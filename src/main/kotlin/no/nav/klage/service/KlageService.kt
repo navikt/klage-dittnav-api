@@ -57,7 +57,7 @@ class KlageService(
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val klage =
-            klageRepository.getLatestKlageDraft(
+            getLatestKlageDraft(
                 fnr = fnr,
                 tema = tema,
                 internalSaksnummer = internalSaksnummer,
@@ -67,6 +67,22 @@ class KlageService(
             validationService.validateKlageAccess(klage = klage, bruker = bruker)
             klage
         } else null
+    }
+
+    fun getLatestKlageDraft(
+        fnr: String,
+        tema: Tema,
+        internalSaksnummer: String?,
+        innsendingsytelse: Innsendingsytelse
+    ): Klage? {
+        return klageRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
+            .filter {
+                if (internalSaksnummer != null) {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                } else {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                }
+            }.maxByOrNull { it.modifiedByUser }
     }
 
     fun createKlage(input: KlageFullInput, bruker: Bruker): Klage {

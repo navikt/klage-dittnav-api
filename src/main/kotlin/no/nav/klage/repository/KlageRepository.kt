@@ -11,19 +11,4 @@ interface KlageRepository : JpaRepository<Klage, UUID> {
 
     fun findByFoedselsnummerAndStatus(fnr: String, status: KlageAnkeStatus): List<Klage>
 
-    fun getLatestKlageDraft(
-        fnr: String,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse
-    ): Klage? {
-        return findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
-            .filter {
-                if (internalSaksnummer != null) {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
-                } else {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
-                }
-            }.maxByOrNull { it.modifiedByUser!! }
-    }
 }

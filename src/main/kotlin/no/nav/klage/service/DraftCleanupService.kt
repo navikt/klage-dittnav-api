@@ -24,7 +24,8 @@ import java.time.temporal.ChronoUnit
 class DraftCleanupService(
     private val slackClient: SlackClient,
     private val klankeRepository: KlankeRepository,
-    private val commonService: CommonService,
+    private val klageService: KlageService,
+    private val ankeService: AnkeService,
     private val fileClient: FileClient,
     @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
     private val maxDraftAgeInDays: String,
@@ -81,13 +82,13 @@ class DraftCleanupService(
                 vedleggSuccessfullyDeleted += klanke.vedlegg.size
                 klanke.vedlegg.clear()
 
-                commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
-
                 when (klanke) {
                     is Klage -> {
+                        klageService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
                         klagerSuccessfullyDeleted++
                     }
                     is Anke -> {
+                        ankeService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
                         ankerSuccessfullyDeleted++
                     }
 

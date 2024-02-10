@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+/*
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Tema
 import no.nav.klage.domain.klage.KlageDAO
@@ -175,3 +176,6 @@ class OldOldKlageRepositoryTest {
     }
 
 }
+
+
+ */

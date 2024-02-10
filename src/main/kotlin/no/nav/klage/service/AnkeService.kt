@@ -61,7 +61,7 @@ class AnkeService(
         val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         val anke =
-            ankeRepository.getLatestAnkeDraft(
+            getLatestAnkeDraft(
                 fnr = fnr,
                 tema = tema,
                 internalSaksnummer = internalSaksnummer,
@@ -71,6 +71,22 @@ class AnkeService(
             validationService.validateAnkeAccess(anke = anke, bruker = bruker)
             anke
         } else null
+    }
+
+    private fun getLatestAnkeDraft(
+        fnr: String,
+        tema: Tema,
+        internalSaksnummer: String?,
+        innsendingsytelse: Innsendingsytelse
+    ): Anke? {
+        return ankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
+            .filter {
+                if (internalSaksnummer != null) {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                } else {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                }
+            }.maxByOrNull { it.modifiedByUser }
     }
 
     fun createAnke(input: AnkeFullInput, bruker: Bruker): Anke {

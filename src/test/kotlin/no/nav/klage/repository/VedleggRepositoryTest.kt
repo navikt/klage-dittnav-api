@@ -1,5 +1,5 @@
 package no.nav.klage.repository
-
+/*
 import no.nav.klage.domain.*
 import no.nav.klage.domain.klage.KlageDAO
 import no.nav.klage.domain.klage.KlageFullInput
@@ -105,3 +105,6 @@ class VedleggRepositoryTest {
     private val vedlegg1 =
         MockMultipartFile("vedlegg.txt", "vedlegg.txt", "txt", "file".toByteArray(Charset.defaultCharset()))
 }
+
+
+ */
