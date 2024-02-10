@@ -15,7 +15,7 @@ import java.util.*
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table(name = "klanke", schema = "klage")
+@Table(name = "klanke")
 @DynamicUpdate
 @DiscriminatorColumn(name = "klanke_type")
 abstract class Klanke(

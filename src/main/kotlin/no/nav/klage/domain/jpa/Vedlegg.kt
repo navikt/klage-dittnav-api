@@ -10,18 +10,18 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = "vedlegg", schema = "klage")
-open class Vedlegg(
+@Table(name = "vedlegg")
+class Vedlegg(
     @Id
-    open val id: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "tittel")
-    open var tittel: String,
+    var tittel: String,
     @Column(name = "ref")
-    open var ref: String,
+    var ref: String,
     @Column(name = "content_type")
-    open var contentType: String,
+    var contentType: String,
     @Column(name = "size_in_bytes")
-    open var sizeInBytes: Int,
+    var sizeInBytes: Int,
 ) {
 
     override fun equals(other: Any?): Boolean {

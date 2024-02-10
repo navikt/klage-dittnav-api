@@ -11,9 +11,12 @@ class CheckboxEnumConverter : AttributeConverter<List<CheckboxEnum>, String?> {
         entity?.joinToString(",")
 
     override fun convertToEntityAttribute(commaSeparatedString: String?): List<CheckboxEnum>? =
-        commaSeparatedString?.let { s ->
-            s.split(",").map {
+        if (commaSeparatedString.isNullOrEmpty()) {
+            null
+        } else {
+            commaSeparatedString.split(",").map {
                 CheckboxEnum.valueOf(it)
             }
         }
+
 }
