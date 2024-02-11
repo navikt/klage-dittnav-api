@@ -54,7 +54,7 @@ abstract class Klanke(
     @JoinColumn(name = "klanke_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
-    open var vedlegg: MutableSet<Vedlegg> = mutableSetOf(),
+    open val vedlegg: MutableSet<Vedlegg> = mutableSetOf(),
 
     @Column(name = "created")
     open var created: LocalDateTime,
