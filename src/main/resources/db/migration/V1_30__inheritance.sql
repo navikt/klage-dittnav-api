@@ -1,3 +1,6 @@
+--klage and anke into klanke
+--klage_vedlegg and anke_vedlegg into vedlegg
+
 --use anke as base for common class, since it already has id as uuid.
 ALTER TABLE anke
     RENAME TO klanke;
@@ -8,7 +11,7 @@ ALTER TABLE anke
 ALTER TABLE klage
     ADD COLUMN enhetsnummer TEXT,
     ADD COLUMN klanke_type  TEXT,
-    ADD COLUMN new_uuid_id  uuid DEFAULT gen_random_uuid();
+    ADD COLUMN new_uuid_id  UUID DEFAULT gen_random_uuid();
 
 --set correct type for klager before merging into common table
 UPDATE klage
@@ -27,15 +30,15 @@ SET klanke_type = 'anke';
 --change id of vedlegg tables to uuid. Should not matter.
 ALTER TABLE klage_vedlegg
     ALTER id DROP DEFAULT,
-    ALTER id TYPE uuid USING (gen_random_uuid());
+    ALTER id TYPE UUID USING (gen_random_uuid());
 
 ALTER TABLE anke_vedlegg
     ALTER id DROP DEFAULT,
-    ALTER id TYPE uuid USING (gen_random_uuid());
+    ALTER id TYPE UUID USING (gen_random_uuid());
 
 --adding new fk prop in klage_vedlegg for the new uuid fks.
 ALTER TABLE klage_vedlegg
-    ADD COLUMN new_klage_id uuid;
+    ADD COLUMN new_klage_id UUID;
 
 --populate all new fks
 UPDATE klage_vedlegg
@@ -88,8 +91,40 @@ ALTER TABLE klage_vedlegg
     RENAME COLUMN klage_id TO klanke_id;
 
 --insert all klage_vedlegg into shared table.
-INSERT INTO vedlegg
-SELECT *
-FROM klage_vedlegg;
+INSERT INTO vedlegg (id, klanke_id, tittel, ref, content_type, size_in_bytes)
+SELECT kv.id, kv.klanke_id, kv.tittel, kv.ref, kv.content_type, kv.size_in_bytes
+FROM klage_vedlegg kv;
 
---TODO indexes
+--move klage into common table
+INSERT INTO klanke (id, foedselsnummer, fritekst, status, tema, user_saksnummer, modified_by_user, created, vedtak_date,
+                    enhetsnummer, language, innsendingsytelse, has_vedlegg, pdf_downloaded, journalpost_id,
+                    internal_saksnummer, checkboxes_selected)
+SELECT k.id,
+       k.foedselsnummer,
+       k.fritekst,
+       k.status,
+       k.tema,
+       k.user_saksnummer,
+       k.modified_by_user,
+       k.created,
+       k.vedtak_date,
+       k.enhetsnummer,
+       k.language,
+       k.innsendingsytelse,
+       k.has_vedlegg,
+       k.pdf_downloaded,
+       k.journalpost_id,
+       k.internal_saksnummer,
+       k.checkboxes_selected
+FROM klage k;
+
+--now turn on fk to the klanke_vedlegg relation
+ALTER TABLE vedlegg
+    ADD CONSTRAINT fk_klanke_vedlegg
+        FOREIGN KEY (klanke_id)
+            REFERENCES klanke (id);
+
+--add some useful indexes
+CREATE INDEX vedlegg_fk_idx ON vedlegg (klanke_id);
+CREATE INDEX klanke_status_idx ON klanke (status);
+CREATE INDEX klanke_foedselsnummer_idx ON klanke (foedselsnummer);
