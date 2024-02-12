@@ -124,6 +124,10 @@ ALTER TABLE vedlegg
         FOREIGN KEY (klanke_id)
             REFERENCES klanke (id);
 
+ALTER TABLE klanke
+    ALTER COLUMN created TYPE TIMESTAMP,
+    ALTER COLUMN modified_by_user TYPE TIMESTAMP;
+
 --add some useful indexes
 CREATE INDEX vedlegg_fk_idx ON vedlegg (klanke_id);
 CREATE INDEX klanke_status_idx ON klanke (status);
