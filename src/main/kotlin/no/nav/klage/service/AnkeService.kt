@@ -13,7 +13,6 @@ import no.nav.klage.domain.anke.AnkeInput
 import no.nav.klage.domain.jpa.Anke
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
-import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
@@ -50,43 +49,6 @@ class AnkeService(
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-    }
-
-    private fun getLatestDraftAnkeByParams(
-        bruker: Bruker,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse,
-    ): Anke? {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-
-        val anke =
-            getLatestAnkeDraft(
-                fnr = fnr,
-                tema = tema,
-                internalSaksnummer = internalSaksnummer,
-                innsendingsytelse = innsendingsytelse,
-            )
-        return if (anke != null) {
-            validationService.validateAnkeAccess(anke = anke, bruker = bruker)
-            anke
-        } else null
-    }
-
-    private fun getLatestAnkeDraft(
-        fnr: String,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse
-    ): Anke? {
-        return ankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
-            .filter {
-                if (internalSaksnummer != null) {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
-                } else {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
-                }
-            }.maxByOrNull { it.modifiedByUser }
     }
 
     fun createAnke(input: AnkeFullInput, bruker: Bruker): Anke {
@@ -153,7 +115,7 @@ class AnkeService(
     }
 
     fun getDraftOrCreateAnke(input: AnkeInput, bruker: Bruker): Anke {
-        val existingAnke = getLatestDraftAnkeByParams(
+        val existingAnke = getLatestAnkeDraft(
             bruker = bruker,
             tema = input.innsendingsytelse.toTema(),
             internalSaksnummer = input.internalSaksnummer,
@@ -164,6 +126,29 @@ class AnkeService(
             input = input,
             bruker = bruker,
         )
+    }
+
+    private fun getLatestAnkeDraft(
+        bruker: Bruker,
+        tema: Tema,
+        internalSaksnummer: String?,
+        innsendingsytelse: Innsendingsytelse,
+    ): Anke? {
+        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+
+        val anke = ankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
+            .filter {
+                if (internalSaksnummer != null) {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                } else {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                }
+            }.maxByOrNull { it.modifiedByUser }
+
+        return if (anke != null) {
+            validationService.validateAnkeAccess(anke = anke, bruker = bruker)
+            anke
+        } else null
     }
 
     fun finalizeAnke(ankeId: UUID, bruker: Bruker): LocalDateTime {

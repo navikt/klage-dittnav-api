@@ -3,11 +3,8 @@ package no.nav.klage.service
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
-import no.nav.klage.controller.view.KlageView
 import no.nav.klage.controller.view.OpenKlageInput
 import no.nav.klage.domain.*
-import no.nav.klage.domain.exception.KlageIsFinalizedException
-import no.nav.klage.domain.jpa.Anke
 import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.*
@@ -19,7 +16,6 @@ import no.nav.klage.util.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.*
-import java.time.ZoneOffset.UTC
 import java.util.*
 
 @Service
@@ -46,43 +42,6 @@ class KlageService(
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-    }
-
-    private fun getLatestDraftKlageByParams(
-        bruker: Bruker,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse,
-    ): Klage? {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-
-        val klage =
-            getLatestKlageDraft(
-                fnr = fnr,
-                tema = tema,
-                internalSaksnummer = internalSaksnummer,
-                innsendingsytelse = innsendingsytelse,
-            )
-        return if (klage != null) {
-            validationService.validateKlageAccess(klage = klage, bruker = bruker)
-            klage
-        } else null
-    }
-
-    fun getLatestKlageDraft(
-        fnr: String,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse
-    ): Klage? {
-        return klageRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
-            .filter {
-                if (internalSaksnummer != null) {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
-                } else {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
-                }
-            }.maxByOrNull { it.modifiedByUser }
     }
 
     fun createKlage(input: KlageFullInput, bruker: Bruker): Klage {
@@ -149,7 +108,7 @@ class KlageService(
     }
 
     fun getDraftOrCreateKlage(input: KlageInput, bruker: Bruker): Klage {
-        val existingKlage = getLatestDraftKlageByParams(
+        val existingKlage = getLatestKlageDraft(
             bruker = bruker,
             tema = input.innsendingsytelse.toTema(),
             internalSaksnummer = input.internalSaksnummer,
@@ -160,6 +119,29 @@ class KlageService(
             input = input,
             bruker = bruker,
         )
+    }
+
+    private fun getLatestKlageDraft(
+        bruker: Bruker,
+        tema: Tema,
+        internalSaksnummer: String?,
+        innsendingsytelse: Innsendingsytelse,
+    ): Klage? {
+        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+
+        val klage = klageRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
+            .filter {
+                if (internalSaksnummer != null) {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                } else {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                }
+            }.maxByOrNull { it.modifiedByUser }
+
+        return if (klage != null) {
+            validationService.validateKlageAccess(klage = klage, bruker = bruker)
+            klage
+        } else null
     }
 
     fun updateCheckboxesSelected(
