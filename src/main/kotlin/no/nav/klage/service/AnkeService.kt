@@ -11,6 +11,7 @@ import no.nav.klage.domain.Tema
 import no.nav.klage.domain.anke.AnkeFullInput
 import no.nav.klage.domain.anke.AnkeInput
 import no.nav.klage.domain.jpa.Anke
+import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.domain.titles.Innsendingsytelse
@@ -270,5 +271,12 @@ class AnkeService(
         existingAnke.modifiedByUser = LocalDateTime.now()
 
         return existingAnke.modifiedByUser
+    }
+
+    fun getAnkeDraftsByFnr(bruker: Bruker): List<Anke> {
+        return ankeRepository.findByFoedselsnummerAndStatus(
+            fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            status = KlageAnkeStatus.DRAFT
+        )
     }
 }

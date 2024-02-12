@@ -4,18 +4,27 @@ import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.controller.view.OpenKlageInput
-import no.nav.klage.domain.*
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.KlageAnkeStatus
+import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.Tema
 import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.domain.jpa.isFinalized
-import no.nav.klage.domain.klage.*
+import no.nav.klage.domain.klage.AggregatedKlageAnke
+import no.nav.klage.domain.klage.CheckboxEnum
+import no.nav.klage.domain.klage.KlageFullInput
+import no.nav.klage.domain.klage.KlageInput
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.KlankeRepository
-import no.nav.klage.util.*
+import no.nav.klage.util.getLogger
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
+import no.nav.klage.util.sanitizeText
+import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -121,7 +130,7 @@ class KlageService(
         )
     }
 
-    private fun getLatestKlageDraft(
+    fun getLatestKlageDraft(
         bruker: Bruker,
         tema: Tema,
         internalSaksnummer: String?,
@@ -267,6 +276,13 @@ class KlageService(
             checkboxesSelected = klage.checkboxesSelected.toSet(),
             language = klage.language,
             hasVedlegg = klage.vedlegg.isNotEmpty() || klage.hasVedlegg,
+        )
+    }
+
+    fun getKlageDraftsByFnr(bruker: Bruker): List<Klage> {
+        return klageRepository.findByFoedselsnummerAndStatus(
+            fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            status = KlageAnkeStatus.DRAFT
         )
     }
 }

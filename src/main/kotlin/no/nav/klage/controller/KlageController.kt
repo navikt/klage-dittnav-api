@@ -53,8 +53,7 @@ class KlageController(
             "Get klager for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getDraftKlankerByFnr(bruker).map {
-            it as Klage
+        return klageService.getKlageDraftsByFnr(bruker).map {
             it.toKlageView()
         }
     }

@@ -55,8 +55,7 @@ class AnkeController(
             "Get anker for user is requested. Fnr: {}",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getDraftKlankerByFnr(bruker).map {
-            it as Anke
+        return ankeService.getAnkeDraftsByFnr(bruker).map {
             it.toAnkeView()
         }
     }

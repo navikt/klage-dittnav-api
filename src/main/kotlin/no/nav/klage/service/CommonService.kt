@@ -34,48 +34,6 @@ abstract class CommonService(
         validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)
     }
 
-    fun getDraftKlankerByFnr(bruker: Bruker): List<Klanke> {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-        return klankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
-    }
-
-    private fun getLatestDraftKlageByParams(
-        bruker: Bruker,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse,
-    ): Klanke? {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-
-        val klanke =
-            getLatestKlankeDraft(
-                fnr = fnr,
-                tema = tema,
-                internalSaksnummer = internalSaksnummer,
-                innsendingsytelse = innsendingsytelse,
-            )
-        return if (klanke != null) {
-            validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)
-            klanke
-        } else null
-    }
-
-    private fun getLatestKlankeDraft(
-        fnr: String,
-        tema: Tema,
-        internalSaksnummer: String?,
-        innsendingsytelse: Innsendingsytelse
-    ): Klanke? {
-        return klankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
-            .filter {
-                if (internalSaksnummer != null) {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
-                } else {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
-                }
-            }.maxByOrNull { it.modifiedByUser }
-    }
-
     fun getJournalpostId(klankeId: UUID, bruker: Bruker): String? {
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke, false)

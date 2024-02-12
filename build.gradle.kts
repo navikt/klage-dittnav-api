@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.45.0"
-val mockkVersion = "1.13.8"
 val h2Version = "2.2.224"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
@@ -18,6 +17,8 @@ val kodeverkVersion = "1.7.28"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
 val testContainersVersion = "1.19.3"
+val mockkVersion = "1.13.8"
+val springMockkVersion = "4.0.2"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -89,12 +90,15 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
 
-    testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
+        exclude(group = "org.mockito")
     }
-    testImplementation("org.mockito:mockito-inline:$mockitoInlineVersion")
+
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
+
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 
