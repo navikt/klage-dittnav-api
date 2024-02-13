@@ -12,8 +12,6 @@ import java.util.*
 
 interface KlankeRepository : JpaRepository<Klanke, UUID> {
 
-    fun findByFoedselsnummerAndStatus(fnr: String, status: KlageAnkeStatus): List<Klanke>
-
     fun findByStatusAndModifiedByUserLessThan(status: KlageAnkeStatus, modifiedByUser: LocalDateTime): List<Klanke>
 
 }

@@ -30,7 +30,7 @@ import java.util.*
 @Service
 @Transactional
 class KlageService(
-    klankeRepository: KlankeRepository,
+    private val klankeRepository: KlankeRepository,
     private val klageRepository: KlageRepository,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
@@ -41,7 +41,6 @@ class KlageService(
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
 ) : CommonService(
     klankeRepository = klankeRepository,
-    fileClient = fileClient,
     validationService = validationService,
     kafkaInternalEventService = kafkaInternalEventService,
 ) {

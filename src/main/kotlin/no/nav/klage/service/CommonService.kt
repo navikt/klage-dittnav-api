@@ -1,17 +1,17 @@
 package no.nav.klage.service
 
-import no.nav.klage.clients.FileClient
-import no.nav.klage.domain.*
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.Event
+import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.jpa.Klanke
-import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.repository.KlankeRepository
-import no.nav.klage.util.*
-import java.time.*
+import no.nav.klage.util.getLogger
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 abstract class CommonService(
-    val klankeRepository: KlankeRepository,
-    private val fileClient: FileClient,
+    private val klankeRepository: KlankeRepository,
     private val validationService: ValidationService,
     private val kafkaInternalEventService: KafkaInternalEventService,
 ) {
@@ -97,15 +97,6 @@ abstract class CommonService(
         val existingKlanke = getAndValidateAccess(klankeId, bruker)
 
         existingKlanke.hasVedlegg = hasVedlegg
-        existingKlanke.modifiedByUser = LocalDateTime.now()
-
-        return existingKlanke.modifiedByUser
-    }
-
-    fun updateStatus(klankeId: UUID, status: KlageAnkeStatus, bruker: Bruker): LocalDateTime {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
-
-        existingKlanke.status = status
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
         return existingKlanke.modifiedByUser
