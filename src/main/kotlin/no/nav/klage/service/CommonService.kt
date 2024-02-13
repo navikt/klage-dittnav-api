@@ -11,9 +11,9 @@ import java.time.LocalDateTime
 import java.util.*
 
 abstract class CommonService(
-    private val klankeRepository: KlankeRepository,
-    private val validationService: ValidationService,
-    private val kafkaInternalEventService: KafkaInternalEventService,
+    val klankeRepository: KlankeRepository,
+    val validationService: ValidationService,
+    val kafkaInternalEventService: KafkaInternalEventService,
 ) {
 
     companion object {
@@ -23,6 +23,12 @@ abstract class CommonService(
     }
 
     fun getKlanke(klankeId: UUID, bruker: Bruker): Klanke {
+        logger.debug(
+            "klankeRepository: {}, validationService: {}, kafkaInternalEventService: {}",
+            klankeRepository,
+            validationService,
+            kafkaInternalEventService
+        )
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)
