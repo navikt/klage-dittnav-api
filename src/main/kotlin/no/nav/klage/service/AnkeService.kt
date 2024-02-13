@@ -30,13 +30,13 @@ import java.util.*
 @Service
 @Transactional
 class AnkeService(
-    private val klankeRepository: KlankeRepository,
+    klankeRepository: KlankeRepository,
     private val ankeRepository: AnkeRepository,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
     private val fileClient: FileClient,
-    private val validationService: ValidationService,
+    validationService: ValidationService,
     kafkaInternalEventService: KafkaInternalEventService,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
 ) : CommonService(
