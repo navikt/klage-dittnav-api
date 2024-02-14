@@ -22,20 +22,27 @@ class ValidationService {
 
     fun validateKlankeAccess(klanke: Klanke, bruker: Bruker) {
         if (!klanke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
-            //TODO
-            throw AnkeNotFoundException()
+            when (klanke) {
+                is Klage -> throw KlageNotFoundException()
+                is Anke -> throw AnkeNotFoundException()
+            }
         }
     }
 
     fun checkKlankeStatus(klanke: Klanke, includeFinalized: Boolean = true) {
         if (klanke.isDeleted()) {
-            //TODO
-            throw KlageIsDeletedException()
+            when (klanke) {
+                is Klage -> throw KlageIsDeletedException()
+                is Anke -> throw AnkeIsDeletedException()
+            }
         }
 
         if (includeFinalized && klanke.isFinalized()) {
-            //TODO
-            throw KlageIsFinalizedException()
+            when (klanke) {
+                is Klage -> throw KlageIsFinalizedException()
+                is Anke -> throw AnkeIsFinalizedException()
+            }
+
         }
     }
 

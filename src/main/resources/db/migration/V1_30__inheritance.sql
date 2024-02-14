@@ -98,7 +98,7 @@ FROM klage_vedlegg kv;
 --move klage into common table
 INSERT INTO klanke (id, foedselsnummer, fritekst, status, tema, user_saksnummer, modified_by_user, created, vedtak_date,
                     enhetsnummer, language, innsendingsytelse, has_vedlegg, pdf_downloaded, journalpost_id,
-                    internal_saksnummer, checkboxes_selected)
+                    internal_saksnummer, checkboxes_selected, klanke_type)
 SELECT k.id,
        k.foedselsnummer,
        k.fritekst,
@@ -115,7 +115,8 @@ SELECT k.id,
        k.pdf_downloaded,
        k.journalpost_id,
        k.internal_saksnummer,
-       k.checkboxes_selected
+       k.checkboxes_selected,
+       k.klanke_type
 FROM klage k;
 
 --now turn on fk to the klanke_vedlegg relation
