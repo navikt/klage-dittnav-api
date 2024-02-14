@@ -36,13 +36,9 @@ class AnkeService(
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
     private val fileClient: FileClient,
-    validationService: ValidationService,
-    kafkaInternalEventService: KafkaInternalEventService,
+    private val validationService: ValidationService,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
-) : CommonService(
-    klankeRepository = klankeRepository,
-    validationService = validationService,
-    kafkaInternalEventService = kafkaInternalEventService,
+    private val commonService: CommonService,
 ) {
     companion object {
         private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
@@ -211,7 +207,7 @@ class AnkeService(
         klageDittnavPdfgenService.createAnkePdfWithFoersteside(
             createPdfWithFoerstesideInput(anke = existingAnke, bruker)
         ).also {
-            setPdfDownloadedWithoutAccessValidation(klankeId = ankeId, pdfDownloaded = LocalDateTime.now())
+            commonService.setPdfDownloadedWithoutAccessValidation(klankeId = ankeId, pdfDownloaded = LocalDateTime.now())
             return it
         }
     }

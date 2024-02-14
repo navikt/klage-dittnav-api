@@ -37,12 +37,8 @@ class KlageService(
     private val fileClient: FileClient,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
     private val klankeRepository: KlankeRepository,
-    validationService: ValidationService,
-    kafkaInternalEventService: KafkaInternalEventService,
-) : CommonService(
-    klankeRepository = klankeRepository,
-    validationService = validationService,
-    kafkaInternalEventService = kafkaInternalEventService,
+    private val validationService: ValidationService,
+    private val commonService: CommonService,
 ) {
 
     companion object {
@@ -232,7 +228,7 @@ class KlageService(
         klageDittnavPdfgenService.createKlagePdfWithFoersteside(
             createPdfWithFoerstesideInput(klage = existingKlage, bruker)
         ).also {
-            setPdfDownloadedWithoutAccessValidation(klankeId = klageId, pdfDownloaded = LocalDateTime.now())
+            commonService.setPdfDownloadedWithoutAccessValidation(klankeId = klageId, pdfDownloaded = LocalDateTime.now())
             return it
         }
     }

@@ -6,14 +6,18 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.getLogger
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-abstract class CommonService(
+@Service
+@Transactional
+class CommonService(
     private val klankeRepository: KlankeRepository,
-    val validationService: ValidationService,
-    val kafkaInternalEventService: KafkaInternalEventService,
+    private val validationService: ValidationService,
+    private val kafkaInternalEventService: KafkaInternalEventService,
 ) {
 
     companion object {
@@ -23,12 +27,6 @@ abstract class CommonService(
     }
 
     fun getKlanke(klankeId: UUID, bruker: Bruker): Klanke {
-        logger.debug(
-            "klankeRepository: {}, validationService: {}, kafkaInternalEventService: {}",
-            klankeRepository,
-            validationService,
-            kafkaInternalEventService
-        )
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)

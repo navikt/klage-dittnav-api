@@ -8,12 +8,12 @@ import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.KlankeRepository
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -51,10 +51,17 @@ class KlageServiceTest {
     private lateinit var klankeRepository: KlankeRepository
 
     private lateinit var klageService: KlageService
+    private lateinit var commonService: CommonService
 
     @BeforeEach
     fun cleanup() {
         klageRepository.deleteAll()
+
+        commonService = CommonService(
+            klankeRepository = klankeRepository,
+            validationService = mockk(relaxed = true),
+            kafkaInternalEventService = mockk(),
+        )
 
         klageService = KlageService(
             klankeRepository = klankeRepository,
@@ -64,9 +71,10 @@ class KlageServiceTest {
             kafkaProducer = mockk(),
             fileClient = mockk(),
             validationService = mockk(relaxed = true),
-            kafkaInternalEventService = mockk(),
             klageDittnavPdfgenService = mockk(),
+            commonService = commonService,
         )
+
     }
 
     @Test
@@ -135,8 +143,8 @@ class KlageServiceTest {
                 kontaktinformasjon = null,
             )
         ).first()
-        klageService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2, bruker = mockk(relaxed = true))
-        val output = klageService.getKlanke(klankeId = klage.id, bruker = mockk(relaxed = true)).fritekst
+        commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2, bruker = mockk(relaxed = true))
+        val output = commonService.getKlanke(klankeId = klage.id, bruker = mockk(relaxed = true)).fritekst
 
         assertEquals(exampleFritekst2, output)
     }

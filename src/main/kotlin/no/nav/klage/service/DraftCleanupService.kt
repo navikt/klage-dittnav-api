@@ -26,6 +26,7 @@ class DraftCleanupService(
     private val klankeRepository: KlankeRepository,
     private val klageService: KlageService,
     private val ankeService: AnkeService,
+    private val commonService: CommonService,
     private val fileClient: FileClient,
     @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
     private val maxDraftAgeInDays: String,
@@ -84,11 +85,11 @@ class DraftCleanupService(
 
                 when (klanke) {
                     is Klage -> {
-                        klageService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
+                        commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
                         klagerSuccessfullyDeleted++
                     }
                     is Anke -> {
-                        ankeService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
+                        commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
                         ankerSuccessfullyDeleted++
                     }
 

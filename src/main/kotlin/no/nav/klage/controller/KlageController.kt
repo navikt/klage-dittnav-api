@@ -12,6 +12,7 @@ import no.nav.klage.controller.view.VedleggView
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.service.BrukerService
+import no.nav.klage.service.CommonService
 import no.nav.klage.service.KlageService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
@@ -37,6 +38,7 @@ class KlageController(
     private val klageService: KlageService,
     private val vedleggService: VedleggService,
     private val kafkaEventClient: KafkaEventClient,
+    private val commonService: CommonService,
 ) {
 
     companion object {
@@ -69,7 +71,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return (klageService.getKlanke(klageId, bruker) as Klage).toKlageView()
+        return (commonService.getKlanke(klageId, bruker) as Klage).toKlageView()
     }
 
     @GetMapping("/{klageId}/journalpostid")
@@ -83,7 +85,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return klageService.getJournalpostId(klageId, bruker)
+        return commonService.getJournalpostId(klageId, bruker)
     }
 
     @GetMapping("/{klageId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
@@ -92,7 +94,7 @@ class KlageController(
     ): Flux<ServerSentEvent<String>> {
         val bruker = brukerService.getBruker()
         kotlin.runCatching {
-            klageService.validateAccess(klageId, bruker)
+            commonService.validateAccess(klageId, bruker)
         }.onFailure {
             throw KlageNotFoundException()
         }
@@ -152,7 +154,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = klageService.updateFritekst(klageId, input.value, bruker)
+        val modifiedByUser = commonService.updateFritekst(klageId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -171,7 +173,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = klageService.updateUserSaksnummer(klageId, input.value, bruker)
+        val modifiedByUser = commonService.updateUserSaksnummer(klageId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -190,7 +192,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = klageService.updateVedtakDate(klageId, input.value, bruker)
+        val modifiedByUser = commonService.updateVedtakDate(klageId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -209,7 +211,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = klageService.updateHasVedlegg(klageId, input.value, bruker)
+        val modifiedByUser = commonService.updateHasVedlegg(klageId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -243,7 +245,7 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        klageService.deleteKlanke(klankeId = klageId, bruker = bruker)
+        commonService.deleteKlanke(klankeId = klageId, bruker = bruker)
     }
 
     @PostMapping("/{klageId}/finalize")

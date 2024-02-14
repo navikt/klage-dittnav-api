@@ -13,6 +13,7 @@ import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.service.AnkeService
 import no.nav.klage.service.BrukerService
+import no.nav.klage.service.CommonService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
@@ -39,6 +40,7 @@ class AnkeController(
     private val ankeService: AnkeService,
     private val vedleggService: VedleggService,
     private val kafkaEventClient: KafkaEventClient,
+    private val commonService: CommonService,
 ) {
 
     companion object {
@@ -71,7 +73,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return (ankeService.getKlanke(ankeId, bruker) as Anke).toAnkeView()
+        return (commonService.getKlanke(ankeId, bruker) as Anke).toAnkeView()
     }
 
     @GetMapping("/{ankeId}/journalpostid")
@@ -85,7 +87,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.getJournalpostId(ankeId, bruker)
+        return commonService.getJournalpostId(ankeId, bruker)
     }
 
     @GetMapping("/{ankeId}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
@@ -94,7 +96,7 @@ class AnkeController(
     ): Flux<ServerSentEvent<String>> {
         val bruker = brukerService.getBruker()
         kotlin.runCatching {
-            ankeService.validateAccess(ankeId, bruker)
+            commonService.validateAccess(ankeId, bruker)
         }.onFailure {
             throw AnkeNotFoundException()
         }
@@ -154,7 +156,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateFritekst(ankeId, input.value, bruker)
+        val modifiedByUser = commonService.updateFritekst(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -173,7 +175,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateUserSaksnummer(ankeId, input.value, bruker)
+        val modifiedByUser = commonService.updateUserSaksnummer(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -192,7 +194,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateVedtakDate(ankeId, input.value, bruker)
+        val modifiedByUser = commonService.updateVedtakDate(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -211,7 +213,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateHasVedlegg(ankeId, input.value, bruker)
+        val modifiedByUser = commonService.updateHasVedlegg(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -245,7 +247,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        ankeService.deleteKlanke(ankeId, bruker)
+        commonService.deleteKlanke(ankeId, bruker)
     }
 
     @PostMapping("/{ankeId}/finalize")
