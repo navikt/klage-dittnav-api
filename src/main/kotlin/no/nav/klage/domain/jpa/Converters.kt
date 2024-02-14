@@ -15,13 +15,13 @@ class CheckboxEnumConverter : AttributeConverter<List<CheckboxEnum>, String?> {
         }
     }
 
-    override fun convertToEntityAttribute(commaSeparatedString: String?): List<CheckboxEnum> =
+    override fun convertToEntityAttribute(commaSeparatedString: String?): MutableList<CheckboxEnum> =
         if (commaSeparatedString.isNullOrEmpty()) {
-            emptyList()
+            mutableListOf()
         } else {
             commaSeparatedString.split(",").map {
                 CheckboxEnum.valueOf(it)
-            }
+            }.toMutableList()
         }
 
 }

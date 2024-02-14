@@ -275,9 +275,6 @@ class KlageService(
     }
 
     fun getKlageDraftsByFnr(bruker: Bruker): List<Klage> {
-        //dev test
-        klankeRepository.findAll().first()
-
         return klageRepository.findByFoedselsnummerAndStatus(
             fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             status = KlageAnkeStatus.DRAFT

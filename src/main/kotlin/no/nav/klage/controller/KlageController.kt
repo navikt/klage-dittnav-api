@@ -230,7 +230,11 @@ class KlageController(
             klageId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = klageService.updateCheckboxesSelected(klageId, input.value, bruker)
+        val modifiedByUser = klageService.updateCheckboxesSelected(
+            klageId = klageId,
+            checkboxesSelected = input.value,
+            bruker = bruker
+        )
         return EditedView(
             modifiedByUser = modifiedByUser
         )
