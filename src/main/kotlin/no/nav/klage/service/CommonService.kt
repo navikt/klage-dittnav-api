@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 abstract class CommonService(
-    val klankeRepository: KlankeRepository,
+    private val klankeRepository: KlankeRepository,
     val validationService: ValidationService,
     val kafkaInternalEventService: KafkaInternalEventService,
 ) {

@@ -30,15 +30,15 @@ import java.util.*
 @Service
 @Transactional
 class KlageService(
-    klankeRepository: KlankeRepository,
     private val klageRepository: KlageRepository,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
     private val fileClient: FileClient,
+    private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
+    private val klankeRepository: KlankeRepository,
     validationService: ValidationService,
     kafkaInternalEventService: KafkaInternalEventService,
-    private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
 ) : CommonService(
     klankeRepository = klankeRepository,
     validationService = validationService,
@@ -279,6 +279,9 @@ class KlageService(
     }
 
     fun getKlageDraftsByFnr(bruker: Bruker): List<Klage> {
+        //dev test
+        klankeRepository.findAll().first()
+
         return klageRepository.findByFoedselsnummerAndStatus(
             fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             status = KlageAnkeStatus.DRAFT

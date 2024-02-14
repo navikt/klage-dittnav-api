@@ -30,7 +30,7 @@ import java.util.*
 @Service
 @Transactional
 class AnkeService(
-    klankeRepository: KlankeRepository,
+    private val klankeRepository: KlankeRepository,
     private val ankeRepository: AnkeRepository,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
