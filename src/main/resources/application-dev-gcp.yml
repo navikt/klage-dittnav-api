@@ -28,4 +28,4 @@ TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 spring:
   datasource:
     hikari:
-      maximum-pool-size: 4
+      maximum-pool-size: 10

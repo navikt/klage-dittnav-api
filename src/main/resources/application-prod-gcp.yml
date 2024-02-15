@@ -1,6 +1,9 @@
 spring:
   flyway:
     clean-on-validation-error: false
+  datasource:
+    hikari:
+      maximum-pool-size: 10
 
 allowed.origins:
   https://klage-dittnav.nav.no,

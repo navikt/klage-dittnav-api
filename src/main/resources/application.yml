@@ -7,9 +7,6 @@ spring:
     url: jdbc:postgresql://${DB_HOST}:5432/klage
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    hikari:
-      maximum-pool-size: 100
-      minimum-idle: 1
   main:
     banner-mode: OFF
   flyway:
