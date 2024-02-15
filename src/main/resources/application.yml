@@ -7,6 +7,7 @@ spring:
     url: jdbc:postgresql://${DB_HOST}:5432/klage
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   main:
     banner-mode: OFF
   flyway:
