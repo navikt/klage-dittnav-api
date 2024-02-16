@@ -3,27 +3,33 @@ package no.nav.klage.service
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.repository.AnkeRepository
-import no.nav.klage.repository.KlageRepository
-import no.nav.klage.repository.VedleggRepository
+import no.nav.klage.domain.jpa.Anke
+import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.repository.*
 import no.nav.klage.util.causeClass
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.rootCause
 import no.nav.slackposter.Severity
 import no.nav.slackposter.SlackClient
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Service
 @Transactional
 class DraftCleanupService(
     private val slackClient: SlackClient,
-    private val klageRepository: KlageRepository,
-    private val ankeRepository: AnkeRepository,
-    private val vedleggRepository: VedleggRepository,
-    private val fileClient: FileClient
+    private val klankeRepository: KlankeRepository,
+    private val klageService: KlageService,
+    private val ankeService: AnkeService,
+    private val commonService: CommonService,
+    private val fileClient: FileClient,
+    @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
+    private val maxDraftAgeInDays: String,
 ) {
 
     companion object {
@@ -36,31 +42,35 @@ class DraftCleanupService(
     @SchedulerLock(name = "markOldDraftsAsDeleted")
     fun markOldDraftsAsDeleted() {
 
-        logger.debug("Looking for expired draft klager")
-        slackClient.postMessage("Ser etter utgåtte draft-klager")
+        val lookingForDraftsMessage = "Looking for expired drafts"
+        logger.debug(lookingForDraftsMessage)
+        slackClient.postMessage(lookingForDraftsMessage)
 
-        var klageVedleggFilesSuccessfullyDeleted = 0
-        var klageVedleggSuccessfullyDeleted = 0
+        var vedleggFilesSuccessfullyDeleted = 0
+        var vedleggSuccessfullyDeleted = 0
+
         var klagerSuccessfullyDeleted = 0
-
         var ankerSuccessfullyDeleted = 0
 
-        val oldKlageDrafts = klageRepository.getExpiredDraftKlager()
-        val expiredKlager = oldKlageDrafts.count()
-        logger.debug("Found $expiredKlager expired draft klager")
-        slackClient.postMessage("Fant $expiredKlager utgåtte draft-klager")
+        val oldKlankeDrafts = klankeRepository.findByStatusAndModifiedByUserLessThan(
+            status = KlageAnkeStatus.DRAFT,
+            LocalDateTime.now().minus(maxDraftAgeInDays.toLong(), ChronoUnit.DAYS)
+        )
+        val expiredKlankeCount = oldKlankeDrafts.count()
 
-        oldKlageDrafts.forEach {
-            logger.debug("Cleaning up expired draft klage ${it.id}")
+        val foundDraftsMessage = "Found $expiredKlankeCount expired drafts"
+        logger.debug(foundDraftsMessage)
+        slackClient.postMessage(foundDraftsMessage)
+
+        oldKlankeDrafts.forEach { klanke ->
+            logger.debug("Cleaning up expired draft {}", klanke.id)
             runCatching {
-                it.vedlegg.forEach { vedlegg ->
-                    logger.debug("Cleaning up vedlegg ${it.id}")
+                klanke.vedlegg.forEach { vedlegg ->
+                    logger.debug("Cleaning up vedlegg {}", vedlegg.id)
                     kotlin.runCatching {
                         if (fileClient.deleteVedleggFile(vedlegg.ref)) {
-                            klageVedleggFilesSuccessfullyDeleted++
+                            vedleggFilesSuccessfullyDeleted++
                         }
-                        vedlegg.id?.let { vedleggId -> vedleggRepository.deleteVedleggFromKlage(vedleggId) }
-                        klageVedleggSuccessfullyDeleted++
                     }.onFailure { failure ->
                         logger.error("Could not remove attachment ${vedlegg.id}. See secure logs for details.")
                         secureLogger.error("Failed to remove attachment", failure)
@@ -70,8 +80,22 @@ class DraftCleanupService(
                         )
                     }
                 }
-                it.id.let { klageId -> klageRepository.updateStatus(klageId.toString(), KlageAnkeStatus.DELETED)}
-                klagerSuccessfullyDeleted++
+                vedleggSuccessfullyDeleted += klanke.vedlegg.size
+                klanke.vedlegg.clear()
+
+                when (klanke) {
+                    is Klage -> {
+                        commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
+                        klagerSuccessfullyDeleted++
+                    }
+                    is Anke -> {
+                        commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
+                        ankerSuccessfullyDeleted++
+                    }
+
+                    else -> {}
+                }
+
             }.onFailure { failure ->
                 logger.error("Could not clean up draft. See secure logs for details.")
                 secureLogger.error("Failed to clean up draft", failure)
@@ -82,34 +106,17 @@ class DraftCleanupService(
             }
         }
 
-        val oldAnkeDrafts = ankeRepository.getExpiredDraftAnker()
-        val expiredAnker = oldAnkeDrafts.count()
-        logger.debug("Found $expiredAnker expired draft anker")
-        slackClient.postMessage("Fant $expiredAnker utgåtte draft-anker")
+        if (expiredKlankeCount > 0) {
+            val cleanupDoneMessage = """
+                Removed $vedleggFilesSuccessfullyDeleted files in file storage.
+                Removed $vedleggSuccessfullyDeleted vedlegg in db. 
+                Removed $klagerSuccessfullyDeleted klage drafts in db.
+                Removed $ankerSuccessfullyDeleted anke drafts in db.
+            """.trimIndent()
 
-        oldAnkeDrafts.forEach {
-            logger.debug("Cleaning up expired draft anke ${it.id}")
-            runCatching {
-                ankeRepository.updateStatus(it.id, KlageAnkeStatus.DELETED)
-                ankerSuccessfullyDeleted++
-            }.onFailure { failure ->
-                logger.error("Could not clean up draft. See secure logs for details.")
-                secureLogger.error("Failed to clean up draft", failure)
-                slackClient.postMessage(
-                    "Kunne ikke fjerne utgått utkast! " +
-                            "(${causeClass(rootCause(failure))})", Severity.ERROR
-                )
-            }
-        }
+            logger.debug(cleanupDoneMessage)
+            slackClient.postMessage(cleanupDoneMessage)
 
-        if (expiredAnker > 0) {
-            logger.debug("Removed $ankerSuccessfullyDeleted draft anker in db")
-            slackClient.postMessage("Fjernet $ankerSuccessfullyDeleted draft-anker i database")
-        }
-
-        if (expiredKlager > 0) {
-            logger.debug("Removed $klageVedleggFilesSuccessfullyDeleted files in file storage, $klageVedleggSuccessfullyDeleted vedlegg in db and $klagerSuccessfullyDeleted draft klager in db")
-            slackClient.postMessage("Fjernet $klageVedleggFilesSuccessfullyDeleted filer i GCP, $klageVedleggSuccessfullyDeleted vedlegg i database og $klagerSuccessfullyDeleted draft-klager i database")
         }
     }
 }

@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion = "0.45.0"
-val mockkVersion = "1.13.8"
 val h2Version = "2.2.224"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
@@ -14,9 +13,12 @@ val resilience4jVersion = "2.2.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.10.2"
 val springDocVersion = "2.3.0"
-val kodeverkVersion = "1.5.5"
+val kodeverkVersion = "1.7.28"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
+val testContainersVersion = "1.19.3"
+val mockkVersion = "1.13.8"
+val springMockkVersion = "4.0.2"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -33,6 +35,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.springframework.boot") version "3.2.1"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
     idea
 }
 
@@ -45,6 +48,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
@@ -53,8 +57,6 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
-    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.postgresql:postgresql")
 
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
@@ -84,12 +86,19 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
-    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
+
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
+        exclude(group = "org.mockito")
     }
-    testImplementation("org.mockito:mockito-inline:$mockitoInlineVersion")
+
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
+
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 }
 

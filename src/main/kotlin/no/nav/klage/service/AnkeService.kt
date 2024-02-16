@@ -1,118 +1,120 @@
 package no.nav.klage.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.controller.view.OpenAnkeInput
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.Event
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.anke.*
-import no.nav.klage.domain.exception.KlageIsFinalizedException
+import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.Tema
+import no.nav.klage.domain.anke.AnkeFullInput
+import no.nav.klage.domain.anke.AnkeInput
+import no.nav.klage.domain.jpa.Anke
+import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.domain.titles.Innsendingsytelse
-import no.nav.klage.domain.vedlegg.toVedleggView
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.repository.AnkeRepository
+import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
 @Transactional
 class AnkeService(
+    private val klankeRepository: KlankeRepository,
     private val ankeRepository: AnkeRepository,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
-    private val vedleggService: VedleggService,
     private val fileClient: FileClient,
-    private val brukerService: BrukerService,
     private val validationService: ValidationService,
-    private val kafkaInternalEventService: KafkaInternalEventService,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
+    private val commonService: CommonService,
 ) {
-
     companion object {
         private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        val objectMapper: ObjectMapper = jacksonObjectMapper()
     }
 
-    fun getAnke(ankeId: UUID, bruker: Bruker): AnkeView {
-        val anke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(anke, false)
-        validationService.validateAnkeAccess(anke, bruker)
-        return anke.toAnkeView(bruker = bruker)
-    }
-
-    fun validateAccess(ankeId: UUID, bruker: Bruker) {
-        val anke = ankeRepository.getAnkeById(ankeId)
-        validationService.validateAnkeAccess(anke, bruker)
-    }
-
-    fun getDraftAnkerByFnr(bruker: Bruker): List<AnkeView> {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-        val anker = ankeRepository.getDraftAnkerByFnr(fnr)
-        return anker.map { it.toAnkeView(bruker) }
-    }
-
-    private fun getLatestDraftAnkeByParams(
-        bruker: Bruker,
-        innsendingsytelse: Innsendingsytelse,
-    ): AnkeView? {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
-
-        val anke =
-            ankeRepository.getLatestAnkeDraft(
-                fnr = fnr,
-                innsendingsytelse = innsendingsytelse
-            )
-        if (anke != null) {
-            validationService.validateAnkeAccess(anke, bruker)
-            return anke.toAnkeView(bruker)
+    fun createAnke(input: AnkeFullInput, bruker: Bruker): Anke {
+        val anke = input.toAnke(bruker = bruker)
+        return ankeRepository.save(anke).also {
+            updateMetrics(input = anke)
         }
-        return null
     }
 
-    private fun createAnkeViewAndUpdateMetrics(input: Anke, bruker: Bruker): AnkeView {
-        return input.toAnkeView(bruker)
-            .also {
-                val temaReport = if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
-                    LOENNSKOMPENSASJON_GRAFANA_TEMA
-                } else {
-                    input.innsendingsytelse.toTema().toString()
-                }
-                klageAnkeMetrics.incrementAnkerInitialized(temaReport)
-            }
+    fun createAnke(input: AnkeInput, bruker: Bruker): Anke {
+        val anke = input.toAnke(bruker = bruker)
+        return ankeRepository.save(anke).also {
+            updateMetrics(input = anke)
+        }
     }
 
-    fun createAnke(input: AnkeFullInput, bruker: Bruker): AnkeView {
-        return createAnkeViewAndUpdateMetrics(
-            input = ankeRepository.createAnke(ankeFullInput = input, bruker = bruker),
-            bruker = bruker
+    fun AnkeFullInput.toAnke(bruker: Bruker): Anke {
+        return Anke(
+            foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            fritekst = fritekst,
+            status = KlageAnkeStatus.DRAFT,
+            tema = innsendingsytelse.toTema(),
+            userSaksnummer = userSaksnummer,
+            journalpostId = null,
+            vedtakDate = vedtakDate,
+            internalSaksnummer = internalSaksnummer,
+            language = language,
+            innsendingsytelse = innsendingsytelse,
+            hasVedlegg = hasVedlegg,
+            created = LocalDateTime.now(),
+            modifiedByUser = LocalDateTime.now(),
+            pdfDownloaded = null,
+            enhetsnummer = enhetsnummer,
         )
     }
 
-    fun createAnke(input: AnkeInput, bruker: Bruker): AnkeView {
-        return createAnkeViewAndUpdateMetrics(
-            input = ankeRepository.createAnke(ankeInput = input, bruker = bruker),
-            bruker = bruker
+    fun AnkeInput.toAnke(bruker: Bruker): Anke {
+        return Anke(
+            foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            fritekst = null,
+            status = KlageAnkeStatus.DRAFT,
+            tema = innsendingsytelse.toTema(),
+            userSaksnummer = null,
+            journalpostId = null,
+            vedtakDate = null,
+            internalSaksnummer = internalSaksnummer,
+            language = LanguageEnum.NB,
+            innsendingsytelse = innsendingsytelse,
+            hasVedlegg = false,
+            created = LocalDateTime.now(),
+            modifiedByUser = LocalDateTime.now(),
+            pdfDownloaded = null,
+            enhetsnummer = null,
         )
     }
 
-    fun getDraftOrCreateAnke(input: AnkeInput, bruker: Bruker): AnkeView {
-        val existingAnke = getLatestDraftAnkeByParams(
+    private fun updateMetrics(input: Anke) {
+        val temaReport = if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
+            LOENNSKOMPENSASJON_GRAFANA_TEMA
+        } else {
+            input.innsendingsytelse.toTema().toString()
+        }
+        klageAnkeMetrics.incrementKlagerInitialized(temaReport)
+    }
+
+    fun getDraftOrCreateAnke(input: AnkeInput, bruker: Bruker): Anke {
+        val existingAnke = getLatestAnkeDraft(
             bruker = bruker,
+            tema = input.innsendingsytelse.toTema(),
+            internalSaksnummer = input.internalSaksnummer,
             innsendingsytelse = input.innsendingsytelse,
         )
 
@@ -122,166 +124,53 @@ class AnkeService(
         )
     }
 
-    fun updateFritekst(ankeId: UUID, fritekst: String, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
-            .updateFritekst(ankeId, fritekst)
-            .toAnkeView(bruker)
-            .modifiedByUser
+    private fun getLatestAnkeDraft(
+        bruker: Bruker,
+        tema: Tema,
+        internalSaksnummer: String?,
+        innsendingsytelse: Innsendingsytelse,
+    ): Anke? {
+        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
+
+        val anke = ankeRepository.findByFoedselsnummerAndStatus(fnr = fnr, status = KlageAnkeStatus.DRAFT)
+            .filter {
+                if (internalSaksnummer != null) {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                } else {
+                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                }
+            }.maxByOrNull { it.modifiedByUser }
+
+        return if (anke != null) {
+            validationService.validateAnkeAccess(anke = anke, bruker = bruker)
+            anke
+        } else null
     }
 
-    fun updateUserSaksnummer(ankeId: UUID, userSaksnummer: String?, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
-            .updateUserSaksnummer(ankeId, userSaksnummer)
-            .toAnkeView(bruker)
-            .modifiedByUser
-    }
-
-    fun updateEnhetsnummer(ankeId: UUID, enhetsnummer: String?, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
-            .updateEnhetsnummer(ankeId, enhetsnummer)
-            .toAnkeView(bruker)
-            .modifiedByUser
-    }
-
-    fun updateVedtakDate(ankeId: UUID, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
-            .updateVedtakDate(ankeId, vedtakDate)
-            .toAnkeView(bruker)
-            .modifiedByUser
-    }
-
-    fun updateHasVedlegg(ankeId: UUID, hasVedlegg: Boolean, bruker: Bruker): LocalDateTime {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        return ankeRepository
-            .updateHasVedlegg(ankeId, hasVedlegg)
-            .toAnkeView(bruker)
-            .modifiedByUser
-    }
-
-    fun deleteAnke(ankeId: UUID, bruker: Bruker) {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        ankeRepository.updateStatus(ankeId, KlageAnkeStatus.DELETED)
-    }
-
-    fun createAnkePdfWithFoersteside(ankeId: UUID, bruker: Bruker): ByteArray? {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        validationService.validateAnke(existingAnke)
-
-        klageDittnavPdfgenService.createAnkePdfWithFoersteside(
-            createPdfWithFoerstesideInput(existingAnke, bruker)
-        ).also {
-            setPdfDownloadedWithoutAccessValidation(ankeId, Instant.now())
-            return it
-        }
-    }
-
-    private fun setPdfDownloadedWithoutAccessValidation(ankeId: UUID, pdfDownloaded: Instant?) {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke)
-        ankeRepository.updatePdfDownloaded(ankeId, pdfDownloaded)
-    }
-
-    fun Anke.toAnkeView(bruker: Bruker): AnkeView {
-        val modifiedDateTime =
-            ZonedDateTime.ofInstant((modifiedByUser ?: Instant.now()), ZoneId.of("Europe/Oslo")).toLocalDateTime()
-        return AnkeView(
-            id = id.toString(),
-            fritekst = fritekst ?: "",
-            status = status,
-            modifiedByUser = modifiedDateTime,
-            vedtakDate = vedtakDate,
-            userSaksnummer = userSaksnummer,
-            language = language,
-            innsendingsytelse = innsendingsytelse,
-            hasVedlegg = hasVedlegg,
-            enhetsnummer = enhetsnummer,
-            vedlegg = vedlegg.map { it.toVedleggView() },
-            journalpostId = journalpostId,
-            finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedDateTime.toLocalDate() else null,
-            internalSaksnummer = internalSaksnummer,
-        )
-    }
-
-    fun createPdfWithFoerstesideInput(anke: Anke, bruker: Bruker): OpenAnkeInput {
-        return OpenAnkeInput(
-            foedselsnummer = anke.foedselsnummer,
-            navn = bruker.navn,
-            fritekst = anke.fritekst!!,//should already be validated
-            userSaksnummer = anke.userSaksnummer,
-            internalSaksnummer = anke.internalSaksnummer,
-            vedtakDate = anke.vedtakDate,
-            innsendingsytelse = anke.innsendingsytelse,
-            enhetsnummer = anke.enhetsnummer!!,//should already be validated
-            language = anke.language,
-            hasVedlegg = anke.vedlegg.isNotEmpty() || anke.hasVedlegg,
-        )
-    }
-
-    fun getJournalpostId(ankeId: UUID, bruker: Bruker): String? {
-        val anke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(anke, false)
-        validationService.validateAnkeAccess(anke, bruker)
-        return anke.journalpostId
-    }
-
-    fun setJournalpostIdWithoutValidation(ankeId: UUID, journalpostId: String) {
-        ankeRepository.updateJournalpostId(ankeId, journalpostId)
-        kafkaInternalEventService.publishEvent(
-            Event(
-                klageAnkeId = ankeId.toString(),
-                name = "journalpostId",
-                id = ankeId.toString(),
-                data = journalpostId,
-            )
-        )
-    }
-
-    fun finalizeAnke(ankeId: UUID, bruker: Bruker): Instant {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(
-            anke = existingAnke,
-            includeFinalized = false
-        )
+    fun finalizeAnke(ankeId: UUID, bruker: Bruker): LocalDateTime {
+        val existingAnke = klankeRepository.findById(ankeId).get() as Anke
+        validationService.checkKlankeStatus(klanke = existingAnke, includeFinalized = false)
 
         if (existingAnke.isFinalized()) {
             return existingAnke.modifiedByUser
-                ?: throw KlageIsFinalizedException("No modified date after finalize anke")
         }
 
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        validationService.validateAnke(existingAnke)
+        validationService.validateKlankeAccess(klanke = existingAnke, bruker = bruker)
+        validationService.validateAnke(anke = existingAnke)
 
-        val updatedAnke = ankeRepository.updateStatus(ankeId, KlageAnkeStatus.DONE)
-        kafkaProducer.sendToKafka(createAggregatedAnke(bruker, updatedAnke))
-        registerFinalizedMetrics(updatedAnke)
+        existingAnke.status = KlageAnkeStatus.DONE
+        existingAnke.modifiedByUser = LocalDateTime.now()
 
-        val ankeIdAsString = ankeId.toString()
+        kafkaProducer.sendToKafka(createAggregatedAnke(bruker = bruker, anke = existingAnke))
+        registerFinalizedMetrics(anke = existingAnke)
+
         logger.debug(
-            "Anke {} med tema {} er sendt inn",
-            ankeIdAsString,
+            "Anke {} med tema {} er sendt inn.",
+            ankeId,
             existingAnke.tema.name,
         )
 
-        //TODO new exception
-        return updatedAnke.modifiedByUser ?: throw KlageIsFinalizedException("No modified date after finalize anke")
+        return existingAnke.modifiedByUser
     }
 
     private fun registerFinalizedMetrics(anke: Anke) {
@@ -301,9 +190,31 @@ class AnkeService(
         vedleggMetrics.registerNumberOfVedleggPerUser(anke.vedlegg.size.toDouble())
     }
 
+    fun getAnkePdf(ankeId: UUID, bruker: Bruker): ByteArray {
+        val existingAnke = ankeRepository.findById(ankeId).get()
+        validationService.checkKlankeStatus(klanke = existingAnke, includeFinalized = false)
+        validationService.validateKlankeAccess(klanke = existingAnke, bruker = bruker)
+        requireNotNull(existingAnke.journalpostId)
+        return fileClient.getKlageAnkeFile(existingAnke.journalpostId!!)
+    }
+
+    fun createAnkePdfWithFoersteside(ankeId: UUID, bruker: Bruker): ByteArray? {
+        val existingAnke = ankeRepository.findById(ankeId).get()
+        validationService.checkKlankeStatus(klanke = existingAnke, includeFinalized = false)
+        validationService.validateKlankeAccess(klanke = existingAnke, bruker = bruker)
+        validationService.validateAnke(anke = existingAnke)
+
+        klageDittnavPdfgenService.createAnkePdfWithFoersteside(
+            createPdfWithFoerstesideInput(anke = existingAnke, bruker)
+        ).also {
+            commonService.setPdfDownloadedWithoutAccessValidation(klankeId = ankeId, pdfDownloaded = LocalDateTime.now())
+            return it
+        }
+    }
+
     private fun createAggregatedAnke(
         bruker: Bruker,
-        anke: Anke,
+        anke: Anke
     ): AggregatedKlageAnke {
         val vedtak = vedtakFromDate(anke.vedtakDate)
 
@@ -313,30 +224,54 @@ class AnkeService(
             mellomnavn = bruker.navn.mellomnavn ?: "",
             etternavn = bruker.navn.etternavn,
             vedtak = vedtak ?: "",
-            dato = ZonedDateTime.ofInstant(anke.modifiedByUser, ZoneOffset.UTC).toLocalDate(),
+            dato = anke.modifiedByUser.toLocalDate(),
             begrunnelse = sanitizeText(anke.fritekst!!),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema = anke.tema.name,
             ytelse = anke.innsendingsytelse.nb,
             vedlegg = anke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
+            userChoices = null,
             userSaksnummer = anke.userSaksnummer,
             internalSaksnummer = anke.internalSaksnummer,
-            enhetsnummer = anke.enhetsnummer,
             klageAnkeType = AggregatedKlageAnke.KlageAnkeType.ANKE,
+            enhetsnummer = anke.enhetsnummer,
         )
     }
 
-    fun getAnkePdf(ankeId: UUID, bruker: Bruker): ByteArray {
-        val existingAnke = ankeRepository.getAnkeById(ankeId)
-        validationService.checkAnkeStatus(existingAnke, false)
-        validationService.validateAnkeAccess(existingAnke, bruker)
-        requireNotNull(existingAnke.journalpostId)
-        return fileClient.getKlageAnkeFile(existingAnke.journalpostId)
+    fun createPdfWithFoerstesideInput(anke: Anke, bruker: Bruker): OpenAnkeInput {
+        return OpenAnkeInput(
+            foedselsnummer = anke.foedselsnummer,
+            navn = bruker.navn,
+            fritekst = anke.fritekst!!,
+            userSaksnummer = anke.userSaksnummer,
+            internalSaksnummer = anke.internalSaksnummer,
+            vedtakDate = anke.vedtakDate,
+            innsendingsytelse = anke.innsendingsytelse,
+            language = anke.language,
+            hasVedlegg = anke.vedlegg.isNotEmpty() || anke.hasVedlegg,
+            enhetsnummer = anke.enhetsnummer!!,
+        )
     }
 
-    fun getJournalpostIdWithoutValidation(ankeId: UUID): String? {
-        val anke = ankeRepository.getAnkeById(ankeId)
-        return anke.journalpostId
+    fun updateEnhetsnummer(
+        ankeId: UUID,
+        enhetsnummer: String?,
+        bruker: Bruker
+    ): LocalDateTime {
+        val existingAnke = ankeRepository.findById(ankeId).get()
+        validationService.checkKlankeStatus(existingAnke)
+        validationService.validateKlankeAccess(existingAnke, bruker)
+
+        existingAnke.enhetsnummer = enhetsnummer
+        existingAnke.modifiedByUser = LocalDateTime.now()
+
+        return existingAnke.modifiedByUser
     }
 
+    fun getAnkeDraftsByFnr(bruker: Bruker): List<Anke> {
+        return ankeRepository.findByFoedselsnummerAndStatus(
+            fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            status = KlageAnkeStatus.DRAFT
+        )
+    }
 }

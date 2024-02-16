@@ -1,9 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.controller.view.OpenAnkeInput
-import no.nav.klage.controller.view.OpenEttersendelseInput
-import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.controller.view.*
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger

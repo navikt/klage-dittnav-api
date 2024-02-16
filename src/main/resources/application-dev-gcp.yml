@@ -20,7 +20,7 @@ FSS_CLUSTER: dev-fss
 #STS_APIKEY
 #PDL_APIKEY
 
-DRAFT_CLEANUP_CRON: 0 0 14 * * FRI
+DRAFT_CLEANUP_CRON: 0 13 13 * * *
 MAX_DRAFT_AGE_IN_DAYS: 90
 
 TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
@@ -28,4 +28,4 @@ TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 spring:
   datasource:
     hikari:
-      maximum-pool-size: 4
+      maximum-pool-size: 5

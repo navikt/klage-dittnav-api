@@ -1,32 +1,16 @@
 package no.nav.klage.service
 
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.anke.Anke
-import no.nav.klage.domain.anke.isAccessibleToUser
-import no.nav.klage.domain.anke.isDeleted
-import no.nav.klage.domain.anke.isFinalized
 import no.nav.klage.domain.exception.*
-import no.nav.klage.domain.klage.Klage
-import no.nav.klage.domain.klage.isAccessibleToUser
-import no.nav.klage.domain.klage.isDeleted
-import no.nav.klage.domain.klage.isFinalized
+import no.nav.klage.domain.jpa.*
 import org.springframework.stereotype.Service
 
 @Service
-class ValidationService(
-    private val brukerService: BrukerService
-) {
+class ValidationService {
 
     fun validateKlageAccess(klage: Klage, bruker: Bruker) {
-        if (klage.fullmektig != null && klage.fullmektig == bruker.folkeregisteridentifikator.identifikasjonsnummer) {
-            val fullmaktsGiver = brukerService.getFullmaktsgiver(klage.tema, klage.foedselsnummer)
-            if (!klage.isAccessibleToUser(fullmaktsGiver.folkeregisteridentifikator.identifikasjonsnummer)) {
-                throw KlageNotFoundException()
-            }
-        } else {
-            if (!klage.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
-                throw KlageNotFoundException()
-            }
+        if (!klage.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            throw KlageNotFoundException()
         }
     }
 
@@ -36,23 +20,29 @@ class ValidationService(
         }
     }
 
-    fun checkKlageStatus(klage: Klage, includeFinalized: Boolean = true) {
-        if (klage.isDeleted()) {
-            throw KlageIsDeletedException()
-        }
-
-        if (includeFinalized && klage.isFinalized()) {
-            throw KlageIsFinalizedException()
+    fun validateKlankeAccess(klanke: Klanke, bruker: Bruker) {
+        if (!klanke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+            when (klanke) {
+                is Klage -> throw KlageNotFoundException()
+                is Anke -> throw AnkeNotFoundException()
+            }
         }
     }
 
-    fun checkAnkeStatus(anke: Anke, includeFinalized: Boolean = true) {
-        if (anke.isDeleted()) {
-            throw AnkeIsDeletedException()
+    fun checkKlankeStatus(klanke: Klanke, includeFinalized: Boolean = true) {
+        if (klanke.isDeleted()) {
+            when (klanke) {
+                is Klage -> throw KlageIsDeletedException()
+                is Anke -> throw AnkeIsDeletedException()
+            }
         }
 
-        if (includeFinalized && anke.isFinalized()) {
-            throw AnkeIsFinalizedException()
+        if (includeFinalized && klanke.isFinalized()) {
+            when (klanke) {
+                is Klage -> throw KlageIsFinalizedException()
+                is Anke -> throw AnkeIsFinalizedException()
+            }
+
         }
     }
 

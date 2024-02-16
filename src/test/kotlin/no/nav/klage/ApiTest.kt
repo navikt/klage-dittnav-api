@@ -1,6 +1,8 @@
 package no.nav.klage
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import no.nav.klage.controller.view.AuthenticationStatus
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
@@ -11,15 +13,14 @@ import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.MockMvc
@@ -39,23 +40,21 @@ class ApiTest {
     @Autowired
     lateinit var server: MockOAuth2Server
 
-    @MockBean
+    @MockkBean
     lateinit var brukerService: BrukerService
 
     private val FNR = "12345678910"
 
     val mapper = jacksonObjectMapper()
 
-    @BeforeAll
+    @BeforeEach
     fun beforeEach() {
-        Mockito.`when`(brukerService.getBruker()).thenReturn(
-            Bruker(
-                navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-                adresse = null,
-                kontaktinformasjon = null,
-                folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
-                tokenExpires = null,
-            )
+        every { brukerService.getBruker() } returns Bruker(
+            navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
+            adresse = null,
+            kontaktinformasjon = null,
+            folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
+            tokenExpires = null,
         )
     }
 
