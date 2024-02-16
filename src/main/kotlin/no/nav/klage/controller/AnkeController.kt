@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import java.time.Duration
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 
 @RestController
@@ -305,7 +303,12 @@ class AnkeController(
             vedleggId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (!vedleggService.deleteVedleggFromAnke(ankeId = ankeId, vedleggId = vedleggId, bruker = bruker)) {
+        if (!vedleggService.deleteVedleggFromKlanke(
+                klankeId = ankeId,
+                vedleggId = vedleggId,
+                bruker = bruker
+            )
+        ) {
             //TODO is there a reason for this choice of exception?
             throw AnkeNotFoundException("Attachment not found.")
         }

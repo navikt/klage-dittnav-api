@@ -6,7 +6,6 @@ import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.jpa.Anke
 import no.nav.klage.domain.jpa.Klage
 import no.nav.klage.domain.jpa.Vedlegg
-import no.nav.klage.controller.view.VedleggView
 import no.nav.klage.repository.AnkeRepository
 import no.nav.klage.repository.KlageRepository
 import no.nav.klage.util.getLogger
@@ -87,29 +86,15 @@ class VedleggService(
         return vedleggToSave
     }
 
-    fun deleteVedleggFromKlage(klageId: UUID, vedleggId: UUID, bruker: Bruker): Boolean {
-        val existingKlage = klageRepository.findById(klageId).get()
-        validationService.checkKlankeStatus(existingKlage)
-        validationService.validateKlankeAccess(existingKlage, bruker)
+    fun deleteVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): Boolean {
+        val existingKlanke = klageRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
 
-        val vedlegg = existingKlage.vedlegg.find { it.id == vedleggId }
-
-        if (vedlegg != null) {
-            return fileClient.deleteVedleggFile(vedlegg.ref)
-        } else {
-            logger.error("No vedlegg found with this id: $vedleggId")
-            return false
-        }
-    }
-
-    fun deleteVedleggFromAnke(ankeId: UUID, vedleggId: UUID, bruker: Bruker): Boolean {
-        val existingAnke = ankeRepository.findById(ankeId).get()
-        validationService.checkKlankeStatus(existingAnke)
-        validationService.validateKlankeAccess(existingAnke, bruker)
-
-        val vedlegg = existingAnke.vedlegg.find { it.id == vedleggId }
+        val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
         if (vedlegg != null) {
+            existingKlanke.vedlegg.remove(vedlegg)
             return fileClient.deleteVedleggFile(vedlegg.ref)
         } else {
             logger.error("No vedlegg found with this id: $vedleggId")
