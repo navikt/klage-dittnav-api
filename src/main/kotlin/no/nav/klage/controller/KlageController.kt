@@ -5,12 +5,12 @@ import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
 import no.nav.klage.domain.exception.KlageNotFoundException
+import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.klage.KlageFullInput
 import no.nav.klage.domain.klage.KlageInput
-import no.nav.klage.controller.view.KlageView
-import no.nav.klage.controller.view.VedleggView
-import no.nav.klage.domain.*
-import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.toHeartBeatServerSentEvent
+import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.CommonService
 import no.nav.klage.service.KlageService
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 @RestController
 @Tag(name = "klager")
@@ -303,7 +303,12 @@ class KlageController(
             vedleggId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        if (!vedleggService.deleteVedleggFromKlage(klageId, vedleggId, bruker)) {
+        if (!vedleggService.deleteVedleggFromKlanke(
+                klankeId = klageId,
+                vedleggId = vedleggId,
+                bruker = bruker
+            )
+        ) {
             throw KlageNotFoundException("Attachment not found.")
         }
     }
