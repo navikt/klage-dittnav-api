@@ -60,7 +60,7 @@ class CommonService(
 
     fun KlankeFullInput.toKlanke(bruker: Bruker): Klanke {
         return Klanke(
-            checkboxesSelected = checkboxesSelected.toMutableList(),
+            checkboxesSelected = checkboxesSelected?.toMutableList() ?: mutableListOf(),
             foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             fritekst = fritekst,
             status = KlageAnkeStatus.DRAFT,
