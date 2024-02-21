@@ -186,7 +186,7 @@ class CommonService(
         existingKlanke.status = KlageAnkeStatus.DONE
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        kafkaProducer.sendToKafka(createAggregatedKlanke(bruker = bruker, klage = existingKlanke))
+        kafkaProducer.sendToKafka(createAggregatedKlanke(bruker = bruker, klanke = existingKlanke))
         registerFinalizedMetrics(klanke = existingKlanke)
 
         logger.debug(
@@ -256,27 +256,27 @@ class CommonService(
 
     private fun createAggregatedKlanke(
         bruker: Bruker,
-        klage: Klanke
+        klanke: Klanke
     ): AggregatedKlageAnke {
-        val vedtak = vedtakFromDate(klage.vedtakDate)
+        val vedtak = vedtakFromDate(klanke.vedtakDate)
 
         return AggregatedKlageAnke(
-            id = klage.id.toString(),
+            id = klanke.id.toString(),
             fornavn = bruker.navn.fornavn,
             mellomnavn = bruker.navn.mellomnavn ?: "",
             etternavn = bruker.navn.etternavn,
             vedtak = vedtak ?: "",
-            dato = klage.modifiedByUser.toLocalDate(),
-            begrunnelse = sanitizeText(klage.fritekst!!),
+            dato = klanke.modifiedByUser.toLocalDate(),
+            begrunnelse = sanitizeText(klanke.fritekst!!),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            tema = klage.tema.name,
-            ytelse = klage.innsendingsytelse.nb,
-            vedlegg = klage.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
-            userChoices = klage.checkboxesSelected.map { x -> x.getFullText(klage.language) },
-            userSaksnummer = klage.userSaksnummer,
-            internalSaksnummer = klage.internalSaksnummer,
-            klageAnkeType = AggregatedKlageAnke.KlageAnkeType.KLAGE,
-            enhetsnummer = null,
+            tema = klanke.tema.name,
+            ytelse = klanke.innsendingsytelse.nb,
+            vedlegg = klanke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
+            userChoices = klanke.checkboxesSelected.map { x -> x.getFullText(klanke.language) },
+            userSaksnummer = klanke.userSaksnummer,
+            internalSaksnummer = klanke.internalSaksnummer,
+            klageAnkeType = AggregatedKlageAnke.KlageAnkeType.valueOf(klanke.type.name),
+            enhetsnummer = klanke.enhetsnummer,
         )
     }
 
