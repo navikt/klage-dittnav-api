@@ -4,9 +4,8 @@ package no.nav.klage.service
 import io.mockk.mockk
 import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.*
-import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.titles.Innsendingsytelse
-import no.nav.klage.repository.KlageRepository
 import no.nav.klage.repository.KlankeRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -23,7 +22,7 @@ import java.time.LocalDateTime
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class KlageServiceTest {
+class CommonServiceTest {
 
     companion object {
         @Container
@@ -45,52 +44,41 @@ class KlageServiceTest {
     private val innsendingsytelseAndNoInternalSaksnummer = "innsendingsytelse and no internalSaksnummer"
 
     @Autowired
-    private lateinit var klageRepository: KlageRepository
-
-    @Autowired
     private lateinit var klankeRepository: KlankeRepository
 
-    private lateinit var klageService: KlageService
     private lateinit var commonService: CommonService
 
     @BeforeEach
     fun cleanup() {
-        klageRepository.deleteAll()
+        klankeRepository.deleteAll()
 
         commonService = CommonService(
             klankeRepository = klankeRepository,
             validationService = mockk(relaxed = true),
             kafkaInternalEventService = mockk(),
-        )
-
-        klageService = KlageService(
-            klankeRepository = klankeRepository,
-            klageRepository = klageRepository,
             klageAnkeMetrics = mockk(),
             vedleggMetrics = mockk(),
             kafkaProducer = mockk(),
             fileClient = mockk(),
-            validationService = mockk(relaxed = true),
             klageDittnavPdfgenService = mockk(),
-            commonService = commonService,
         )
-
     }
 
     @Test
     fun `should get correct klage based on internalSaksnummer and innsendingsytelse`() {
         createDBEntries()
 
-        val hentetKlage = klageService.getLatestKlageDraft(
-            Bruker(
+        val hentetKlage = commonService.getLatestKlankeDraft(
+            bruker = Bruker(
                 navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
                 adresse = null,
                 folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
                 kontaktinformasjon = null,
             ),
-            exampleTema,
-            exampleInternalSaksnummer,
-            exampleInnsendingsytelse
+            tema = exampleTema,
+            internalSaksnummer = exampleInternalSaksnummer,
+            innsendingsytelse = exampleInnsendingsytelse,
+            type = Type.KLAGE,
         )
         assertEquals(innsendingsytelseAndInternalSaksnummer, hentetKlage?.fritekst)
     }
@@ -99,7 +87,7 @@ class KlageServiceTest {
     fun `should get correct klage based on no internalSaksnummer and innsendingsytelse`() {
         createDBEntries()
 
-        val hentetKlage = klageService.getLatestKlageDraft(
+        val hentetKlage = commonService.getLatestKlankeDraft(
             Bruker(
                 navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
                 adresse = null,
@@ -108,7 +96,8 @@ class KlageServiceTest {
             ),
             tema = exampleTema,
             internalSaksnummer = null,
-            innsendingsytelse = exampleInnsendingsytelse
+            innsendingsytelse = exampleInnsendingsytelse,
+            type = Type.KLAGE,
         )
         assertEquals(innsendingsytelseAndNoInternalSaksnummer, hentetKlage?.fritekst)
     }
@@ -117,16 +106,17 @@ class KlageServiceTest {
     fun `should get latest klage`() {
         createTwoSimilarEntries()
 
-        val hentetKlage = klageService.getLatestKlageDraft(
-            Bruker(
+        val hentetKlage = commonService.getLatestKlankeDraft(
+            bruker = Bruker(
                 navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
                 adresse = null,
                 folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
                 kontaktinformasjon = null,
             ),
-            exampleTema,
-            exampleInternalSaksnummer,
-            exampleInnsendingsytelse
+            tema = exampleTema,
+            internalSaksnummer = exampleInternalSaksnummer,
+            innsendingsytelse = exampleInnsendingsytelse,
+            type = Type.KLAGE,
         )
         assertEquals(exampleFritekst2, hentetKlage?.fritekst)
     }
@@ -135,14 +125,7 @@ class KlageServiceTest {
     fun `updateFritekst works as expected`() {
         createDBEntryWithYtelse()
 
-        val klage = klageService.getKlageDraftsByFnr(
-            bruker = Bruker(
-                navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-                adresse = null,
-                folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
-                kontaktinformasjon = null,
-            )
-        ).first()
+        val klage = klankeRepository.findAll().first()
         commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2, bruker = mockk(relaxed = true))
         val output = commonService.getKlanke(klankeId = klage.id, bruker = mockk(relaxed = true)).fritekst
 
@@ -152,8 +135,8 @@ class KlageServiceTest {
     private fun createTwoSimilarEntries() {
         val now = LocalDateTime.now()
 
-        klageRepository.save(
-            Klage(
+        klankeRepository.save(
+            Klanke(
                 checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst,
@@ -170,11 +153,13 @@ class KlageServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = exampleModifiedByUser,
+                enhetsnummer = null,
+                type = Type.KLAGE,
             )
         )
 
-        klageRepository.save(
-            Klage(
+        klankeRepository.save(
+            Klanke(
                 checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst2,
@@ -191,6 +176,8 @@ class KlageServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = exampleModifiedByUser2,
+                enhetsnummer = null,
+                type = Type.KLAGE,
             )
         )
     }
@@ -199,8 +186,8 @@ class KlageServiceTest {
         var now = LocalDateTime.now()
 
         //innsendingsytelse and internalSaksnummer
-        klageRepository.save(
-            Klage(
+        klankeRepository.save(
+            Klanke(
                 checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = innsendingsytelseAndInternalSaksnummer,
@@ -217,14 +204,16 @@ class KlageServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = now,
+                enhetsnummer = null,
+                type = Type.KLAGE,
             )
         )
 
         now = LocalDateTime.now()
 
         //innsendingsytelse and no internalSaksnummer
-        klageRepository.save(
-            Klage(
+        klankeRepository.save(
+            Klanke(
                 checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = innsendingsytelseAndNoInternalSaksnummer,
@@ -241,14 +230,16 @@ class KlageServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = now,
+                enhetsnummer = null,
+                type = Type.KLAGE,
             )
         )
     }
 
     private fun createDBEntryWithYtelse() {
         val now = LocalDateTime.now()
-        klageRepository.save(
-            Klage(
+        klankeRepository.save(
+            Klanke(
                 checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst,
@@ -265,6 +256,8 @@ class KlageServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = now,
+                enhetsnummer = null,
+                type = Type.KLAGE,
             )
         )
     }

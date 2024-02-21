@@ -4,8 +4,8 @@ import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Tema
-import no.nav.klage.domain.jpa.Anke
-import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.Type
+import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.domain.titles.Innsendingsytelse
 import org.assertj.core.api.Assertions.assertThat
@@ -27,10 +27,6 @@ import java.time.LocalDateTime
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class KlankeRepositoryTest(
     @Autowired
-    private val klageRepository: KlageRepository,
-    @Autowired
-    private val ankeRepository: AnkeRepository,
-    @Autowired
     private val klankeRepository: KlankeRepository,
     @Autowired
     private val testEntityManager: TestEntityManager,
@@ -46,7 +42,7 @@ class KlankeRepositoryTest(
     fun `persist klage works`() {
 
         val klage = testEntityManager.persistAndFlush(
-            Klage(
+            Klanke(
                 checkboxesSelected = mutableListOf(),
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
@@ -63,19 +59,21 @@ class KlankeRepositoryTest(
                 vedlegg = mutableSetOf(),
                 created = LocalDateTime.now(),
                 modifiedByUser = LocalDateTime.now(),
+                type = Type.KLAGE,
+                enhetsnummer = null,
             )
         )
 
         testEntityManager.clear()
 
-        assertThat(klageRepository.findAll().first()).isEqualTo(klage)
+        assertThat(klankeRepository.findAll().first()).isEqualTo(klage)
     }
 
     @Test
     fun `persist anke works`() {
 
         val anke = testEntityManager.persistAndFlush(
-            Anke(
+            Klanke(
                 enhetsnummer = "abc123",
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
@@ -92,19 +90,21 @@ class KlankeRepositoryTest(
                 vedlegg = mutableSetOf(),
                 created = LocalDateTime.now(),
                 modifiedByUser = LocalDateTime.now(),
+                type = Type.ANKE,
+                checkboxesSelected = mutableListOf(),
             )
         )
 
         testEntityManager.clear()
 
-        assertThat(ankeRepository.findAll().first()).isEqualTo(anke)
+        assertThat(klankeRepository.findAll().first()).isEqualTo(anke)
     }
 
     @Test
     fun `persist vedlegg works`() {
 
         val klanke = testEntityManager.persistAndFlush(
-            Anke(
+            Klanke(
                 enhetsnummer = "abc123",
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
@@ -121,6 +121,8 @@ class KlankeRepositoryTest(
                 vedlegg = mutableSetOf(),
                 created = LocalDateTime.now(),
                 modifiedByUser = LocalDateTime.now(),
+                type = Type.ANKE,
+                checkboxesSelected = mutableListOf(),
             )
         )
 
@@ -133,7 +135,7 @@ class KlankeRepositoryTest(
             sizeInBytes = 512,
         )
         klanke.vedlegg += vedlegg
-        ankeRepository.save(klanke)
+        klankeRepository.save(klanke)
 
         testEntityManager.flush()
         testEntityManager.clear()

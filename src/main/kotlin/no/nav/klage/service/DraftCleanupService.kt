@@ -3,8 +3,7 @@ package no.nav.klage.service
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
 import no.nav.klage.domain.KlageAnkeStatus
-import no.nav.klage.domain.jpa.Anke
-import no.nav.klage.domain.jpa.Klage
+import no.nav.klage.domain.Type
 import no.nav.klage.repository.*
 import no.nav.klage.util.causeClass
 import no.nav.klage.util.getLogger
@@ -24,8 +23,6 @@ import java.time.temporal.ChronoUnit
 class DraftCleanupService(
     private val slackClient: SlackClient,
     private val klankeRepository: KlankeRepository,
-    private val klageService: KlageService,
-    private val ankeService: AnkeService,
     private val commonService: CommonService,
     private val fileClient: FileClient,
     @Value("\${MAX_DRAFT_AGE_IN_DAYS}")
@@ -50,7 +47,9 @@ class DraftCleanupService(
         var vedleggSuccessfullyDeleted = 0
 
         var klagerSuccessfullyDeleted = 0
+        var klageettersendelserSuccessfullyDeleted = 0
         var ankerSuccessfullyDeleted = 0
+        var ankeettersendelserSuccessfullyDeleted = 0
 
         val oldKlankeDrafts = klankeRepository.findByStatusAndModifiedByUserLessThan(
             status = KlageAnkeStatus.DRAFT,
@@ -83,17 +82,23 @@ class DraftCleanupService(
                 vedleggSuccessfullyDeleted += klanke.vedlegg.size
                 klanke.vedlegg.clear()
 
-                when (klanke) {
-                    is Klage -> {
+                when (klanke.type) {
+                    Type.KLAGE -> {
                         commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
                         klagerSuccessfullyDeleted++
                     }
-                    is Anke -> {
+                    Type.ANKE -> {
                         commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
                         ankerSuccessfullyDeleted++
                     }
-
-                    else -> {}
+                    Type.KLAGE_ETTERSENDELSE -> {
+                        commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
+                        klageettersendelserSuccessfullyDeleted++
+                    }
+                    Type.ANKE_ETTERSENDELSE -> {
+                        commonService.updateStatusWithoutValidation(klanke.id, KlageAnkeStatus.DELETED)
+                        ankeettersendelserSuccessfullyDeleted++
+                    }
                 }
 
             }.onFailure { failure ->
@@ -112,6 +117,8 @@ class DraftCleanupService(
                 Removed $vedleggSuccessfullyDeleted vedlegg in db. 
                 Removed $klagerSuccessfullyDeleted klage drafts in db.
                 Removed $ankerSuccessfullyDeleted anke drafts in db.
+                Removed $klageettersendelserSuccessfullyDeleted klageettersendelser drafts in db.
+                Removed $ankeettersendelserSuccessfullyDeleted ankeettersendelser drafts in db.
             """.trimIndent()
 
             logger.debug(cleanupDoneMessage)
