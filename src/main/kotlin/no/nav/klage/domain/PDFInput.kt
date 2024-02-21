@@ -26,7 +26,7 @@ data class PDFInput (
 
 fun OpenKlankeInput.toPDFInput(): PDFInput {
     return PDFInput(
-        type = if (type == Type.KLAGE) "klage" else "anke",
+        type = type!!.name,
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
         mellomnavn = navn.mellomnavn,
