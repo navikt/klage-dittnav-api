@@ -111,8 +111,8 @@ class CommonService(
         when (input.type) {
             Type.KLAGE -> klageAnkeMetrics.incrementKlagerInitialized(temaReport)
             Type.ANKE -> klageAnkeMetrics.incrementAnkerInitialized(temaReport)
-            Type.KLAGE_ETTERSENDELSE -> TODO()
-            Type.ANKE_ETTERSENDELSE -> TODO()
+            Type.KLAGE_ETTERSENDELSE -> {} //TODO
+            Type.ANKE_ETTERSENDELSE -> {} //TODO
         }
     }
 
