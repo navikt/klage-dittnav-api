@@ -214,8 +214,8 @@ class CommonService(
             Type.ANKE -> {
                 klageAnkeMetrics.incrementAnkerFinalized(temaReport)
             }
-            Type.KLAGE_ETTERSENDELSE -> TODO()
-            Type.ANKE_ETTERSENDELSE -> TODO()
+            Type.KLAGE_ETTERSENDELSE -> {} //TODO
+            Type.ANKE_ETTERSENDELSE -> {} //TODO
         }
 
 
