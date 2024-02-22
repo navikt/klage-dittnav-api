@@ -35,10 +35,12 @@ class KlageDittnavPdfgenService(
             klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput())
         }
 
-        return if (input.innsendingsytelse != Innsendingsytelse.LONNSGARANTI && input.type == Type.KLAGE) {
-            val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
-            mergeDocuments(foerstesidePDF, klankePDF)
-        } else klankePDF
+        if (input.innsendingsytelse == Innsendingsytelse.LONNSGARANTI && input.type == Type.KLAGE) {
+            return klankePDF
+        }
+
+        val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
+        return mergeDocuments(foerstesidePDF, klankePDF)
     }
 
     fun createFoerstesideForEttersendelse(input: OpenEttersendelseInput): ByteArray {

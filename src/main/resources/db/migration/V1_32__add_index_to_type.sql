@@ -1,0 +1,1 @@
+CREATE INDEX klanke_type_idx ON klanke (klanke_type);
