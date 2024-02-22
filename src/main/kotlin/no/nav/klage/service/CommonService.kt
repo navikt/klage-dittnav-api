@@ -344,11 +344,11 @@ class CommonService(
     }
 
     fun updateEnhetsnummer(
-        ankeId: UUID,
+        klankeId: UUID,
         enhetsnummer: String?,
         bruker: Bruker
     ): LocalDateTime {
-        val existingAnke = klankeRepository.findById(ankeId).get()
+        val existingAnke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingAnke)
         validationService.validateKlankeAccess(existingAnke, bruker)
 
@@ -356,15 +356,6 @@ class CommonService(
         existingAnke.modifiedByUser = LocalDateTime.now()
 
         return existingAnke.modifiedByUser
-    }
-
-    fun updateJournalpostId(klankeId: UUID, journalpostId: String, bruker: Bruker): LocalDateTime {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
-
-        existingKlanke.journalpostId = journalpostId
-        existingKlanke.modifiedByUser = LocalDateTime.now()
-
-        return existingKlanke.modifiedByUser
     }
 
     fun updateJournalpostIdWithoutValidation(klankeId: UUID, journalpostId: String): LocalDateTime {
