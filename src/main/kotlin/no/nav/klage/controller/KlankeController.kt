@@ -26,7 +26,7 @@ import java.time.Duration
 import java.util.*
 
 @RestController
-@Tag(name = "klager")
+@Tag(name = "klanker")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/klanker")
 class KlankeController(

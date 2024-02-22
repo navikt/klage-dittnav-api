@@ -27,7 +27,7 @@ import java.time.Duration
 import java.util.*
 
 @RestController
-@Tag(name = "anker")
+@Tag(name = "anker - deprecated")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/anker")
 class AnkeController(

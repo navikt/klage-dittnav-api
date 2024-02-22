@@ -27,7 +27,7 @@ import java.time.Duration
 import java.util.*
 
 @RestController
-@Tag(name = "klager")
+@Tag(name = "klager - deprecated")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/klager")
 class KlageController(
