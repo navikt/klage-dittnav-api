@@ -31,13 +31,13 @@ class VedleggService(
     }
 
     fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile, bruker: Bruker): Vedlegg {
-        val existingKlage = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingKlage)
-        validationService.validateKlankeAccess(existingKlage, bruker)
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
         val timeStart = System.currentTimeMillis()
         vedleggMetrics.registerVedleggSize(multipart.bytes.size.toDouble())
         vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
-        attachmentValidator.validateAttachment(multipart, existingKlage.attachmentsTotalSize())
+        attachmentValidator.validateAttachment(multipart, existingKlanke.attachmentsTotalSize())
         //Convert attachment (if not already pdf)
         val convertedBytes = image2PDF.convert(multipart.bytes)
 
@@ -49,7 +49,7 @@ class VedleggService(
             contentType = multipart.contentType.toString(),
             sizeInBytes = multipart.bytes.size,
         )
-        existingKlage.vedlegg.add(
+        existingKlanke.vedlegg.add(
             vedleggToSave
         ).also {
             vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
@@ -74,11 +74,11 @@ class VedleggService(
     }
 
     fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): ByteArray {
-        val existingKlage = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingKlage, false)
-        validationService.validateKlankeAccess(existingKlage, bruker)
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke, false)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
 
-        val vedlegg = existingKlage.vedlegg.find { it.id == vedleggId }
+        val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
         if (vedlegg != null) {
             return fileClient.getVedleggFile(vedlegg.ref)

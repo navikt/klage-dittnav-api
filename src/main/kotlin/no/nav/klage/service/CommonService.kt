@@ -117,7 +117,7 @@ class CommonService(
     }
 
     fun getDraftOrCreateKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
-        val existingKlage = getLatestKlankeDraft(
+        val existingKlanke = getLatestKlankeDraft(
             bruker = bruker,
             tema = input.innsendingsytelse.toTema(),
             internalSaksnummer = input.internalSaksnummer,
@@ -125,7 +125,7 @@ class CommonService(
             type = input.type!!,
         )
 
-        return existingKlage ?: createKlanke(
+        return existingKlanke ?: createKlanke(
             input = input,
             bruker = bruker,
         )
@@ -159,17 +159,17 @@ class CommonService(
         checkboxesSelected: Set<CheckboxEnum>?,
         bruker: Bruker
     ): LocalDateTime {
-        val existingKlage = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingKlage)
-        validationService.validateKlankeAccess(existingKlage, bruker)
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
 
-        existingKlage.checkboxesSelected.clear()
+        existingKlanke.checkboxesSelected.clear()
         if (!checkboxesSelected.isNullOrEmpty()) {
-            existingKlage.checkboxesSelected.addAll(checkboxesSelected)
+            existingKlanke.checkboxesSelected.addAll(checkboxesSelected)
         }
-        existingKlage.modifiedByUser = LocalDateTime.now()
+        existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingKlage.modifiedByUser
+        return existingKlanke.modifiedByUser
     }
 
     fun finalizeKlanke(klankeId: UUID, bruker: Bruker): LocalDateTime {
@@ -229,22 +229,22 @@ class CommonService(
     }
 
     fun getKlankePdf(klankeId: UUID, bruker: Bruker): ByteArray {
-        val existingKlage = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(klanke = existingKlage, includeFinalized = false)
-        validationService.validateKlankeAccess(klanke = existingKlage, bruker = bruker)
-        requireNotNull(existingKlage.journalpostId)
-        return fileClient.getKlageAnkeFile(existingKlage.journalpostId!!)
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
+        validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
+        requireNotNull(existingKlanke.journalpostId)
+        return fileClient.getKlageAnkeFile(existingKlanke.journalpostId!!)
     }
 
     fun createKlankePdfWithFoersteside(klankeId: UUID, bruker: Bruker): ByteArray? {
-        val existingKlage = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(klanke = existingKlage, includeFinalized = false)
-        validationService.validateKlankeAccess(klanke = existingKlage, bruker = bruker)
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
+        validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
 
-        validationService.validateKlanke(klanke = existingKlage)
+        validationService.validateKlanke(klanke = existingKlanke)
 
         klageDittnavPdfgenService.createKlankePdfWithFoersteside(
-            createPdfWithFoerstesideInput(klanke = existingKlage, bruker)
+            createPdfWithFoerstesideInput(klanke = existingKlanke, bruker)
         ).also {
             setPdfDownloadedWithoutAccessValidation(
                 klankeId = klankeId,
@@ -348,14 +348,14 @@ class CommonService(
         enhetsnummer: String?,
         bruker: Bruker
     ): LocalDateTime {
-        val existingAnke = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingAnke)
-        validationService.validateKlankeAccess(existingAnke, bruker)
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
 
-        existingAnke.enhetsnummer = enhetsnummer
-        existingAnke.modifiedByUser = LocalDateTime.now()
+        existingKlanke.enhetsnummer = enhetsnummer
+        existingKlanke.modifiedByUser = LocalDateTime.now()
 
-        return existingAnke.modifiedByUser
+        return existingKlanke.modifiedByUser
     }
 
     fun updateJournalpostIdWithoutValidation(klankeId: UUID, journalpostId: String): LocalDateTime {
