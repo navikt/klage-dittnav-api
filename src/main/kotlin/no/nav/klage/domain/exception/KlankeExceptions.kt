@@ -6,7 +6,6 @@ class KlankeIsDeletedException(override val message: String = "Klage/anke is del
 class KlankeIsFinalizedException(override val message: String = "Klage/anke is already finalized"): RuntimeException()
 class UpdateMismatchException(override val message: String = "Error in update query"): RuntimeException()
 class InvalidIdentException(override val message: String = "Oppgitt identifikasjonsnummer er ugyldig."): RuntimeException()
-class AnkeNotFoundException(override val message: String = "Anke not found"): RuntimeException()
 
 class SectionedValidationErrorWithDetailsException(val title: String, val sections: List<ValidationSection>) :
     RuntimeException()

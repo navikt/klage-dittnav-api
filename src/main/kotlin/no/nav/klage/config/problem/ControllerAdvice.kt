@@ -40,6 +40,27 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler
+    fun handleKlankeNotFound(
+        ex: KlankeNotFoundException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
+
+    @ExceptionHandler
+    fun handleKlankeIsDeleted(
+        ex: KlankeIsDeletedException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
+
+    @ExceptionHandler
+    fun handleKlankeIsFinalized(
+        ex: KlankeIsFinalizedException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
+
+    @ExceptionHandler
     fun handleAttemptedIllegalUpdate(
         ex: AttemptedIllegalUpdateException,
         request: NativeWebRequest
