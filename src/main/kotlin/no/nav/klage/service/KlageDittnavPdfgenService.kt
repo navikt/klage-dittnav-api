@@ -68,7 +68,39 @@ class KlageDittnavPdfgenService(
     }
 
     private fun OpenKlankeInput.toFoerstesideRequest(): FoerstesideRequest {
-        val documentList = mutableListOf("Klagen din")
+        val text: String
+        val arkivtittel: String
+        val navSkjemaId: String
+        val foerstesidetype: Foerstesidetype
+
+        when (type!!) {
+            Type.KLAGE -> {
+                text = "Klagen din"
+                arkivtittel = "Klage"
+                navSkjemaId = "NAV 90-00.08 K"
+                foerstesidetype = Foerstesidetype.SKJEMA
+            }
+            Type.ANKE -> {
+                text = "Anken din"
+                arkivtittel = "Anke"
+                navSkjemaId = "NAV 90-00.08 A"
+                foerstesidetype = Foerstesidetype.SKJEMA
+            }
+            Type.KLAGE_ETTERSENDELSE -> {
+                text = "Beskrivelse av ettersendelsen"
+                arkivtittel = "Ettersendelse til klage"
+                navSkjemaId = "NAV 90-00.08 K"
+                foerstesidetype = Foerstesidetype.ETTERSENDELSE
+            }
+            Type.ANKE_ETTERSENDELSE -> {
+                text = "Beskrivelse av ettersendelsen"
+                arkivtittel = "Ettersendelse til anke"
+                navSkjemaId = "NAV 90-00.08 A"
+                foerstesidetype = Foerstesidetype.ETTERSENDELSE
+            }
+        }
+
+        val documentList = mutableListOf(text)
         if (hasVedlegg) {
             documentList += "Vedlegg"
         }
@@ -80,11 +112,11 @@ class KlageDittnavPdfgenService(
                 brukerType = Brukertype.PERSON
             ),
             tema = innsendingsytelse.toTema().name,
-            arkivtittel = "Klage",
-            navSkjemaId = "NAV 90-00.08 K",
-            overskriftstittel = "Klage NAV 90-00.08 K",
+            arkivtittel = arkivtittel,
+            navSkjemaId = navSkjemaId,
+            overskriftstittel = "$arkivtittel $navSkjemaId",
             dokumentlisteFoersteside = documentList,
-            foerstesidetype = Foerstesidetype.SKJEMA,
+            foerstesidetype = foerstesidetype,
             enhetsnummer = enhetsnummer,
         )
     }
