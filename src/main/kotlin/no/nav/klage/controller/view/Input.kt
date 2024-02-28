@@ -10,6 +10,10 @@ data class StringInput(
     val value: String
 )
 
+data class StringInputNullable(
+    val value: String?
+)
+
 data class DateInput(
     val value: LocalDate?
 )
@@ -20,10 +24,6 @@ data class CheckboxesSelectedInput(
 
 data class BooleanInput(
     val value: Boolean
-)
-
-data class TypeInput(
-    val value: Type
 )
 
 /**
