@@ -145,7 +145,7 @@ class KlankeController(
     @PutMapping("/{klankeId}/usersaksnummer")
     fun updateUserSaksnummer(
         @PathVariable klankeId: UUID,
-        @RequestBody input: StringInput,
+        @RequestBody input: StringInputNullable,
         response: HttpServletResponse
     ): EditedView {
         val bruker = brukerService.getBruker()
