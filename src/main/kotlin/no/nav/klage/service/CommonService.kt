@@ -260,14 +260,14 @@ class CommonService(
         bruker: Bruker,
         klanke: Klanke
     ): AggregatedKlageAnke {
-        val vedtak = vedtakFromDate(klanke.vedtakDate)
+        val vedtak = vedtakFromDate(klanke.vedtakDate) ?: "Ikke angitt"
 
         return AggregatedKlageAnke(
             id = klanke.id.toString(),
             fornavn = bruker.navn.fornavn,
             mellomnavn = bruker.navn.mellomnavn ?: "",
             etternavn = bruker.navn.etternavn,
-            vedtak = vedtak ?: "",
+            vedtak = vedtak,
             dato = klanke.modifiedByUser.toLocalDate(),
             begrunnelse = sanitizeText(klanke.fritekst!!),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
