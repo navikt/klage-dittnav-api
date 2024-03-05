@@ -28,7 +28,7 @@ class ValidationService {
     fun validateKlanke(klanke: Klanke) {
         val validationErrors = mutableListOf<InvalidProperty>()
 
-        if (klanke.fritekst == null) {
+        if ((klanke.type == Type.ANKE || klanke.type == Type.KLAGE) && klanke.fritekst == null) {
             validationErrors += createMustBeFilledValidationError("fritekst")
         }
 //TODO: Introduce after client sync
