@@ -269,7 +269,7 @@ class CommonService(
             etternavn = bruker.navn.etternavn,
             vedtak = vedtak,
             dato = klanke.modifiedByUser.toLocalDate(),
-            begrunnelse = sanitizeText(klanke.fritekst!!),
+            begrunnelse = sanitizeText(klanke.fritekst ?: ""),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema = klanke.tema.name,
             ytelse = klanke.innsendingsytelse.nb,
@@ -286,7 +286,7 @@ class CommonService(
         return OpenKlankeInput(
             foedselsnummer = klanke.foedselsnummer,
             navn = bruker.navn,
-            fritekst = klanke.fritekst!!,
+            fritekst = klanke.fritekst ?: "",
             userSaksnummer = klanke.userSaksnummer,
             internalSaksnummer = klanke.internalSaksnummer,
             vedtakDate = klanke.vedtakDate,
