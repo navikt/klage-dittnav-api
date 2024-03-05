@@ -65,13 +65,17 @@ class Klanke(
     @Convert(converter = CheckboxEnumConverter::class)
     val checkboxesSelected: MutableList<CheckboxEnum> = mutableListOf(),
 
-    /* only anke and ankeettersendelse */
+    /* not for klager. Used to indicate KA-enhet. */
     @Column(name = "enhetsnummer")
     var enhetsnummer: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "klanke_type")
     var type: Type,
+
+    /* ettersendelser klage */
+    @Column(name = "case_is_at_ka")
+    var caseIsAtKA: Boolean?,
 ) {
 
     override fun equals(other: Any?): Boolean {

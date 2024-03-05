@@ -22,6 +22,7 @@ fun Klanke.toKlankeView(): KlankeView {
         checkboxesSelected = checkboxesSelected.toSet(),
         enhetsnummer = enhetsnummer,
         type = type,
+        caseIsAtKA = caseIsAtKA,
     )
 }
 

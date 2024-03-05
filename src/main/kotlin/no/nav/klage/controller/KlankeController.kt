@@ -245,6 +245,29 @@ class KlankeController(
         )
     }
 
+    @PutMapping("/{klankeId}/caseisatka")
+    fun updateCaseIsAtKA(
+        @PathVariable klankeId: UUID,
+        @RequestBody input: BooleanInput,
+        response: HttpServletResponse
+    ): EditedView {
+        val bruker = brukerService.getBruker()
+        logger.debug("updateCaseIsAtKA is requested. Id: {}", klankeId)
+        secureLogger.debug(
+            "updateCaseIsAtKA is requested. Id: {}, fnr: {}",
+            klankeId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+        val modifiedByUser = commonService.updateCaseIsAtKA(
+            klankeId = klankeId,
+            caseIsAtKA = input.value,
+            bruker = bruker
+        )
+        return EditedView(
+            modifiedByUser = modifiedByUser
+        )
+    }
+
     @DeleteMapping("/{klankeId}")
     fun deleteKlanke(@PathVariable klankeId: UUID) {
         val bruker = brukerService.getBruker()

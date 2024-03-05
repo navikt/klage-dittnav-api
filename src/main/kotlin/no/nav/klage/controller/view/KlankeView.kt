@@ -26,4 +26,5 @@ data class KlankeView(
     val innsendingsytelse: Innsendingsytelse,
     val hasVedlegg: Boolean,
     val type: Type,
+    val caseIsAtKA: Boolean?,
 )

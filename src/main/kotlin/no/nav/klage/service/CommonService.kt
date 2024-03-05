@@ -77,6 +77,7 @@ class CommonService(
             pdfDownloaded = null,
             enhetsnummer = enhetsnummer,
             type = type!!,
+            caseIsAtKA = caseIsAtKA,
         )
     }
 
@@ -99,6 +100,7 @@ class CommonService(
             pdfDownloaded = null,
             enhetsnummer = null,
             type = type!!,
+            caseIsAtKA = null,
         )
     }
 
@@ -353,6 +355,21 @@ class CommonService(
         validationService.validateKlankeAccess(existingKlanke, bruker)
 
         existingKlanke.enhetsnummer = enhetsnummer
+        existingKlanke.modifiedByUser = LocalDateTime.now()
+
+        return existingKlanke.modifiedByUser
+    }
+
+    fun updateCaseIsAtKA(
+        klankeId: UUID,
+        caseIsAtKA: Boolean,
+        bruker: Bruker
+    ): LocalDateTime {
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
+
+        existingKlanke.caseIsAtKA = caseIsAtKA
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
         return existingKlanke.modifiedByUser

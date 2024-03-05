@@ -49,4 +49,5 @@ data class KlankeFullInput(
     val fritekst: String = "",
     val hasVedlegg: Boolean,
     val type: Type? = null,
+    val caseIsAtKA: Boolean?,
 )

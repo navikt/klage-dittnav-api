@@ -155,6 +155,7 @@ class CommonServiceTest {
                 modifiedByUser = exampleModifiedByUser,
                 enhetsnummer = null,
                 type = Type.KLAGE,
+                caseIsAtKA = null,
             )
         )
 
@@ -178,6 +179,7 @@ class CommonServiceTest {
                 modifiedByUser = exampleModifiedByUser2,
                 enhetsnummer = null,
                 type = Type.KLAGE,
+                caseIsAtKA = null,
             )
         )
     }
@@ -206,6 +208,7 @@ class CommonServiceTest {
                 modifiedByUser = now,
                 enhetsnummer = null,
                 type = Type.KLAGE,
+                caseIsAtKA = null,
             )
         )
 
@@ -232,6 +235,7 @@ class CommonServiceTest {
                 modifiedByUser = now,
                 enhetsnummer = null,
                 type = Type.KLAGE,
+                caseIsAtKA = null,
             )
         )
     }
@@ -258,6 +262,7 @@ class CommonServiceTest {
                 modifiedByUser = now,
                 enhetsnummer = null,
                 type = Type.KLAGE,
+                caseIsAtKA = null,
             )
         )
     }

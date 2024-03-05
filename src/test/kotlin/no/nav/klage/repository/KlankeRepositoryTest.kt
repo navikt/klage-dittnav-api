@@ -61,6 +61,7 @@ class KlankeRepositoryTest(
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.KLAGE,
                 enhetsnummer = null,
+                caseIsAtKA = null,
             )
         )
 
@@ -92,6 +93,7 @@ class KlankeRepositoryTest(
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.ANKE,
                 checkboxesSelected = mutableListOf(),
+                caseIsAtKA = true,
             )
         )
 
@@ -123,6 +125,7 @@ class KlankeRepositoryTest(
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.ANKE,
                 checkboxesSelected = mutableListOf(),
+                caseIsAtKA = true,
             )
         )
 
