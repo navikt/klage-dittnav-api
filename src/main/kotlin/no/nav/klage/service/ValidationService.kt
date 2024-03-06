@@ -27,12 +27,21 @@ class ValidationService {
 
     fun validateKlanke(klanke: Klanke) {
         val validationErrors = mutableListOf<InvalidProperty>()
+//
+//        if ((klanke.type == Type.ANKE || klanke.type == Type.KLAGE) && klanke.fritekst == null) {
+//            validationErrors += createMustBeFilledValidationError("fritekst")
+//        }
+//TODO: Introduce after client sync
+//
+//        if (klanke.type == Type.KLAGE_ETTERSENDELSE && klanke.caseIsAtKA == null) {
+//            validationErrors += createMustBeFilledValidationError("caseIstAtKa")
+//        }
+//
+//        if (klanke.caseIsAtKA == true && klanke.enhetsnummer == null) {
+//            validationErrors += createMustBeFilledValidationError("enhetsnummer")
+//        }
 
-        if (klanke.fritekst == null) {
-            validationErrors += createMustBeFilledValidationError("fritekst")
-        }
-
-        if (klanke.type == Type.ANKE && klanke.enhetsnummer == null) {
+        if ((klanke.type == Type.ANKE || klanke.type == Type.ANKE_ETTERSENDELSE) && klanke.enhetsnummer == null) {
             validationErrors += createMustBeFilledValidationError("enhetsnummer")
         }
 
@@ -41,11 +50,7 @@ class ValidationService {
         if (validationErrors.isNotEmpty()) {
             sectionList.add(
                 ValidationSection(
-                    section = when (klanke.type) {
-                        Type.KLAGE -> "klagedata"
-                        Type.ANKE -> "ankedata"
-                        else -> "klankedata"
-                    },
+                    section = "klankedata",
                     properties = validationErrors
                 )
             )
