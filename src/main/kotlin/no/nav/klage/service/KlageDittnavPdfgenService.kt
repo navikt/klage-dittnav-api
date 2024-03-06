@@ -75,25 +75,25 @@ class KlageDittnavPdfgenService(
 
         when (type!!) {
             Type.KLAGE -> {
-                text = "Klagen din"
+                text = "Klageskjema"
                 arkivtittel = "Klage"
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
             Type.ANKE -> {
-                text = "Anken din"
+                text = "Ankeskjema"
                 arkivtittel = "Anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
             Type.KLAGE_ETTERSENDELSE -> {
-                text = "Beskrivelse av ettersendelsen"
+                text = "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til klage"
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
             }
             Type.ANKE_ETTERSENDELSE -> {
-                text = "Beskrivelse av ettersendelsen"
+                text = "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
