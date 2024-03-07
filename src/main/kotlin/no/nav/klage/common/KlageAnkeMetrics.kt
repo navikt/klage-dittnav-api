@@ -1,6 +1,7 @@
 package no.nav.klage.common
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.klage.domain.Type
 import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.util.getLogger
@@ -13,28 +14,23 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
 
-        private const val COUNTER_KLAGER_FINALIZED = "klager_finalized"
-        private const val COUNTER_KLAGER_INITIALIZED = "klager_initialized"
         private const val COUNTER_KLAGER_FINALIZED_GRUNN = "klager_finalized_grunn"
         private const val COUNTER_KLAGER_OPTIONAL_SAKSNUMMER = "klager_optional_saksnummer"
         private const val COUNTER_KLAGER_OPTIONAL_VEDTAKSDATO = "klager_optional_vedtaksdato"
         private const val COUNTER_KLAGER_FINALIZED_TITLE = "klager_finalized_title"
-
-        private const val COUNTER_ANKER_FINALIZED = "anker_finalized"
-        private const val COUNTER_ANKER_INITIALIZED = "anker_initialized"
     }
 
-    fun incrementKlagerInitialized(ytelse: String) {
+    fun incrementKlankerInitialized(ytelse: String, type: Type) {
         try {
-            meterRegistry.counter(COUNTER_KLAGER_INITIALIZED, "ytelse", ytelse).increment()
+            meterRegistry.counter(type.name.lowercase() + "r_initialized", "ytelse", ytelse).increment()
         } catch (e: Exception) {
-            logger.warn("incrementKlagerInitialized failed", e)
+            logger.warn("incrementKlankerInitialized failed", e)
         }
     }
 
-    fun incrementKlagerFinalized(ytelse: String) {
+    fun incrementKlankerFinalized(ytelse: String, type: Type) {
         try {
-            meterRegistry.counter(COUNTER_KLAGER_FINALIZED, "ytelse", ytelse).increment()
+            meterRegistry.counter(type.name.lowercase() + "r_finalized", "ytelse", ytelse).increment()
         } catch (e: Exception) {
             logger.warn("incrementKlagerFinalized failed", e)
         }
@@ -71,22 +67,6 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
             meterRegistry.counter(COUNTER_KLAGER_FINALIZED_TITLE, "tittel", title.nb).increment()
         } catch (e: Exception) {
             logger.warn("incrementKlageTitle failed", e)
-        }
-    }
-
-    fun incrementAnkerInitialized(ytelse: String) {
-        try {
-            meterRegistry.counter(COUNTER_ANKER_INITIALIZED, "ytelse", ytelse).increment()
-        } catch (e: Exception) {
-            logger.warn("incrementAnkerInitialized failed", e)
-        }
-    }
-
-    fun incrementAnkerFinalized(ytelse: String) {
-        try {
-            meterRegistry.counter(COUNTER_ANKER_FINALIZED, "ytelse", ytelse).increment()
-        } catch (e: Exception) {
-            logger.warn("incrementAnkerFinalized failed", e)
         }
     }
 

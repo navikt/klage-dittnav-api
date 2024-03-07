@@ -3,7 +3,9 @@ package no.nav.klage.service
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
-import no.nav.klage.controller.view.*
+import no.nav.klage.controller.view.KlankeFullInput
+import no.nav.klage.controller.view.KlankeMinimalInput
+import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isFinalized
@@ -45,16 +47,16 @@ class CommonService(
     }
 
     fun createKlanke(input: KlankeFullInput, bruker: Bruker): Klanke {
-        val klage = input.toKlanke(bruker = bruker)
-        return klankeRepository.save(klage).also {
-            updateMetrics(input = klage)
+        val klanke = input.toKlanke(bruker = bruker)
+        return klankeRepository.save(klanke).also {
+            updateMetrics(input = klanke)
         }
     }
 
     fun createKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
-        val klage = input.toKlanke(bruker = bruker)
-        return klankeRepository.save(klage).also {
-            updateMetrics(input = klage)
+        val klanke = input.toKlanke(bruker = bruker)
+        return klankeRepository.save(klanke).also {
+            updateMetrics(input = klanke)
         }
     }
 
@@ -76,7 +78,7 @@ class CommonService(
             modifiedByUser = LocalDateTime.now(),
             pdfDownloaded = null,
             enhetsnummer = enhetsnummer,
-            type = type!!,
+            type = type,
             caseIsAtKA = caseIsAtKA,
         )
     }
@@ -99,7 +101,7 @@ class CommonService(
             modifiedByUser = LocalDateTime.now(),
             pdfDownloaded = null,
             enhetsnummer = null,
-            type = type!!,
+            type = type,
             caseIsAtKA = null,
         )
     }
@@ -110,12 +112,10 @@ class CommonService(
         } else {
             input.innsendingsytelse.toTema().toString()
         }
-        when (input.type) {
-            Type.KLAGE -> klageAnkeMetrics.incrementKlagerInitialized(temaReport)
-            Type.ANKE -> klageAnkeMetrics.incrementAnkerInitialized(temaReport)
-            Type.KLAGE_ETTERSENDELSE -> {} //TODO
-            Type.ANKE_ETTERSENDELSE -> {} //TODO
-        }
+        klageAnkeMetrics.incrementKlankerInitialized(
+            ytelse = temaReport,
+            type = input.type
+        )
     }
 
     fun getDraftOrCreateKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
@@ -124,7 +124,7 @@ class CommonService(
             tema = input.innsendingsytelse.toTema(),
             internalSaksnummer = input.internalSaksnummer,
             innsendingsytelse = input.innsendingsytelse,
-            type = input.type!!,
+            type = input.type,
         )
 
         return existingKlanke ?: createKlanke(
@@ -207,19 +207,12 @@ class CommonService(
             klanke.tema.toString()
         }
 
-        when (klanke.type) {
-            Type.KLAGE -> {
-                klageAnkeMetrics.incrementKlagerFinalizedTitle(klanke.innsendingsytelse)
-                klageAnkeMetrics.incrementKlagerFinalized(temaReport)
-                klageAnkeMetrics.incrementKlagerGrunn(temaReport, klanke.checkboxesSelected)
-            }
-            Type.ANKE -> {
-                klageAnkeMetrics.incrementAnkerFinalized(temaReport)
-            }
-            Type.KLAGE_ETTERSENDELSE -> {} //TODO
-            Type.ANKE_ETTERSENDELSE -> {} //TODO
+        if (klanke.type == Type.KLAGE) {
+            klageAnkeMetrics.incrementKlagerFinalizedTitle(klanke.innsendingsytelse)
+            klageAnkeMetrics.incrementKlagerGrunn(temaReport, klanke.checkboxesSelected)
         }
 
+        klageAnkeMetrics.incrementKlankerFinalized(ytelse = temaReport, type = klanke.type)
 
         if (klanke.userSaksnummer != null) {
             klageAnkeMetrics.incrementOptionalSaksnummer(temaReport)

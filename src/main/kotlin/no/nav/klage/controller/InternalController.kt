@@ -23,40 +23,6 @@ class InternalController(
         private val secureLogger = getSecureLogger()
     }
 
-    @PostMapping("/klager/{klageId}/journalpostid")
-    fun setJournalpostIdInternalOnKlage(
-        @PathVariable klageId: UUID,
-        @RequestBody journalpost: Journalpost
-    ) {
-        logger.debug("Set journalpostId on klage is requested. KlageId: {}, journalpostId: {}", klageId, journalpost.id)
-        commonService.setJournalpostIdWithoutValidation(klageId, journalpost.id)
-    }
-
-    @PostMapping("/anker/{ankeId}/journalpostid")
-    fun setJournalpostIdInternalOnAnke(
-        @PathVariable ankeId: UUID,
-        @RequestBody journalpost: Journalpost
-    ) {
-        logger.debug("Set journalpostId on anke is requested. AnkeId: {}, journalpostId: {}", ankeId, journalpost.id)
-        commonService.setJournalpostIdWithoutValidation(ankeId, journalpost.id)
-    }
-
-    @GetMapping("/klager/{klageId}/journalpostid")
-    fun getJournalpostIdKlage(
-        @PathVariable klageId: UUID
-    ): JournalpostIdResponse {
-        logger.debug("Get journalpostId on klage is requested from an internal service. KlageId: {}", klageId)
-        return JournalpostIdResponse(journalpostId = commonService.getJournalpostIdWithoutValidation(klageId))
-    }
-
-    @GetMapping("/anker/{ankeId}/journalpostid")
-    fun getJournalpostIdAnke(
-        @PathVariable ankeId: UUID
-    ): JournalpostIdResponse {
-        logger.debug("Get journalpostId on anke is requested from an internal service. AnkeId: {}", ankeId)
-        return JournalpostIdResponse(journalpostId = commonService.getJournalpostIdWithoutValidation(ankeId))
-    }
-
     @PostMapping("/klanker/{klankeId}/journalpostid")
     fun setJournalpostIdInternalOnKlanke(
         @PathVariable klankeId: UUID,

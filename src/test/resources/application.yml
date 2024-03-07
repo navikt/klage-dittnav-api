@@ -62,9 +62,6 @@ KLAGE_DITTNAV_TOKENX_IDP: idporten
 
 KLAGE_FILE_API_APP_NAME: klage-file-api
 
-KABAL_API_APP_NAME: kabal-api
-KABAL_API_BASE_URL: http://localhost/kabal-api
-
 NAIS_CLUSTER_NAME: local
 NAIS_NAMESPACE: klage
 
