@@ -19,12 +19,5 @@ data class OpenKlankeInput(
     val enhetsnummer: String?,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
-    val type: Type?,
-)
-
-data class OpenEttersendelseInput(
-    val foedselsnummer: String,
-    val enhetsnummer: String?,
-    val innsendingsytelse: Innsendingsytelse,
-    val language: LanguageEnum = LanguageEnum.NB,
+    val type: Type,
 )

@@ -1,9 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.controller.view.OpenEttersendelseInput
 import no.nav.klage.controller.view.OpenKlankeInput
-import no.nav.klage.domain.Type
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
@@ -29,52 +27,6 @@ class PdfController(
     }
 
     @ResponseBody
-    @PostMapping("/klage")
-    fun createPdfForKlage(
-        @RequestBody input: OpenKlankeInput
-    ): ResponseEntity<ByteArray> {
-        logger.debug("Create klage pdf is requested.")
-        secureLogger.debug(
-            "Create klage pdf is requested. Input: {} ",
-            input,
-        )
-
-        val content = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input.copy(type = Type.KLAGE))
-
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=klage.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
-    }
-
-    @ResponseBody
-    @PostMapping("/anke")
-    fun createPdfForAnke(
-        @RequestBody input: OpenKlankeInput
-    ): ResponseEntity<ByteArray> {
-        logger.debug("Create anke pdf is requested.")
-        secureLogger.debug(
-            "Create anke pdf is requested. Input: {} ",
-            input,
-        )
-
-        val content = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input.copy(type = Type.ANKE))
-
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=anke.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
-    }
-
-    @ResponseBody
     @PostMapping("/klanke")
     fun createPdfForKlanke(
         @RequestBody input: OpenKlankeInput
@@ -97,26 +49,4 @@ class PdfController(
         )
     }
 
-    @ResponseBody
-    @PostMapping("/ettersendelse")
-    fun createPdfForEttersendelse(
-        @RequestBody input: OpenEttersendelseInput
-    ): ResponseEntity<ByteArray> {
-        logger.debug("Create ettersendelse pdf is requested.")
-        secureLogger.debug(
-            "Create ettersendelse pdf is requested. Input: {} ",
-            input,
-        )
-
-        val content = klageDittnavPdfgenService.createFoerstesideForEttersendelse(input)
-
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=ettersendelse.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
-    }
 }

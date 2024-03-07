@@ -24,9 +24,6 @@ class KlageDittnavPdfgenService(
 ) {
 
     fun createKlankePdfWithFoersteside(input: OpenKlankeInput): ByteArray {
-        if (input.type == null) {
-            throw RuntimeException("type must be set")
-        }
         validateIdent(input.foedselsnummer)
 
         val klankePDF = if (input.type.name.contains("ETTERSENDELSE")) {
@@ -41,11 +38,6 @@ class KlageDittnavPdfgenService(
 
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
         return mergeDocuments(foerstesidePDF, klankePDF)
-    }
-
-    fun createFoerstesideForEttersendelse(input: OpenEttersendelseInput): ByteArray {
-        validateIdent(input.foedselsnummer)
-        return foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
     }
 
     private fun mergeDocuments(foerstesidePDF: ByteArray, klageAnkePDF: ByteArray): ByteArray {
@@ -73,7 +65,7 @@ class KlageDittnavPdfgenService(
         val navSkjemaId: String
         val foerstesidetype: Foerstesidetype
 
-        when (type!!) {
+        when (type) {
             Type.KLAGE -> {
                 text = "Klageskjema"
                 arkivtittel = "Klage"
@@ -117,24 +109,6 @@ class KlageDittnavPdfgenService(
             overskriftstittel = "$arkivtittel $navSkjemaId",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = foerstesidetype,
-            enhetsnummer = enhetsnummer,
-        )
-    }
-
-    private fun OpenEttersendelseInput.toFoerstesideRequest(): FoerstesideRequest {
-        return FoerstesideRequest(
-            spraakkode = Spraakkode.NB,
-            netsPostboks = "1400", //always
-            bruker = Bruker(
-                brukerId = foedselsnummer,
-                brukerType = Brukertype.PERSON
-            ),
-            tema = innsendingsytelse.toTema().name,
-            arkivtittel = "Ettersendelse til klage/anke",
-            navSkjemaId = "NAV 90-00.08",
-            overskriftstittel = "Ettersendelse til klage/anke NAV 90-00.08",
-            dokumentlisteFoersteside = listOf("Vedlegg"),
-            foerstesidetype = Foerstesidetype.ETTERSENDELSE,
             enhetsnummer = enhetsnummer,
         )
     }

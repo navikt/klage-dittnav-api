@@ -30,7 +30,7 @@ class FlywayMigrationTest {
     @Test
     fun `flyway should run`() {
         val idList: List<String> = jdbcTemplate.query(
-            "SELECT * FROM klage"
+            "SELECT * FROM klanke"
         ) { rs: ResultSet, _: Int ->
             rs.getString("id")
         }

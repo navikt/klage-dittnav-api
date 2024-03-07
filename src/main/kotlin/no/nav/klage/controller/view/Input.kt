@@ -32,7 +32,7 @@ data class BooleanInput(
 data class KlankeMinimalInput(
     val internalSaksnummer: String?,
     val innsendingsytelse: Innsendingsytelse,
-    val type: Type? = null,
+    val type: Type,
 )
 
 /**
@@ -48,6 +48,6 @@ data class KlankeFullInput(
     val internalSaksnummer: String? = null,
     val fritekst: String = "",
     val hasVedlegg: Boolean,
-    val type: Type? = null,
+    val type: Type,
     val caseIsAtKA: Boolean?,
 )

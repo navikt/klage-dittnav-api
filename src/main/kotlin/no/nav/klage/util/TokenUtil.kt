@@ -77,10 +77,6 @@ class TokenUtil(
         return response.accessToken
     }
 
-    fun getExpiry(): Long? {
-        return ctxHolder.tokenValidationContext?.getClaims(issuer)?.expirationTime?.time
-    }
-
     fun getExpiryFromIdPortenToken(token: String): Long {
         val correctPartOfToken = Base64.getDecoder().decode(token.split(".")[1])
         val value = jacksonObjectMapper().readTree(correctPartOfToken)
