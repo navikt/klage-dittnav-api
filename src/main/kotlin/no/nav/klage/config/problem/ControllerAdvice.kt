@@ -8,7 +8,6 @@ import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
-import org.springframework.web.multipart.MaxUploadSizeExceededException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 
@@ -41,53 +40,25 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler
-    fun handleKlageNotFound(
-        ex: KlageNotFoundException,
+    fun handleKlankeNotFound(
+        ex: KlankeNotFoundException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
-    fun handleKlageIsDeleted(
-        ex: KlageIsDeletedException,
+    fun handleKlankeIsDeleted(
+        ex: KlankeIsDeletedException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
-    fun handleKlageIsFinalized(
-        ex: KlageIsFinalizedException,
+    fun handleKlankeIsFinalized(
+        ex: KlankeIsFinalizedException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.CONFLICT, ex)
-
-    @ExceptionHandler
-    fun handleAnkeNotFound(
-        ex: AnkeNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
-
-    @ExceptionHandler
-    fun handleAnkeIsDeleted(
-        ex: AnkeIsDeletedException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.CONFLICT, ex)
-
-    @ExceptionHandler
-    fun handleAnkeIsFinalized(
-        ex: AnkeIsFinalizedException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.CONFLICT, ex)
-
-    @ExceptionHandler
-    fun handleAvailableAnkeNotFound(
-        ex: AvailableAnkeNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleAttemptedIllegalUpdate(
@@ -171,6 +142,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             httpStatus.is5xxServerError -> {
                 secureLogger.error("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
             }
+
             else -> {
                 secureLogger.warn("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
             }

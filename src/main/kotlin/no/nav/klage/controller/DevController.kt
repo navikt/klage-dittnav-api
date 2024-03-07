@@ -1,6 +1,6 @@
 package no.nav.klage.controller
 
-import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
@@ -27,10 +27,10 @@ class DevController(private val klageDittnavPdfgenService: KlageDittnavPdfgenSer
     @ResponseBody
     @PostMapping("/internal/uinnloggetklage")
     fun generateFoersteside(
-        @RequestBody input: OpenKlageInput
+        @RequestBody input: OpenKlankeInput
     ): ResponseEntity<ByteArray> {
         logger.debug("Test create foersteside with input: {}", input)
-        val data = klageDittnavPdfgenService.createKlagePdfWithFoersteside(input)
+        val data = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.APPLICATION_PDF

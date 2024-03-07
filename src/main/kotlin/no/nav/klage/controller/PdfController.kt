@@ -1,7 +1,9 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.controller.view.*
+import no.nav.klage.controller.view.OpenEttersendelseInput
+import no.nav.klage.controller.view.OpenKlankeInput
+import no.nav.klage.domain.Type
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/pdf")
 class PdfController(
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService
-){
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -29,7 +31,7 @@ class PdfController(
     @ResponseBody
     @PostMapping("/klage")
     fun createPdfForKlage(
-        @RequestBody input: OpenKlageInput
+        @RequestBody input: OpenKlankeInput
     ): ResponseEntity<ByteArray> {
         logger.debug("Create klage pdf is requested.")
         secureLogger.debug(
@@ -37,7 +39,7 @@ class PdfController(
             input,
         )
 
-        val content = klageDittnavPdfgenService.createKlagePdfWithFoersteside(input)
+        val content = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input.copy(type = Type.KLAGE))
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
@@ -52,7 +54,7 @@ class PdfController(
     @ResponseBody
     @PostMapping("/anke")
     fun createPdfForAnke(
-        @RequestBody input: OpenAnkeInput
+        @RequestBody input: OpenKlankeInput
     ): ResponseEntity<ByteArray> {
         logger.debug("Create anke pdf is requested.")
         secureLogger.debug(
@@ -60,11 +62,34 @@ class PdfController(
             input,
         )
 
-        val content = klageDittnavPdfgenService.createAnkePdfWithFoersteside(input)
+        val content = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input.copy(type = Type.ANKE))
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
         responseHeaders.add("Content-Disposition", "inline; filename=anke.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
+    }
+
+    @ResponseBody
+    @PostMapping("/klanke")
+    fun createPdfForKlanke(
+        @RequestBody input: OpenKlankeInput
+    ): ResponseEntity<ByteArray> {
+        logger.debug("Create klanke pdf is requested.")
+        secureLogger.debug(
+            "Create klanke pdf is requested. Input: {} ",
+            input,
+        )
+
+        val content = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=${input.type!!.name.lowercase()}.pdf")
         return ResponseEntity(
             content,
             responseHeaders,

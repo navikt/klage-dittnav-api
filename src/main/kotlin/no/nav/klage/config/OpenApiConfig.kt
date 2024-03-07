@@ -11,7 +11,6 @@ class OpenApiConfig {
     fun api(): GroupedOpenApi {
         return GroupedOpenApi.builder()
             .group("standard")
-            .pathsToExclude("/api/old/**")
             .pathsToMatch("/api/**")
             .build()
     }

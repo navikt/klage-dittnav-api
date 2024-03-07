@@ -25,8 +25,6 @@ class TokenUtil(
         private val secureLogger = getSecureLogger()
     }
 
-    //TODO: Sjekk om det trengs to versjoner her.
-
     fun getSubject(useTokenX: Boolean = true): String {
         val token = ctxHolder.tokenValidationContext?.getClaims(if (useTokenX) issuer else oldIssuer)
 

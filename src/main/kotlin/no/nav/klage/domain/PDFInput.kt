@@ -1,7 +1,6 @@
 package no.nav.klage.domain
 
-import no.nav.klage.controller.view.OpenAnkeInput
-import no.nav.klage.controller.view.OpenKlageInput
+import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
@@ -13,11 +12,9 @@ data class PDFInput (
     val type: String,
     val foedselsnummer: String,
     val fornavn: String,
-    val mellomnavn: String? = null,
+    val mellomnavn: String?,
     val etternavn: String,
-    val adresse: String? = null,
-    val telefonnummer: String? = null,
-    val enhetsnavn: String? = null,
+    val enhetsnavn: String?,
     val vedtak: String,
     val begrunnelse: String,
     val saksnummer: String?,
@@ -27,9 +24,9 @@ data class PDFInput (
     val sendesIPosten: Boolean,
 )
 
-fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
+fun OpenKlankeInput.toPDFInput(): PDFInput {
     return PDFInput(
-        type = "klage",
+        type = type!!.name,
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
         mellomnavn = navn.mellomnavn,
@@ -40,24 +37,8 @@ fun OpenKlageInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = innsendingsytelse.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
-        sendesIPosten = sendesIPosten,
-    )
-}
-
-fun OpenAnkeInput.toPDFInput(sendesIPosten: Boolean): PDFInput {
-    return PDFInput(
-        type = "anke",
-        foedselsnummer = foedselsnummer,
-        fornavn = navn.fornavn,
-        mellomnavn = navn.mellomnavn,
-        etternavn = navn.etternavn,
-        vedtak = vedtakFromDate(vedtakDate) ?: "Ikke angitt",
-        begrunnelse = sanitizeText(fritekst),
-        saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
-        dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        ytelse = innsendingsytelse.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
+        sendesIPosten = true,
         enhetsnavn = Enhet.entries.find { it.navn == enhetsnummer }?.beskrivelse,
-        sendesIPosten = sendesIPosten,
     )
 }
 

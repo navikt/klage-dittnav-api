@@ -4,14 +4,11 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
-import no.nav.klage.domain.anke.AnkeFullInput
-import no.nav.klage.domain.anke.AnkeInput
-import no.nav.klage.domain.exception.AnkeNotFoundException
-import no.nav.klage.domain.jpa.Anke
+import no.nav.klage.domain.Type
+import no.nav.klage.domain.exception.KlankeNotFoundException
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
-import no.nav.klage.service.AnkeService
 import no.nav.klage.service.BrukerService
 import no.nav.klage.service.CommonService
 import no.nav.klage.service.VedleggService
@@ -30,12 +27,11 @@ import java.time.Duration
 import java.util.*
 
 @RestController
-@Tag(name = "anker")
+@Tag(name = "anker - deprecated")
 @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
 @RequestMapping("/api/anker")
 class AnkeController(
     private val brukerService: BrukerService,
-    private val ankeService: AnkeService,
     private val vedleggService: VedleggService,
     private val kafkaEventClient: KafkaEventClient,
     private val commonService: CommonService,
@@ -47,23 +43,10 @@ class AnkeController(
         private val secureLogger = getSecureLogger()
     }
 
-    @GetMapping
-    fun getAnker(): List<AnkeView> {
-        val bruker = brukerService.getBruker()
-        logger.debug("Get anker for user is requested.")
-        secureLogger.debug(
-            "Get anker for user is requested. Fnr: {}",
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-        return ankeService.getAnkeDraftsByFnr(bruker).map {
-            it.toAnkeView()
-        }
-    }
-
     @GetMapping("/{ankeId}")
     fun getAnke(
         @PathVariable ankeId: UUID
-    ): AnkeView {
+    ): KlankeView {
         val bruker = brukerService.getBruker()
         logger.debug("Get anke is requested. Id: {}", ankeId)
         secureLogger.debug(
@@ -71,7 +54,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return (commonService.getKlanke(ankeId, bruker) as Anke).toAnkeView()
+        return commonService.getKlanke(ankeId, bruker).toKlankeView()
     }
 
     @GetMapping("/{ankeId}/journalpostid")
@@ -96,7 +79,7 @@ class AnkeController(
         kotlin.runCatching {
             commonService.validateAccess(ankeId, bruker)
         }.onFailure {
-            throw AnkeNotFoundException()
+            throw KlankeNotFoundException()
         }
         logger.debug("Journalpostid events called for ankeId: {}", ankeId)
         //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
@@ -114,22 +97,22 @@ class AnkeController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createAnke(
-        @RequestBody anke: AnkeFullInput, response: HttpServletResponse
-    ): AnkeView {
+        @RequestBody anke: KlankeFullInput, response: HttpServletResponse
+    ): KlankeView {
         val bruker = brukerService.getBruker()
         logger.debug("Create anke is requested.")
         secureLogger.debug(
             "Create anke is requested for user with fnr {}.",
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return ankeService.createAnke(anke, bruker).toAnkeView()
+        return commonService.createKlanke(anke.copy(type = Type.ANKE), bruker).toKlankeView()
     }
 
     @PutMapping
     fun createOrGetAnke(
-        @RequestBody ankeInput: AnkeInput,
+        @RequestBody ankeInput: KlankeMinimalInput,
         response: HttpServletResponse
-    ): AnkeView {
+    ): KlankeView {
         val bruker = brukerService.getBruker()
         logger.debug("Create or update anke for user is requested.")
         secureLogger.debug(
@@ -138,7 +121,7 @@ class AnkeController(
             ankeInput.innsendingsytelse
         )
 
-        return ankeService.getDraftOrCreateAnke(ankeInput, bruker).toAnkeView()
+        return commonService.getDraftOrCreateKlanke(ankeInput.copy(type = Type.ANKE), bruker).toKlankeView()
     }
 
     @PutMapping("/{ankeId}/fritekst")
@@ -230,7 +213,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val modifiedByUser = ankeService.updateEnhetsnummer(ankeId, input.value, bruker)
+        val modifiedByUser = commonService.updateEnhetsnummer(ankeId, input.value, bruker)
         return EditedView(
             modifiedByUser = modifiedByUser
         )
@@ -260,7 +243,7 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        val finalizedLocalDateTime = ankeService.finalizeAnke(ankeId = ankeId, bruker = bruker)
+        val finalizedLocalDateTime = commonService.finalizeKlanke(klankeId = ankeId, bruker = bruker)
         return mapOf(
             "finalizedDate" to finalizedLocalDateTime.toLocalDate().toString(),
             "modifiedByUser" to finalizedLocalDateTime.toString()
@@ -279,8 +262,8 @@ class AnkeController(
             ankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return vedleggService.addAnkevedlegg(
-            ankeId = ankeId,
+        return vedleggService.addKlankevedlegg(
+            klankeId = ankeId,
             multipart = vedlegg,
             bruker = bruker
         ).toVedleggView()
@@ -310,7 +293,7 @@ class AnkeController(
             )
         ) {
             //TODO is there a reason for this choice of exception?
-            throw AnkeNotFoundException("Attachment not found.")
+            throw KlankeNotFoundException("Attachment not found.")
         }
     }
 
@@ -333,7 +316,7 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = vedleggService.getVedleggFromAnke(ankeId = ankeId, vedleggId = vedleggId, bruker = bruker)
+        val content = vedleggService.getVedleggFromKlanke(klankeId = ankeId, vedleggId = vedleggId, bruker = bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
@@ -358,7 +341,7 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = ankeService.getAnkePdf(ankeId = ankeId, bruker = bruker)
+        val content = commonService.getKlankePdf(klankeId = ankeId, bruker = bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
@@ -383,7 +366,7 @@ class AnkeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = ankeService.createAnkePdfWithFoersteside(ankeId, bruker)
+        val content = commonService.createKlankePdfWithFoersteside(ankeId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")

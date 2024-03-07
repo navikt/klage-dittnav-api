@@ -2,6 +2,7 @@ package no.nav.klage.domain.jpa
 
 import jakarta.persistence.*
 import no.nav.klage.domain.*
+import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
 import org.hibernate.annotations.BatchSize
@@ -14,52 +15,67 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "klanke")
 @DynamicUpdate
-@DiscriminatorColumn(name = "klanke_type")
-abstract class Klanke(
+class Klanke(
     @Id
-    open val id: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "foedselsnummer")
-    open var foedselsnummer: String,
+    var foedselsnummer: String,
     @Column(name = "fritekst")
-    open var fritekst: String?,
+    var fritekst: String?,
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    open var status: KlageAnkeStatus,
+    var status: KlageAnkeStatus,
     @Enumerated(EnumType.STRING)
     @Column(name = "tema")
-    open var tema: Tema,
+    var tema: Tema,
     @Column(name = "user_saksnummer")
-    open var userSaksnummer: String?,
+    var userSaksnummer: String?,
     @Column(name = "journalpost_id")
-    open var journalpostId: String?,
+    var journalpostId: String?,
     @Column(name = "vedtak_date")
-    open var vedtakDate: LocalDate?,
+    var vedtakDate: LocalDate?,
     @Column(name = "internal_saksnummer")
-    open var internalSaksnummer: String?,
+    var internalSaksnummer: String?,
     @Enumerated(EnumType.STRING)
     @Column(name = "language")
-    open var language: LanguageEnum,
+    var language: LanguageEnum,
     @Enumerated(EnumType.STRING)
     @Column(name = "innsendingsytelse")
-    open var innsendingsytelse: Innsendingsytelse,
+    var innsendingsytelse: Innsendingsytelse,
     @Column(name = "has_vedlegg")
-    open var hasVedlegg: Boolean,
+    var hasVedlegg: Boolean,
     @Column(name = "pdf_downloaded")
-    open var pdfDownloaded: LocalDateTime?,
+    var pdfDownloaded: LocalDateTime?,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klanke_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
-    open val vedlegg: MutableSet<Vedlegg> = mutableSetOf(),
+    val vedlegg: MutableSet<Vedlegg> = mutableSetOf(),
 
     @Column(name = "created")
-    open var created: LocalDateTime,
+    var created: LocalDateTime,
     @Column(name = "modified_by_user")
-    open var modifiedByUser: LocalDateTime,
+    var modifiedByUser: LocalDateTime,
+
+    /* only klage */
+    @Column(name = "checkboxes_selected")
+    @Convert(converter = CheckboxEnumConverter::class)
+    val checkboxesSelected: MutableList<CheckboxEnum> = mutableListOf(),
+
+    /* not for klager. Used to indicate KA-enhet. */
+    @Column(name = "enhetsnummer")
+    var enhetsnummer: String?,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "klanke_type")
+    var type: Type,
+
+    /* ettersendelser klage */
+    @Column(name = "case_is_at_ka")
+    var caseIsAtKA: Boolean?,
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -76,7 +92,7 @@ abstract class Klanke(
     }
 
     override fun toString(): String {
-        return "Klanke(id=$id)"
+        return "Klanke(id=$id, type=$type)"
     }
 }
 

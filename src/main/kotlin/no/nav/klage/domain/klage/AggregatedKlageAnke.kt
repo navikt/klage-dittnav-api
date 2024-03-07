@@ -23,7 +23,7 @@ data class AggregatedKlageAnke(
     val enhetsnummer: String?,
 ) {
     enum class KlageAnkeType {
-        KLAGE, ANKE
+        KLAGE, ANKE, KLAGE_ETTERSENDELSE, ANKE_ETTERSENDELSE,
     }
 
     data class Vedlegg(
