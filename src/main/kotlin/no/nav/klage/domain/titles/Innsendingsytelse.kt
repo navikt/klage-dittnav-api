@@ -74,7 +74,7 @@ enum class Innsendingsytelse(val nb: String, val en: String) {
     YRA("Yrkesrettet attføring", "Yrkesrettet attføring"),
     YRK("Yrkesskade / Menerstatning", "Occupational injury / Menerstatning"),
 
-    ALDERSPENSJON("Alderspensjon", "Old-age pension"),
+    ALDERSPENSJON("Alderspensjon", "Retirement pension"),
     ARBEIDSAVKLARINGSPENGER("Arbeidsavklaringspenger (AAP)", "Work assessment allowance (AAP)"),
     AVTALEFESTET_PENSJON_SPK("Avtalefestet pensjon (AFP) fra Statens pensjonskasse", "Contractual early retirement pension (AFP) in the public sector"),
     AVTALEFESTET_PENSJON_PRIVAT("Avtalefestet pensjon (AFP) i privat sektor", "Contractual early retirement pension (AFP) in the private sector"),
