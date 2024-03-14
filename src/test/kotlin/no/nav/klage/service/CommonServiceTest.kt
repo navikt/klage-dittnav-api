@@ -61,6 +61,7 @@ class CommonServiceTest {
             kafkaProducer = mockk(),
             fileClient = mockk(),
             klageDittnavPdfgenService = mockk(),
+            documentService = mockk()
         )
     }
 

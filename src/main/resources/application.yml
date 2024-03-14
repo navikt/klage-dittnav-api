@@ -79,6 +79,18 @@ no.nav.security.jwt:
           client-auth-method: private_key_jwt
         token-exchange:
           audience: ${PDL_SCOPE}
+      safselvbetjening-onbehalfof:
+        token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
+        grant_type: urn:ietf:params:oauth:grant-type:token-exchange
+        client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+        subject_token_type: urn:ietf:params:oauth:token-type:jwt
+        audience: ${SAFSELVBETJENING_SCOPE}
+        authentication:
+          client-id: ${TOKEN_X_CLIENT_ID}
+          client-jwk: ${TOKEN_X_PRIVATE_JWK}
+          client-auth-method: private_key_jwt
+        token-exchange:
+          audience: ${SAFSELVBETJENING_SCOPE}
       klage-fss-proxy-onbehalfof:
         token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
         grant-type: client_credentials
