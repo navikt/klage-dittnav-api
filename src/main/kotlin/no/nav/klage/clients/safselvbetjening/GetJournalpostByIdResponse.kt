@@ -12,7 +12,6 @@ data class JournalpostById(
 
 data class Dokument(
     val dokumentInfoId: String,
-    val tittel: String
 )
 
 data class PdlError(
