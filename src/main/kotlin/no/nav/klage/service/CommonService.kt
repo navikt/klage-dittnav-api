@@ -20,6 +20,7 @@ import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Path
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -35,6 +36,7 @@ class CommonService(
     private val kafkaProducer: AivenKafkaProducer,
     private val fileClient: FileClient,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
+    private val documentService: DocumentService
 
     ) {
 
@@ -223,12 +225,13 @@ class CommonService(
         vedleggMetrics.registerNumberOfVedleggPerUser(klanke.vedlegg.size.toDouble())
     }
 
-    fun getKlankePdf(klankeId: UUID, bruker: Bruker): ByteArray {
+    fun getKlankePdf(klankeId: UUID, bruker: Bruker): Pair<Path, String> {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
         requireNotNull(existingKlanke.journalpostId)
-        return fileClient.getKlageAnkeFile(existingKlanke.journalpostId!!)
+
+        return documentService.getPathToDocumentPdfAndTitle(existingKlanke.journalpostId!!)
     }
 
     fun createKlankePdfWithFoersteside(klankeId: UUID, bruker: Bruker): ByteArray? {

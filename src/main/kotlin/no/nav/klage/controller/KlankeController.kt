@@ -14,6 +14,8 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -22,6 +24,9 @@ import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
+import java.io.FileInputStream
+import java.io.InputStream
+import java.nio.file.Files
 import java.time.Duration
 import java.util.*
 
@@ -372,7 +377,7 @@ class KlankeController(
     @GetMapping("/{klankeId}/pdf")
     fun getKlankePdf(
         @PathVariable klankeId: UUID
-    ): ResponseEntity<ByteArray> {
+    ): ResponseEntity<Resource> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klanke pdf is requested. KlankeId: {}", klankeId)
         secureLogger.debug(
@@ -380,19 +385,26 @@ class KlankeController(
             klankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-
-        val klanke = commonService.getKlanke(klankeId = klankeId, bruker = bruker)
-
-        val content = commonService.getKlankePdf(klankeId, bruker)
-
+        val (pathToMergedDocument, title) = commonService.getKlankePdf(klankeId, bruker)
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "${klanke.type.name.lowercase()}.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"$title.pdf\"")
+
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(pathToMergedDocument.toFile().length())
+            .body(
+                object : FileSystemResource(pathToMergedDocument) {
+                    override fun getInputStream(): InputStream {
+                        return object : FileInputStream(pathToMergedDocument.toFile()) {
+                            override fun close() {
+                                super.close()
+                                //Override to do this after client has downloaded file
+                                Files.delete(file.toPath())
+                            }
+                        }
+                    }
+                })
     }
 
     @ResponseBody

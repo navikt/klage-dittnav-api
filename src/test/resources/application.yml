@@ -80,6 +80,7 @@ SLACK_CHANNEL_ID: test
 
 PDL_BASE_URL_GW: https://localhost
 PDL_BASE_URL: https://localhost
+SAFSELVBETJENING_BASE_URL: https://localhost
 SECURITY_TOKEN_SERVICE_REST_URL: http://localhost
 PDL_SCOPE: dev-fss.pdl.pdl-api
 

@@ -69,6 +69,12 @@ class TokenUtil(
         return response.accessToken
     }
 
+    fun getOnBehalfOfTokenWithSafselvbetjeningScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getSelvbetjeningExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(oldIssuer)?.expirationTime?.time
 
     fun getOnBehalfOfTokenWithKlageFSSProxyScope(): String {

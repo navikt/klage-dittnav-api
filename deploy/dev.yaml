@@ -4,6 +4,7 @@ externalHosts:
   - api-gw-q1.oera.no
   - pdl-api.dev-fss-pub.nais.io
   - klage-fss-proxy.dev-fss-pub.nais.io
+  - safselvbetjening-q1.dev-fss-pub.nais.io
 springProfile: dev-gcp
 
 envs:

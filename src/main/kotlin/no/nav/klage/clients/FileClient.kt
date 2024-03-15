@@ -19,17 +19,7 @@ class FileClient(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun getKlageAnkeFile(journalpostId: String): ByteArray {
-        logger.debug("Fetching klage file with journalpost id {}", journalpostId)
-
-        return fileWebClient.get()
-            .uri { it.path("/klage/{id}").build(journalpostId) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
-            .retrieve()
-            .bodyToMono<ByteArray>()
-            .block() ?: throw RuntimeException("File could not be fetched")
-    }
-
+    //TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
 
     fun uploadVedleggFile(vedleggFile: ByteArray, originalFilename: String): String {
         logger.debug("Uploading attachment to file store.")
