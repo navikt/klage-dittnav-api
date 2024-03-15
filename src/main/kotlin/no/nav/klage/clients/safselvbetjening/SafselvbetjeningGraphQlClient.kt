@@ -44,7 +44,7 @@ class SafselvbetjeningGraphQlClient(
                     logErrorResponse(response, ::getJournalpostById.name, secureLogger)
                 }
                 .bodyToMono<GetJournalpostByIdResponse>()
-                .block() ?: throw java.lang.RuntimeException("No connection to safselvbetjening")
+                .block() ?: throw RuntimeException("No connection to safselvbetjening")
         }
 
         return response
