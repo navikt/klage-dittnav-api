@@ -26,61 +26,53 @@ class TokenUtil(
     }
 
     fun getSubject(useTokenX: Boolean = true): String {
-        val token = ctxHolder.tokenValidationContext?.getClaims(if (useTokenX) issuer else oldIssuer)
+        val token = ctxHolder.getTokenValidationContext().getClaims(if (useTokenX) issuer else oldIssuer)
 
         val subject =
-            if (token?.get("pid") != null) {
+            if (token.get("pid") != null) {
                 token.get("pid").toString()
-            } else if (token?.subject != null) {
-                token.subject.toString()
             } else {
-                throw JwtTokenValidatorException("pid/sub not found in token")
+                token.subject.toString()
             }
 
         return subject
     }
 
     fun getToken(useTokenX: Boolean = true): String {
-        val token = ctxHolder.tokenValidationContext?.getJwtToken(if (useTokenX) issuer else oldIssuer)?.tokenAsString
+        val token = ctxHolder.getTokenValidationContext().getJwtToken(if (useTokenX) issuer else oldIssuer)?.encodedToken
         return checkNotNull(token) { "Token must be present" }
     }
 
     fun isAuthenticated(): Boolean {
-        ctxHolder.tokenValidationContext?.getJwtToken(issuer) ?: return false
+        ctxHolder.getTokenValidationContext().getJwtToken(issuer) ?: return false
         //TODO: Finn en måte å bruke token-support på til dette.
-        if (getExpiryFromIdPortenToken(request.getHeader("idporten-token")) - 100000 < System.currentTimeMillis()) {
-            return false
-        }
-        return true
+        return getExpiryFromIdPortenToken(request.getHeader("idporten-token")) - 100000 >= System.currentTimeMillis()
     }
 
     fun isSelvbetjeningAuthenticated(): Boolean {
-        ctxHolder.tokenValidationContext?.getJwtToken(oldIssuer) ?: return false
+        ctxHolder.getTokenValidationContext().getJwtToken(oldIssuer) ?: return false
         //TODO: Finn en måte å bruke token-support på til dette.
-        if (getSelvbetjeningExpiry()!!.minus(100000) < System.currentTimeMillis()) {
-            return false
-        }
-        return true
+        return getSelvbetjeningExpiry()!!.minus(100000) >= System.currentTimeMillis()
     }
 
     fun getOnBehalfOfTokenWithPdlScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
+        val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]!!
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
+        return response.accessToken!!
     }
 
     fun getOnBehalfOfTokenWithSafselvbetjeningScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]
+        val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]!!
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
+        return response.accessToken!!
     }
 
-    fun getSelvbetjeningExpiry(): Long? = ctxHolder.tokenValidationContext?.getClaims(oldIssuer)?.expirationTime?.time
+    fun getSelvbetjeningExpiry(): Long? = ctxHolder.getTokenValidationContext().getClaims(oldIssuer).expirationTime?.time
 
     fun getOnBehalfOfTokenWithKlageFSSProxyScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-onbehalfof"]
+        val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-onbehalfof"]!!
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
+        return response.accessToken!!
     }
 
     fun getExpiryFromIdPortenToken(token: String): Long {

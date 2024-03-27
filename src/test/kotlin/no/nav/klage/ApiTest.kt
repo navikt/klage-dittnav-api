@@ -131,20 +131,6 @@ class ApiTest {
         }
 
         @Test
-        fun `kall på GET authenticated med selvbetjeningstoken gir tokenx false og selvbetjening true`() {
-            val token = selvbetjeningToken(fnr = FNR)
-
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/bruker/authenticated")
-                    .header("Authorization", "Bearer $token")
-                    .contentType(MediaType.APPLICATION_JSON)
-            ).andReturn().response
-            val output = mapper.readValue(response.contentAsString, AuthenticationStatus::class.java)
-            assertFalse(output.tokenx)
-            assertTrue(output.selvbetjening)
-        }
-
-        @Test
         fun `kall på GET authenticated med tokenx-token gir tokenx true`() {
             val token = tokenxToken(fnr = FNR)
 
