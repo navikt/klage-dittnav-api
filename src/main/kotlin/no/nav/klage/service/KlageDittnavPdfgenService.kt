@@ -97,7 +97,7 @@ class KlageDittnavPdfgenService(
             documentList += "Vedlegg"
         }
         return FoerstesideRequest(
-            spraakkode = Spraakkode.NB,
+            spraakkode = Spraakkode.valueOf(language.name),
             netsPostboks = "1400", //always
             bruker = Bruker(
                 brukerId = foedselsnummer,
