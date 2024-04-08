@@ -27,6 +27,8 @@ class PdlClientConfiguration(private val webClientBuilder: WebClient.Builder) {
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("Nav-Consumer-Id", username)
             .defaultHeader("TEMA", "KLA")
+            //Fra behandlingskatalogen
+            .defaultHeader("behandlingsnummer", "B392")
             .defaultHeader("x-nav-apiKey", apiKey)
             .build()
     }
