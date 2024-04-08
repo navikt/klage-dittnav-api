@@ -10,4 +10,3 @@ enum class LanguageEnum {
     @JsonProperty("nn")
     NN,
 }
-

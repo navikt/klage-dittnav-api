@@ -6,6 +6,7 @@ import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
 import no.nav.klage.controller.view.*
+import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.titles.Innsendingsytelse
@@ -67,25 +68,25 @@ class KlageDittnavPdfgenService(
 
         when (type) {
             Type.KLAGE -> {
-                text = "Klageskjema"
+                text = if (language == LanguageEnum.EN) "Complaint form" else "Klageskjema"
                 arkivtittel = "Klage"
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
             Type.ANKE -> {
-                text = "Ankeskjema"
+                text = if (language == LanguageEnum.EN) "Appeal form" else "Ankeskjema"
                 arkivtittel = "Anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
             Type.KLAGE_ETTERSENDELSE -> {
-                text = "Ettersendelsesskjema"
+                text = if (language == LanguageEnum.EN) "Form for additional documentation for complaint" else "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til klage"
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
             }
             Type.ANKE_ETTERSENDELSE -> {
-                text = "Ettersendelsesskjema"
+                text = if (language == LanguageEnum.EN) "Form for additional documentation for appeal" else "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
@@ -94,7 +95,7 @@ class KlageDittnavPdfgenService(
 
         val documentList = mutableListOf(text)
         if (hasVedlegg) {
-            documentList += "Vedlegg"
+            documentList += if (language == LanguageEnum.EN) "Attachments" else "Vedlegg"
         }
         return FoerstesideRequest(
             spraakkode = Spraakkode.valueOf(language.name),
