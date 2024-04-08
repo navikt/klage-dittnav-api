@@ -21,8 +21,9 @@ data class FoerstesideRequest(
 ) {
 
     enum class Spraakkode {
-        //Don't think anything else is supported
-        NB
+        NB,
+        NN,
+        EN,
     }
 
     data class Adresse(

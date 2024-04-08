@@ -6,6 +6,7 @@ enum class LanguageEnum {
     @JsonProperty("nb")
     NB,
     @JsonProperty("en")
-    EN
+    EN,
+    @JsonProperty("nn")
+    NN,
 }
-
