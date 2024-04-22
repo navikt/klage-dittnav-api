@@ -6,15 +6,11 @@ import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
-import no.nav.klage.domain.Tema
-import no.nav.klage.domain.exception.FullmaktNotFoundException
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import no.nav.pam.geography.PostDataDAO
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -29,21 +25,11 @@ class BrukerService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Value("\${ALL_FULLMAKT_OMRAADER}")
-    private lateinit var allFullmaktOmraader: String
-
     private val postDataDAO = PostDataDAO()
 
     fun getBruker(useOboToken: Boolean = true): Bruker {
         val personinfo = pdlClient.getPersonInfo(useOboToken)
         return mapToBruker(personinfo, useOboToken)
-    }
-
-    fun getFullmaktsgiver(tema: Tema, fnr: String): Bruker {
-        if (fullmaktExists(tema, fnr)) {
-            val fullmaktsgiverPersonInfo = pdlClient.getPersonInfoWithSystemUser(fnr)
-            return mapToBruker(fullmaktsgiverPersonInfo)
-        } else throw FullmaktNotFoundException()
     }
 
     fun mapToBruker(personInfo: HentPdlPersonResponse, useIdPortenTokenForExpiry: Boolean = true): Bruker {
@@ -79,27 +65,6 @@ class BrukerService(
         val correctPartOfToken = Base64.getDecoder().decode(token.split(".")[1])
         val value = jacksonObjectMapper().readTree(correctPartOfToken)
         return value["exp"].asLong() * 1000
-    }
-
-    fun verifyFullmakt(tema: Tema, fullmaktsGiverFnr: String) {
-        when {
-            !fullmaktExists(tema, fullmaktsGiverFnr) -> throw FullmaktNotFoundException()
-        }
-    }
-
-    private fun fullmaktExists(tema: Tema, fullmaktsGiverFnr: String): Boolean {
-        val fullmektigResponse = pdlClient.getFullmektigInfoWithSystemUser(fullmaktsGiverFnr)
-        if (fullmektigResponse.data?.hentPerson == null) {
-            throw FullmaktNotFoundException()
-        }
-        val fullmaktList = fullmektigResponse.data.hentPerson.fullmakt
-
-        return fullmaktList.any { fullmakt ->
-            tokenUtil.getSubject() == fullmakt.motpartsPersonident &&
-                    fullmakt.motpartsRolle == FullmaktsRolle.FULLMEKTIG &&
-                    (fullmakt.omraader.contains(tema.name) || fullmakt.omraader.contains(allFullmaktOmraader)) &&
-                    LocalDate.now() in fullmakt.gyldigFraOgMed..fullmakt.gyldigTilOgMed
-        }
     }
 
     private fun Folkeregisteridentifikator.toIdentifikator() = Identifikator(

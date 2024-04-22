@@ -103,13 +103,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
 
     @ExceptionHandler
-    fun handleFullmaktNotFound(
-        ex: FullmaktNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
-
-    @ExceptionHandler
     fun handleUpdateMismatch(
         ex: UpdateMismatchException,
         request: NativeWebRequest

@@ -158,20 +158,6 @@ enum class Innsendingsytelse(val nb: String, val en: String, val nn: String) {
         }
     }
 
-    data class TitleInAllLanguages(
-        val nb: String,
-        val en: String,
-        val nn: String,
-    )
-
-    fun getTitleInAllLanguages(): TitleInAllLanguages {
-        return TitleInAllLanguages(
-            this.nb,
-            this.en,
-            this.nn,
-        )
-    }
-
     fun toTema(): Tema {
         return when(this) {
             AAP -> Tema.AAP

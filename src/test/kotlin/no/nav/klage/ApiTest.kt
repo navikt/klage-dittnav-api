@@ -12,7 +12,6 @@ import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -184,33 +183,6 @@ class ApiTest {
                 audience = listOf(audience),
                 claims = claims,
                 expiry = expiry,
-            )
-        ).serialize()
-    }
-
-    fun selvbetjeningToken(
-        fnr: String,
-        audience: String = "klage-dittnav-api-client-id",
-        issuerId: String = "selvbetjening",
-        clientId: String = "klage-dittnav-client-id",
-        claims: Map<String, Any> = mapOf(
-            "acr" to "Level4",
-            "idp" to "idporten",
-            "client_id" to clientId,
-            "pid" to fnr,
-        ),
-        expiry: Long = 3600,
-    ): String {
-
-        return server.issueToken(
-            issuerId,
-            clientId,
-            DefaultOAuth2TokenCallback(
-                issuerId = issuerId,
-                subject = UUID.randomUUID().toString(),
-                audience = listOf(audience),
-                claims = claims,
-                expiry = expiry
             )
         ).serialize()
     }

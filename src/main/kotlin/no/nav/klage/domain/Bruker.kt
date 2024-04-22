@@ -26,21 +26,9 @@ data class Adresse(
     val poststed: String?,
     val husnummer: String?,
     val husbokstav: String?
-) {
-    fun toKlageskjemaString(): String =
-        "${adressenavn.orEmpty()} " +
-                "${husnummer.orEmpty()} " +
-                "${husbokstav.orEmpty()}, " +
-                "${postnummer.orEmpty()}, " +
-                poststed.orEmpty()
-}
+)
 
 data class Kontaktinformasjon(
     val telefonnummer: String?,
     val epost: String?
 )
-
-private fun String?.orEmpty(): String = this ?: ""
-
-fun Bruker.getCompoundedNavn(): String =
-    navn.fornavn + " " + if (navn.mellomnavn != null) { navn.mellomnavn + " "} else {""} + navn.etternavn

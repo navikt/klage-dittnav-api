@@ -103,8 +103,6 @@ no.nav.security.jwt:
 maxAttachmentSize: 8MB
 maxTotalSize: 32MB
 
-ALL_FULLMAKT_OMRAADER: "*"
-
 KLAGE_FILE_API_APP_NAME: klage-file-api
 
 CLAM_AV_URL: http://clamav.nais-system/scan

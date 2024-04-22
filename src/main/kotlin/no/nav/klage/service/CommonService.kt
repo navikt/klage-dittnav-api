@@ -1,6 +1,5 @@
 package no.nav.klage.service
 
-import no.nav.klage.clients.FileClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.controller.view.KlankeFullInput
@@ -34,11 +33,10 @@ class CommonService(
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val kafkaProducer: AivenKafkaProducer,
-    private val fileClient: FileClient,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
     private val documentService: DocumentService
 
-    ) {
+) {
 
     companion object {
 

@@ -6,4 +6,3 @@ enum class KlageAnkeStatus {
 
 fun KlageAnkeStatus.isDeleted() = this === KlageAnkeStatus.DELETED
 fun KlageAnkeStatus.isFinalized() = this === KlageAnkeStatus.DONE
-fun KlageAnkeStatus.couldBeShownAsAvailableAnke() = setOf(KlageAnkeStatus.OPEN, KlageAnkeStatus.DRAFT).contains(this)

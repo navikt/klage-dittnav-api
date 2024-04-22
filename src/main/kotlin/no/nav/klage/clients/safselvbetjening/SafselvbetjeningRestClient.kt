@@ -3,19 +3,18 @@ package no.nav.klage.clients.safselvbetjening
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
+import org.slf4j.Logger
+import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
-import org.springframework.http.MediaType
-import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.core.publisher.Mono
-import org.slf4j.Logger
-import org.springframework.web.reactive.function.client.ClientResponse
-import org.springframework.core.io.buffer.DataBuffer
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.nio.file.Path
 
 @Component
