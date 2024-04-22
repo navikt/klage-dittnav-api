@@ -1,7 +1,6 @@
 package no.nav.klage.clients.pdl
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 
 data class HentPdlPersonResponse(val data: HentPerson?, val errors: List<PdlError>?)
@@ -46,20 +45,6 @@ data class Telefonnummer(
     val prioritet: String?
 )
 
-enum class Endringstype {
-    OPPRETT,
-    KORRIGER,
-    OPPHOER,
-}
-
-data class Endring(
-    val type: Endringstype?,
-    val registrert: LocalDateTime?,
-    val registrertAv: String?,
-    val systemKilde: String?,
-    val kilde: String?
-)
-
 data class VegAdresse(
     val matrikkelId: Int?,
     val husnummer: String?,
@@ -88,15 +73,3 @@ data class Folkeregisteridentifikator(
     val type: String,
     val status: String
 )
-
-data class Fullmakt(
-    val motpartsPersonident: String,
-    val motpartsRolle: FullmaktsRolle,
-    val omraader: List<String>,
-    val gyldigFraOgMed: LocalDate,
-    val gyldigTilOgMed: LocalDate
-)
-
-enum class FullmaktsRolle {
-    FULLMAKTSGIVER, FULLMEKTIG
-}

@@ -18,15 +18,6 @@ data class HentPersonVariabler(
     val ident: String
 )
 
-data class FullmektigGraphqlQuery(
-    val query: String,
-    val variables: HentFullmektigVariabler
-)
-
-data class HentFullmektigVariabler(
-    val ident: String
-)
-
 data class Variables(
     val ident: String,
     val navnHistorikk: Boolean,
@@ -53,9 +44,4 @@ data class PdlErrorExtension(
 fun hentPersonQuery(fnr: String): PersonGraphqlQuery {
     val query = GraphqlQuery::class.java.getResource("/pdl/hentPerson.graphql").readText().replace("[\n\r]", "")
     return PersonGraphqlQuery(query, HentPersonVariabler(fnr))
-}
-
-fun hentFullmektigQuery(fnr: String): FullmektigGraphqlQuery {
-    val query = GraphqlQuery::class.java.getResource("/pdl/hentFullmektig.graphql").readText().replace("[\n\r]", "")
-    return FullmektigGraphqlQuery(query, HentFullmektigVariabler(fnr))
 }

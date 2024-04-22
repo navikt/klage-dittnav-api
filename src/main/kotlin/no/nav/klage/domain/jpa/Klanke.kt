@@ -9,7 +9,6 @@ import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*

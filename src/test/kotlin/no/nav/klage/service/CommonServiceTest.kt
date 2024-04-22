@@ -59,7 +59,6 @@ class CommonServiceTest {
             klageAnkeMetrics = mockk(),
             vedleggMetrics = mockk(),
             kafkaProducer = mockk(),
-            fileClient = mockk(),
             klageDittnavPdfgenService = mockk(),
             documentService = mockk()
         )

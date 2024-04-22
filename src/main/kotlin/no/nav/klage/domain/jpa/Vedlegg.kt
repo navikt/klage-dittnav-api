@@ -1,12 +1,9 @@
 package no.nav.klage.domain.jpa
 
-import jakarta.persistence.*
-import org.hibernate.Hibernate
-import org.hibernate.annotations.BatchSize
-import org.hibernate.annotations.DynamicUpdate
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
-import java.time.LocalDateTime
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.util.*
 
 @Entity
