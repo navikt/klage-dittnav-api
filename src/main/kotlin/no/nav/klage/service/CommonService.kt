@@ -11,7 +11,6 @@ import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.kafka.AivenKafkaProducer
-import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.repository.KlankeRepository
@@ -68,7 +67,6 @@ class CommonService(
             foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             fritekst = fritekst,
             status = KlageAnkeStatus.DRAFT,
-            tema = innsendingsytelseToTema[innsendingsytelse]!!,
             userSaksnummer = userSaksnummer,
             journalpostId = null,
             vedtakDate = vedtakDate,
@@ -91,7 +89,6 @@ class CommonService(
             foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             fritekst = null,
             status = KlageAnkeStatus.DRAFT,
-            tema = innsendingsytelseToTema[innsendingsytelse]!!,
             userSaksnummer = null,
             journalpostId = null,
             vedtakDate = null,
@@ -123,7 +120,6 @@ class CommonService(
     fun getDraftOrCreateKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
         val existingKlanke = getLatestKlankeDraft(
             bruker = bruker,
-            tema = innsendingsytelseToTema[input.innsendingsytelse]!!,
             internalSaksnummer = input.internalSaksnummer,
             innsendingsytelse = input.innsendingsytelse,
             type = input.type,
@@ -137,7 +133,6 @@ class CommonService(
 
     fun getLatestKlankeDraft(
         bruker: Bruker,
-        tema: Tema,
         internalSaksnummer: String?,
         innsendingsytelse: Innsendingsytelse,
         type: Type,
@@ -151,9 +146,9 @@ class CommonService(
         )
             .filter {
                 if (internalSaksnummer != null) {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                    it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
                 } else {
-                    it.tema == tema && it.innsendingsytelse == innsendingsytelse
+                    it.innsendingsytelse == innsendingsytelse
                 }
             }.maxByOrNull { it.modifiedByUser }
     }
@@ -194,9 +189,9 @@ class CommonService(
         registerFinalizedMetrics(klanke = existingKlanke)
 
         logger.debug(
-            "Klanke {} med tema {} er sendt inn.",
+            "Klanke {} med innsendingsytelse {} er sendt inn.",
             klankeId,
-            existingKlanke.tema.name,
+            existingKlanke.innsendingsytelse.name,
         )
 
         return existingKlanke.modifiedByUser
@@ -206,7 +201,7 @@ class CommonService(
         val temaReport = if (klageAnkeIsLonnskompensasjon(klanke.innsendingsytelse)) {
             LOENNSKOMPENSASJON_GRAFANA_TEMA
         } else {
-            klanke.tema.toString()
+            innsendingsytelseToTema[klanke.innsendingsytelse]!!.name
         }
 
         if (klanke.type == Type.KLAGE) {
@@ -267,7 +262,7 @@ class CommonService(
             dato = klanke.modifiedByUser.toLocalDate(),
             begrunnelse = sanitizeText(klanke.fritekst ?: ""),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            tema = klanke.tema.name,
+            tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!.name,
             ytelse = klanke.innsendingsytelse.nbName,
             vedlegg = klanke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
             userChoices = klanke.checkboxesSelected.map { x -> x.getFullText(klanke.language) },

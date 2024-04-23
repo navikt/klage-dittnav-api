@@ -6,7 +6,6 @@ import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
-import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -47,7 +46,6 @@ class KlankeRepositoryTest(
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,
-                tema = Tema.PEN,
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
@@ -79,7 +77,6 @@ class KlankeRepositoryTest(
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,
-                tema = Tema.FRI,
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
@@ -111,7 +108,6 @@ class KlankeRepositoryTest(
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,
-                tema = Tema.FRI,
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
