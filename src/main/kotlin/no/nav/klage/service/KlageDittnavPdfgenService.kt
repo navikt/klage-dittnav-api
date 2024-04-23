@@ -9,8 +9,9 @@ import no.nav.klage.controller.view.*
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.exception.InvalidIdentException
-import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.domain.toPDFInput
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.util.isValidFnrOrDnr
 import org.apache.pdfbox.io.IOUtils
 import org.apache.pdfbox.io.RandomAccessReadBuffer
@@ -104,7 +105,7 @@ class KlageDittnavPdfgenService(
                 brukerId = foedselsnummer,
                 brukerType = Brukertype.PERSON
             ),
-            tema = innsendingsytelse.toTema().name,
+            tema = innsendingsytelseToTema[innsendingsytelse]!!.name,
             arkivtittel = arkivtittel,
             navSkjemaId = navSkjemaId,
             overskriftstittel = "$arkivtittel $navSkjemaId",

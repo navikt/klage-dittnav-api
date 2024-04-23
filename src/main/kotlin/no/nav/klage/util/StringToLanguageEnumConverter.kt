@@ -1,7 +1,7 @@
 package no.nav.klage.util
 
 import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import org.springframework.core.convert.converter.Converter
 import java.util.*
 

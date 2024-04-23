@@ -3,7 +3,9 @@ package no.nav.klage.domain.jpa
 import jakarta.persistence.*
 import no.nav.klage.domain.*
 import no.nav.klage.domain.klage.CheckboxEnum
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.InnsendingsytelseConverter
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
@@ -40,8 +42,8 @@ class Klanke(
     @Enumerated(EnumType.STRING)
     @Column(name = "language")
     var language: LanguageEnum,
-    @Enumerated(EnumType.STRING)
     @Column(name = "innsendingsytelse")
+    @Convert(converter = InnsendingsytelseConverter::class)
     var innsendingsytelse: Innsendingsytelse,
     @Column(name = "has_vedlegg")
     var hasVedlegg: Boolean,

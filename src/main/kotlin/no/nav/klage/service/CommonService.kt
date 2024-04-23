@@ -10,8 +10,10 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.domain.klage.CheckboxEnum
-import no.nav.klage.domain.titles.Innsendingsytelse
 import no.nav.klage.kafka.AivenKafkaProducer
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.klageAnkeIsLonnskompensasjon
@@ -66,7 +68,7 @@ class CommonService(
             foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             fritekst = fritekst,
             status = KlageAnkeStatus.DRAFT,
-            tema = innsendingsytelse.toTema(),
+            tema = innsendingsytelseToTema[innsendingsytelse]!!,
             userSaksnummer = userSaksnummer,
             journalpostId = null,
             vedtakDate = vedtakDate,
@@ -89,7 +91,7 @@ class CommonService(
             foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             fritekst = null,
             status = KlageAnkeStatus.DRAFT,
-            tema = innsendingsytelse.toTema(),
+            tema = innsendingsytelseToTema[innsendingsytelse]!!,
             userSaksnummer = null,
             journalpostId = null,
             vedtakDate = null,
@@ -110,7 +112,7 @@ class CommonService(
         val temaReport = if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
             LOENNSKOMPENSASJON_GRAFANA_TEMA
         } else {
-            input.innsendingsytelse.toTema().toString()
+            innsendingsytelseToTema[input.innsendingsytelse]!!.name
         }
         klageAnkeMetrics.incrementKlankerInitialized(
             ytelse = temaReport,
@@ -121,7 +123,7 @@ class CommonService(
     fun getDraftOrCreateKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
         val existingKlanke = getLatestKlankeDraft(
             bruker = bruker,
-            tema = input.innsendingsytelse.toTema(),
+            tema = innsendingsytelseToTema[input.innsendingsytelse]!!,
             internalSaksnummer = input.internalSaksnummer,
             innsendingsytelse = input.innsendingsytelse,
             type = input.type,
@@ -266,13 +268,14 @@ class CommonService(
             begrunnelse = sanitizeText(klanke.fritekst ?: ""),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             tema = klanke.tema.name,
-            ytelse = klanke.innsendingsytelse.nb,
+            ytelse = klanke.innsendingsytelse.nbName,
             vedlegg = klanke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
             userChoices = klanke.checkboxesSelected.map { x -> x.getFullText(klanke.language) },
             userSaksnummer = klanke.userSaksnummer,
             internalSaksnummer = klanke.internalSaksnummer,
             klageAnkeType = AggregatedKlageAnke.KlageAnkeType.valueOf(klanke.type.name),
             enhetsnummer = klanke.enhetsnummer,
+            innsendingsYtelseId = klanke.innsendingsytelse.id,
         )
     }
 

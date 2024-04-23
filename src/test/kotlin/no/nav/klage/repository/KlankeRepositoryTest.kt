@@ -3,11 +3,11 @@ package no.nav.klage.repository
 import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
-import no.nav.klage.domain.Tema
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,13 +47,13 @@ class KlankeRepositoryTest(
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,
-                tema = Tema.FRI,
+                tema = Tema.PEN,
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
                 internalSaksnummer = "int123",
                 language = LanguageEnum.NB,
-                innsendingsytelse = Innsendingsytelse.PEN,
+                innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
                 hasVedlegg = true,
                 pdfDownloaded = null,
                 vedlegg = mutableSetOf(),
@@ -85,7 +85,7 @@ class KlankeRepositoryTest(
                 vedtakDate = LocalDate.now(),
                 internalSaksnummer = "int123",
                 language = LanguageEnum.NB,
-                innsendingsytelse = Innsendingsytelse.PEN,
+                innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
                 hasVedlegg = true,
                 pdfDownloaded = null,
                 vedlegg = mutableSetOf(),
@@ -117,7 +117,7 @@ class KlankeRepositoryTest(
                 vedtakDate = LocalDate.now(),
                 internalSaksnummer = "int123",
                 language = LanguageEnum.NB,
-                innsendingsytelse = Innsendingsytelse.PEN,
+                innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
                 hasVedlegg = true,
                 pdfDownloaded = null,
                 vedlegg = mutableSetOf(),

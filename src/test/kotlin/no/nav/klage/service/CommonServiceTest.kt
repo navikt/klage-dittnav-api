@@ -5,7 +5,8 @@ import io.mockk.mockk
 import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klanke
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.repository.KlankeRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
