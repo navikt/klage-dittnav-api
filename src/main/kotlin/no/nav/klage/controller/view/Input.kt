@@ -1,5 +1,6 @@
 package no.nav.klage.controller.view
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.klage.CheckboxEnum
@@ -29,6 +30,7 @@ data class BooleanInput(
 /**
  * Completely new
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class KlankeMinimalInput(
     val internalSaksnummer: String?,
     val innsendingsytelse: Innsendingsytelse,
@@ -38,6 +40,7 @@ data class KlankeMinimalInput(
 /**
  * From not logged in to logged in
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class KlankeFullInput(
     val innsendingsytelse: Innsendingsytelse,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
