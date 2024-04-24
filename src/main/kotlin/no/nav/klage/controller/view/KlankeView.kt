@@ -4,7 +4,7 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.klage.CheckboxEnum
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*

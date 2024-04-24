@@ -3,7 +3,7 @@ package no.nav.klage.common
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.klage.CheckboxEnum
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
 
@@ -62,9 +62,9 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         }
     }
 
-    fun incrementKlagerFinalizedTitle(title: Innsendingsytelse) {
+    fun incrementKlagerFinalizedTitle(innsendingsytelse: Innsendingsytelse) {
         try {
-            meterRegistry.counter(COUNTER_KLAGER_FINALIZED_TITLE, "tittel", title.nb).increment()
+            meterRegistry.counter(COUNTER_KLAGER_FINALIZED_TITLE, "tittel", innsendingsytelse.nbName).increment()
         } catch (e: Exception) {
             logger.warn("incrementKlageTitle failed", e)
         }

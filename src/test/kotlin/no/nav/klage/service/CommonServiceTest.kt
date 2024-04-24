@@ -5,7 +5,8 @@ import io.mockk.mockk
 import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klanke
-import no.nav.klage.domain.titles.Innsendingsytelse
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.repository.KlankeRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -75,7 +76,6 @@ class CommonServiceTest {
                 folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
                 kontaktinformasjon = null,
             ),
-            tema = exampleTema,
             internalSaksnummer = exampleInternalSaksnummer,
             innsendingsytelse = exampleInnsendingsytelse,
             type = Type.KLAGE,
@@ -94,7 +94,6 @@ class CommonServiceTest {
                 folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
                 kontaktinformasjon = null,
             ),
-            tema = exampleTema,
             internalSaksnummer = null,
             innsendingsytelse = exampleInnsendingsytelse,
             type = Type.KLAGE,
@@ -113,7 +112,6 @@ class CommonServiceTest {
                 folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
                 kontaktinformasjon = null,
             ),
-            tema = exampleTema,
             internalSaksnummer = exampleInternalSaksnummer,
             innsendingsytelse = exampleInnsendingsytelse,
             type = Type.KLAGE,
@@ -141,7 +139,6 @@ class CommonServiceTest {
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst,
                 status = draftStatus,
-                tema = exampleTema,
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
@@ -165,7 +162,6 @@ class CommonServiceTest {
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst2,
                 status = draftStatus,
-                tema = exampleTema,
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
@@ -194,7 +190,6 @@ class CommonServiceTest {
                 foedselsnummer = fnr,
                 fritekst = innsendingsytelseAndInternalSaksnummer,
                 status = draftStatus,
-                tema = exampleTema,
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
@@ -221,7 +216,6 @@ class CommonServiceTest {
                 foedselsnummer = fnr,
                 fritekst = innsendingsytelseAndNoInternalSaksnummer,
                 status = draftStatus,
-                tema = exampleTema,
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
@@ -248,7 +242,6 @@ class CommonServiceTest {
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst,
                 status = draftStatus,
-                tema = exampleTema,
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,

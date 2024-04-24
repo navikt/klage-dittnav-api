@@ -35,7 +35,7 @@ fun OpenKlankeInput.toPDFInput(): PDFInput {
         begrunnelse = sanitizeText(fritekst),
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-        ytelse = innsendingsytelse.nb.replaceFirstChar { it.lowercase(Locale.getDefault()) },
+        ytelse = innsendingsytelse.nbName.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
         sendesIPosten = true,
         enhetsnavn = Enhet.entries.find { it.navn == enhetsnummer }?.beskrivelse,
