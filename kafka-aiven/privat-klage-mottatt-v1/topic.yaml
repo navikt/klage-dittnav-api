@@ -22,5 +22,8 @@ spec:
       application: klage-arkiver-journalpost
       access: read
     - team: klage
+      application: klage-arkiver-journalpost-q2
+      access: read
+    - team: klage
       application: klage-kafka-manager
       access: read
