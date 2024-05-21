@@ -22,7 +22,7 @@ class FoerstesidegeneratorClient(
     fun createFoersteside(foerstesideRequest: FoerstesideRequest): ByteArray {
         val result = runCatching {
             foerstesidegeneratorWebClient.post()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFSSProxyScope()}")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()}")
                 .bodyValue(foerstesideRequest)
                 .retrieve()
                 .bodyToMono<ByteArray>()

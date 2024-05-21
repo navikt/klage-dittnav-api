@@ -79,6 +79,14 @@ no.nav.security.jwt:
           client-auth-method: private_key_jwt
         token-exchange:
           audience: ${PDL_SCOPE}
+      pdl-maskintilmaskin:
+        token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: api://${PDL_SCOPE}/.default
+        authentication:
+          client-id: ${AZURE_APP_CLIENT_ID}
+          client-jwk: ${AZURE_APP_JWK}
+          client-auth-method: private_key_jwt
       safselvbetjening-onbehalfof:
         token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
         grant_type: urn:ietf:params:oauth:grant-type:token-exchange
@@ -91,7 +99,7 @@ no.nav.security.jwt:
           client-auth-method: private_key_jwt
         token-exchange:
           audience: ${SAFSELVBETJENING_SCOPE}
-      klage-fss-proxy-onbehalfof:
+      klage-fss-proxy-maskintilmaskin:
         token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
         grant-type: client_credentials
         scope: api://${FSS_CLUSTER}.klage.klage-fss-proxy/.default

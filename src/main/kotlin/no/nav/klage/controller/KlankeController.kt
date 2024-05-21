@@ -227,29 +227,6 @@ class KlankeController(
         )
     }
 
-    @PutMapping("/{klankeId}/enhetsnummer")
-    fun updateEnhetsnummer(
-        @PathVariable klankeId: UUID,
-        @RequestBody input: StringInputNullable,
-        response: HttpServletResponse
-    ): EditedView {
-        val bruker = brukerService.getBruker()
-        logger.debug("Update klankeId enhetsnummer is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Update klankeId enhetsnummer is requested. Id: {}, fnr: {}",
-            klankeId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-        val modifiedByUser = commonService.updateEnhetsnummer(
-            klankeId = klankeId,
-            enhetsnummer = input.value,
-            bruker = bruker
-        )
-        return EditedView(
-            modifiedByUser = modifiedByUser
-        )
-    }
-
     @PutMapping("/{klankeId}/caseisatka")
     fun updateCaseIsAtKA(
         @PathVariable klankeId: UUID,

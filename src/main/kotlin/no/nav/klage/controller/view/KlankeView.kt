@@ -19,7 +19,6 @@ data class KlankeView(
     val finalizedDate: LocalDate?,
     val vedtakDate: LocalDate?,
     val checkboxesSelected: Set<CheckboxEnum>?,
-    val enhetsnummer: String?,
     val userSaksnummer: String?,
     val internalSaksnummer: String?,
     val language: LanguageEnum,

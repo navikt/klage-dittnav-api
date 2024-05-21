@@ -60,6 +60,12 @@ class TokenUtil(
         return response.accessToken!!
     }
 
+    fun getAppAccessTokenWithPdlScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["pdl-maskintilmaskin"]!!
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken!!
+    }
+
     fun getOnBehalfOfTokenWithSafselvbetjeningScope(): String {
         val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]!!
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
@@ -68,8 +74,8 @@ class TokenUtil(
 
     fun getSelvbetjeningExpiry(): Long? = ctxHolder.getTokenValidationContext().getClaims(oldIssuer).expirationTime?.time
 
-    fun getOnBehalfOfTokenWithKlageFSSProxyScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-onbehalfof"]!!
+    fun getAppAccessTokenWithKlageFSSProxyScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-maskintilmaskin"]!!
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.accessToken!!
     }
