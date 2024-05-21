@@ -17,7 +17,7 @@ val kodeverkVersion = "1.8.13"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
 val testContainersVersion = "1.19.8"
-val mockkVersion = "1.13.10"
+val mockkVersion = "1.13.11"
 val springMockkVersion = "4.0.2"
 
 val githubUser: String by project
@@ -31,7 +31,7 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "1.9.24"
+    val kotlinVersion = "2.0.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.springframework.boot") version "3.2.5"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
