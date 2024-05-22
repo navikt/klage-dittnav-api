@@ -130,15 +130,15 @@ class KlageDittnavPdfgenService(
         innsendingsytelse: Innsendingsytelse,
         ettersendelseTilKa: Boolean?
     ): String? {
-        val adressebeskyttelse =
-            pdlClient.getPersonInfoAsSystemUser(foedselsnummer = foedselsnummer).data?.hentPerson?.adressebeskyttelse
+        val adressebeskyttelse = null
+//            pdlClient.getPersonInfoAsSystemUser(foedselsnummer = foedselsnummer).data?.hentPerson?.adressebeskyttelse
 
-        if (adressebeskyttelse?.any {
-                it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG
-                        || it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
-            } == true) {
-            return null
-        }
+//        if (adressebeskyttelse?.any {
+//                it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG
+//                        || it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+//            } == true) {
+//            return null
+//        }
 
         return if (shouldBeSentToKA(klageAnkeType = type, ettersendelseToKA = ettersendelseTilKa == true)) {
             innsendingsytelseToAnkeEnhet[innsendingsytelse]!!.navn
