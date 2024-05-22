@@ -227,6 +227,16 @@ class KlankeController(
         )
     }
 
+    @Deprecated("No longer in use")
+    @PutMapping("/{klankeId}/enhetsnummer")
+    fun updateEnhetsnummer(
+        @PathVariable klankeId: UUID,
+        @RequestBody input: StringInputNullable,
+        response: HttpServletResponse
+    ) {
+        logger.debug("Deprecated update klankeId enhetsnummer is requested. Returning 200.")
+    }
+
     @PutMapping("/{klankeId}/caseisatka")
     fun updateCaseIsAtKA(
         @PathVariable klankeId: UUID,
