@@ -10,8 +10,9 @@ SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw-q1.oera.no/security-token-servic
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/genererfoersteside
 SAFSELVBETJENING_BASE_URL: https://safselvbetjening-q1.dev-fss-pub.nais.io
 
+PDL_AUDIENCE: dev-fss:pdl:pdl-api
 PDL_SCOPE: dev-fss.pdl.pdl-api
-SAFSELVBETJENING_SCOPE: dev-fss:teamdokumenthandtering:safselvbetjening-q1
+SAFSELVBETJENING_AUDIENCE: dev-fss:teamdokumenthandtering:safselvbetjening-q1
 FSS_CLUSTER: dev-fss
 
 #These are read from the environment:
