@@ -119,7 +119,7 @@ class KlageDittnavPdfgenService(
                 type = type,
                 foedselsnummer = foedselsnummer,
                 innsendingsytelse = innsendingsytelse,
-                ettersendelseTilKa = ettersendelseTilKa
+                ettersendelseTilKa = caseIsAtKA
             ),
         )
     }

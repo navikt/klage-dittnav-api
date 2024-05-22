@@ -16,7 +16,7 @@ data class OpenKlankeInput(
     val vedtakDate: LocalDate?,
     val innsendingsytelse: Innsendingsytelse,
     val checkboxesSelected: Set<CheckboxEnum>?,
-    val ettersendelseTilKa: Boolean?,
+    val caseIsAtKA: Boolean?,
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
     val type: Type,

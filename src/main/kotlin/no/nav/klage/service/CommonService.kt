@@ -284,7 +284,7 @@ class CommonService(
             checkboxesSelected = klanke.checkboxesSelected.toSet(),
             language = klanke.language,
             hasVedlegg = klanke.vedlegg.isNotEmpty() || klanke.hasVedlegg,
-            ettersendelseTilKa = klanke.caseIsAtKA,
+            caseIsAtKA = klanke.caseIsAtKA,
             type = klanke.type,
         )
     }
