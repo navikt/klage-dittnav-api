@@ -33,6 +33,28 @@ class PdlClient(
         return if (useOboToken) getPersonInfo() else getPersonInfoThroughGateway()
     }
 
+    fun getPersonInfoAsSystemUser(foedselsnummer: String): HentPdlPersonResponse {
+        var results = HentPdlPersonResponse(null, null)
+
+        runCatching {
+            retryPdl.executeFunction {
+                results = pdlWebClient.post()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithPdlScope()}")
+                    .bodyValue(hentPersonQuery(fnr = foedselsnummer))
+                    .retrieve()
+                    .bodyToMono<HentPdlPersonResponse>()
+                    .block() ?: throw RuntimeException("Person not found")
+
+            }
+        }.onFailure {
+            slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
+            secureLogger.error("PDL could not be reached", it)
+            throw RuntimeException("PDL could not be reached")
+        }
+
+        return results
+    }
+
     private fun getPersonInfo(): HentPdlPersonResponse {
         var results = HentPdlPersonResponse(null, null)
 

@@ -1,7 +1,6 @@
 package no.nav.klage.domain
 
 import no.nav.klage.controller.view.OpenKlankeInput
-import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import java.time.LocalDate
@@ -14,7 +13,6 @@ data class PDFInput (
     val fornavn: String,
     val mellomnavn: String?,
     val etternavn: String,
-    val enhetsnavn: String?,
     val vedtak: String,
     val begrunnelse: String,
     val saksnummer: String?,
@@ -22,6 +20,7 @@ data class PDFInput (
     val ytelse: String,
     val userChoices: List<String>? = emptyList(),
     val sendesIPosten: Boolean,
+    val ettersendelseTilKa: Boolean,
 )
 
 fun OpenKlankeInput.toPDFInput(): PDFInput {
@@ -38,7 +37,7 @@ fun OpenKlankeInput.toPDFInput(): PDFInput {
         ytelse = innsendingsytelse.nbName.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
         sendesIPosten = true,
-        enhetsnavn = Enhet.entries.find { it.navn == enhetsnummer }?.beskrivelse,
+        ettersendelseTilKa = caseIsAtKA ?: false,
     )
 }
 

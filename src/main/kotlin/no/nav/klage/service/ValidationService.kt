@@ -42,14 +42,6 @@ class ValidationService {
             validationErrors += createMustBeFilledValidationError("caseIsAtKa")
         }
 
-        if (klanke.caseIsAtKA == true && klanke.enhetsnummer == null) {
-            validationErrors += createMustBeFilledValidationError("enhetsnummer")
-        }
-
-        if ((klanke.type == Type.ANKE || klanke.type == Type.ANKE_ETTERSENDELSE) && klanke.enhetsnummer == null) {
-            validationErrors += createMustBeFilledValidationError("enhetsnummer")
-        }
-
         val sectionList = mutableListOf<ValidationSection>()
 
         if (validationErrors.isNotEmpty()) {

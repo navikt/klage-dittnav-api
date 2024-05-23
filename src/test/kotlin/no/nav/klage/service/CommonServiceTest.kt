@@ -150,7 +150,6 @@ class CommonServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = exampleModifiedByUser,
-                enhetsnummer = null,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
             )
@@ -173,7 +172,6 @@ class CommonServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = exampleModifiedByUser2,
-                enhetsnummer = null,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
             )
@@ -201,7 +199,6 @@ class CommonServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = now,
-                enhetsnummer = null,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
             )
@@ -227,7 +224,6 @@ class CommonServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = now,
-                enhetsnummer = null,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
             )
@@ -253,7 +249,6 @@ class CommonServiceTest {
                 vedlegg = mutableSetOf(),
                 created = now,
                 modifiedByUser = now,
-                enhetsnummer = null,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
             )

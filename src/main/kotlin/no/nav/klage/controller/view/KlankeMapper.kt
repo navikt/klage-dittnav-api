@@ -20,7 +20,6 @@ fun Klanke.toKlankeView(): KlankeView {
         finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedByUser.toLocalDate() else null,
         internalSaksnummer = internalSaksnummer,
         checkboxesSelected = checkboxesSelected.toSet(),
-        enhetsnummer = enhetsnummer,
         type = type,
         caseIsAtKA = caseIsAtKA,
     )

@@ -58,7 +58,6 @@ class KlankeRepositoryTest(
                 created = LocalDateTime.now(),
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.KLAGE,
-                enhetsnummer = null,
                 caseIsAtKA = null,
             )
         )
@@ -73,7 +72,6 @@ class KlankeRepositoryTest(
 
         val anke = testEntityManager.persistAndFlush(
             Klanke(
-                enhetsnummer = "abc123",
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,
@@ -104,7 +102,6 @@ class KlankeRepositoryTest(
 
         val klanke = testEntityManager.persistAndFlush(
             Klanke(
-                enhetsnummer = "abc123",
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,

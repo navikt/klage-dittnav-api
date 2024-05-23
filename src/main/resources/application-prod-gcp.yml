@@ -15,8 +15,9 @@ SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw.oera.no/security-token-service/
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/genererfoersteside
 SAFSELVBETJENING_BASE_URL: https://safselvbetjening.prod-fss-pub.nais.io
 
-PDL_SCOPE: prod-fss:pdl:pdl-api
-SAFSELVBETJENING_SCOPE: prod-fss:teamdokumenthandtering:safselvbetjening
+PDL_AUDIENCE: prod-fss:pdl:pdl-api
+PDL_SCOPE: prod-fss.pdl.pdl-api
+SAFSELVBETJENING_AUDIENCE: prod-fss:teamdokumenthandtering:safselvbetjening
 FSS_CLUSTER: prod-fss
 
 #These are read from the environment:

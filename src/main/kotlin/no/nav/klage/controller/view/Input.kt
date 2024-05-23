@@ -44,7 +44,6 @@ data class KlankeMinimalInput(
 data class KlankeFullInput(
     val innsendingsytelse: Innsendingsytelse,
     val checkboxesSelected: Set<CheckboxEnum>? = null,
-    val enhetsnummer: String? = null,
     val userSaksnummer: String? = null,
     val language: LanguageEnum,
     val vedtakDate: LocalDate? = null,

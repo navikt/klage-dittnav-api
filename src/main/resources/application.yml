@@ -72,26 +72,34 @@ no.nav.security.jwt:
         grant_type: urn:ietf:params:oauth:grant-type:token-exchange
         client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
         subject_token_type: urn:ietf:params:oauth:token-type:jwt
-        audience: ${PDL_SCOPE}
+        audience: ${PDL_AUDIENCE}
         authentication:
           client-id: ${TOKEN_X_CLIENT_ID}
           client-jwk: ${TOKEN_X_PRIVATE_JWK}
           client-auth-method: private_key_jwt
         token-exchange:
-          audience: ${PDL_SCOPE}
+          audience: ${PDL_AUDIENCE}
+      pdl-maskintilmaskin:
+        token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: api://${PDL_SCOPE}/.default
+        authentication:
+          client-id: ${AZURE_APP_CLIENT_ID}
+          client-jwk: ${AZURE_APP_JWK}
+          client-auth-method: private_key_jwt
       safselvbetjening-onbehalfof:
         token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
         grant_type: urn:ietf:params:oauth:grant-type:token-exchange
         client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
         subject_token_type: urn:ietf:params:oauth:token-type:jwt
-        audience: ${SAFSELVBETJENING_SCOPE}
+        audience: ${SAFSELVBETJENING_AUDIENCE}
         authentication:
           client-id: ${TOKEN_X_CLIENT_ID}
           client-jwk: ${TOKEN_X_PRIVATE_JWK}
           client-auth-method: private_key_jwt
         token-exchange:
-          audience: ${SAFSELVBETJENING_SCOPE}
-      klage-fss-proxy-onbehalfof:
+          audience: ${SAFSELVBETJENING_AUDIENCE}
+      klage-fss-proxy-maskintilmaskin:
         token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
         grant-type: client_credentials
         scope: api://${FSS_CLUSTER}.klage.klage-fss-proxy/.default

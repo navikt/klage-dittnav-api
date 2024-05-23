@@ -5,12 +5,15 @@ import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
+import no.nav.klage.clients.pdl.AdressebeskyttelseGradering
+import no.nav.klage.clients.pdl.PdlClient
 import no.nav.klage.controller.view.*
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.toPDFInput
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
+import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToAnkeEnhet
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.util.isValidFnrOrDnr
 import org.apache.pdfbox.io.IOUtils
@@ -23,6 +26,7 @@ import java.io.ByteArrayOutputStream
 class KlageDittnavPdfgenService(
     private val klageDittnavPdfgenClient: KlageDittnavPdfgenClient,
     private val foerstesidegeneratorClient: FoerstesidegeneratorClient,
+    private val pdlClient: PdlClient,
 ) {
 
     fun createKlankePdfWithFoersteside(input: OpenKlankeInput): ByteArray {
@@ -111,7 +115,38 @@ class KlageDittnavPdfgenService(
             overskriftstittel = "$arkivtittel $navSkjemaId",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = foerstesidetype,
-            enhetsnummer = enhetsnummer,
+            enhetsnummer = getEnhetsnummerOverride(
+                type = type,
+                foedselsnummer = foedselsnummer,
+                innsendingsytelse = innsendingsytelse,
+                ettersendelseTilKa = caseIsAtKA
+            ),
         )
+    }
+
+    private fun getEnhetsnummerOverride(
+        type: Type,
+        foedselsnummer: String,
+        innsendingsytelse: Innsendingsytelse,
+        ettersendelseTilKa: Boolean?
+    ): String? {
+        val adressebeskyttelse =
+            pdlClient.getPersonInfoAsSystemUser(foedselsnummer = foedselsnummer).data?.hentPerson?.adressebeskyttelse
+
+        if (adressebeskyttelse?.any {
+                it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG
+                        || it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
+            } == true) {
+            return null
+        }
+
+        return if (shouldBeSentToKA(klageAnkeType = type, ettersendelseToKA = ettersendelseTilKa == true)) {
+            innsendingsytelseToAnkeEnhet[innsendingsytelse]!!.navn
+        } else null
+    }
+
+    private fun shouldBeSentToKA(klageAnkeType: Type, ettersendelseToKA: Boolean): Boolean {
+        return (klageAnkeType == Type.KLAGE_ETTERSENDELSE && ettersendelseToKA) ||
+                (klageAnkeType in listOf(Type.ANKE, Type.ANKE_ETTERSENDELSE))
     }
 }

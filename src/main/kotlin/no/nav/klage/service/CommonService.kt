@@ -77,7 +77,6 @@ class CommonService(
             created = LocalDateTime.now(),
             modifiedByUser = LocalDateTime.now(),
             pdfDownloaded = null,
-            enhetsnummer = enhetsnummer,
             type = type,
             caseIsAtKA = caseIsAtKA,
         )
@@ -99,7 +98,6 @@ class CommonService(
             created = LocalDateTime.now(),
             modifiedByUser = LocalDateTime.now(),
             pdfDownloaded = null,
-            enhetsnummer = null,
             type = type,
             caseIsAtKA = null,
         )
@@ -269,7 +267,7 @@ class CommonService(
             userSaksnummer = klanke.userSaksnummer,
             internalSaksnummer = klanke.internalSaksnummer,
             klageAnkeType = AggregatedKlageAnke.KlageAnkeType.valueOf(klanke.type.name),
-            enhetsnummer = klanke.enhetsnummer,
+            ettersendelseTilKa = klanke.caseIsAtKA,
             innsendingsYtelseId = klanke.innsendingsytelse.id,
         )
     }
@@ -286,7 +284,7 @@ class CommonService(
             checkboxesSelected = klanke.checkboxesSelected.toSet(),
             language = klanke.language,
             hasVedlegg = klanke.vedlegg.isNotEmpty() || klanke.hasVedlegg,
-            enhetsnummer = klanke.enhetsnummer,
+            caseIsAtKA = klanke.caseIsAtKA,
             type = klanke.type,
         )
     }
@@ -332,21 +330,6 @@ class CommonService(
         val existingKlanke = getAndValidateAccess(klankeId, bruker)
 
         existingKlanke.vedtakDate = vedtakDate
-        existingKlanke.modifiedByUser = LocalDateTime.now()
-
-        return existingKlanke.modifiedByUser
-    }
-
-    fun updateEnhetsnummer(
-        klankeId: UUID,
-        enhetsnummer: String?,
-        bruker: Bruker
-    ): LocalDateTime {
-        val existingKlanke = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(existingKlanke, bruker)
-
-        existingKlanke.enhetsnummer = enhetsnummer
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
         return existingKlanke.modifiedByUser

@@ -62,10 +62,6 @@ class Klanke(
     @Convert(converter = CheckboxEnumConverter::class)
     val checkboxesSelected: MutableList<CheckboxEnum> = mutableListOf(),
 
-    /* not for klager. Used to indicate KA-enhet. */
-    @Column(name = "enhetsnummer")
-    var enhetsnummer: String?,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "klanke_type")
     var type: Type,
