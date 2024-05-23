@@ -67,7 +67,6 @@ spec:
     inbound:
       rules:
         - application: klage-dittnav
-        - application: klang
         - application: klage-arkiver-journalpost
     outbound:
       external:
