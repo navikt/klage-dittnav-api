@@ -2,7 +2,7 @@ navCallIdName: nav-callid
 
 spring:
   application:
-    name: klage-dittnav-api
+    name: klang-api
   datasource:
     url: jdbc:postgresql://${DB_HOST}:5432/klage
     username: ${DB_USERNAME}
@@ -118,11 +118,11 @@ CLAM_AV_URL: http://clamav.nais-system/scan
 FILE_BASE_URL: http://klage-file-api
 
 KAFKA_TOPIC: klage.privat-klage-mottatt-v1
-INTERNAL_EVENT_TOPIC: klage.klage-dittnav-api-internal-events.v1
+INTERNAL_EVENT_TOPIC: klage.klang-api-internal-events.v1
 
-SERVICE_USER_USERNAME: srvklage-dittnav
+SERVICE_USER_USERNAME: srv-klang
 
-KLAGE_DITTNAV_PDF_SERVICE_URL: http://klage-dittnav-pdfgen/api/v1/genpdf/klage-dittnav-pdfgen/
+KLAGE_DITTNAV_PDF_SERVICE_URL: http://klang-pdfgen/api/v1/genpdf/klang-pdfgen/
 
 logging:
   level:

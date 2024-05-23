@@ -2,7 +2,7 @@ navCallIdName: nav-callid
 
 spring:
   application:
-    name: klage-dittnav-api
+    name: klang-api
   flyway:
     enabled: false
   datasource:
@@ -17,14 +17,14 @@ management:
     exposure.include: health,prometheus
 
 LOGINSERVICE_IDPORTEN_DISCOVERY_URL: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
-LOGINSERVICE_IDPORTEN_AUDIENCE: klage-dittnav-api-client-id
+LOGINSERVICE_IDPORTEN_AUDIENCE: klang-api-client-id
 
 AZURE_APP_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
-AZURE_APP_CLIENT_ID: klage-dittnav-api-client-id
+AZURE_APP_CLIENT_ID: klang-api-client-id
 AZURE_APP_CLIENT_SECRET: azure-app-client-secret
 
 TOKEN_X_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
-TOKEN_X_CLIENT_ID: klage-dittnav-api-client-id
+TOKEN_X_CLIENT_ID: klang-api-client-id
 TOKEN_X_TOKEN_ENDPOINT: http://localhost:${mock-oauth2-server.port}/tokenx
 
 no.nav.security.jwt:
@@ -53,7 +53,7 @@ allowed.origins:
   http://localhost:3000,
   http://localhost:8080
 
-KLAGE_DITTNAV_CLIENT_ID: klage-dittnav-client-id
+KLAGE_DITTNAV_CLIENT_ID: klang-client-id
 KLAGE_DITTNAV_TOKENX_IDP: idporten
 
 KLAGE_FILE_API_APP_NAME: klage-file-api
@@ -61,7 +61,7 @@ KLAGE_FILE_API_APP_NAME: klage-file-api
 NAIS_CLUSTER_NAME: local
 NAIS_NAMESPACE: klage
 
-SERVICE_USER_USERNAME: srvklage-dittnav
+SERVICE_USER_USERNAME: srv-klang
 SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
 
 CLAM_AV_URL: http://localhost

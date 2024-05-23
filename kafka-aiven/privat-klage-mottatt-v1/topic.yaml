@@ -13,7 +13,7 @@ spec:
   {{/each}}
   acl:
     - team: klage
-      application: klage-dittnav-api
+      application: klang-api
       access: write
     - team: klage
       application: klage-dlt-consumer

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: klage-dittnav-api
+    name: klang-api
   flyway:
     enabled: true
   datasource:

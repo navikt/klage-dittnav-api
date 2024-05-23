@@ -19,7 +19,7 @@ DB_PASSWORD: klage
 
 PDL_BASE_URL: https://pdl-api.dev-fss.nais.io/graphql
 SECURITY_TOKEN_SERVICE_REST_URL: http://localhost:8088
-SERVICE_USER_USERNAME: srvklage-dittnav
+SERVICE_USER_USERNAME: srv-klang
 SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
 
 CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan

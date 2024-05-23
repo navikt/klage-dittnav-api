@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: klage-dittnav-api
+  name: klang-api
   namespace: klage
   labels:
     team: klage
@@ -79,10 +79,12 @@ spec:
       rules:
         - application: klage-file-api
         - application: klage-dittnav-pdfgen
+        - application: klang-pdfgen
         - application: clamav
           namespace: nais-system
   envFrom:
     - secret: srvklage-dittnav
+    - secret: srv-klang
     - secret: sts-apikey
     - secret: pdl-apikey
     - secret: slack-url

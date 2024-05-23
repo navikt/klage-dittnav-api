@@ -1,10 +1,10 @@
-# klage-dittnav-api
+# klang-api
 
 API for moderniserte klager.
 
 ##Title Keys
 
-Denne appen er i hovedsak backend for https://github.com/navikt/klage-dittnav. 
+Denne appen er i hovedsak backend for https://github.com/navikt/klang. 
 Denne klienten tilbyr en direkte lenke til opprettelse av klage, der det er mulig å sette feltet `tittel`. 
 Verdien på dette feltet må være en av nøklene som er definert i [TitleEnum.kt](src/main/kotlin/no/nav/klage/domain/titles/TitleEnum.kt).
 
@@ -36,7 +36,7 @@ Lager en kjørbar jar-fil.
 
 #### Kun DB
 ```
-docker-compose up -d klage-dittnav-db
+docker-compose up -d klang-db
 ```
 
 Stop/delete:
@@ -97,7 +97,7 @@ få kjørt appen med Docker Compose kan du spesifisere følgende i `docker-compo
 
 ```
 services:
-  klage-dittnav-api:
+  klang-api:
     ...
     environment:
       ...

@@ -1,23 +1,23 @@
 version: '2.4'
 
 services:
-  klage-dittnav-api:
+  klang-api:
     depends_on:
-      klage-dittnav-db:
+      klang-db:
         condition: service_healthy
     build: .
     ports:
       - "7070:7070"
     environment:
-      DB_HOST: klage-dittnav-db
+      DB_HOST: klang-db
       DB_USERNAME: klage
       DB_PASSWORD: klage
 #      Bruk de to neste linjene dersom du er på Windows:
 #      SECURITY_TOKEN_SERVICE_REST_URL: http://host.docker.internal:8088
 #      PDL_BASE_URL: http://host.docker.internal:7000/graphql
       SPRING_PROFILES_ACTIVE: local
-  klage-dittnav-db:
-    container_name: klage-dittnav-db
+  klang-db:
+    container_name: klang-db
     image: library/postgres:11
     environment:
       POSTGRES_USER: klage

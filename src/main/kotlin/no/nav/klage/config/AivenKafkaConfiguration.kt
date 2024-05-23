@@ -45,7 +45,7 @@ class AivenKafkaConfiguration(
     @Bean
     fun aivenKafkaTemplate(): KafkaTemplate<String, String> {
         val config = mapOf(
-            ProducerConfig.CLIENT_ID_CONFIG to "klage-dittnav-api-producer",
+            ProducerConfig.CLIENT_ID_CONFIG to "klang-api-producer",
             ProducerConfig.ACKS_CONFIG to "all",
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
@@ -58,8 +58,8 @@ class AivenKafkaConfiguration(
     fun kafkaEventReceiver(): KafkaReceiver<String, String> {
         val uniqueIdPerInstance = UUID.randomUUID().toString()
         val config = mapOf(
-            ConsumerConfig.GROUP_ID_CONFIG to "klage-dittnav-event-consumer-$uniqueIdPerInstance",
-            ConsumerConfig.CLIENT_ID_CONFIG to "klage-dittnav-event-client-$uniqueIdPerInstance",
+            ConsumerConfig.GROUP_ID_CONFIG to "klang-event-consumer-$uniqueIdPerInstance",
+            ConsumerConfig.CLIENT_ID_CONFIG to "klang-event-client-$uniqueIdPerInstance",
             ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to true,
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,

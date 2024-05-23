@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: klage-dittnav-api-internal-events.v1
+  name: klang-api-internal-events.v1
   namespace: klage
   labels:
     team: klage
@@ -13,7 +13,7 @@ spec:
   {{/each}}
   acl:
     - team: klage
-      application: klage-dittnav-api
+      application: klang-api
       access: readwrite
   {{#each acl}}
     - team: {{team}}

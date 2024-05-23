@@ -7,6 +7,7 @@ spring:
 
 allowed.origins:
   https://klage-dittnav.nav.no,
+  https://klang.nav.no,
   https://klage.nav.no
 
 PDL_BASE_URL_GW: https://api-gw.oera.no/pdl-api/graphql

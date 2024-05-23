@@ -1,1 +1,1 @@
-rootProject.name = "klage-dittnav-api"
+rootProject.name = "klang-api"

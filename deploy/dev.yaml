@@ -1,5 +1,5 @@
 ingresses:
-  - https://klage-dittnav-api.intern.dev.nav.no
+  - https://klang-api.intern.dev.nav.no
 externalHosts:
   - api-gw-q1.oera.no
   - pdl-api.dev-fss-pub.nais.io

@@ -162,9 +162,9 @@ class ApiTest {
 
     fun tokenxToken(
         fnr: String,
-        audience: String = "klage-dittnav-api-client-id",
+        audience: String = "klang-api-client-id",
         issuerId: String = "tokenx",
-        clientId: String = "klage-dittnav-client-id",
+        clientId: String = "klang-client-id",
         claims: Map<String, Any> = mapOf(
             "acr" to "Level4",
             "idp" to "idporten",
