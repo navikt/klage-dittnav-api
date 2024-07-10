@@ -1,7 +1,10 @@
 package no.nav.klage.clients
 
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.logErrorResponse
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
@@ -17,6 +20,7 @@ class FileClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     //TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
@@ -50,6 +54,19 @@ class FileClient(
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
+    }
+
+    fun getVedleggFileAsSignedUrl(vedleggRef: String): String {
+        logger.debug("Fetching vedlegg file (signed URL) with vedlegg ref {}", vedleggRef)
+        return fileWebClient.get()
+            .uri { it.path("/attachment/{id}/signedurl").build(vedleggRef) }
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                logErrorResponse(response, ::getVedleggFileAsSignedUrl.name, secureLogger)
+            }
+            .bodyToMono<String>()
+            .block()!!
     }
 
     fun deleteVedleggFile(vedleggRef: String): Boolean {

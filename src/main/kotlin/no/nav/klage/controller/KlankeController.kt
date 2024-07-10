@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.ModelAndView
 import reactor.core.publisher.Flux
 import java.io.FileInputStream
 import java.io.InputStream
@@ -338,7 +339,7 @@ class KlankeController(
     fun getVedleggFromKlanke(
         @PathVariable klankeId: UUID,
         @PathVariable vedleggId: UUID
-    ): ResponseEntity<ByteArray> {
+    ): ModelAndView {
         val bruker = brukerService.getBruker()
         logger.debug("Get vedlegg to klanke is requested. KlankeId: {} - VedleggId: {}", klankeId, vedleggId)
         secureLogger.debug(
@@ -348,16 +349,8 @@ class KlankeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = vedleggService.getVedleggFromKlanke(klankeId, vedleggId, bruker)
-
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
+        val url = vedleggService.getVedleggFromKlankeAsSignedUrl(klankeId, vedleggId, bruker)
+        return ModelAndView("redirect:$url")
     }
 
     @ResponseBody

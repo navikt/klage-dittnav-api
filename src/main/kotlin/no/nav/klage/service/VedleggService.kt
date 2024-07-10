@@ -87,6 +87,20 @@ class VedleggService(
         }
     }
 
+    fun getVedleggFromKlankeAsSignedUrl(klankeId: UUID, vedleggId: UUID, bruker: Bruker): String {
+        val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.checkKlankeStatus(existingKlanke, false)
+        validationService.validateKlankeAccess(existingKlanke, bruker)
+
+        val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
+
+        if (vedlegg != null) {
+            return fileClient.getVedleggFileAsSignedUrl(vedlegg.ref)
+        } else {
+            throw RuntimeException("No vedlegg found with this id: $vedleggId")
+        }
+    }
+
 
     private fun Klanke.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
 }
