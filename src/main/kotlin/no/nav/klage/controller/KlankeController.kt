@@ -12,6 +12,7 @@ import no.nav.klage.service.BrukerService
 import no.nav.klage.service.CommonService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getResourceThatWillBeDeleted
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.io.FileSystemResource
@@ -337,6 +338,32 @@ class KlankeController(
     @ResponseBody
     @GetMapping("/{klankeId}/vedlegg/{vedleggId}")
     fun getVedleggFromKlanke(
+        @PathVariable klankeId: UUID,
+        @PathVariable vedleggId: UUID
+    ): ResponseEntity<Resource> {
+        val bruker = brukerService.getBruker()
+        logger.debug("Get vedlegg to klanke is requested. KlankeId: {} - VedleggId: {}", klankeId, vedleggId)
+        secureLogger.debug(
+            "Vedlegg from klanke is requested. KlankeId: {}, vedleggId: {}, fnr: {} ",
+            klankeId,
+            vedleggId,
+            bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
+
+        val fileResource = vedleggService.getVedleggFromKlanke(klankeId, vedleggId, bruker)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + (fileResource.filename ?: "vedlegg.pdf"))
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(fileResource.file.length())
+            .body(getResourceThatWillBeDeleted(fileResource))
+    }
+
+    @ResponseBody
+    @GetMapping("/{klankeId}/vedlegg/{vedleggId}/signedurl")
+    fun getVedleggFromKlankeSignedUrl(
         @PathVariable klankeId: UUID,
         @PathVariable vedleggId: UUID
     ): ModelAndView {

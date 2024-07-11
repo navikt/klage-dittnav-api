@@ -3,6 +3,10 @@ package no.nav.klage.clients
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.logErrorResponse
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.client.MultipartBodyBuilder
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.nio.file.Files
 
 @Component
 class FileClient(
@@ -55,6 +60,25 @@ class FileClient(
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
     }
+
+    fun getVedleggAsResource(vedleggRef: String): Resource {
+        logger.debug("Fetching vedlegg file as resource with vedlegg ref {}", vedleggRef)
+
+        val dataBufferFlux = fileWebClient.get()
+            .uri { it.path("/attachment/{id}").build(vedleggRef) }
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                logErrorResponse(response, ::getVedleggAsResource.name, secureLogger)
+            }
+            .bodyToFlux(DataBuffer::class.java)
+
+        val tempFile = Files.createTempFile(null, null)
+
+        DataBufferUtils.write(dataBufferFlux, tempFile).block()
+        return FileSystemResource(tempFile)
+    }
+
 
     fun getVedleggFileAsSignedUrl(vedleggRef: String): String {
         logger.debug("Fetching vedlegg file (signed URL) with vedlegg ref {}", vedleggRef)

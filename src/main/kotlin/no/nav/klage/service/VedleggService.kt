@@ -9,6 +9,7 @@ import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
 import no.nav.klage.vedlegg.Image2PDF
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -73,7 +74,7 @@ class VedleggService(
         }
     }
 
-    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): ByteArray {
+    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): Resource {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke, false)
         validationService.validateKlankeAccess(existingKlanke, bruker)
@@ -81,7 +82,7 @@ class VedleggService(
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
         if (vedlegg != null) {
-            return fileClient.getVedleggFile(vedlegg.ref)
+            return getVedleggAsResource(vedlegg.ref)
         } else {
             throw RuntimeException("No vedlegg found with this id: $vedleggId")
         }
@@ -99,6 +100,10 @@ class VedleggService(
         } else {
             throw RuntimeException("No vedlegg found with this id: $vedleggId")
         }
+    }
+
+    fun getVedleggAsResource(vedleggRef: String): Resource {
+        return fileClient.getVedleggAsResource(vedleggRef = vedleggRef)
     }
 
 
