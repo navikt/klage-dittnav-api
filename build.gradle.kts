@@ -51,7 +51,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.micrometer:micrometer-tracing-bridge-brave")
 
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
 
