@@ -1,5 +1,3 @@
-navCallIdName: nav-callid
-
 spring:
   application:
     name: klage-dittnav-api
@@ -46,12 +44,7 @@ management:
     tags:
       application: ${spring.application.name}
   tracing:
-    baggage:
-      remote-fields:
-        - ${navCallIdName}
-      correlation:
-        fields:
-          - ${navCallIdName}
+    enabled: false
   prometheus:
     metrics:
       export:
