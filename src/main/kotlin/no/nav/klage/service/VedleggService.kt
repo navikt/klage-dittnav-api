@@ -41,6 +41,7 @@ class VedleggService(
         bruker: Bruker,
         request: HttpServletRequest
     ): Vedlegg? {
+        logger.debug("Request: {}", request)
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
         validationService.validateKlankeAccess(existingKlanke, bruker)
@@ -58,12 +59,18 @@ class VedleggService(
             throw AttachmentTooLargeException("Total størrelse på alle vedlegg er for stor")
         }
 
+        logger.debug("Content-length {}", contentLength)
+
         val contentType = request.getHeader("Content-Type")
+
+        logger.debug("Content-type {}", contentType)
+
         vedleggMetrics.incrementVedleggType(contentType ?: "unknown")
 
         val upload = JakartaServletFileUpload()
         var filename: String? = null
         val parts = upload.getItemIterator(request)
+        logger.debug("Parts: {}", parts)
         parts.forEachRemaining { item ->
             timeStart = System.currentTimeMillis()
             val inputStream = item.inputStream
