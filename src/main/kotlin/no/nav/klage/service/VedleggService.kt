@@ -12,12 +12,17 @@ import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
 import no.nav.klage.vedlegg.Image2PDF
 import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload
+import org.apache.tika.Tika
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.unit.DataSize
+import org.springframework.util.unit.DataUnit
+import org.springframework.http.MediaType.*
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import kotlin.math.min
 
 @Service
 @Transactional
@@ -102,12 +107,19 @@ class VedleggService(
             }
         }
 
-        val vedleggIdInFileStore = fileApiService.uploadFileAsPDF(file = filePath.toFile())
+        val file = filePath.toFile()
+
+        val bytesForFiletypeDetection =
+            file.inputStream()
+                .readNBytes(min(DataSize.of(3, DataUnit.KILOBYTES).toBytes().toInt(), file.length().toInt()))
+        val mediaType = valueOf(Tika().detect(bytesForFiletypeDetection))
+
+        val vedleggIdInFileStore = fileApiService.uploadFileAsPDF(file = file)
 
         val vedleggToSave = Vedlegg(
             tittel = filename ?: "Mangler tittel",
             ref = vedleggIdInFileStore,
-            contentType = contentType,
+            contentType = mediaType.toString(),
             sizeInBytes = contentLength.toInt(),
         )
         existingKlanke.vedlegg.add(
