@@ -10,7 +10,9 @@ import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
+import java.nio.file.Files
 import javax.imageio.ImageIO
 
 object ImageUtils {
@@ -30,6 +32,25 @@ object ImageUtils {
             } else {
                 val scaledImg = scaleDown(image, newDim)
                 toBytes(scaledImg, format)
+            }
+        } catch (ex: IOException) {
+            throw RuntimeException("Converting attachment failed.", ex)
+        }
+    }
+
+    fun downToA4(origImageFile: File, format: String): File {
+        val A4 = PDRectangle.A4
+        return try {
+            var image = ImageIO.read(origImageFile)
+            image = rotatePortrait(image)
+            val pdfPageDim = Dimension(A4.width.toInt(), A4.height.toInt())
+            val origDim = Dimension(image.width, image.height)
+            val newDim = getScaledDimension(origDim, pdfPageDim)
+            if (newDim == origDim) {
+                origImageFile
+            } else {
+                val scaledImg = scaleDown(image, newDim)
+                toFile(scaledImg, format)
             }
         } catch (ex: IOException) {
             throw RuntimeException("Converting attachment failed.", ex)
@@ -90,5 +111,11 @@ object ImageUtils {
             ImageIO.write(img, format, baos)
             return baos.toByteArray()
         }
+    }
+
+    private fun toFile(img: BufferedImage, format: String): File {
+        val tempFile = Files.createTempFile(null, null).toFile()
+        ImageIO.write(img, format, tempFile)
+        return tempFile
     }
 }

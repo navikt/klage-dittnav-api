@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
@@ -23,7 +24,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.ModelAndView
 import reactor.core.publisher.Flux
 import java.io.FileInputStream
@@ -296,8 +296,9 @@ class KlankeController(
     @PostMapping(value = ["/{klankeId}/vedlegg"], consumes = ["multipart/form-data"])
     fun addVedleggToKlanke(
         @PathVariable klankeId: UUID,
-        @RequestParam vedlegg: MultipartFile
-    ): VedleggView {
+        request: HttpServletRequest,
+//        @RequestParam vedlegg: MultipartFile
+    ) {
         val bruker = brukerService.getBruker()
         logger.debug("Add vedlegg to klanke is requested. KlankeId: {}", klankeId)
         secureLogger.debug(
@@ -305,11 +306,12 @@ class KlankeController(
             klankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        return vedleggService.addKlankevedlegg(
+        vedleggService.addKlankevedlegg(
             klankeId = klankeId,
-            multipart = vedlegg,
+            request = request,
+
             bruker = bruker
-        ).toVedleggView()
+        )?.toVedleggView()
     }
 
     @DeleteMapping("/{klankeId}/vedlegg/{vedleggId}")

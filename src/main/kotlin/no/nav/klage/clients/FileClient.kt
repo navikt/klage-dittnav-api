@@ -9,6 +9,7 @@ import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType
 import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
@@ -28,8 +29,6 @@ class FileClient(
         private val secureLogger = getSecureLogger()
     }
 
-    //TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
-
     fun uploadVedleggFile(vedleggFile: ByteArray, originalFilename: String): String {
         logger.debug("Uploading attachment to file store.")
 
@@ -47,6 +46,40 @@ class FileClient(
         requireNotNull(response)
 
         logger.debug("Attachment uploaded to file store with id: {}", response.id)
+        return response.id
+    }
+
+    fun uploadVedleggResource(resource: Resource): String {
+        logger.debug("Uploading attachment to file store.")
+
+        var start = System.currentTimeMillis()
+        val bodyBuilder = MultipartBodyBuilder()
+        bodyBuilder.part("file", resource).contentType(MediaType.APPLICATION_PDF).filename("file")
+        logger.debug("File added to body. Time taken: ${System.currentTimeMillis() - start} ms")
+
+        start = System.currentTimeMillis()
+        val response = fileWebClient
+            .post()
+            .uri("/attachment")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
+            .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                logErrorResponse(response, ::uploadVedleggResource.name, secureLogger)
+            }
+            .bodyToMono<VedleggResponse>()
+            .block()
+
+        logger.debug("Response received. Time taken: ${System.currentTimeMillis() - start} ms")
+        requireNotNull(response)
+
+        if (resource is FileSystemResource) {
+            start = System.currentTimeMillis()
+            resource.file.delete()
+            logger.debug("File deleted. Time taken: ${System.currentTimeMillis() - start} ms")
+        }
+
+        logger.debug("Document uploaded to file store with id: {}", response.id)
         return response.id
     }
 

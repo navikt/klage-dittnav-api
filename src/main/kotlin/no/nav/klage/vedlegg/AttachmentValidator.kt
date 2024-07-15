@@ -11,6 +11,7 @@ import org.apache.tika.Tika
 import org.springframework.http.MediaType
 import org.springframework.util.unit.DataSize
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
 
 class AttachmentValidator(
     private val clamAvClient: ClamAvClient,
@@ -55,6 +56,27 @@ class AttachmentValidator(
         logger.debug("Validation successful.")
     }
 
+    fun validateAttachment(file: File) {
+        logger.debug("Validating attachment.")
+
+        if (file.length() == 0L) {
+            logger.warn("Attachment is empty")
+            throw AttachmentIsEmptyException()
+        }
+
+        if (clamAvClient.hasVirus(file)) {
+            logger.warn("Attachment has virus")
+            throw AttachmentHasVirusException()
+        }
+
+        if (file.isPDF() && file.isEncrypted()) {
+            logger.warn("Attachment is encrypted")
+            throw AttachmentEncryptedException()
+        }
+
+        logger.debug("Validation successful.")
+    }
+
     private fun MultipartFile.hasVirus() = !clamAvClient.scan(this.bytes)
 
     private fun MultipartFile.isTooLarge() = this.bytes.size > maxAttachmentSize.toBytes()
@@ -69,7 +91,20 @@ class AttachmentValidator(
         }
     }
 
+    private fun File.isEncrypted(): Boolean {
+        return try {
+            val temp: PDDocument = Loader.loadPDF(this)
+            temp.close()
+            false
+        } catch (ipe: InvalidPasswordException) {
+            true
+        }
+    }
+
     private fun MultipartFile.isPDF() =
         MediaType.valueOf(Tika().detect(this.bytes)) == MediaType.APPLICATION_PDF
+
+    private fun File.isPDF() =
+        MediaType.valueOf(Tika().detect(this)) == MediaType.APPLICATION_PDF
 
 }

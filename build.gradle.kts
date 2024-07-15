@@ -13,12 +13,13 @@ val resilience4jVersion = "2.2.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "5.13.0"
 val springDocVersion = "2.5.0"
-val kodeverkVersion = "1.8.13"
+val kodeverkVersion = "1.8.34"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
 val testContainersVersion = "1.19.8"
 val mockkVersion = "1.13.10"
 val springMockkVersion = "4.0.2"
+val commonsFileupload2JakartaVersion = "2.0.0-M1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -73,6 +74,8 @@ dependencies {
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
     implementation("org.apache.tika:tika-core:$tikaVersion")
     implementation("io.projectreactor.kafka:reactor-kafka")
+
+    implementation("org.apache.commons:commons-fileupload2-jakarta:$commonsFileupload2JakartaVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
