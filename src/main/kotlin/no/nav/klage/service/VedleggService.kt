@@ -72,11 +72,14 @@ class VedleggService(
         val parts = upload.getItemIterator(request)
         logger.debug("Parts: {}", parts)
         parts.forEachRemaining { item ->
+            logger.debug("item: {}", item)
             timeStart = System.currentTimeMillis()
             val inputStream = item.inputStream
+            logger.debug("inputStream: {}", inputStream)
             logger.debug("Got input stream in {} ms", System.currentTimeMillis() - timeStart)
             if (!item.isFormField) {
                 filename = item.name
+                logger.debug("item.name: {}", item.name)
                 try {
                     timeStart = System.currentTimeMillis()
                     Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)

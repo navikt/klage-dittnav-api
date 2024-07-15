@@ -293,11 +293,10 @@ class KlankeController(
         )
     }
 
-    @PostMapping(value = ["/{klankeId}/vedlegg"], consumes = ["multipart/form-data"])
+    @PostMapping("/{klankeId}/vedlegg")
     fun addVedleggToKlanke(
         @PathVariable klankeId: UUID,
         request: HttpServletRequest,
-//        @RequestParam vedlegg: MultipartFile
     ) {
         val bruker = brukerService.getBruker()
         logger.debug("Add vedlegg to klanke is requested. KlankeId: {}", klankeId)
@@ -309,7 +308,6 @@ class KlankeController(
         vedleggService.addKlankevedlegg(
             klankeId = klankeId,
             request = request,
-
             bruker = bruker
         )?.toVedleggView()
     }
