@@ -98,7 +98,7 @@ class FileClient(
         logger.debug("Fetching vedlegg file as resource with vedlegg ref {}", vedleggRef)
 
         val dataBufferFlux = fileWebClient.get()
-            .uri { it.path("/attachment/{id}").build(vedleggRef) }
+            .uri { it.path("/attachment/{id}/outputstream").build(vedleggRef) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .onStatus(HttpStatusCode::isError) { response ->
