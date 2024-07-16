@@ -297,7 +297,7 @@ class KlankeController(
     fun addVedleggToKlanke(
         @PathVariable klankeId: UUID,
         request: HttpServletRequest,
-    ) {
+    ): VedleggView {
         val bruker = brukerService.getBruker()
         logger.debug("Add vedlegg to klanke is requested. KlankeId: {}", klankeId)
         secureLogger.debug(
@@ -305,7 +305,7 @@ class KlankeController(
             klankeId,
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
-        vedleggService.addKlankevedlegg(
+        return vedleggService.addKlankevedlegg(
             klankeId = klankeId,
             request = request,
             bruker = bruker

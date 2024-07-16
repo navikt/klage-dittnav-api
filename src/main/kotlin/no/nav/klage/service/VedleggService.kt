@@ -130,7 +130,7 @@ class VedleggService(
             vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
         }
 
-        logger.debug("Vedlegg {}", vedleggIdInFileStore)
+        logger.debug("Vedlegg {}", vedleggToSave)
         return vedleggToSave
 
     }
