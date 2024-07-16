@@ -45,7 +45,7 @@ class VedleggService(
         klankeId: UUID,
         bruker: Bruker,
         request: HttpServletRequest
-    ): Vedlegg? {
+    ): Vedlegg {
         logger.debug("Request: {}", request)
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
@@ -112,9 +112,11 @@ class VedleggService(
         val bytesForFiletypeDetection =
             file.inputStream()
                 .readNBytes(min(DataSize.of(3, DataUnit.KILOBYTES).toBytes().toInt(), file.length().toInt()))
+        //TODO: Sjekk innhold i db på disse
         val mediaType = valueOf(Tika().detect(bytesForFiletypeDetection))
-
+        logger.debug("Media type {}", mediaType)
         val vedleggIdInFileStore = fileApiService.uploadFileAsPDF(file = file)
+        logger.debug("Vedlegg id {}", vedleggIdInFileStore)
 
         val vedleggToSave = Vedlegg(
             tittel = filename ?: "Mangler tittel",
@@ -127,6 +129,8 @@ class VedleggService(
         ).also {
             vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
         }
+
+        logger.debug("Vedlegg {}", vedleggIdInFileStore)
         return vedleggToSave
 
     }

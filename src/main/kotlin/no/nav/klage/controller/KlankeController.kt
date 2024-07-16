@@ -309,7 +309,7 @@ class KlankeController(
             klankeId = klankeId,
             request = request,
             bruker = bruker
-        )?.toVedleggView()
+        ).toVedleggView()
     }
 
     @DeleteMapping("/{klankeId}/vedlegg/{vedleggId}")
