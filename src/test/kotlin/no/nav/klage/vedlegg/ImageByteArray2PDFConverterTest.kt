@@ -24,20 +24,28 @@ internal class ImageByteArray2PDFConverterTest {
 
     @Test
     fun `jpg converts to pdf`() {
+        val path = TEST_RESOURCES_FOLDER + "pdf/jks.jpg"
+        val originalFile = File(path)
+        val tempFile = originalFile.copyTo(File("$path.tmp"))
         assertTrue(
             isPdf(
-                converter.convertIfImage(File(TEST_RESOURCES_FOLDER + "pdf/jks.jpg")).contentAsByteArray
+                converter.convertIfImage(tempFile).contentAsByteArray
             )
         )
+        tempFile.deleteOnExit()
     }
 
     @Test
     fun `png converts to pdf`() {
+        val path = TEST_RESOURCES_FOLDER + "pdf/nav-logo.png"
+        val originalFile = File(path)
+        val tempFile = originalFile.copyTo(File("$path.tmp"))
         assertTrue(
             isPdf(
-                converter.convertIfImage(File(TEST_RESOURCES_FOLDER + "pdf/nav-logo.png")).contentAsByteArray
+                converter.convertIfImage(tempFile).contentAsByteArray
             )
         )
+        tempFile.deleteOnExit()
     }
 
     @Test
