@@ -29,26 +29,6 @@ class FileClient(
         private val secureLogger = getSecureLogger()
     }
 
-    fun uploadVedleggFile(vedleggFile: ByteArray, originalFilename: String): String {
-        logger.debug("Uploading attachment to file store.")
-
-        val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("file", vedleggFile).filename(originalFilename)
-        val response = fileWebClient
-            .post()
-            .uri { it.path("/attachment").build() }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
-            .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
-            .retrieve()
-            .bodyToMono<VedleggResponse>()
-            .block()
-
-        requireNotNull(response)
-
-        logger.debug("Attachment uploaded to file store with id: {}", response.id)
-        return response.id
-    }
-
     fun uploadVedleggResource(resource: Resource): String {
         logger.debug("Uploading attachment to file store.")
 
@@ -83,22 +63,11 @@ class FileClient(
         return response.id
     }
 
-
-    fun getVedleggFile(vedleggRef: String): ByteArray {
-        logger.debug("Fetching vedlegg file with vedlegg ref {}", vedleggRef)
-        return fileWebClient.get()
-            .uri { it.path("/attachment/{id}").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
-            .retrieve()
-            .bodyToMono<ByteArray>()
-            .block() ?: throw RuntimeException("Attachment could not be fetched")
-    }
-
     fun getVedleggAsResource(vedleggRef: String): Resource {
         logger.debug("Fetching vedlegg file as resource with vedlegg ref {}", vedleggRef)
 
         val dataBufferFlux = fileWebClient.get()
-            .uri { it.path("/attachment/{id}/outputstream").build(vedleggRef) }
+            .uri { it.path("/attachment/{id}").build(vedleggRef) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
             .onStatus(HttpStatusCode::isError) { response ->
@@ -111,21 +80,6 @@ class FileClient(
         DataBufferUtils.write(dataBufferFlux, tempFile).block()
         return FileSystemResource(tempFile)
     }
-
-
-    fun getVedleggFileAsSignedUrl(vedleggRef: String): String {
-        logger.debug("Fetching vedlegg file (signed URL) with vedlegg ref {}", vedleggRef)
-        return fileWebClient.get()
-            .uri { it.path("/attachment/{id}/signedurl").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
-            .retrieve()
-            .onStatus(HttpStatusCode::isError) { response ->
-                logErrorResponse(response, ::getVedleggFileAsSignedUrl.name, secureLogger)
-            }
-            .bodyToMono<String>()
-            .block()!!
-    }
-
     fun deleteVedleggFile(vedleggRef: String): Boolean {
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
         val deletedInFileStore = fileWebClient.delete()

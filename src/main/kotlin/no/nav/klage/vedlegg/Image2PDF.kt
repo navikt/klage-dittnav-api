@@ -15,7 +15,6 @@ import org.springframework.http.MediaType.*
 import org.springframework.stereotype.Component
 import org.springframework.util.unit.DataSize
 import org.springframework.util.unit.DataUnit
-import java.io.ByteArrayOutputStream
 import java.io.File
 import kotlin.math.min
 
@@ -32,19 +31,7 @@ class Image2PDF {
 
     private val A4: PDRectangle = PDRectangle.A4
 
-    fun convert(bytes: ByteArray): ByteArray {
-        val mediaType = valueOf(Tika().detect(bytes))
-        if (APPLICATION_PDF == mediaType) {
-            return bytes
-        }
-        if (validImageTypes(mediaType)) {
-            return embedImageInPDF(mediaType.subtype, bytes)
-        }
-        val exception = AttachmentCouldNotBeConvertedException()
-        logger.warn("User tried to upload an unsupported file type: $mediaType", exception)
-        throw exception
-    }
-
+    //TODO: Konverterer selve fila, fiks
     fun convertIfImage(file: File): Resource {
         var start = System.currentTimeMillis()
         val bytesForFiletypeDetection =
@@ -69,29 +56,6 @@ class Image2PDF {
         throw exception
     }
 
-    private fun embedImageInPDF(imgType: String, image: ByteArray): ByteArray {
-        return embedImageInPDF(image, imgType)
-    }
-
-    private fun embedImageInPDF(image: ByteArray, imgType: String): ByteArray {
-        try {
-            PDDocument().use { doc ->
-                ByteArrayOutputStream().use { outputStream ->
-                    addPDFPageFromImage(
-                        doc,
-                        image,
-                        imgType
-                    )
-                    doc.save(outputStream)
-                    doc.close()
-                    return outputStream.toByteArray()
-                }
-            }
-        } catch (ex: Exception) {
-            throw RuntimeException("Conversion of attachment failed", ex)
-        }
-    }
-
     private fun embedImageInPDF(image: File, imgType: String) {
         try {
             PDDocument().use { doc ->
@@ -112,21 +76,6 @@ class Image2PDF {
         val validImageTypes = supportedMediaTypes!!.contains(mediaType)
         logger.debug("{} convert bytes, of type {}, to PDF", if (validImageTypes) "Will" else "Won't", mediaType)
         return validImageTypes
-    }
-
-    private fun addPDFPageFromImage(doc: PDDocument, origImg: ByteArray, imgFormat: String) {
-        val page = PDPage(A4)
-        doc.addPage(page)
-        val scaledImg = ImageUtils.downToA4(origImg, imgFormat)
-        try {
-            PDPageContentStream(doc, page).use { contentStream ->
-                val xImage: PDImageXObject = PDImageXObject.createFromByteArray(doc, scaledImg, "img")
-                contentStream.drawImage(xImage, A4.lowerLeftX, A4.lowerLeftY)
-                contentStream.close()
-            }
-        } catch (ex: Exception) {
-            throw RuntimeException("Converting attachment failed", ex)
-        }
     }
 
     private fun addPDFPageFromImage(doc: PDDocument, origImg: File, imgFormat: String) {

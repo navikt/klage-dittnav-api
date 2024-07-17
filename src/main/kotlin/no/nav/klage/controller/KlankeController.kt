@@ -24,7 +24,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.ModelAndView
 import reactor.core.publisher.Flux
 import java.io.FileInputStream
 import java.io.InputStream
@@ -359,25 +358,6 @@ class KlankeController(
             .headers(responseHeaders)
             .contentLength(fileResource.file.length())
             .body(getResourceThatWillBeDeleted(fileResource))
-    }
-
-    @ResponseBody
-    @GetMapping("/{klankeId}/vedlegg/{vedleggId}/signedurl")
-    fun getVedleggFromKlankeSignedUrl(
-        @PathVariable klankeId: UUID,
-        @PathVariable vedleggId: UUID
-    ): ModelAndView {
-        val bruker = brukerService.getBruker()
-        logger.debug("Get vedlegg to klanke is requested. KlankeId: {} - VedleggId: {}", klankeId, vedleggId)
-        secureLogger.debug(
-            "Vedlegg from klanke is requested. KlankeId: {}, vedleggId: {}, fnr: {} ",
-            klankeId,
-            vedleggId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-
-        val url = vedleggService.getVedleggFromKlankeAsSignedUrl(klankeId, vedleggId, bruker)
-        return ModelAndView("redirect:$url")
     }
 
     @ResponseBody

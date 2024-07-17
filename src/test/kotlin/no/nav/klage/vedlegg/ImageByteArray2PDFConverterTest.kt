@@ -4,6 +4,7 @@ import org.apache.tika.Tika
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -19,16 +20,13 @@ internal class ImageByteArray2PDFConverterTest {
                 PDFSIGNATURE
             )
         }
-
-        private fun String.filepathToBytes() =
-            Files.readAllBytes(Path.of(TEST_RESOURCES_FOLDER, this))
     }
 
     @Test
     fun `jpg converts to pdf`() {
         assertTrue(
             isPdf(
-                converter.convert("pdf/jks.jpg".filepathToBytes())
+                converter.convertIfImage(File(TEST_RESOURCES_FOLDER + "pdf/jks.jpg")).contentAsByteArray
             )
         )
     }
@@ -37,7 +35,7 @@ internal class ImageByteArray2PDFConverterTest {
     fun `png converts to pdf`() {
         assertTrue(
             isPdf(
-                converter.convert("pdf/nav-logo.png".filepathToBytes())
+                converter.convertIfImage(File(TEST_RESOURCES_FOLDER + "pdf/nav-logo.png")).contentAsByteArray
             )
         )
     }
@@ -45,7 +43,7 @@ internal class ImageByteArray2PDFConverterTest {
     @Test
     fun `gif fails when not configured`() {
         assertThrows(RuntimeException::class.java) {
-            converter.convert("pdf/loading.gif".filepathToBytes())
+            converter.convertIfImage(File(TEST_RESOURCES_FOLDER + "pdf/loading.gif"))
         }
     }
 
@@ -55,24 +53,19 @@ internal class ImageByteArray2PDFConverterTest {
             MediaType.APPLICATION_PDF,
             MediaType.valueOf(
                 Tika().detect(
-                    converter.convert(
-                        "pdf/test123.pdf".filepathToBytes()
-                    )
+                    converter.convertIfImage(
+                        File(
+                            TEST_RESOURCES_FOLDER + "pdf/test123.pdf"
+                        )
+                    ).contentAsByteArray
                 )
             )
         )
     }
 
     @Test
-    fun `whatever else is not allowed`() {
-        assertThrows(RuntimeException::class.java) {
-            converter.convert(byteArrayOf(1, 2, 3, 4))
-        }
-    }
-
-    @Test
     fun `pdf with many pages does not fail`() {
-        converter.convert("pdf/spring-framework-reference.pdf".filepathToBytes())
+        converter.convertIfImage(File(TEST_RESOURCES_FOLDER + "pdf/spring-framework-reference.pdf"))
     }
 }
 

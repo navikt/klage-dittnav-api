@@ -99,9 +99,6 @@ no.nav.security.jwt:
           client-jwk: ${AZURE_APP_JWK}
           client-auth-method: private_key_jwt
 
-maxAttachmentSize: 8MB
-maxTotalSize: 32MB
-
 KLAGE_FILE_API_APP_NAME: klage-file-api
 
 CLAM_AV_URL: http://clamav.nais-system/scan
