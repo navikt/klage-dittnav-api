@@ -20,6 +20,7 @@ import org.springframework.util.unit.DataUnit
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import kotlin.io.path.outputStream
 import kotlin.math.min
 
 @Service
@@ -73,7 +74,11 @@ class VedleggService(
                 logger.debug("item.name: {}", item.name)
                 try {
                     timeStart = System.currentTimeMillis()
-                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
+                    inputStream.use { input ->
+                        filePath.outputStream().use { output ->
+                            input.copyTo(output, 16 * 1024)
+                        }
+                    }
                     logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
                 } catch (e: Exception) {
                     throw RuntimeException("Failed to save file", e)
