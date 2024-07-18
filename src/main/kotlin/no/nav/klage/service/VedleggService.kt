@@ -36,6 +36,7 @@ class VedleggService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val maxAttachmentSize = 256 * 1024 * 1024
     }
 
     fun addKlankevedlegg(
@@ -54,11 +55,11 @@ class VedleggService(
         val contentLength = request.getHeader("Content-Length")?.toDouble() ?: 0.0
         vedleggMetrics.registerVedleggSize(contentLength)
 
-        if (contentLength > 269484032) {
+        if (contentLength > maxAttachmentSize) {
             throw AttachmentTooLargeException("For stort vedlegg")
         }
 
-        if (existingKlanke.attachmentsTotalSize() + contentLength > 269484032) {
+        if (existingKlanke.attachmentsTotalSize() + contentLength > maxAttachmentSize) {
             throw AttachmentTooLargeException("Total størrelse på alle vedlegg er for stor")
         }
 
