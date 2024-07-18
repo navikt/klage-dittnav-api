@@ -63,6 +63,8 @@ class VedleggService(
         }
 
         val upload = JakartaServletFileUpload()
+        logger.debug("getFileSizeMax: ${upload.fileSizeMax}")
+        logger.debug("getSizeMax: ${upload.sizeMax}")
         var filename: String? = null
         val parts = upload.getItemIterator(request)
         parts.forEachRemaining { item ->
@@ -71,12 +73,11 @@ class VedleggService(
             logger.debug("Got input stream in {} ms", System.currentTimeMillis() - timeStart)
             if (!item.isFormField) {
                 filename = item.name
-                logger.debug("item.name: {}", item.name)
                 try {
                     timeStart = System.currentTimeMillis()
                     inputStream.use { input ->
                         filePath.outputStream().use { output ->
-                            input.copyTo(output, 16 * 1024)
+                            input.copyTo(output, 32 * 1024)
                         }
                     }
                     logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
