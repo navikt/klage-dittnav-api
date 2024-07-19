@@ -76,13 +76,13 @@ class VedleggService(
             if (!item.isFormField) {
                 filename = item.name
                 try {
-                    timeStart = System.currentTimeMillis()
-                    inputStream.use { input ->
-                        filePath.outputStream().use { output ->
-                            input.copyTo(output, 32 * 1024)
-                        }
-                    }
-                    logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
+//                    timeStart = System.currentTimeMillis()
+//                    inputStream.use { input ->
+//                        filePath.outputStream().use { output ->
+//                            input.copyTo(output, 32 * 1024)
+//                        }
+//                    }
+//                    logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
 
                     timeStart = System.currentTimeMillis()
                     inputStream.use { input ->
