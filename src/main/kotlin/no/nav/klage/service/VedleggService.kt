@@ -68,6 +68,7 @@ class VedleggService(
         logger.debug("getSizeMax: ${upload.sizeMax}")
         var filename: String? = null
         val parts = upload.getItemIterator(request)
+        var output: ByteArray
         parts.forEachRemaining { item ->
             timeStart = System.currentTimeMillis()
             val inputStream = item.inputStream
@@ -82,6 +83,12 @@ class VedleggService(
                         }
                     }
                     logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
+
+                    timeStart = System.currentTimeMillis()
+                    inputStream.use { input ->
+                        output = input.readBytes()
+                    }
+                    logger.debug("Copied file to byte array in {} ms", System.currentTimeMillis() - timeStart)
                 } catch (e: Exception) {
                     throw RuntimeException("Failed to save file", e)
                 } finally {
