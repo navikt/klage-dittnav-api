@@ -53,6 +53,7 @@ class VedleggService(
         val filePath = Files.createTempFile(null, null)
         logger.debug("Created temp file in {} ms", System.currentTimeMillis() - timeStart)
         val contentLength = request.getHeader("Content-Length")?.toDouble() ?: 0.0
+        logger.debug("contentLength: {}", contentLength)
         vedleggMetrics.registerVedleggSize(contentLength)
 
         if (contentLength > maxAttachmentSize) {
@@ -69,13 +70,19 @@ class VedleggService(
         var filename: String? = null
         val parts = upload.getItemIterator(request)
         var output: ByteArray
-        parts.forEachRemaining { item ->
-            timeStart = System.currentTimeMillis()
-            val inputStream = item.inputStream
-            logger.debug("Got input stream in {} ms", System.currentTimeMillis() - timeStart)
-            if (!item.isFormField) {
-                filename = item.name
-                try {
+
+        timeStart = System.currentTimeMillis()
+        var bytes: ByteArray = request.inputStream.readBytes()
+        logger.debug("Copied request to byte array in {} ms", System.currentTimeMillis() - timeStart)
+
+
+//        parts.forEachRemaining { item ->
+//            timeStart = System.currentTimeMillis()
+//            val inputStream = item.inputStream
+//            logger.debug("Got input stream in {} ms", System.currentTimeMillis() - timeStart)
+//            if (!item.isFormField) {
+//                filename = item.name
+//                try {
 //                    timeStart = System.currentTimeMillis()
 //                    inputStream.use { input ->
 //                        filePath.outputStream().use { output ->
@@ -83,27 +90,27 @@ class VedleggService(
 //                        }
 //                    }
 //                    logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
-
-                    timeStart = System.currentTimeMillis()
-                    inputStream.use { input ->
-                        output = input.readBytes()
-                    }
-                    logger.debug("Copied file to byte array in {} ms", System.currentTimeMillis() - timeStart)
-                } catch (e: Exception) {
-                    throw RuntimeException("Failed to save file", e)
-                } finally {
-                    inputStream.close()
-                }
-            } else {
-                try {
-                    logger.error("Shouldn't be here, $klankeId")
-                } catch (e: Exception) {
-                    throw RuntimeException("Failed to read content", e)
-                } finally {
-                    inputStream.close()
-                }
-            }
-        }
+//
+//                    timeStart = System.currentTimeMillis()
+//                    inputStream.use { input ->
+//                        output = input.readBytes()
+//                    }
+//                    logger.debug("Copied file to byte array in {} ms", System.currentTimeMillis() - timeStart)
+//                } catch (e: Exception) {
+//                    throw RuntimeException("Failed to save file", e)
+//                } finally {
+//                    inputStream.close()
+//                }
+//            } else {
+//                try {
+//                    logger.error("Shouldn't be here, $klankeId")
+//                } catch (e: Exception) {
+//                    throw RuntimeException("Failed to read content", e)
+//                } finally {
+//                    inputStream.close()
+//                }
+//            }
+//        }
 
         val file = filePath.toFile()
 
