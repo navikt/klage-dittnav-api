@@ -1,59 +1,139 @@
 package no.nav.klage.service
 
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.exception.AttachmentTooLargeException
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.getLogger
-import no.nav.klage.vedlegg.AttachmentValidator
-import no.nav.klage.vedlegg.Image2PDF
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload
+import org.apache.tika.Tika
+import org.springframework.core.io.Resource
+import org.springframework.http.MediaType.valueOf
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
+import org.springframework.util.unit.DataSize
+import org.springframework.util.unit.DataUnit
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.*
+import kotlin.io.path.outputStream
+import kotlin.math.min
 
 @Service
 @Transactional
 class VedleggService(
     private val klankeRepository: KlankeRepository,
-    private val image2PDF: Image2PDF,
-    private val attachmentValidator: AttachmentValidator,
     private val vedleggMetrics: VedleggMetrics,
     private val fileClient: FileClient,
     private val validationService: ValidationService,
+    private val fileApiService: FileApiService,
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val maxAttachmentSize = 256 * 1024 * 1024
     }
 
-    fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile, bruker: Bruker): Vedlegg {
+    fun addKlankevedlegg(
+        klankeId: UUID,
+        bruker: Bruker,
+        request: HttpServletRequest
+    ): Vedlegg {
+        logger.debug("Request: {}", request)
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
         validationService.validateKlankeAccess(existingKlanke, bruker)
-        val timeStart = System.currentTimeMillis()
-        vedleggMetrics.registerVedleggSize(multipart.bytes.size.toDouble())
-        vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
-        attachmentValidator.validateAttachment(multipart, existingKlanke.attachmentsTotalSize())
-        //Convert attachment (if not already pdf)
-        val convertedBytes = image2PDF.convert(multipart.bytes)
 
-        val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, multipart.originalFilename!!)
+        var timeStart = System.currentTimeMillis()
+        val filePath = Files.createTempFile(null, null)
+        logger.debug("Created temp file in {} ms", System.currentTimeMillis() - timeStart)
+        val contentLength = request.getHeader("Content-Length")?.toDouble() ?: 0.0
+        logger.debug("contentLength: {}", contentLength)
+        vedleggMetrics.registerVedleggSize(contentLength)
+
+        if (contentLength > maxAttachmentSize) {
+            throw AttachmentTooLargeException("For stort vedlegg")
+        }
+
+        if (existingKlanke.attachmentsTotalSize() + contentLength > maxAttachmentSize) {
+            throw AttachmentTooLargeException("Total størrelse på alle vedlegg er for stor")
+        }
+
+        val upload = JakartaServletFileUpload()
+        logger.debug("getFileSizeMax: ${upload.fileSizeMax}")
+        logger.debug("getSizeMax: ${upload.sizeMax}")
+        var filename: String? = null
+        val parts = upload.getItemIterator(request)
+        var output: ByteArray
+
+        timeStart = System.currentTimeMillis()
+        var bytes: ByteArray = request.inputStream.readBytes()
+        logger.debug("Copied request to byte array in {} ms", System.currentTimeMillis() - timeStart)
+
+
+//        parts.forEachRemaining { item ->
+//            timeStart = System.currentTimeMillis()
+//            val inputStream = item.inputStream
+//            logger.debug("Got input stream in {} ms", System.currentTimeMillis() - timeStart)
+//            if (!item.isFormField) {
+//                filename = item.name
+//                try {
+//                    timeStart = System.currentTimeMillis()
+//                    inputStream.use { input ->
+//                        filePath.outputStream().use { output ->
+//                            input.copyTo(output, 32 * 1024)
+//                        }
+//                    }
+//                    logger.debug("Copied file to temp file in {} ms", System.currentTimeMillis() - timeStart)
+//
+//                    timeStart = System.currentTimeMillis()
+//                    inputStream.use { input ->
+//                        output = input.readBytes()
+//                    }
+//                    logger.debug("Copied file to byte array in {} ms", System.currentTimeMillis() - timeStart)
+//                } catch (e: Exception) {
+//                    throw RuntimeException("Failed to save file", e)
+//                } finally {
+//                    inputStream.close()
+//                }
+//            } else {
+//                try {
+//                    logger.error("Shouldn't be here, $klankeId")
+//                } catch (e: Exception) {
+//                    throw RuntimeException("Failed to read content", e)
+//                } finally {
+//                    inputStream.close()
+//                }
+//            }
+//        }
+
+        val file = filePath.toFile()
+
+        val bytesForFiletypeDetection =
+            file.inputStream()
+                .readNBytes(min(DataSize.of(3, DataUnit.KILOBYTES).toBytes().toInt(), file.length().toInt()))
+        val mediaType = valueOf(Tika().detect(bytesForFiletypeDetection)).toString()
+        vedleggMetrics.incrementVedleggType(mediaType)
+
+        val vedleggIdInFileStore = fileApiService.uploadFileAsPDF(file = file)
 
         val vedleggToSave = Vedlegg(
-            tittel = multipart.originalFilename.toString(),
+            tittel = filename ?: "Mangler tittel",
             ref = vedleggIdInFileStore,
-            contentType = multipart.contentType.toString(),
-            sizeInBytes = multipart.bytes.size,
+            contentType = mediaType,
+            sizeInBytes = contentLength.toInt(),
         )
         existingKlanke.vedlegg.add(
             vedleggToSave
         ).also {
             vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
         }
+
         return vedleggToSave
     }
 
@@ -73,7 +153,7 @@ class VedleggService(
         }
     }
 
-    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): ByteArray {
+    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): Resource {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke, false)
         validationService.validateKlankeAccess(existingKlanke, bruker)
@@ -81,12 +161,15 @@ class VedleggService(
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
         if (vedlegg != null) {
-            return fileClient.getVedleggFile(vedlegg.ref)
+            return getVedleggAsResource(vedlegg.ref)
         } else {
             throw RuntimeException("No vedlegg found with this id: $vedleggId")
         }
     }
 
+    fun getVedleggAsResource(vedleggRef: String): Resource {
+        return fileClient.getVedleggAsResource(vedleggRef = vedleggRef)
+    }
 
     private fun Klanke.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
 }

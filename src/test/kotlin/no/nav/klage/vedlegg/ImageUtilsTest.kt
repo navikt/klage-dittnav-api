@@ -4,41 +4,48 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.io.File
 import javax.imageio.ImageIO
 import kotlin.experimental.and
 
 internal class ImageUtilsTest {
+    companion object {
+        private const val TEST_RESOURCES_FOLDER = "src/test/resources/"
+    }
 
     @Test
     fun imgSmallerThanA4RemainsUnchanged() {
-        val orig = this::class.java.getResource("/pdf/jks.jpg").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
-        assertThat(scaled.size).isEqualTo(orig.size)
+        val orig = File(TEST_RESOURCES_FOLDER + "/pdf/jks.jpg")
+        val scaled = ImageUtils.downToA4(orig, "jpg")
+        val origImg = fromBytes(orig.readBytes())
+        val scaledImg = fromBytes(scaled.readBytes())
+        assertThat(origImg.width).isEqualTo(scaledImg.width)
+        assertThat(origImg.height).isEqualTo(scaledImg.height)
     }
 
     @Test
     fun imgBiggerThanA4IsScaledDown() {
-        val orig = javaClass.getResource("/pdf/rdd.png").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
-        val origImg = fromBytes(orig)
-        val scaledImg = fromBytes(scaled)
+        val orig = File(TEST_RESOURCES_FOLDER + "/pdf/rdd.png")
+        val scaled = ImageUtils.downToA4(orig, "jpg")
+        val origImg = fromBytes(orig.readBytes())
+        val scaledImg = fromBytes(scaled.readBytes())
         assertThat(scaledImg.width).isLessThan(origImg.width)
         assertThat(scaledImg.height).isLessThan(origImg.height)
     }
 
     @Test
     fun scaledImgHasRetainedFormat() {
-        val orig = javaClass.getResource("/pdf/rdd.png").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
-        assertThat(hasJpgSignature(scaled)).isTrue()
+        val orig = File(TEST_RESOURCES_FOLDER + "/pdf/rdd.png")
+        val scaled = ImageUtils.downToA4(orig, "jpg")
+        assertThat(hasJpgSignature(scaled.readBytes())).isTrue()
     }
 
     @Test
     fun rotateLandscapeToPortrait() {
-        val orig = javaClass.getResource("/pdf/landscape.jpg").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
-        val origImg = fromBytes(orig)
-        val scaledImg = fromBytes(scaled)
+        val orig = File(TEST_RESOURCES_FOLDER + "/pdf/landscape.jpg")
+        val scaled = ImageUtils.downToA4(orig, "jpg")
+        val origImg = fromBytes(orig.readBytes())
+        val scaledImg = fromBytes(scaled.readBytes())
         assertThat(origImg.width).isGreaterThan(origImg.height)
         assertThat(scaledImg.height).isGreaterThan(scaledImg.width)
     }

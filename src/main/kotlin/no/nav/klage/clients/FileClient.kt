@@ -1,12 +1,21 @@
 package no.nav.klage.clients
 
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.logErrorResponse
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType
 import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.nio.file.Files
 
 @Component
 class FileClient(
@@ -17,41 +26,60 @@ class FileClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
-    //TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
-
-    fun uploadVedleggFile(vedleggFile: ByteArray, originalFilename: String): String {
+    fun uploadVedleggResource(resource: Resource): String {
         logger.debug("Uploading attachment to file store.")
 
+        var start = System.currentTimeMillis()
         val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("file", vedleggFile).filename(originalFilename)
+        bodyBuilder.part("file", resource).contentType(MediaType.APPLICATION_PDF).filename("file")
+        logger.debug("File added to body. Time taken: ${System.currentTimeMillis() - start} ms")
+
+        start = System.currentTimeMillis()
         val response = fileWebClient
             .post()
-            .uri { it.path("/attachment").build() }
+            .uri("/attachment")
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                logErrorResponse(response, ::uploadVedleggResource.name, secureLogger)
+            }
             .bodyToMono<VedleggResponse>()
             .block()
 
+        logger.debug("Response received. Time taken: ${System.currentTimeMillis() - start} ms")
         requireNotNull(response)
 
-        logger.debug("Attachment uploaded to file store with id: {}", response.id)
+        if (resource is FileSystemResource) {
+            start = System.currentTimeMillis()
+            resource.file.delete()
+            logger.debug("File deleted. Time taken: ${System.currentTimeMillis() - start} ms")
+        }
+
+        logger.debug("Document uploaded to file store with id: {}", response.id)
         return response.id
     }
 
+    fun getVedleggAsResource(vedleggRef: String): Resource {
+        logger.debug("Fetching vedlegg file as resource with vedlegg ref {}", vedleggRef)
 
-    fun getVedleggFile(vedleggRef: String): ByteArray {
-        logger.debug("Fetching vedlegg file with vedlegg ref {}", vedleggRef)
-        return fileWebClient.get()
+        val dataBufferFlux = fileWebClient.get()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
             .retrieve()
-            .bodyToMono<ByteArray>()
-            .block() ?: throw RuntimeException("Attachment could not be fetched")
-    }
+            .onStatus(HttpStatusCode::isError) { response ->
+                logErrorResponse(response, ::getVedleggAsResource.name, secureLogger)
+            }
+            .bodyToFlux(DataBuffer::class.java)
 
+        val tempFile = Files.createTempFile(null, null)
+
+        DataBufferUtils.write(dataBufferFlux, tempFile).block()
+        return FileSystemResource(tempFile)
+    }
     fun deleteVedleggFile(vedleggRef: String): Boolean {
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
         val deletedInFileStore = fileWebClient.delete()

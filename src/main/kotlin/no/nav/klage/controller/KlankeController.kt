@@ -1,6 +1,7 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
@@ -12,6 +13,7 @@ import no.nav.klage.service.BrukerService
 import no.nav.klage.service.CommonService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
+import no.nav.klage.util.getResourceThatWillBeDeleted
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.io.FileSystemResource
@@ -22,7 +24,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import java.io.FileInputStream
 import java.io.InputStream
@@ -291,10 +292,10 @@ class KlankeController(
         )
     }
 
-    @PostMapping(value = ["/{klankeId}/vedlegg"], consumes = ["multipart/form-data"])
+    @PostMapping("/{klankeId}/vedlegg")
     fun addVedleggToKlanke(
         @PathVariable klankeId: UUID,
-        @RequestParam vedlegg: MultipartFile
+        request: HttpServletRequest,
     ): VedleggView {
         val bruker = brukerService.getBruker()
         logger.debug("Add vedlegg to klanke is requested. KlankeId: {}", klankeId)
@@ -305,7 +306,7 @@ class KlankeController(
         )
         return vedleggService.addKlankevedlegg(
             klankeId = klankeId,
-            multipart = vedlegg,
+            request = request,
             bruker = bruker
         ).toVedleggView()
     }
@@ -338,7 +339,7 @@ class KlankeController(
     fun getVedleggFromKlanke(
         @PathVariable klankeId: UUID,
         @PathVariable vedleggId: UUID
-    ): ResponseEntity<ByteArray> {
+    ): ResponseEntity<Resource> {
         val bruker = brukerService.getBruker()
         logger.debug("Get vedlegg to klanke is requested. KlankeId: {} - VedleggId: {}", klankeId, vedleggId)
         secureLogger.debug(
@@ -348,16 +349,15 @@ class KlankeController(
             bruker.folkeregisteridentifikator.identifikasjonsnummer
         )
 
-        val content = vedleggService.getVedleggFromKlanke(klankeId, vedleggId, bruker)
+        val fileResource = vedleggService.getVedleggFromKlanke(klankeId, vedleggId, bruker)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
-        return ResponseEntity(
-            content,
-            responseHeaders,
-            HttpStatus.OK
-        )
+        responseHeaders.add("Content-Disposition", "inline; filename=" + (fileResource.filename ?: "vedlegg.pdf"))
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(fileResource.file.length())
+            .body(getResourceThatWillBeDeleted(fileResource))
     }
 
     @ResponseBody
