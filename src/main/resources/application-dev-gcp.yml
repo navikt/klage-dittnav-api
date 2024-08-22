@@ -6,11 +6,11 @@ allowed.origins:
 
 PDL_BASE_URL: https://pdl-api.dev-fss-pub.nais.io/graphql
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/genererfoersteside
-SAFSELVBETJENING_BASE_URL: https://safselvbetjening-q1.dev-fss-pub.nais.io
+SAFSELVBETJENING_BASE_URL: https://safselvbetjening.dev-fss-pub.nais.io
 
 PDL_AUDIENCE: dev-fss:pdl:pdl-api
 PDL_SCOPE: dev-fss.pdl.pdl-api
-SAFSELVBETJENING_AUDIENCE: dev-fss:teamdokumenthandtering:safselvbetjening-q1
+SAFSELVBETJENING_AUDIENCE: dev-fss:teamdokumenthandtering:safselvbetjening
 FSS_CLUSTER: dev-fss
 
 #These are read from the environment:
