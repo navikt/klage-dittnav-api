@@ -1,5 +1,4 @@
 externalHosts:
-  - api-gw.oera.no
   - pdl-api.prod-fss-pub.nais.io
   - klage-fss-proxy.dev-fss-pub.nais.io
   - safselvbetjening.prod-fss-pub.nais.io
