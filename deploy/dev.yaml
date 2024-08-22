@@ -1,7 +1,6 @@
 ingresses:
   - https://klage-dittnav-api.intern.dev.nav.no
 externalHosts:
-  - api-gw-q1.oera.no
   - pdl-api.dev-fss-pub.nais.io
   - klage-fss-proxy.dev-fss-pub.nais.io
   - safselvbetjening-q1.dev-fss-pub.nais.io

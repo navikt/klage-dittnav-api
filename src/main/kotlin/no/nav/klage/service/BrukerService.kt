@@ -6,7 +6,6 @@ import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
-import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import no.nav.pam.geography.PostDataDAO
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
@@ -16,7 +15,6 @@ import java.util.*
 @Service
 class BrukerService(
     private val pdlClient: PdlClient,
-    private val tokenUtil: TokenUtil,
     private val request: HttpServletRequest,
 ) {
 
@@ -27,12 +25,12 @@ class BrukerService(
 
     private val postDataDAO = PostDataDAO()
 
-    fun getBruker(useOboToken: Boolean = true): Bruker {
-        val personinfo = pdlClient.getPersonInfo(useOboToken)
-        return mapToBruker(personinfo, useOboToken)
+    fun getBruker(): Bruker {
+        val personinfo = pdlClient.getPersonInfo()
+        return mapToBruker(personinfo)
     }
 
-    fun mapToBruker(personInfo: HentPdlPersonResponse, useIdPortenTokenForExpiry: Boolean = true): Bruker {
+    fun mapToBruker(personInfo: HentPdlPersonResponse): Bruker {
         if (personInfo.errors != null) {
             logger.warn("Errors from pdl: ${personInfo.errors}")
             if (personInfo.errors[0].extensions.code == "unauthenticated") {
@@ -57,7 +55,7 @@ class BrukerService(
             adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
             folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator(),
-            tokenExpires = if (useIdPortenTokenForExpiry) getExpiryFromIdPortenToken(request.getHeader("idporten-token")) else tokenUtil.getSelvbetjeningExpiry()
+            tokenExpires = getExpiryFromIdPortenToken(request.getHeader("idporten-token"))
         )
     }
 

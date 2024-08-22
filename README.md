@@ -81,14 +81,6 @@ Port på localhost, her `8088` og `7000`, kan være hva du ønsker, men disse sk
 
 Vi har opplevd at disse prosessene ofte avsluttes fordi man mister tilkoblingen, da er det i så fall bare å kjøre dem på
 nytt. 
-###### Innstillinger
-
-I `application.yml` setter du opp følgende:
-```
-SECURITY_TOKEN_SERVICE_REST_URL: http://localhost:8088
-PDL_BASE_URL: http://localhost:7000/graphql
-``` 
-Her må portene stemme med de som settes opp i port forwardingen.
 
 ###### Docker Compose
 
