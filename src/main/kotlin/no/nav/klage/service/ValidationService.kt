@@ -7,10 +7,18 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isAccessibleToUser
 import no.nav.klage.domain.jpa.isDeleted
 import no.nav.klage.domain.jpa.isFinalized
+import no.nav.klage.util.getLogger
+import no.nav.klage.util.getSecureLogger
 import org.springframework.stereotype.Service
 
 @Service
 class ValidationService {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+    }
 
     fun validateKlankeAccess(klanke: Klanke, bruker: Bruker) {
         if (!klanke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
@@ -54,6 +62,7 @@ class ValidationService {
         }
 
         if (sectionList.isNotEmpty()) {
+            logger.warn("Validation error: {}", sectionList)
             throw SectionedValidationErrorWithDetailsException(
                 title = "Validation error",
                 sections = sectionList
