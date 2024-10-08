@@ -23,6 +23,8 @@ class PdlClientConfiguration(private val webClientBuilder: WebClient.Builder) {
     fun pdlWebClient(): WebClient {
         return webClientBuilder
             .baseUrl(pdlUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("Nav-Consumer-Id", username)
             .defaultHeader("TEMA", "KLA")
             //Fra behandlingskatalogen

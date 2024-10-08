@@ -17,5 +17,7 @@ class SafselvbetjeningClientConfiguration(private val webClientBuilder: WebClien
     fun safselvbetjeningWebClient(): WebClient =
         webClientBuilder
             .baseUrl(url)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .build()
 }

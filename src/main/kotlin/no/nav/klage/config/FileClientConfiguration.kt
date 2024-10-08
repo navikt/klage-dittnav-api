@@ -17,5 +17,6 @@ class FileClientConfiguration(private val webClientBuilder: WebClient.Builder) {
     fun fileWebClient(): WebClient =
         webClientBuilder
             .baseUrl(url)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .build()
 }
