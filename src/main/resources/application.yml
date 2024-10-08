@@ -94,10 +94,10 @@ no.nav.security.jwt:
           audience: ${SAFSELVBETJENING_AUDIENCE}
       klage-file-api-onbehalfof:
         token-endpoint-url: ${TOKEN_X_TOKEN_ENDPOINT}
-        grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+        grant_type: urn:ietf:params:oauth:grant-type:token-exchange
         client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
         subject_token_type: urn:ietf:params:oauth:token-type:jwt
-        scope: api://${NAIS_CLUSTER_NAME}.${NAIS_NAMESPACE}.${KLAGE_FILE_API_APP_NAME}/.default
+        audience: ${KLAGE_FILE_API_AUDIENCE}
         authentication:
           client-id: ${TOKEN_X_CLIENT_ID}
           client-jwk: ${TOKEN_X_PRIVATE_JWK}
