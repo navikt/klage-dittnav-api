@@ -19,6 +19,7 @@ val mockitoInlineVersion = "5.2.0"
 val testContainersVersion = "1.19.8"
 val mockkVersion = "1.13.10"
 val springMockkVersion = "4.0.2"
+val otelVersion = "1.42.1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -51,6 +52,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    implementation("io.opentelemetry:opentelemetry-api:$otelVersion")
 
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
 
