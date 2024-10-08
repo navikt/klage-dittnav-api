@@ -74,6 +74,7 @@ class TokenUtil(
 
     fun getOnBehalfOfTokenWithKlageFileApiScope(): String {
         val clientProperties = clientConfigurationProperties.registration["klage-file-api-onbehalfof"]!!
+        secureLogger.debug("Getting clientProperties for klage-file-api-onbehalfof: {}", clientProperties)
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.accessToken!!
     }
