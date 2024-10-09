@@ -16,7 +16,6 @@ SAFSELVBETJENING_BASE_URL: https://safselvbetjening.prod-fss-pub.nais.io
 PDL_AUDIENCE: prod-fss:pdl:pdl-api
 PDL_SCOPE: prod-fss.pdl.pdl-api
 SAFSELVBETJENING_AUDIENCE: prod-fss:teamdokumenthandtering:safselvbetjening
-KLAGE_FILE_API_AUDIENCE: prod-gcp:klage:klage-file-api
 FSS_CLUSTER: prod-fss
 
 #These are read from the environment:
