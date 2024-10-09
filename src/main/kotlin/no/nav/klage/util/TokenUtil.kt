@@ -72,6 +72,12 @@ class TokenUtil(
         return response.accessToken!!
     }
 
+    fun getAppAccessTokenWithKlageFileApiScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["klage-file-api-maskintilmaskin"]!!
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken!!
+    }
+
     fun getSelvbetjeningExpiry(): Long? = ctxHolder.getTokenValidationContext().getClaims(oldIssuer).expirationTime?.time
 
     fun getAppAccessTokenWithKlageFSSProxyScope(): String {

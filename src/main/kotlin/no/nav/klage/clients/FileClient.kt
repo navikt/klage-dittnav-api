@@ -1,5 +1,6 @@
 package no.nav.klage.clients
 
+import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.MultipartBodyBuilder
@@ -11,7 +12,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class FileClient(
     private val fileWebClient: WebClient,
-    private val azureADClient: AzureADClient
+    private val tokenUtil: TokenUtil
 ) {
 
     companion object {
@@ -29,7 +30,7 @@ class FileClient(
         val response = fileWebClient
             .post()
             .uri { it.path("/attachment").build() }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
             .bodyToMono<VedleggResponse>()
@@ -46,7 +47,7 @@ class FileClient(
         logger.debug("Fetching vedlegg file with vedlegg ref {}", vedleggRef)
         return fileWebClient.get()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
@@ -56,7 +57,7 @@ class FileClient(
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
         val deletedInFileStore = fileWebClient.delete()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${azureADClient.klageFileApiOidcToken()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .retrieve()
             .bodyToMono<Boolean>()
             .block()!!
