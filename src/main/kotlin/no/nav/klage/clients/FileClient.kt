@@ -30,7 +30,7 @@ class FileClient(
         val response = fileWebClient
             .post()
             .uri { it.path("/attachment").build() }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFileApiScope()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
             .bodyToMono<VedleggResponse>()
@@ -47,7 +47,7 @@ class FileClient(
         logger.debug("Fetching vedlegg file with vedlegg ref {}", vedleggRef)
         return fileWebClient.get()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFileApiScope()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
@@ -57,7 +57,7 @@ class FileClient(
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
         val deletedInFileStore = fileWebClient.delete()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFileApiScope()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .retrieve()
             .bodyToMono<Boolean>()
             .block()!!
