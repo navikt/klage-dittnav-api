@@ -59,6 +59,7 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
 
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
@@ -67,7 +68,6 @@ dependencies {
     implementation("no.nav.klage:klage-kodeverk:$kodeverkVersion")
 
     implementation("ch.qos.logback:logback-classic")
-    implementation("ch.qos.logback:logback-access")
     implementation("org.codehaus.janino:janino")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
