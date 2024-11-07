@@ -61,7 +61,4 @@
     <logger name="org.hibernate.SQL_SLOW" level="debug"/>
 
     <logger name="no.nav.klage" level="debug"/>
-
-    <logger name="no.nav.security.token.support.filter.JwtTokenValidationFilter" level="trace" />
-
 </configuration>
