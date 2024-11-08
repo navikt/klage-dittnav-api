@@ -4,7 +4,7 @@ val exposedVersion = "0.45.0"
 val h2Version = "2.3.232"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
-val tokenSupportVersion = "5.0.10"
+val tokenSupportVersion = "4.1.7"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "8.0"
 val pdfboxVersion = "3.0.3"
@@ -34,7 +34,7 @@ repositories {
 plugins {
     val kotlinVersion = "2.0.21"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.2.5"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
@@ -59,7 +59,6 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
-    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
 
     implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
