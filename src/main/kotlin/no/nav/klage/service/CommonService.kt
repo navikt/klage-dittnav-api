@@ -47,24 +47,24 @@ class CommonService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun createKlanke(input: KlankeFullInput, bruker: Bruker): Klanke {
-        val klanke = input.toKlanke(bruker = bruker)
+    fun createKlanke(input: KlankeFullInput, foedselsnummer: String): Klanke {
+        val klanke = input.toKlanke(foedselsnummer = foedselsnummer)
         return klankeRepository.save(klanke).also {
             updateMetrics(input = klanke)
         }
     }
 
-    fun createKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
-        val klanke = input.toKlanke(bruker = bruker)
+    fun createKlanke(input: KlankeMinimalInput, foedselsnummer: String): Klanke {
+        val klanke = input.toKlanke(foedselsnummer = foedselsnummer)
         return klankeRepository.save(klanke).also {
             updateMetrics(input = klanke)
         }
     }
 
-    fun KlankeFullInput.toKlanke(bruker: Bruker): Klanke {
+    fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke {
         return Klanke(
             checkboxesSelected = checkboxesSelected?.toMutableList() ?: mutableListOf(),
-            foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            foedselsnummer = foedselsnummer,
             fritekst = fritekst,
             status = KlageAnkeStatus.DRAFT,
             userSaksnummer = userSaksnummer,
@@ -82,10 +82,10 @@ class CommonService(
         )
     }
 
-    fun KlankeMinimalInput.toKlanke(bruker: Bruker): Klanke {
+    fun KlankeMinimalInput.toKlanke(foedselsnummer: String): Klanke {
         return Klanke(
             checkboxesSelected = mutableListOf(),
-            foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
+            foedselsnummer = foedselsnummer,
             fritekst = null,
             status = KlageAnkeStatus.DRAFT,
             userSaksnummer = null,
@@ -115,9 +115,9 @@ class CommonService(
         )
     }
 
-    fun getDraftOrCreateKlanke(input: KlankeMinimalInput, bruker: Bruker): Klanke {
+    fun getDraftOrCreateKlanke(input: KlankeMinimalInput, foedselsnummer: String): Klanke {
         val existingKlanke = getLatestKlankeDraft(
-            bruker = bruker,
+            foedselsnummer = foedselsnummer,
             internalSaksnummer = input.internalSaksnummer,
             innsendingsytelse = input.innsendingsytelse,
             type = input.type,
@@ -125,20 +125,19 @@ class CommonService(
 
         return existingKlanke ?: createKlanke(
             input = input,
-            bruker = bruker,
+            foedselsnummer = foedselsnummer,
         )
     }
 
     fun getLatestKlankeDraft(
-        bruker: Bruker,
+        foedselsnummer: String,
         internalSaksnummer: String?,
         innsendingsytelse: Innsendingsytelse,
         type: Type,
     ): Klanke? {
-        val fnr = bruker.folkeregisteridentifikator.identifikasjonsnummer
 
         return klankeRepository.findByFoedselsnummerAndStatusAndType(
-            fnr = fnr,
+            fnr = foedselsnummer,
             status = KlageAnkeStatus.DRAFT,
             type = type
         )
@@ -154,11 +153,14 @@ class CommonService(
     fun updateCheckboxesSelected(
         klankeId: UUID,
         checkboxesSelected: Set<CheckboxEnum>?,
-        bruker: Bruker
+        foedselsnummer: String,
     ): LocalDateTime {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(existingKlanke, bruker)
+        validationService.validateKlankeAccess(
+            klanke = existingKlanke,
+            foedselsnummer = foedselsnummer,
+        )
 
         existingKlanke.checkboxesSelected.clear()
         if (!checkboxesSelected.isNullOrEmpty()) {
@@ -177,7 +179,7 @@ class CommonService(
             return existingKlanke.modifiedByUser
         }
 
-        validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer)
         validationService.validateKlanke(klanke = existingKlanke)
 
         existingKlanke.status = KlageAnkeStatus.DONE
@@ -218,10 +220,10 @@ class CommonService(
         vedleggMetrics.registerNumberOfVedleggPerUser(klanke.vedlegg.size.toDouble())
     }
 
-    fun getKlankePdf(klankeId: UUID, bruker: Bruker): Pair<Path, String> {
+    fun getKlankePdf(klankeId: UUID, foedselsnummer: String): Pair<Path, String> {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
-        validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
         requireNotNull(existingKlanke.journalpostId)
 
         return documentService.getPathToDocumentPdfAndTitle(existingKlanke.journalpostId!!)
@@ -230,12 +232,12 @@ class CommonService(
     fun createKlankePdfWithFoersteside(klankeId: UUID, bruker: Bruker): ByteArray? {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
-        validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
         validationService.validateKlanke(klanke = existingKlanke)
 
         klageDittnavPdfgenService.createKlankePdfWithFoersteside(
-            createPdfWithFoerstesideInput(klanke = existingKlanke, bruker)
+            createPdfWithFoerstesideInput(klanke = existingKlanke, bruker = bruker)
         ).also {
             setPdfDownloadedWithoutAccessValidation(
                 klankeId = klankeId,
@@ -289,27 +291,27 @@ class CommonService(
         )
     }
 
-    fun getKlanke(klankeId: UUID, bruker: Bruker): Klanke {
+    fun getKlanke(klankeId: UUID, foedselsnummer: String): Klanke {
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
-        validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)
+        validationService.validateKlankeAccess(klanke = klanke, foedselsnummer = foedselsnummer)
         return klanke
     }
 
-    fun validateAccess(klankeId: UUID, bruker: Bruker) {
+    fun validateAccess(klankeId: UUID, foedselsnummer: String) {
         val klanke = klankeRepository.findById(klankeId).get()
-        validationService.validateKlankeAccess(klanke = klanke, bruker = bruker)
+        validationService.validateKlankeAccess(klanke = klanke, foedselsnummer = foedselsnummer)
     }
 
-    fun getJournalpostId(klankeId: UUID, bruker: Bruker): String? {
+    fun getJournalpostId(klankeId: UUID, foedselsnummer: String): String? {
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke, false)
-        validationService.validateKlankeAccess(klanke, bruker)
+        validationService.validateKlankeAccess(klanke = klanke, foedselsnummer = foedselsnummer)
         return klanke.journalpostId
     }
 
-    fun updateFritekst(klankeId: UUID, fritekst: String, bruker: Bruker): LocalDateTime {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
+    fun updateFritekst(klankeId: UUID, fritekst: String, foedselsnummer: String): LocalDateTime {
+        val existingKlanke = getAndValidateAccess(klankeId = klankeId, foedselsnummer = foedselsnummer)
 
         existingKlanke.fritekst = fritekst
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -317,8 +319,8 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun updateUserSaksnummer(klankeId: UUID, userSaksnummer: String?, bruker: Bruker): LocalDateTime {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
+    fun updateUserSaksnummer(klankeId: UUID, userSaksnummer: String?, foedselsnummer: String): LocalDateTime {
+        val existingKlanke = getAndValidateAccess(klankeId = klankeId, foedselsnummer = foedselsnummer)
 
         existingKlanke.userSaksnummer = userSaksnummer
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -326,8 +328,8 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun updateVedtakDate(klankeId: UUID, vedtakDate: LocalDate?, bruker: Bruker): LocalDateTime {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
+    fun updateVedtakDate(klankeId: UUID, vedtakDate: LocalDate?, foedselsnummer: String): LocalDateTime {
+        val existingKlanke = getAndValidateAccess(klankeId = klankeId, foedselsnummer = foedselsnummer)
 
         existingKlanke.vedtakDate = vedtakDate
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -338,11 +340,11 @@ class CommonService(
     fun updateCaseIsAtKA(
         klankeId: UUID,
         caseIsAtKA: Boolean,
-        bruker: Bruker
+        foedselsnummer: String,
     ): LocalDateTime {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(existingKlanke, bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
 
         existingKlanke.caseIsAtKA = caseIsAtKA
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -359,15 +361,15 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    private fun getAndValidateAccess(klankeId: UUID, bruker: Bruker): Klanke {
+    private fun getAndValidateAccess(klankeId: UUID, foedselsnummer: String): Klanke {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke)
-        validationService.validateKlankeAccess(klanke = existingKlanke, bruker = bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
         return existingKlanke
     }
 
-    fun updateHasVedlegg(klankeId: UUID, hasVedlegg: Boolean, bruker: Bruker): LocalDateTime {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
+    fun updateHasVedlegg(klankeId: UUID, hasVedlegg: Boolean, foedselsnummer: String): LocalDateTime {
+        val existingKlanke = getAndValidateAccess(klankeId = klankeId, foedselsnummer = foedselsnummer)
 
         existingKlanke.hasVedlegg = hasVedlegg
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -384,8 +386,8 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun deleteKlanke(klankeId: UUID, bruker: Bruker) {
-        val existingKlanke = getAndValidateAccess(klankeId, bruker)
+    fun deleteKlanke(klankeId: UUID, foedselsnummer: String) {
+        val existingKlanke = getAndValidateAccess(klankeId = klankeId, foedselsnummer = foedselsnummer)
 
         existingKlanke.status = KlageAnkeStatus.DELETED
         existingKlanke.modifiedByUser = LocalDateTime.now()
