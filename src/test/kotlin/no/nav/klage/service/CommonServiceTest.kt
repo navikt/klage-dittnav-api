@@ -70,12 +70,7 @@ class CommonServiceTest {
         createDBEntries()
 
         val hentetKlage = commonService.getLatestKlankeDraft(
-            bruker = Bruker(
-                navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-                adresse = null,
-                folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
-                kontaktinformasjon = null,
-            ),
+            foedselsnummer = "12345678910",
             internalSaksnummer = exampleInternalSaksnummer,
             innsendingsytelse = exampleInnsendingsytelse,
             type = Type.KLAGE,
@@ -88,12 +83,7 @@ class CommonServiceTest {
         createDBEntries()
 
         val hentetKlage = commonService.getLatestKlankeDraft(
-            Bruker(
-                navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-                adresse = null,
-                folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
-                kontaktinformasjon = null,
-            ),
+            foedselsnummer = "12345678910",
             internalSaksnummer = null,
             innsendingsytelse = exampleInnsendingsytelse,
             type = Type.KLAGE,
@@ -106,12 +96,7 @@ class CommonServiceTest {
         createTwoSimilarEntries()
 
         val hentetKlage = commonService.getLatestKlankeDraft(
-            bruker = Bruker(
-                navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-                adresse = null,
-                folkeregisteridentifikator = Identifikator(type = "fnr", "12345678910"),
-                kontaktinformasjon = null,
-            ),
+            foedselsnummer = "12345678910",
             internalSaksnummer = exampleInternalSaksnummer,
             innsendingsytelse = exampleInnsendingsytelse,
             type = Type.KLAGE,
@@ -124,8 +109,8 @@ class CommonServiceTest {
         createDBEntryWithYtelse()
 
         val klage = klankeRepository.findAll().first()
-        commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2, bruker = mockk(relaxed = true))
-        val output = commonService.getKlanke(klankeId = klage.id, bruker = mockk(relaxed = true)).fritekst
+        commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2, foedselsnummer = "12345678910")
+        val output = commonService.getKlanke(klankeId = klage.id, foedselsnummer = "12345678910").fritekst
 
         assertEquals(exampleFritekst2, output)
     }

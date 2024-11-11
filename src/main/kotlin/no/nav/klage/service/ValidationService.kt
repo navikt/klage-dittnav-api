@@ -20,8 +20,15 @@ class ValidationService {
         private val secureLogger = getSecureLogger()
     }
 
-    fun validateKlankeAccess(klanke: Klanke, bruker: Bruker) {
-        if (!klanke.isAccessibleToUser(bruker.folkeregisteridentifikator.identifikasjonsnummer)) {
+    fun validateKlankeAccess(klanke: Klanke, foedselsnummer: String) {
+        validateKlankeAccessForIdentifikasjonsnummer(
+            klanke = klanke,
+            identifikasjonsnummer = foedselsnummer
+        )
+    }
+
+    fun validateKlankeAccessForIdentifikasjonsnummer(klanke: Klanke, identifikasjonsnummer: String) {
+        if (!klanke.isAccessibleToUser(identifikasjonsnummer)) {
             throw KlankeNotFoundException()
         }
     }

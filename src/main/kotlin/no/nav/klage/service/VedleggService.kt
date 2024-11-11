@@ -30,10 +30,10 @@ class VedleggService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile, bruker: Bruker): Vedlegg {
+    fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile, foedselsnummer: String): Vedlegg {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(existingKlanke, bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
         val timeStart = System.currentTimeMillis()
         vedleggMetrics.registerVedleggSize(multipart.bytes.size.toDouble())
         vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
@@ -57,10 +57,10 @@ class VedleggService(
         return vedleggToSave
     }
 
-    fun deleteVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): Boolean {
+    fun deleteVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, foedselsnummer: String): Boolean {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(existingKlanke, bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
 
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
@@ -73,10 +73,10 @@ class VedleggService(
         }
     }
 
-    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, bruker: Bruker): ByteArray {
+    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, foedselsnummer: String): ByteArray {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke, false)
-        validationService.validateKlankeAccess(existingKlanke, bruker)
+        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
 
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
