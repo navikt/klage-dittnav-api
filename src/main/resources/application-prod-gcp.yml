@@ -7,7 +7,8 @@ spring:
 
 allowed.origins:
   https://klage-dittnav.nav.no,
-  https://klage.nav.no
+  https://klage.nav.no,
+  https://www.nav.no
 
 PDL_BASE_URL: https://pdl-api.prod-fss-pub.nais.io/graphql
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/genererfoersteside
