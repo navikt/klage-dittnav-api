@@ -26,23 +26,23 @@ class SseBrokenPipeLogFilter : TurboFilter() {
             if (
                 (throwable.javaClass.name == "java.io.IOException" &&
                  throwable.message == "Broken pipe" &&
-                logger?.name?.contains("org.apache.catalina.core.ContainerBase") == true
-                ) ||
+                 logger?.name?.contains("org.apache.catalina.core.ContainerBase") == true
+                )
+                /*
+                 ||
                 (throwable.javaClass.name == "AsyncRequestNotUsableException" &&
                  throwable.message?.contains("Broken pipe", ignoreCase = true) == true
                 )
+                 */
             ) {
-                ourLogger.debug("Suppressing error log message when broken pipe and logger is ${logger?.name}. This is probably due to lost client during async/SSE operations.")
+                ourLogger.debug("Suppressing error log message when broken pipe and logger is ${logger.name}. This is probably due to lost client during async/SSE operations.")
                 return FilterReply.DENY
-            } else {
-                ourLogger.debug("Got another type of exception: ${throwable.javaClass.name} with message: ${throwable.message}")
-                return FilterReply.NEUTRAL
             }
         }
 
-        if (level == Level.WARN) {
-            ourLogger.debug("Got a warning log message without an exception. Format: $format, params: $params, logger: ${logger?.name}, level: $level, marker: $marker, throwable: $throwable")
-            return FilterReply.NEUTRAL
+        if (level == Level.WARN && logger?.name == "org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver" && format?.contains("java.io.IOException: Broken pipe") == true) {
+            ourLogger.debug("Suppressing warning log message when broken pipe and logger is ${logger.name}. This is probably due to lost client during async/SSE operations.")
+            return FilterReply.DENY
         }
 
         return FilterReply.NEUTRAL
