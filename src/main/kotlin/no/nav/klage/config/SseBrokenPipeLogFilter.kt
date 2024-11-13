@@ -22,15 +22,21 @@ class SseBrokenPipeLogFilter : TurboFilter() {
         params: Array<out Any>?,
         throwable: Throwable?
     ): FilterReply {
-        if (level == Level.ERROR &&
-            throwable != null &&
-            throwable.javaClass.name == "java.io.IOException" &&
-            throwable.message == "Broken pipe" &&
-            logger?.name?.contains("org.apache.catalina.core.ContainerBase") == true
-        ) {
-            ourLogger.debug("Suppressing error log message when broken pipe from org.apache.catalina.core.ContainerBase. This is probably due to lost client during async/SSE operations.")
-            return FilterReply.DENY
+        if (throwable != null) {
+            if (
+                (throwable.javaClass.name == "java.io.IOException" &&
+                 throwable.message == "Broken pipe" &&
+                logger?.name?.contains("org.apache.catalina.core.ContainerBase") == true
+                ) ||
+                (throwable.javaClass.name == "AsyncRequestNotUsableException" &&
+                 throwable.message?.contains("Broken pipe", ignoreCase = true) == true
+                )
+            ) {
+                ourLogger.debug("Suppressing error log message when broken pipe and logger is ${logger?.name}. This is probably due to lost client during async/SSE operations.")
+                return FilterReply.DENY
+            }
         }
+
         return FilterReply.NEUTRAL
     }
 }
