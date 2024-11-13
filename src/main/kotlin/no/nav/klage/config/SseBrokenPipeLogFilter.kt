@@ -45,6 +45,11 @@ class SseBrokenPipeLogFilter : TurboFilter() {
             return FilterReply.DENY
         }
 
+        if (level == Level.WARN && logger?.name == "no.nav.klage.config.problem.GlobalExceptionHandler" && format?.contains("Response already committed") == true) {
+            ourLogger.debug("Suppressing warning log message when response already committed and logger is ${logger.name}. This is probably due to lost client during async/SSE operations.")
+            return FilterReply.DENY
+        }
+
         return FilterReply.NEUTRAL
     }
 }
