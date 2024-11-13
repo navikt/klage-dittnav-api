@@ -34,6 +34,9 @@ class SseBrokenPipeLogFilter : TurboFilter() {
             ) {
                 ourLogger.debug("Suppressing error log message when broken pipe and logger is ${logger?.name}. This is probably due to lost client during async/SSE operations.")
                 return FilterReply.DENY
+            } else {
+                ourLogger.debug("Got another type of exception: ${throwable.javaClass.name} with message: ${throwable.message}")
+                return FilterReply.NEUTRAL
             }
         }
 
