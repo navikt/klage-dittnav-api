@@ -40,6 +40,11 @@ class SseBrokenPipeLogFilter : TurboFilter() {
             }
         }
 
+        if (level == Level.WARN) {
+            ourLogger.debug("Got a warning log message without an exception. Format: $format, params: $params, logger: ${logger?.name}, level: $level, marker: $marker, throwable: $throwable")
+            return FilterReply.NEUTRAL
+        }
+
         return FilterReply.NEUTRAL
     }
 }
