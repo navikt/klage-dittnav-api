@@ -31,6 +31,7 @@ server:
   error:
     whitelabel:
       enabled: false
+  max-http-request-header-size: 1MB
 
 management:
   endpoint:
