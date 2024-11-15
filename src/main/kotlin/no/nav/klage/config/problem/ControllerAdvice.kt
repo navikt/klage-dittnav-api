@@ -1,6 +1,7 @@
 package no.nav.klage.config.problem
 
 import no.nav.klage.domain.exception.*
+import no.nav.klage.util.getLogger
 import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.springframework.http.HttpStatus
@@ -8,6 +9,7 @@ import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 
@@ -16,7 +18,17 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val ourLogger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+    }
+
+    @ExceptionHandler
+    fun handleAsyncRequestNotUsableException(
+        ex: AsyncRequestNotUsableException,
+        request: NativeWebRequest
+    ) {
+        //Log in regular logs instead of secure logs to make it easier to compare with other suppressed logs
+        ourLogger.debug("Suppressing AsyncRequestNotUsableException. This is probably due to lost client during async/SSE operations.", ex)
     }
 
     @ExceptionHandler
