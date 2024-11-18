@@ -19,7 +19,7 @@ val mockitoInlineVersion = "5.2.0"
 val testContainersVersion = "1.20.3"
 val mockkVersion = "1.13.13"
 val springMockkVersion = "4.0.2"
-val otelVersion = "1.43.0"
+val otelVersion = "1.44.1"
 
 val githubUser: String by project
 val githubPassword: String by project
