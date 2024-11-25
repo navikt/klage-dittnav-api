@@ -11,15 +11,15 @@ val pdfboxVersion = "3.0.3"
 val tikaVersion = "3.0.0"
 val resilience4jVersion = "2.2.0"
 val problemSpringWebStartVersion = "0.27.0"
-val shedlockVersion = "5.16.0"
-val springDocVersion = "2.6.0"
+val shedlockVersion = "6.0.1"
+val springDocVersion = "2.7.0"
 val kodeverkVersion = "1.8.13"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
-val testContainersVersion = "1.20.3"
+val testContainersVersion = "1.20.4"
 val mockkVersion = "1.13.13"
 val springMockkVersion = "4.0.2"
-val otelVersion = "1.43.0"
+val otelVersion = "1.44.1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -34,7 +34,7 @@ repositories {
 plugins {
     val kotlinVersion = "2.0.21"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.4.0"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
