@@ -2,7 +2,7 @@ package no.nav.klage.domain.exception
 
 class AttachmentTooLargeException(override val message: String = "TOO_LARGE") : RuntimeException() {
     @Synchronized
-    fun fillInStackTrace(): Throwable? {
+    fun fillInStackTrace(): Throwable {
         //Remove stacktrace
         return this
     }
