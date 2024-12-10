@@ -2,7 +2,6 @@ package no.nav.klage.service
 
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
-import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.repository.KlankeRepository

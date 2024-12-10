@@ -1,6 +1,5 @@
 package no.nav.klage.service
 
-import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.exception.*
 import no.nav.klage.domain.jpa.Klanke
