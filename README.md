@@ -4,19 +4,7 @@ API for moderniserte klager.
 
 ##Title Keys
 
-Denne appen er i hovedsak backend for https://github.com/navikt/klage-dittnav. 
-Denne klienten tilbyr en direkte lenke til opprettelse av klage, der det er mulig å sette feltet `tittel`. 
-Verdien på dette feltet må være en av nøklene som er definert i [TitleEnum.kt](src/main/kotlin/no/nav/klage/domain/titles/TitleEnum.kt).
-
-###Nye titler
-
-Dersom du ønsker å bruke en tittel som ikke fins i den definerte listen, så er det mulig å legge til flere. 
-Dette kan gjøres ved å opprette en Pull Request til dette repoet der du legger til ønsket tittel i [TitleEnum.kt](src/main/kotlin/no/nav/klage/domain/titles/TitleEnum.kt) på dette formatet:
-```
-NY_TITTEL("Den nye tittelen på norsk", "The new title in English")
-```
-Det går også an å kontakte oss på Slack, i kanalen #team-digital-klage.
-
+Denne appen er i hovedsak backend for https://github.com/navikt/klang. Se readme der for informasjon om hvordan du kan ta i bruk lenker til klageløsningen.
 
 ##Utvikling
 
