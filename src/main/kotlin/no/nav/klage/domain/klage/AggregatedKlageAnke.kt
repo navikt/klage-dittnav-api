@@ -11,7 +11,6 @@ data class AggregatedKlageAnke(
     val vedtak: String,
     val dato: LocalDate,
     val begrunnelse: String,
-    val tema: String,
     val ytelse: String,
     val vedlegg: List<Vedlegg>,
     val userSaksnummer: String?,

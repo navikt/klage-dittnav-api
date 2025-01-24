@@ -262,7 +262,6 @@ class CommonService(
             dato = klanke.modifiedByUser.toLocalDate(),
             begrunnelse = sanitizeText(klanke.fritekst ?: ""),
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
-            tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!.name,
             ytelse = klanke.innsendingsytelse.nbName,
             vedlegg = klanke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
             userChoices = klanke.checkboxesSelected.map { x -> x.getFullText(klanke.language) },

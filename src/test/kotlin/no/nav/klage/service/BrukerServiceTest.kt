@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.pdl.*
 import no.nav.klage.domain.*
 import no.nav.klage.domain.Navn
-import no.nav.klage.util.TokenUtil
 import no.nav.pam.geography.PostDataDAO
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals

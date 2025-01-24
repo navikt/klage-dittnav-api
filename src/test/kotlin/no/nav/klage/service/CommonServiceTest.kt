@@ -35,7 +35,6 @@ class CommonServiceTest {
     private val exampleFritekst2 = "fritekst2"
     private val fnr = "12345678910"
     private val draftStatus = KlageAnkeStatus.DRAFT
-    private val exampleTema = Tema.AAP
     private val exampleInnsendingsytelse = Innsendingsytelse.ARBEIDSAVKLARINGSPENGER
     private val exampleInternalSaksnummer = "123456"
     private val exampleModifiedByUser = LocalDateTime.now()
