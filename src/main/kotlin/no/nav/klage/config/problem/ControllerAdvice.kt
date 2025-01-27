@@ -23,15 +23,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     }
 
     @ExceptionHandler
-    fun handleAsyncRequestNotUsableException(
-        ex: AsyncRequestNotUsableException,
-        request: NativeWebRequest
-    ) {
-        //Log in regular logs instead of secure logs to make it easier to compare with other suppressed logs
-        ourLogger.debug("Suppressing AsyncRequestNotUsableException. This is probably due to lost client during async/SSE operations.", ex)
-    }
-
-    @ExceptionHandler
     fun handleJwtTokenUnauthorizedException(
         ex: JwtTokenUnauthorizedException,
         request: NativeWebRequest
