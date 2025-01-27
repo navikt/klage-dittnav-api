@@ -12,7 +12,7 @@ val tikaVersion = "3.0.0"
 val resilience4jVersion = "2.3.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "6.2.0"
-val springDocVersion = "2.8.3"
+val springDocVersion = "2.8.4"
 val kodeverkVersion = "1.9.9"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
@@ -32,7 +32,7 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "2.1.0"
+    val kotlinVersion = "2.1.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.springframework.boot") version "3.4.2"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
