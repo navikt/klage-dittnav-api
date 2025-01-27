@@ -34,6 +34,11 @@ class SseBrokenPipeLogFilter : TurboFilter() {
             }
         }
 
+        if (level == Level.WARN && logger?.name == "org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" && format?.startsWith("Failure in @ExceptionHandler no.nav.klage.config.problem.GlobalExceptionHandler") == true) {
+            ourLogger.debug("Suppressing warning log message from ${logger.name}. This is probably due to lost client during async/SSE operations.")
+            return FilterReply.DENY
+        }
+
         if (level == Level.WARN && logger?.name == "org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver" && format?.contains("java.io.IOException: Broken pipe") == true) {
             ourLogger.debug("Suppressing warning log message when broken pipe and logger is ${logger.name}. This is probably due to lost client during async/SSE operations.")
             return FilterReply.DENY
