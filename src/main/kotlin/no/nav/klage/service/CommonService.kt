@@ -99,7 +99,7 @@ class CommonService(
             modifiedByUser = LocalDateTime.now(),
             pdfDownloaded = null,
             type = type,
-            caseIsAtKA = null,
+            caseIsAtKA = caseIsAtKA,
         )
     }
 
@@ -122,6 +122,10 @@ class CommonService(
             innsendingsytelse = input.innsendingsytelse,
             type = input.type,
         )
+
+        if (existingKlanke != null && input.caseIsAtKA != null) {
+            existingKlanke.caseIsAtKA = input.caseIsAtKA
+        }
 
         return existingKlanke ?: createKlanke(
             input = input,
@@ -179,7 +183,10 @@ class CommonService(
             return existingKlanke.modifiedByUser
         }
 
-        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        validationService.validateKlankeAccess(
+            klanke = existingKlanke,
+            foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
         validationService.validateKlanke(klanke = existingKlanke)
 
         existingKlanke.status = KlageAnkeStatus.DONE
@@ -232,7 +239,10 @@ class CommonService(
     fun createKlankePdfWithFoersteside(klankeId: UUID, bruker: Bruker): ByteArray? {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
-        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer)
+        validationService.validateKlankeAccess(
+            klanke = existingKlanke,
+            foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer
+        )
 
         validationService.validateKlanke(klanke = existingKlanke)
 
