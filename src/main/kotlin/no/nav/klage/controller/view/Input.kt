@@ -35,6 +35,7 @@ data class KlankeMinimalInput(
     val internalSaksnummer: String?,
     val innsendingsytelse: Innsendingsytelse,
     val type: Type,
+    val caseIsAtKA: Boolean?,
 )
 
 /**
