@@ -17,7 +17,7 @@ val kodeverkVersion = "1.9.12"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
 val testContainersVersion = "1.20.5"
-val mockkVersion = "1.13.16"
+val mockkVersion = "1.13.17"
 val springMockkVersion = "4.0.2"
 val otelVersion = "1.47.0"
 
