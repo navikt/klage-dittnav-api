@@ -26,7 +26,8 @@ class AuthorizationLogFilter : TurboFilter() {
             if (
                 (level == Level.ERROR &&
                         throwable.javaClass.name == "no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException" &&
-                        format?.contains("Exception thrown to client: Unauthorized, No authorization header in request") == true
+                        (format?.contains("Exception thrown to client: Unauthorized, No authorization header in request") == true ||
+                                format?.contains("Exception thrown to client: Unauthorized, No valid token found in validation context") == true)
                         )
             ) {
                 ourLogger.debug("Suppressing error log message from missing authorization header. Probably expired token.")
