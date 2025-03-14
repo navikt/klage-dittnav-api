@@ -7,6 +7,7 @@ import no.nav.klage.controller.view.KlankeMinimalInput
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klanke
+import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.domain.klage.CheckboxEnum
@@ -70,7 +71,11 @@ class CommonService(
             userSaksnummer = userSaksnummer,
             journalpostId = null,
             vedtakDate = vedtakDate,
-            internalSaksnummer = internalSaksnummer,
+            sak = Sak(
+                fagsakid = internalSaksnummer,
+                sakstype = sakSakstype,
+                fagsaksystem = sakFagsaksystem,
+            ),
             language = language,
             innsendingsytelse = innsendingsytelse,
             hasVedlegg = hasVedlegg,
@@ -91,7 +96,11 @@ class CommonService(
             userSaksnummer = null,
             journalpostId = null,
             vedtakDate = null,
-            internalSaksnummer = internalSaksnummer,
+            sak = Sak(
+                fagsakid = internalSaksnummer,
+                sakstype = sakSakstype,
+                fagsaksystem = sakFagsaksystem,
+            ),
             language = LanguageEnum.NB,
             innsendingsytelse = innsendingsytelse,
             hasVedlegg = false,
@@ -147,7 +156,7 @@ class CommonService(
         )
             .filter {
                 if (internalSaksnummer != null) {
-                    it.innsendingsytelse == innsendingsytelse && it.internalSaksnummer == internalSaksnummer
+                    it.innsendingsytelse == innsendingsytelse && it.sak?.fagsakid == internalSaksnummer
                 } else {
                     it.innsendingsytelse == innsendingsytelse
                 }
@@ -276,10 +285,17 @@ class CommonService(
             vedlegg = klanke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
             userChoices = klanke.checkboxesSelected.map { x -> x.getFullText(klanke.language) },
             userSaksnummer = klanke.userSaksnummer,
-            internalSaksnummer = klanke.internalSaksnummer,
+            internalSaksnummer = klanke.sak?.fagsakid,
             klageAnkeType = AggregatedKlageAnke.KlageAnkeType.valueOf(klanke.type.name),
             ettersendelseTilKa = klanke.caseIsAtKA,
             innsendingsYtelseId = klanke.innsendingsytelse.id,
+            sak = if (klanke.sak?.fagsakid != null && klanke.sak?.sakstype != null && klanke.sak?.fagsaksystem != null) {
+                AggregatedKlageAnke.Sak(
+                    sakstype = klanke.sak?.sakstype!!,
+                    fagsaksystem = klanke.sak?.fagsaksystem!!,
+                    fagsakid = klanke.sak?.fagsakid!!,
+                )
+            } else null
         )
     }
 
@@ -289,7 +305,7 @@ class CommonService(
             navn = bruker.navn,
             fritekst = klanke.fritekst ?: "",
             userSaksnummer = klanke.userSaksnummer,
-            internalSaksnummer = klanke.internalSaksnummer,
+            internalSaksnummer = klanke.sak?.fagsakid,
             vedtakDate = klanke.vedtakDate,
             innsendingsytelse = klanke.innsendingsytelse,
             checkboxesSelected = klanke.checkboxesSelected.toSet(),
