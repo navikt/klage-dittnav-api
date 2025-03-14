@@ -1,5 +1,6 @@
 package no.nav.klage.domain.klage
 
+import no.nav.klage.domain.jpa.Sakstype
 import java.time.LocalDate
 
 data class AggregatedKlageAnke(
@@ -15,6 +16,7 @@ data class AggregatedKlageAnke(
     val vedlegg: List<Vedlegg>,
     val userSaksnummer: String?,
     val internalSaksnummer: String?,
+    val sak: Sak?,
     val klageAnkeType: KlageAnkeType,
     //klage specific
     val userChoices: List<String>?,
@@ -29,6 +31,10 @@ data class AggregatedKlageAnke(
         val tittel: String,
         val ref: String,
     )
+
+    data class Sak(
+        val sakstype: Sakstype,
+        var fagsaksystem: String,
+        var fagsakid: String,
+    )
 }
-
-

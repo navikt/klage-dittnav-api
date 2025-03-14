@@ -18,7 +18,7 @@ fun Klanke.toKlankeView(): KlankeView {
         vedlegg = vedlegg.map { it.toVedleggView() },
         journalpostId = journalpostId,
         finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedByUser.toLocalDate() else null,
-        internalSaksnummer = internalSaksnummer,
+        internalSaksnummer = sak?.fagsakid,
         checkboxesSelected = checkboxesSelected.toSet(),
         type = type,
         caseIsAtKA = caseIsAtKA,

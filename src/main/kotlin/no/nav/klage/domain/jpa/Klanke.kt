@@ -33,8 +33,8 @@ class Klanke(
     var journalpostId: String?,
     @Column(name = "vedtak_date")
     var vedtakDate: LocalDate?,
-    @Column(name = "internal_saksnummer")
-    var internalSaksnummer: String?,
+    @Embedded
+    var sak: Sak?,
     @Enumerated(EnumType.STRING)
     @Column(name = "language")
     var language: LanguageEnum,

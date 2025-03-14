@@ -5,6 +5,8 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.jpa.Klanke
+import no.nav.klage.domain.jpa.Sak
+import no.nav.klage.domain.jpa.Sakstype
 import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import org.assertj.core.api.Assertions.assertThat
@@ -49,7 +51,11 @@ class KlankeRepositoryTest(
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
-                internalSaksnummer = "int123",
+                sak = Sak(
+                    sakstype = Sakstype.FAGSAK,
+                    fagsaksystem = "FS123",
+                    fagsakid = "int123",
+                ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
                 hasVedlegg = true,
@@ -78,7 +84,11 @@ class KlankeRepositoryTest(
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
-                internalSaksnummer = "int123",
+                sak = Sak(
+                    sakstype = Sakstype.FAGSAK,
+                    fagsaksystem = "FS123",
+                    fagsakid = "int123",
+                ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
                 hasVedlegg = true,
@@ -108,7 +118,11 @@ class KlankeRepositoryTest(
                 userSaksnummer = "123",
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
-                internalSaksnummer = "int123",
+                sak = Sak(
+                    sakstype = Sakstype.FAGSAK,
+                    fagsaksystem = "FS123",
+                    fagsakid = "int123",
+                ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
                 hasVedlegg = true,
