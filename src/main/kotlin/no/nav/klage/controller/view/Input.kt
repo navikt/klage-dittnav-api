@@ -3,7 +3,6 @@ package no.nav.klage.controller.view
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
-import no.nav.klage.domain.jpa.Sakstype
 import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import java.time.LocalDate
@@ -34,7 +33,7 @@ data class BooleanInput(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class KlankeMinimalInput(
     val internalSaksnummer: String?,
-    val sakSakstype: Sakstype?,
+    val sakSakstype: String?,
     val sakFagsaksystem: String?,
     val innsendingsytelse: Innsendingsytelse,
     val type: Type,
@@ -52,7 +51,7 @@ data class KlankeFullInput(
     val language: LanguageEnum,
     val vedtakDate: LocalDate? = null,
     val internalSaksnummer: String? = null,
-    val sakSakstype: Sakstype?,
+    val sakSakstype: String?,
     val sakFagsaksystem: String?,
     val fritekst: String = "",
     val hasVedlegg: Boolean,

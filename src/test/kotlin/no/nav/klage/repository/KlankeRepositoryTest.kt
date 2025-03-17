@@ -6,7 +6,6 @@ import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
-import no.nav.klage.domain.jpa.Sakstype
 import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import org.assertj.core.api.Assertions.assertThat
@@ -52,7 +51,7 @@ class KlankeRepositoryTest(
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
                 sak = Sak(
-                    sakstype = Sakstype.FAGSAK,
+                    sakstype = "FAGSAK",
                     fagsaksystem = "FS123",
                     fagsakid = "int123",
                 ),
@@ -85,7 +84,7 @@ class KlankeRepositoryTest(
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
                 sak = Sak(
-                    sakstype = Sakstype.FAGSAK,
+                    sakstype = "FAGSAK",
                     fagsaksystem = "FS123",
                     fagsakid = "int123",
                 ),
@@ -119,7 +118,7 @@ class KlankeRepositoryTest(
                 journalpostId = "abc",
                 vedtakDate = LocalDate.now(),
                 sak = Sak(
-                    sakstype = Sakstype.FAGSAK,
+                    sakstype = "FAGSAK",
                     fagsaksystem = "FS123",
                     fagsakid = "int123",
                 ),

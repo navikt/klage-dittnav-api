@@ -6,7 +6,6 @@ import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
-import no.nav.klage.domain.jpa.Sakstype
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.repository.KlankeRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -128,7 +127,7 @@ class CommonServiceTest {
                 journalpostId = null,
                 vedtakDate = null,
                 sak = Sak(
-                    sakstype = Sakstype.FAGSAK,
+                    sakstype = "FAGSAK",
                     fagsaksystem = "FS123",
                     fagsakid = exampleInternalSaksnummer,
                 ),
@@ -154,7 +153,7 @@ class CommonServiceTest {
                 journalpostId = null,
                 vedtakDate = null,
                 sak = Sak(
-                    sakstype = Sakstype.FAGSAK,
+                    sakstype = "FAGSAK",
                     fagsaksystem = "FS123",
                     fagsakid = exampleInternalSaksnummer,
                 ),
@@ -185,7 +184,7 @@ class CommonServiceTest {
                 journalpostId = null,
                 vedtakDate = null,
                 sak = Sak(
-                    sakstype = Sakstype.FAGSAK,
+                    sakstype = "FAGSAK",
                     fagsaksystem = "FS123",
                     fagsakid = exampleInternalSaksnummer,
                 ),

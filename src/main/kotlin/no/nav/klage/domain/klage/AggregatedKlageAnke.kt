@@ -1,6 +1,5 @@
 package no.nav.klage.domain.klage
 
-import no.nav.klage.domain.jpa.Sakstype
 import java.time.LocalDate
 
 data class AggregatedKlageAnke(
@@ -33,7 +32,7 @@ data class AggregatedKlageAnke(
     )
 
     data class Sak(
-        val sakstype: Sakstype,
+        val sakstype: String,
         var fagsaksystem: String,
         var fagsakid: String,
     )
