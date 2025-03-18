@@ -5,7 +5,7 @@ import io.mockk.mockk
 import no.nav.klage.db.TestPostgresqlContainer
 import no.nav.klage.domain.*
 import no.nav.klage.domain.jpa.Klanke
-import no.nav.klage.kodeverk.Tema
+import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.repository.KlankeRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -126,7 +126,11 @@ class CommonServiceTest {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                internalSaksnummer = exampleInternalSaksnummer,
+                sak = Sak(
+                    sakstype = "FAGSAK",
+                    fagsaksystem = "FS123",
+                    fagsakid = exampleInternalSaksnummer,
+                ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -148,7 +152,11 @@ class CommonServiceTest {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                internalSaksnummer = exampleInternalSaksnummer,
+                sak = Sak(
+                    sakstype = "FAGSAK",
+                    fagsaksystem = "FS123",
+                    fagsakid = exampleInternalSaksnummer,
+                ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -175,7 +183,11 @@ class CommonServiceTest {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                internalSaksnummer = exampleInternalSaksnummer,
+                sak = Sak(
+                    sakstype = "FAGSAK",
+                    fagsaksystem = "FS123",
+                    fagsakid = exampleInternalSaksnummer,
+                ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -200,7 +212,7 @@ class CommonServiceTest {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                internalSaksnummer = null,
+                sak = null,
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -225,7 +237,7 @@ class CommonServiceTest {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                internalSaksnummer = null,
+                sak = null,
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,

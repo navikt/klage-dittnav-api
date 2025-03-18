@@ -15,6 +15,7 @@ data class AggregatedKlageAnke(
     val vedlegg: List<Vedlegg>,
     val userSaksnummer: String?,
     val internalSaksnummer: String?,
+    val sak: Sak?,
     val klageAnkeType: KlageAnkeType,
     //klage specific
     val userChoices: List<String>?,
@@ -29,6 +30,10 @@ data class AggregatedKlageAnke(
         val tittel: String,
         val ref: String,
     )
+
+    data class Sak(
+        val sakstype: String,
+        var fagsaksystem: String,
+        var fagsakid: String,
+    )
 }
-
-

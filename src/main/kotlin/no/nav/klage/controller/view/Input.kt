@@ -33,6 +33,8 @@ data class BooleanInput(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class KlankeMinimalInput(
     val internalSaksnummer: String?,
+    val sakSakstype: String?,
+    val sakFagsaksystem: String?,
     val innsendingsytelse: Innsendingsytelse,
     val type: Type,
     val caseIsAtKA: Boolean?,
@@ -49,6 +51,8 @@ data class KlankeFullInput(
     val language: LanguageEnum,
     val vedtakDate: LocalDate? = null,
     val internalSaksnummer: String? = null,
+    val sakSakstype: String?,
+    val sakFagsaksystem: String?,
     val fritekst: String = "",
     val hasVedlegg: Boolean,
     val type: Type,
