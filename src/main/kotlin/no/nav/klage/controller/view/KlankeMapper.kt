@@ -19,6 +19,8 @@ fun Klanke.toKlankeView(): KlankeView {
         journalpostId = journalpostId,
         finalizedDate = if (status === KlageAnkeStatus.DONE) modifiedByUser.toLocalDate() else null,
         internalSaksnummer = sak?.fagsakid,
+        sakFagsaksystem = sak?.fagsaksystem,
+        sakSakstype = sak?.sakstype,
         checkboxesSelected = checkboxesSelected.toSet(),
         type = type,
         caseIsAtKA = caseIsAtKA,

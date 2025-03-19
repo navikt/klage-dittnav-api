@@ -23,6 +23,8 @@ data class KlankeView(
     val enhetsnummer: String? = null,
     val userSaksnummer: String?,
     val internalSaksnummer: String?,
+    val sakFagsaksystem: String?,
+    val sakSakstype: String?,
     val language: LanguageEnum,
     val innsendingsytelse: Innsendingsytelse,
     val hasVedlegg: Boolean,
