@@ -4,7 +4,7 @@ val exposedVersion = "0.45.0"
 val h2Version = "2.3.232"
 val pamGeographyVersion = "2.9"
 val tokenValidationVersion = "1.3.0"
-val tokenSupportVersion = "5.0.19"
+val tokenSupportVersion = "5.0.20"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "8.0"
 val pdfboxVersion = "3.0.4"
@@ -12,7 +12,7 @@ val tikaVersion = "3.1.0"
 val resilience4jVersion = "2.3.0"
 val problemSpringWebStartVersion = "0.27.0"
 val shedlockVersion = "6.3.0"
-val springDocVersion = "2.8.5"
+val springDocVersion = "2.8.6"
 val kodeverkVersion = "1.9.24"
 val simpleSlackPosterVersion = "0.1.4"
 val mockitoInlineVersion = "5.2.0"
@@ -32,9 +32,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "2.1.10"
+    val kotlinVersion = "2.1.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.4.3"
+    id("org.springframework.boot") version "3.4.4"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
