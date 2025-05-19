@@ -4,6 +4,7 @@
 
     <turboFilter class="no.nav.klage.config.SseBrokenPipeLogFilter" />
     <turboFilter class="no.nav.klage.config.AuthorizationLogFilter" />
+    <turboFilter class="no.nav.klage.config.InternalLogFilter" />
 
     <springProfile name="local">
         <appender name="text" class="ch.qos.logback.core.ConsoleAppender">
