@@ -3,7 +3,7 @@ package no.nav.klage.clients.safselvbetjening
 
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.getTeamLogger
 import org.slf4j.Logger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
@@ -24,7 +24,7 @@ class SafselvbetjeningGraphQlClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
+        private val teamLogger = getTeamLogger()
     }
 
     @Retryable
@@ -41,7 +41,7 @@ class SafselvbetjeningGraphQlClient(
                 .bodyValue(getJournalpostByIdQuery(journalpostId = journalpostId))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError) { response ->
-                    logErrorResponse(response, ::getJournalpostById.name, secureLogger)
+                    logErrorResponse(response, ::getJournalpostById.name, teamLogger)
                 }
                 .bodyToMono<GetJournalpostByIdResponse>()
                 .block() ?: throw RuntimeException("No connection to safselvbetjening")

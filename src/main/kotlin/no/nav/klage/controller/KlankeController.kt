@@ -1,7 +1,6 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletResponse
 import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.controller.view.*
 import no.nav.klage.domain.exception.KlankeNotFoundException
@@ -13,7 +12,6 @@ import no.nav.klage.service.CommonService
 import no.nav.klage.service.VedleggService
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
@@ -46,7 +44,6 @@ class KlankeController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
     }
 
     @GetMapping("/{klankeId}")
@@ -55,11 +52,6 @@ class KlankeController(
     ): KlankeView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Get klanke is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Get klanke is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         return commonService.getKlanke(klankeId = klankeId, foedselsnummer = brukerIdent).toKlankeView()
     }
 
@@ -69,11 +61,6 @@ class KlankeController(
     ): String? {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Get journalpost id is requested. KlankeId: {}", klankeId)
-        secureLogger.debug(
-            "Get journalpost id is requested. KlankeId: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         return commonService.getJournalpostId(klankeId = klankeId, foedselsnummer = brukerIdent)
     }
 
@@ -103,30 +90,19 @@ class KlankeController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createKlanke(
-        @RequestBody klankeFullInput: KlankeFullInput, response: HttpServletResponse
+        @RequestBody klankeFullInput: KlankeFullInput
     ): KlankeView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Create klanke is requested.")
-        secureLogger.debug(
-            "Create klanke is requested for user with fnr {}.",
-            brukerIdent
-        )
         return commonService.createKlanke(input = klankeFullInput, foedselsnummer = brukerIdent).toKlankeView()
     }
 
     @PutMapping
     fun createOrGetKlanke(
         @RequestBody klankeMinimalInput: KlankeMinimalInput,
-        response: HttpServletResponse
     ): KlankeView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Create or update klanke for user is requested.")
-        secureLogger.debug(
-            "Create or update klanke for user is requested. Fnr: {}, innsendingsytelse: {}",
-            brukerIdent,
-            klankeMinimalInput.innsendingsytelse
-        )
-
         return commonService.getDraftOrCreateKlanke(input = klankeMinimalInput, foedselsnummer = brukerIdent).toKlankeView()
     }
 
@@ -134,15 +110,9 @@ class KlankeController(
     fun updateFritekst(
         @PathVariable klankeId: UUID,
         @RequestBody input: StringInput,
-        response: HttpServletResponse
     ): EditedView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Update klanke fritekst is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Update klanke fritekst is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         val modifiedByUser = commonService.updateFritekst(
             klankeId = klankeId,
             fritekst = input.value,
@@ -157,15 +127,9 @@ class KlankeController(
     fun updateUserSaksnummer(
         @PathVariable klankeId: UUID,
         @RequestBody input: StringInputNullable,
-        response: HttpServletResponse
     ): EditedView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Update klanke userSaksnummer is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Update klanke userSaksnummer is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         val modifiedByUser = commonService.updateUserSaksnummer(
             klankeId = klankeId,
             userSaksnummer = input.value,
@@ -180,15 +144,9 @@ class KlankeController(
     fun updateVedtakDate(
         @PathVariable klankeId: UUID,
         @RequestBody input: DateInput,
-        response: HttpServletResponse
     ): EditedView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Update klanke vedtakDate is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Update klanke vedtakDate is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         val modifiedByUser = commonService.updateVedtakDate(
             klankeId = klankeId,
             vedtakDate = input.value,
@@ -203,15 +161,9 @@ class KlankeController(
     fun updateHasVedlegg(
         @PathVariable klankeId: UUID,
         @RequestBody input: BooleanInput,
-        response: HttpServletResponse
     ): EditedView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Update klanke hasVedlegg is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Update klanke hasVedlegg is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         val modifiedByUser = commonService.updateHasVedlegg(
             klankeId = klankeId,
             hasVedlegg = input.value,
@@ -226,15 +178,9 @@ class KlankeController(
     fun updateCheckboxesSelected(
         @PathVariable klankeId: UUID,
         @RequestBody input: CheckboxesSelectedInput,
-        response: HttpServletResponse
     ): EditedView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Update klanke checkboxesSelected is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Update klanke checkboxesSelected is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         val modifiedByUser = commonService.updateCheckboxesSelected(
             klankeId = klankeId,
             checkboxesSelected = input.value,
@@ -245,29 +191,13 @@ class KlankeController(
         )
     }
 
-    @Deprecated("No longer in use")
-    @PutMapping("/{klankeId}/enhetsnummer")
-    fun updateEnhetsnummer(
-        @PathVariable klankeId: UUID,
-        @RequestBody input: StringInputNullable,
-        response: HttpServletResponse
-    ) {
-        logger.debug("Deprecated update klankeId enhetsnummer is requested. Returning 200.")
-    }
-
     @PutMapping("/{klankeId}/caseisatka")
     fun updateCaseIsAtKA(
         @PathVariable klankeId: UUID,
         @RequestBody input: BooleanInput,
-        response: HttpServletResponse
     ): EditedView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("updateCaseIsAtKA is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "updateCaseIsAtKA is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         val modifiedByUser = commonService.updateCaseIsAtKA(
             klankeId = klankeId,
             caseIsAtKA = input.value,
@@ -282,11 +212,6 @@ class KlankeController(
     fun deleteKlanke(@PathVariable klankeId: UUID) {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Delete klanke is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Delete klanke is requested. Id: {}, fnr: {}",
-            klankeId,
-            brukerIdent
-        )
         commonService.deleteKlanke(klankeId = klankeId, foedselsnummer = brukerIdent)
     }
 
@@ -297,11 +222,6 @@ class KlankeController(
     ): Map<String, String> {
         val bruker = brukerService.getBruker()
         logger.debug("Finalize klanke is requested. Id: {}", klankeId)
-        secureLogger.debug(
-            "Finalize klanke is requested. Id: {}, fnr: {}",
-            klankeId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer,
-        )
         val finalizedLocalDateTime = commonService.finalizeKlanke(klankeId = klankeId, bruker = bruker)
         return mapOf(
             "finalizedDate" to finalizedLocalDateTime.toLocalDate().toString(),
@@ -316,11 +236,6 @@ class KlankeController(
     ): VedleggView {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Add vedlegg to klanke is requested. KlankeId: {}", klankeId)
-        secureLogger.debug(
-            "Add Vedlegg to klanke is requested. KlankeId: {}, fnr: {} ",
-            klankeId,
-            brukerIdent
-        )
         return vedleggService.addKlankevedlegg(
             klankeId = klankeId,
             multipart = vedlegg,
@@ -335,12 +250,6 @@ class KlankeController(
     ) {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Delete vedlegg from klanke is requested. KlankeId: {}, VedleggId: {}", klankeId, vedleggId)
-        secureLogger.debug(
-            "Delete vedlegg from klanke is requested. KlankeId: {}, vedleggId: {}, fnr: {} ",
-            klankeId,
-            vedleggId,
-            brukerIdent
-        )
         if (!vedleggService.deleteVedleggFromKlanke(
                 klankeId = klankeId,
                 vedleggId = vedleggId,
@@ -359,13 +268,6 @@ class KlankeController(
     ): ResponseEntity<ByteArray> {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Get vedlegg to klanke is requested. KlankeId: {} - VedleggId: {}", klankeId, vedleggId)
-        secureLogger.debug(
-            "Vedlegg from klanke is requested. KlankeId: {}, vedleggId: {}, fnr: {} ",
-            klankeId,
-            vedleggId,
-            brukerIdent
-        )
-
         val content = vedleggService.getVedleggFromKlanke(
             klankeId = klankeId,
             vedleggId = vedleggId,
@@ -389,11 +291,6 @@ class KlankeController(
     ): ResponseEntity<Resource> {
         val brukerIdent = tokenUtil.getSubject()
         logger.debug("Get klanke pdf is requested. KlankeId: {}", klankeId)
-        secureLogger.debug(
-            "Get klanke pdf is requested. KlankeId: {}, fnr: {} ",
-            klankeId,
-            brukerIdent
-        )
         val (pathToMergedDocument, title) = commonService.getKlankePdf(klankeId = klankeId, foedselsnummer = brukerIdent)
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.APPLICATION_PDF
@@ -423,12 +320,6 @@ class KlankeController(
     ): ResponseEntity<ByteArray> {
         val bruker = brukerService.getBruker()
         logger.debug("Get klanke pdf for print is requested. KlankeId: {}", klankeId)
-        secureLogger.debug(
-            "Get klanke pdf for print is requested. KlankeId: {}, fnr: {} ",
-            klankeId,
-            bruker.folkeregisteridentifikator.identifikasjonsnummer
-        )
-
         val klanke = commonService.getKlanke(klankeId = klankeId, foedselsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer)
 
         val content = commonService.createKlankePdfWithFoersteside(klankeId, bruker)

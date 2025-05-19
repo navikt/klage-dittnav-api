@@ -4,10 +4,9 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.clients.FileClient
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.Type
-import no.nav.klage.repository.*
+import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.causeClass
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
 import no.nav.klage.util.rootCause
 import no.nav.slackposter.Severity
 import no.nav.slackposter.SlackClient
@@ -32,7 +31,6 @@ class DraftCleanupService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
     }
 
     @Scheduled(cron = "\${DRAFT_CLEANUP_CRON}", zone = "Europe/Oslo")
@@ -71,8 +69,7 @@ class DraftCleanupService(
                             vedleggFilesSuccessfullyDeleted++
                         }
                     }.onFailure { failure ->
-                        logger.error("Could not remove attachment ${vedlegg.id}. See secure logs for details.")
-                        secureLogger.error("Failed to remove attachment", failure)
+                        logger.error("Could not remove attachment ${vedlegg.id}.", failure)
                         slackClient.postMessage(
                             "Kunne ikke fjerne vedlegg! " +
                                     "(${causeClass(rootCause(failure))})", Severity.ERROR
@@ -102,8 +99,7 @@ class DraftCleanupService(
                 }
 
             }.onFailure { failure ->
-                logger.error("Could not clean up draft. See secure logs for details.")
-                secureLogger.error("Failed to clean up draft", failure)
+                logger.error("Could not clean up draft.", failure)
                 slackClient.postMessage(
                     "Kunne ikke fjerne utgått utkast! " +
                             "(${causeClass(rootCause(failure))})", Severity.ERROR

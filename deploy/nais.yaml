@@ -52,8 +52,6 @@ spec:
         databases:
           - name: klage
             envVarPrefix: DB
-  secureLogs:
-    enabled: true
   webproxy: true
   tokenx:
     enabled: true
@@ -79,6 +77,8 @@ spec:
         - application: klage-file-api
         - application: klage-dittnav-pdfgen
         - application: clamav
+          namespace: nais-system
+        - application: logging
           namespace: nais-system
   envFrom:
     - secret: srvklage-dittnav

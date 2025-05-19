@@ -1,7 +1,5 @@
 package no.nav.klage.config
 
-import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -34,13 +32,6 @@ class AivenKafkaConfiguration(
     private val internalEventTopic: String
 
 ) {
-
-    companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
-    }
-
     //Producer bean
     @Bean
     fun aivenKafkaTemplate(): KafkaTemplate<String, String> {
