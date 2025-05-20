@@ -4,7 +4,7 @@ import io.github.resilience4j.kotlin.retry.executeFunction
 import io.github.resilience4j.retry.Retry
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.causeClass
-import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.getTeamLogger
 import no.nav.klage.util.rootCause
 import no.nav.slackposter.Severity
 import no.nav.slackposter.SlackClient
@@ -23,7 +23,7 @@ class PdlClient(
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val secureLogger = getSecureLogger()
+        private val teamLogger = getTeamLogger()
     }
 
     fun getPersonInfoAsSystemUser(foedselsnummer: String): HentPdlPersonResponse {
@@ -41,7 +41,7 @@ class PdlClient(
             }
         }.onFailure {
             slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
-            secureLogger.error("PDL could not be reached", it)
+            teamLogger.error("PDL could not be reached", it)
             throw RuntimeException("PDL could not be reached")
         }
 
@@ -63,7 +63,7 @@ class PdlClient(
             }
         }.onFailure {
             slackClient.postMessage("Kontakt med pdl feilet! (${causeClass(rootCause(it))})", Severity.ERROR)
-            secureLogger.error("PDL could not be reached", it)
+            teamLogger.error("PDL could not be reached", it)
             throw RuntimeException("PDL could not be reached")
         }
 

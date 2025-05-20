@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.getTeamLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -23,7 +23,7 @@ class PdfController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
+        private val teamLogger = getTeamLogger()
     }
 
     @ResponseBody
@@ -32,7 +32,7 @@ class PdfController(
         @RequestBody input: OpenKlankeInput
     ): ResponseEntity<ByteArray> {
         logger.debug("Create klanke pdf is requested.")
-        secureLogger.debug(
+        teamLogger.debug(
             "Create klanke pdf is requested. Input: {} ",
             input,
         )

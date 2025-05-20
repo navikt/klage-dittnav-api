@@ -2,7 +2,7 @@ package no.nav.klage.clients.safselvbetjening
 
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
-import no.nav.klage.util.getSecureLogger
+import no.nav.klage.util.getTeamLogger
 import org.slf4j.Logger
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
@@ -26,7 +26,7 @@ class SafselvbetjeningRestClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
+        private val teamLogger = getTeamLogger()
     }
 
     @Retryable
@@ -51,7 +51,7 @@ class SafselvbetjeningRestClient(
                     )
                     .retrieve()
                     .onStatus(HttpStatusCode::isError) { response ->
-                        logErrorResponse(response, ::downloadDocumentAsMono.name, secureLogger)
+                        logErrorResponse(response, ::downloadDocumentAsMono.name, teamLogger)
                     }
                     .bodyToFlux(DataBuffer::class.java)
                 DataBufferUtils.write(flux, pathToFile)
