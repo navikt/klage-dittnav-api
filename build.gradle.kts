@@ -10,7 +10,7 @@ val pdfboxVersion = "3.0.5"
 val tikaVersion = "3.2.2"
 val resilience4jVersion = "2.3.0"
 val shedlockVersion = "6.10.0"
-val springDocVersion = "2.8.10"
+val springDocVersion = "2.8.12"
 val kodeverkVersion = "1.11.1"
 val simpleSlackPosterVersion = "1.0.0"
 val testContainersVersion = "1.21.3"
@@ -28,7 +28,7 @@ repositories {
 plugins {
     val kotlinVersion = "2.2.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.5"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
