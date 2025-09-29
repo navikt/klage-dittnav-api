@@ -2,7 +2,6 @@ package no.nav.klage.domain.jpa
 
 import jakarta.persistence.*
 import no.nav.klage.domain.*
-import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.InnsendingsytelseConverter
 import no.nav.klage.util.klageAnkeIsAccessibleToUser
@@ -56,11 +55,6 @@ class Klanke(
     var created: LocalDateTime,
     @Column(name = "modified_by_user")
     var modifiedByUser: LocalDateTime,
-
-    /* only klage */
-    @Column(name = "checkboxes_selected")
-    @Convert(converter = CheckboxEnumConverter::class)
-    val checkboxesSelected: MutableList<CheckboxEnum> = mutableListOf(),
 
     @Enumerated(EnumType.STRING)
     @Column(name = "klanke_type")

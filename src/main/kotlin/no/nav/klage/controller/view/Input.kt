@@ -3,7 +3,6 @@ package no.nav.klage.controller.view
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
-import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import java.time.LocalDate
 
@@ -17,10 +16,6 @@ data class StringInputNullable(
 
 data class DateInput(
     val value: LocalDate?
-)
-
-data class CheckboxesSelectedInput(
-    val value: Set<CheckboxEnum>
 )
 
 data class BooleanInput(
@@ -46,7 +41,6 @@ data class KlankeMinimalInput(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class KlankeFullInput(
     val innsendingsytelse: Innsendingsytelse,
-    val checkboxesSelected: Set<CheckboxEnum>? = null,
     val userSaksnummer: String? = null,
     val language: LanguageEnum,
     val vedtakDate: LocalDate? = null,

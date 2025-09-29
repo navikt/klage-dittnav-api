@@ -21,7 +21,6 @@ fun Klanke.toKlankeView(): KlankeView {
         internalSaksnummer = sak?.fagsakid,
         sakFagsaksystem = sak?.fagsaksystem,
         sakSakstype = sak?.sakstype,
-        checkboxesSelected = checkboxesSelected.toSet(),
         type = type,
         caseIsAtKA = caseIsAtKA,
     )

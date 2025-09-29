@@ -3,7 +3,6 @@ package no.nav.klage.controller.view
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
-import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,7 +17,6 @@ data class KlankeView(
     val journalpostId: String?,
     val finalizedDate: LocalDate?,
     val vedtakDate: LocalDate?,
-    val checkboxesSelected: Set<CheckboxEnum>?,
     //For compability
     val enhetsnummer: String? = null,
     val userSaksnummer: String?,

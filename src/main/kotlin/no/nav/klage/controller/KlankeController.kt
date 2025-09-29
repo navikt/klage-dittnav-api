@@ -174,23 +174,6 @@ class KlankeController(
         )
     }
 
-    @PutMapping("/{klankeId}/checkboxesselected")
-    fun updateCheckboxesSelected(
-        @PathVariable klankeId: UUID,
-        @RequestBody input: CheckboxesSelectedInput,
-    ): EditedView {
-        val brukerIdent = tokenUtil.getSubject()
-        logger.debug("Update klanke checkboxesSelected is requested. Id: {}", klankeId)
-        val modifiedByUser = commonService.updateCheckboxesSelected(
-            klankeId = klankeId,
-            checkboxesSelected = input.value,
-            foedselsnummer = brukerIdent
-        )
-        return EditedView(
-            modifiedByUser = modifiedByUser
-        )
-    }
-
     @PutMapping("/{klankeId}/caseisatka")
     fun updateCaseIsAtKA(
         @PathVariable klankeId: UUID,
