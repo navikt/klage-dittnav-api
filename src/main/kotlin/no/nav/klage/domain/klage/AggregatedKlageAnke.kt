@@ -17,8 +17,6 @@ data class AggregatedKlageAnke(
     val internalSaksnummer: String?,
     val sak: Sak?,
     val klageAnkeType: KlageAnkeType,
-    //klage specific
-    val userChoices: List<String>?,
     val innsendingsYtelseId: String,
     val ettersendelseTilKa: Boolean?
 ) {

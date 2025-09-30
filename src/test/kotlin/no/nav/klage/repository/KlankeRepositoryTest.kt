@@ -43,7 +43,6 @@ class KlankeRepositoryTest(
 
         val klage = testEntityManager.persistAndFlush(
             Klanke(
-                checkboxesSelected = mutableListOf(),
                 foedselsnummer = "12345678910",
                 fritekst = "hei",
                 status = KlageAnkeStatus.DRAFT,
@@ -96,7 +95,6 @@ class KlankeRepositoryTest(
                 created = LocalDateTime.now(),
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.ANKE,
-                checkboxesSelected = mutableListOf(),
                 caseIsAtKA = true,
             )
         )
@@ -130,7 +128,6 @@ class KlankeRepositoryTest(
                 created = LocalDateTime.now(),
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.ANKE,
-                checkboxesSelected = mutableListOf(),
                 caseIsAtKA = true,
             )
         )

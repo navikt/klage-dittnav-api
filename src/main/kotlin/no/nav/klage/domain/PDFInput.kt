@@ -18,7 +18,6 @@ data class PDFInput (
     val saksnummer: String?,
     val dato: String,
     val ytelse: String,
-    val userChoices: List<String>? = emptyList(),
     val sendesIPosten: Boolean,
     val ettersendelseTilKa: Boolean,
 )
@@ -35,7 +34,6 @@ fun OpenKlankeInput.toPDFInput(): PDFInput {
         saksnummer = sanitizeText(getSaksnummerString(userSaksnummer, internalSaksnummer)),
         dato = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
         ytelse = innsendingsytelse.nbName.replaceFirstChar { it.lowercase(Locale.getDefault()) },
-        userChoices = checkboxesSelected?.map { x -> x.getFullText(language) },
         sendesIPosten = true,
         ettersendelseTilKa = caseIsAtKA ?: false,
     )

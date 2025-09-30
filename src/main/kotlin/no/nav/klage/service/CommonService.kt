@@ -10,7 +10,6 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
-import no.nav.klage.domain.klage.CheckboxEnum
 import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
@@ -64,7 +63,6 @@ class CommonService(
 
     fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke {
         return Klanke(
-            checkboxesSelected = checkboxesSelected?.toMutableList() ?: mutableListOf(),
             foedselsnummer = foedselsnummer,
             fritekst = fritekst,
             status = KlageAnkeStatus.DRAFT,
@@ -89,7 +87,6 @@ class CommonService(
 
     fun KlankeMinimalInput.toKlanke(foedselsnummer: String): Klanke {
         return Klanke(
-            checkboxesSelected = mutableListOf(),
             foedselsnummer = foedselsnummer,
             fritekst = null,
             status = KlageAnkeStatus.DRAFT,
@@ -163,27 +160,6 @@ class CommonService(
             }.maxByOrNull { it.modifiedByUser }
     }
 
-    fun updateCheckboxesSelected(
-        klankeId: UUID,
-        checkboxesSelected: Set<CheckboxEnum>?,
-        foedselsnummer: String,
-    ): LocalDateTime {
-        val existingKlanke = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(
-            klanke = existingKlanke,
-            foedselsnummer = foedselsnummer,
-        )
-
-        existingKlanke.checkboxesSelected.clear()
-        if (!checkboxesSelected.isNullOrEmpty()) {
-            existingKlanke.checkboxesSelected.addAll(checkboxesSelected)
-        }
-        existingKlanke.modifiedByUser = LocalDateTime.now()
-
-        return existingKlanke.modifiedByUser
-    }
-
     fun finalizeKlanke(klankeId: UUID, bruker: Bruker): LocalDateTime {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
@@ -222,7 +198,6 @@ class CommonService(
 
         if (klanke.type == Type.KLAGE) {
             klageAnkeMetrics.incrementKlagerFinalizedTitle(klanke.innsendingsytelse)
-            klageAnkeMetrics.incrementKlagerGrunn(temaReport, klanke.checkboxesSelected)
         }
 
         klageAnkeMetrics.incrementKlankerFinalized(ytelse = temaReport, type = klanke.type)
@@ -283,7 +258,6 @@ class CommonService(
             identifikasjonsnummer = bruker.folkeregisteridentifikator.identifikasjonsnummer,
             ytelse = klanke.innsendingsytelse.nbName,
             vedlegg = klanke.vedlegg.map { AggregatedKlageAnke.Vedlegg(tittel = it.tittel, ref = it.ref) },
-            userChoices = klanke.checkboxesSelected.map { x -> x.getFullText(klanke.language) },
             userSaksnummer = klanke.userSaksnummer,
             internalSaksnummer = klanke.sak?.fagsakid,
             klageAnkeType = AggregatedKlageAnke.KlageAnkeType.valueOf(klanke.type.name),
@@ -308,7 +282,6 @@ class CommonService(
             internalSaksnummer = klanke.sak?.fagsakid,
             vedtakDate = klanke.vedtakDate,
             innsendingsytelse = klanke.innsendingsytelse,
-            checkboxesSelected = klanke.checkboxesSelected.toSet(),
             language = klanke.language,
             hasVedlegg = klanke.vedlegg.isNotEmpty() || klanke.hasVedlegg,
             caseIsAtKA = klanke.caseIsAtKA,

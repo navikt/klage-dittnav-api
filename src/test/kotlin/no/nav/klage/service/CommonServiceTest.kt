@@ -3,7 +3,9 @@ package no.nav.klage.service
 
 import io.mockk.mockk
 import no.nav.klage.db.TestPostgresqlContainer
-import no.nav.klage.domain.*
+import no.nav.klage.domain.KlageAnkeStatus
+import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.Type
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
@@ -119,7 +121,6 @@ class CommonServiceTest {
 
         klankeRepository.save(
             Klanke(
-                checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst,
                 status = draftStatus,
@@ -145,7 +146,6 @@ class CommonServiceTest {
 
         klankeRepository.save(
             Klanke(
-                checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst2,
                 status = draftStatus,
@@ -176,7 +176,6 @@ class CommonServiceTest {
         //innsendingsytelse and internalSaksnummer
         klankeRepository.save(
             Klanke(
-                checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = innsendingsytelseAndInternalSaksnummer,
                 status = draftStatus,
@@ -205,7 +204,6 @@ class CommonServiceTest {
         //innsendingsytelse and no internalSaksnummer
         klankeRepository.save(
             Klanke(
-                checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = innsendingsytelseAndNoInternalSaksnummer,
                 status = draftStatus,
@@ -230,7 +228,6 @@ class CommonServiceTest {
         val now = LocalDateTime.now()
         klankeRepository.save(
             Klanke(
-                checkboxesSelected = mutableListOf(),
                 foedselsnummer = fnr,
                 fritekst = exampleFritekst,
                 status = draftStatus,
