@@ -45,6 +45,13 @@ class SseBrokenPipeLogFilter : TurboFilter() {
                 ourLogger.debug("Suppressing error log message for JwtTokenUnauthorizedException wrapped in ServletException. This is probably due to expired token during async/SSE operations.")
                 return FilterReply.DENY
             }
+            if (
+                throwable.javaClass.name == "java.lang.IllegalStateException" &&
+                throwable.message == "Committed"
+            ) {
+                ourLogger.debug("Suppressing warning log message for IllegalStateException: Committed. This is probably due to lost client during async/SSE operations.")
+                return FilterReply.DENY
+            }
         }
 
         return FilterReply.NEUTRAL
