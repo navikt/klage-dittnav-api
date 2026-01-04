@@ -2,7 +2,7 @@ externalHosts:
   - pdl-api.prod-fss-pub.nais.io
   - klage-fss-proxy.dev-fss-pub.nais.io
   - safselvbetjening.prod-fss-pub.nais.io
-springProfile: prod-gcp
+springProfile: prod
 envs:
   - name: JAVA_OPTS
     value: "-Xms512m -Xmx4096m"

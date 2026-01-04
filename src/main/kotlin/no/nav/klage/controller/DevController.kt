@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
-@Profile("dev-gcp")
+@Profile("dev")
 @RestController
 class DevController(private val klageDittnavPdfgenService: KlageDittnavPdfgenService) {
 
