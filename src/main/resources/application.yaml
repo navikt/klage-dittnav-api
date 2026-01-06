@@ -17,8 +17,9 @@ spring:
   main:
     banner-mode: OFF
   flyway:
+    enabled: true
+    clean-disabled: true
     table: "schema_version"
-    clean-on-validation-error: false
   servlet:
     multipart:
       #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
