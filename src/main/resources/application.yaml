@@ -25,8 +25,9 @@ spring:
       #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
       max-request-size: 8MB
       max-file-size: 8MB
-  codec:
-    max-in-memory-size: 10MB
+  http:
+    codecs:
+      max-in-memory-size: 10MB
 server:
   port: 7070
   error:
