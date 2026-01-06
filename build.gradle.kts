@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val h2Version = "2.4.240"
 val pamGeographyVersion = "2.23"
-val tokenSupportVersion = "5.0.30"
+val tokenSupportVersion = "6.0.1"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "9.0"
 val pdfboxVersion = "3.0.6"
