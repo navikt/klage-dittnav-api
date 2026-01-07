@@ -14,9 +14,6 @@ management:
     base-path: /internal
     exposure.include: health,prometheus
 
-LOGINSERVICE_IDPORTEN_DISCOVERY_URL: http://localhost:${mock-oauth2-server.port}/selvbetjening/.well-known/openid-configuration
-LOGINSERVICE_IDPORTEN_AUDIENCE: klage-dittnav-api-client-id
-
 AZURE_APP_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
 AZURE_APP_CLIENT_ID: klage-dittnav-api-client-id
 AZURE_APP_CLIENT_SECRET: azure-app-client-secret
