@@ -3,24 +3,17 @@ package no.nav.klage.util
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import org.springframework.core.convert.converter.Converter
-import java.util.*
+import java.util.Locale
 
-class StringToLanguageEnumConverter : Converter<String?, LanguageEnum?> {
+
+class StringToLanguageEnumConverter : Converter<String, LanguageEnum?> {
     override fun convert(source: String): LanguageEnum {
-        if (source != null) {
-            return LanguageEnum.valueOf(source.uppercase(Locale.getDefault()))
-        } else {
-            throw RuntimeException("error")
-        }
+        return LanguageEnum.valueOf(source.uppercase(Locale.getDefault()))
     }
 }
 
-class StringToTitleEnumConverter : Converter<String?, Innsendingsytelse?> {
+class StringToTitleEnumConverter : Converter<String, Innsendingsytelse?> {
     override fun convert(source: String): Innsendingsytelse {
-        if (source != null) {
-            return Innsendingsytelse.valueOf(source.uppercase(Locale.getDefault()))
-        } else {
-            throw RuntimeException("error")
-        }
+        return Innsendingsytelse.valueOf(source.uppercase(Locale.getDefault()))
     }
 }

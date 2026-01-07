@@ -7,7 +7,7 @@ import no.nav.klage.util.getTeamLogger
 import org.slf4j.Logger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
-import org.springframework.retry.annotation.Retryable
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient

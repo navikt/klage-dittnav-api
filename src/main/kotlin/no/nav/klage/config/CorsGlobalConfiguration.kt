@@ -22,7 +22,7 @@ class CorsGlobalConfiguration {
         val source = corsConfigurationSource(config)
         val corsFilter = CorsFilter(source)
         val bean = FilterRegistrationBean<CorsFilter>()
-        bean.filter = corsFilter
+        bean.setFilter(corsFilter)
         bean.order = Ordered.HIGHEST_PRECEDENCE
         bean.urlPatterns = setOf("/*")
         bean.isEnabled = true

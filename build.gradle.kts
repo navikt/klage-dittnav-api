@@ -1,22 +1,23 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val h2Version = "2.3.232"
+val h2Version = "2.4.240"
 val pamGeographyVersion = "2.23"
-val tokenSupportVersion = "5.0.30"
+val tokenSupportVersion = "6.0.1"
 val oidcSupportVersion = "0.2.18"
-val logstashVersion = "8.1"
-val pdfboxVersion = "3.0.5"
-val tikaVersion = "3.2.2"
+val logstashVersion = "9.0"
+val pdfboxVersion = "3.0.6"
+val tikaVersion = "3.2.3"
 val resilience4jVersion = "2.3.0"
-val shedlockVersion = "6.10.0"
-val springDocVersion = "2.8.13"
+val shedlockVersion = "7.5.0"
+val springDocVersion = "3.0.1"
 val kodeverkVersion = "1.11.1"
 val simpleSlackPosterVersion = "1.0.0"
-val testContainersVersion = "1.21.3"
-val mockkVersion = "1.14.5"
-val springMockkVersion = "4.0.2"
-val otelVersion = "1.54.0"
+val testContainersVersion = "2.0.2"
+val mockkVersion = "1.14.7"
+val springMockkVersion = "5.0.1"
+val otelVersion = "1.57.0"
+val reactorKafkaVersion = "1.3.25"
 
 ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
@@ -26,9 +27,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "2.2.20"
+    val kotlinVersion = "2.3.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "3.5.8"
+    id("org.springframework.boot") version "4.0.1"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
@@ -51,14 +52,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-webclient")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
 
     implementation("io.opentelemetry:opentelemetry-api:$otelVersion")
 
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
-
-    implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
@@ -75,7 +76,7 @@ dependencies {
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
     implementation("org.apache.tika:tika-core:$tikaVersion")
-    implementation("io.projectreactor.kafka:reactor-kafka")
+    implementation("io.projectreactor.kafka:reactor-kafka:${reactorKafkaVersion}")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
@@ -90,14 +91,19 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:testcontainers-postgresql:$testContainersVersion")
 
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
         exclude(group = "org.mockito")
     }
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test") {
+        exclude(group = "org.junit.vintage")
+        exclude(group = "org.mockito")
+    }
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
