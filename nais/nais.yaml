@@ -86,7 +86,6 @@ spec:
     - secret: pdl-apikey
     - secret: slack-url
     - secret: slack-channel-id
-    - configmap: loginservice-idporten
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
