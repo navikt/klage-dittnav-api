@@ -13,10 +13,10 @@ val shedlockVersion = "7.5.0"
 val springDocVersion = "3.0.1"
 val kodeverkVersion = "1.11.1"
 val simpleSlackPosterVersion = "1.0.0"
-val testContainersVersion = "2.0.2"
+val testContainersVersion = "2.0.3"
 val mockkVersion = "1.14.7"
 val springMockkVersion = "5.0.1"
-val otelVersion = "1.57.0"
+val otelVersion = "1.58.0"
 val reactorKafkaVersion = "1.3.25"
 
 ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
