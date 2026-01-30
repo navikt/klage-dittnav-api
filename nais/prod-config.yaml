@@ -9,7 +9,7 @@ envs:
 kafka_pool: nav-prod
 
 db_tier: db-custom-1-3840
-db_type: POSTGRES_15
+db_type: POSTGRES_16
 db_high_availability: true
 
 max_replicas: 4
