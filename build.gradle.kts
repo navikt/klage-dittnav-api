@@ -16,7 +16,7 @@ val simpleSlackPosterVersion = "1.0.0"
 val testContainersVersion = "2.0.3"
 val mockkVersion = "1.14.9"
 val springMockkVersion = "5.0.1"
-val otelVersion = "1.58.0"
+val otelVersion = "1.59.0"
 val reactorKafkaVersion = "1.3.25"
 
 ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
@@ -27,9 +27,9 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "2.3.0"
+    val kotlinVersion = "2.3.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "4.0.2"
+    id("org.springframework.boot") version "4.0.3"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
