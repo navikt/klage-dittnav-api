@@ -10,10 +10,10 @@ import org.springframework.util.unit.DataSize
 @Configuration
 class AttachmentValidatorConfig(private val clamAvClient: ClamAvClient) {
 
-    @Value("\${maxAttachmentSize}")
+    @Value($$"${maxAttachmentSize}")
     private lateinit var maxAttachmentSizeAsString: String
 
-    @Value("\${maxTotalSize}")
+    @Value($$"${maxTotalSize}")
     private lateinit var maxTotalSizeAsString: String
 
     @Bean

@@ -20,7 +20,10 @@ internal class AttachmentValidatorTest {
     @BeforeEach
     fun beforeEach() {
         clamAvClient = mockk()
-        validator = AttachmentValidator(clamAvClient, DataSize.ofMegabytes(8), DataSize.ofMegabytes(32))
+        validator = AttachmentValidator(clamAvClient,
+            maxAttachmentSize = DataSize.ofMegabytes(8),
+            maxTotalSize = DataSize.ofMegabytes(32),
+        )
     }
 
     @Test
