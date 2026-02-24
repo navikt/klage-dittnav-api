@@ -23,11 +23,11 @@ spring:
   servlet:
     multipart:
       #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
-      max-request-size: 8MB
-      max-file-size: 8MB
+      max-request-size: 50MB
+      max-file-size: 50MB
   http:
     codecs:
-      max-in-memory-size: 10MB
+      max-in-memory-size: 50MB
 server:
   port: 7070
   error:
@@ -112,8 +112,8 @@ no.nav.security.jwt:
           client-jwk: ${AZURE_APP_JWK}
           client-auth-method: private_key_jwt
 
-maxAttachmentSize: 8MB
-maxTotalSize: 32MB
+maxAttachmentSize: 50MB
+maxTotalSize: 150MB
 
 KLAGE_FILE_API_APP_NAME: klage-file-api
 

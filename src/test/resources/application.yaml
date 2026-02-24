@@ -74,8 +74,8 @@ PDL_AUDIENCE: dev-fss.pdl.pdl-api
 DRAFT_CLEANUP_CRON: 0 0 9,12,16 * * MON-FRI
 MAX_DRAFT_AGE_IN_DAYS: 180
 
-maxAttachmentSize: 8MB
-maxTotalSize: 32MB
+maxAttachmentSize: 50MB
+maxTotalSize: 150MB
 
 KAFKA_BROKERS: localhost
 KAFKA_TRUSTSTORE_PATH: somepath

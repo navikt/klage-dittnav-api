@@ -10,7 +10,6 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException
 import org.apache.tika.Tika
 import org.springframework.http.MediaType
 import org.springframework.util.unit.DataSize
-import org.springframework.web.multipart.MultipartFile
 
 class AttachmentValidator(
     private val clamAvClient: ClamAvClient,
@@ -23,31 +22,32 @@ class AttachmentValidator(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun validateAttachment(vedlegg: MultipartFile, totalSizeExistingAttachments: Int) {
+    fun validateAttachment(bytes: ByteArray, totalSizeExistingAttachments: Int) {
         logger.debug("Validating attachment.")
-        //Can this happen?
-        if (vedlegg.isEmpty) {
+
+        if (bytes.isEmpty()) {
             logger.warn("Attachment is empty")
             throw AttachmentIsEmptyException()
         }
 
         //This limit could be set other places (Spring), since we only upload one at a time
-        if (vedlegg.isTooLarge()) {
+        if (bytes.size > maxAttachmentSize.toBytes()) {
             logger.warn("Attachment too large")
             throw AttachmentTooLargeException()
         }
 
-        if (totalSizeExistingAttachments + vedlegg.bytes.size > maxTotalSize.toBytes()) {
+        if (totalSizeExistingAttachments + bytes.size > maxTotalSize.toBytes()) {
             logger.warn("Attachment total too large")
             throw AttachmentTotalTooLargeException()
         }
 
-        if (vedlegg.hasVirus()) {
+        if (!clamAvClient.scan(bytes)) {
             logger.warn("Attachment has virus")
             throw AttachmentHasVirusException()
         }
 
-        if (vedlegg.isPDF() && vedlegg.isEncrypted()) {
+        val mediaType = MediaType.valueOf(Tika().detect(bytes))
+        if (mediaType == MediaType.APPLICATION_PDF && isEncrypted(bytes)) {
             logger.warn("Attachment is encrypted")
             throw AttachmentEncryptedException()
         }
@@ -55,13 +55,9 @@ class AttachmentValidator(
         logger.debug("Validation successful.")
     }
 
-    private fun MultipartFile.hasVirus() = !clamAvClient.scan(this.bytes)
-
-    private fun MultipartFile.isTooLarge() = this.bytes.size > maxAttachmentSize.toBytes()
-
-    private fun MultipartFile.isEncrypted(): Boolean {
+    private fun isEncrypted(bytes: ByteArray): Boolean {
         return try {
-            val temp: PDDocument = Loader.loadPDF(RandomAccessReadBuffer(this.bytes))
+            val temp: PDDocument = Loader.loadPDF(RandomAccessReadBuffer(bytes))
             temp.close()
             false
         } catch (ipe: InvalidPasswordException) {
@@ -69,7 +65,5 @@ class AttachmentValidator(
         }
     }
 
-    private fun MultipartFile.isPDF() =
-        MediaType.valueOf(Tika().detect(this.bytes)) == MediaType.APPLICATION_PDF
 
 }
