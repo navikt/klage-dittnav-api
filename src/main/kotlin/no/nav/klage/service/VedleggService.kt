@@ -34,11 +34,12 @@ class VedleggService(
         validationService.checkKlankeStatus(existingKlanke)
         validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
         val timeStart = System.currentTimeMillis()
-        vedleggMetrics.registerVedleggSize(multipart.bytes.size.toDouble())
+        val bytes = multipart.bytes
+        vedleggMetrics.registerVedleggSize(bytes.size.toDouble())
         vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
-        attachmentValidator.validateAttachment(multipart, existingKlanke.attachmentsTotalSize())
+        attachmentValidator.validateAttachment(bytes, existingKlanke.attachmentsTotalSize())
         //Convert attachment (if not already pdf)
-        val convertedBytes = image2PDF.convert(multipart.bytes)
+        val convertedBytes = image2PDF.convert(bytes)
 
         val vedleggIdInFileStore = fileClient.uploadVedleggFile(convertedBytes, multipart.originalFilename!!)
 
@@ -46,7 +47,7 @@ class VedleggService(
             tittel = multipart.originalFilename.toString(),
             ref = vedleggIdInFileStore,
             contentType = multipart.contentType.toString(),
-            sizeInBytes = multipart.bytes.size,
+            sizeInBytes = bytes.size,
         )
         existingKlanke.vedlegg.add(
             vedleggToSave
