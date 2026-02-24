@@ -31,8 +31,6 @@ spec:
     initialDelay: 20
     timeout: 1
   resources:
-    limits:
-      memory: 4096Mi
     requests:
       cpu: 100m
       memory: 2048Mi
