@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.webmvc.test.autoconfigure.MockMvcPrint
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
+import org.springframework.boot.webmvc.test.autoconfigure.MockMvcPrint
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.MockMvc
@@ -48,7 +48,6 @@ class ApiTest {
     fun beforeEach() {
         every { brukerService.getBruker() } returns Bruker(
             navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-            adresse = null,
             kontaktinformasjon = null,
             folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
             tokenExpires = null,
