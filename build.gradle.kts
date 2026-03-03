@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val h2Version = "2.4.240"
-val pamGeographyVersion = "2.23"
 val tokenSupportVersion = "6.0.1"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "9.0"
@@ -86,7 +85,6 @@ dependencies {
     implementation("org.codehaus.janino:janino")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
     implementation("org.apache.tika:tika-core:$tikaVersion")
     implementation("io.projectreactor.kafka:reactor-kafka:${reactorKafkaVersion}")

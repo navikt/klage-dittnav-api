@@ -3,11 +3,9 @@ package no.nav.klage.service
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.pdl.*
-import no.nav.klage.domain.Adresse
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.klage.util.getLogger
-import no.nav.pam.geography.PostDataDAO
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.springframework.stereotype.Service
 import java.util.*
@@ -22,8 +20,6 @@ class BrukerService(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
-
-    private val postDataDAO = PostDataDAO()
 
     fun getBruker(): Bruker {
         val personinfo = pdlClient.getPersonInfo()
@@ -52,7 +48,6 @@ class BrukerService(
 
         return Bruker(
             navn = pdlNavn.toBrukerNavn(),
-            adresse = pdlAdresse?.toBrukerAdresse(),
             kontaktinformasjon = pdlTelefonnummer?.toKontaktinformasjon(),
             folkeregisteridentifikator = pdlFolkeregisteridentifikator.toIdentifikator(),
             tokenExpires = getExpiryFromIdPortenToken(request.getHeader("idporten-token"))
@@ -75,15 +70,6 @@ class BrukerService(
         mellomnavn = mellomnavn,
         etternavn = etternavn
     )
-
-    private fun VegAdresse.toBrukerAdresse() =
-        Adresse(
-            adressenavn = adressenavn,
-            postnummer = postnummer,
-            poststed = postDataDAO.findPostData(postnummer).orElse(null)?.city,
-            husnummer = husnummer,
-            husbokstav = husbokstav
-        )
 
     private fun Telefonnummer.toKontaktinformasjon() = no.nav.klage.domain.Kontaktinformasjon(
         telefonnummer = "$landskode $nummer",

@@ -3,7 +3,6 @@ package no.nav.klage.domain
 data class Bruker
     (
     val navn: Navn,
-    val adresse: Adresse?,
     val kontaktinformasjon: Kontaktinformasjon?,
     val folkeregisteridentifikator: Identifikator,
     val tokenExpires: Long? = null

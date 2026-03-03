@@ -5,18 +5,17 @@ import io.mockk.every
 import io.mockk.mockk
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.pdl.*
-import no.nav.klage.domain.*
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.Identifikator
+import no.nav.klage.domain.Kontaktinformasjon
 import no.nav.klage.domain.Navn
-import no.nav.pam.geography.PostDataDAO
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class BrukerServiceTest {
     private val pdlClient: PdlClient = mockk()
-    private val postDataDAO: PostDataDAO = mockk()
     private val request: HttpServletRequest = mockk()
     private val brukerService = BrukerService(pdlClient, request)
     private val fornavn = "Fornavn"
@@ -241,11 +240,9 @@ internal class BrukerServiceTest {
     @Test
     fun `should convert from pdl format to Bruker object`() {
         every { pdlClient.getPersonInfo() } returns hentPdlPersonResponse
-        every { postDataDAO.findPostData(any()).get().city } returns poststed
         every { request.getHeader(any()) } returns idPortenToken
         val expectedOutput = Bruker(
             Navn(fornavn, mellomnavn, etternavn),
-            Adresse(adressenavn, postnummer, poststed, husnummer, husbokstav),
             Kontaktinformasjon("$landskode $nummer", null),
             Identifikator(idType, folkeregisteridentifikator),
             1658242074000
@@ -263,16 +260,6 @@ internal class BrukerServiceTest {
         }
 
         assertEquals("Navn missing", exception.message)
-    }
-
-    @Test
-    fun `should receive poststed null when missing in pam-geograaphy`() {
-        every { pdlClient.getPersonInfo() } returns hentPdlPersonResponseWithWrongPostnummer
-        every { request.getHeader(any()) } returns idPortenToken
-
-        val output: Bruker = brukerService.getBruker()
-
-        assertNull(output.adresse?.poststed)
     }
 
     val idPortenToken =
