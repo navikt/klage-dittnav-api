@@ -18,6 +18,8 @@ class AttachmentValidator(
 ) {
 
     companion object {
+        private const val MAX_FILENAME_LENGTH = 196
+
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
@@ -30,7 +32,7 @@ class AttachmentValidator(
             throw AttachmentIsEmptyException()
         }
 
-        if (filename.length > 196) {
+        if (filename.length > MAX_FILENAME_LENGTH) {
             logger.warn("Filename too long. Filename length: {}", filename.length)
             throw AttachmentFilenameTooLongException()
         }
