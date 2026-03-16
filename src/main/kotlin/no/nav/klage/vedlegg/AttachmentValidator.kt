@@ -22,12 +22,17 @@ class AttachmentValidator(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun validateAttachment(bytes: ByteArray, totalSizeExistingAttachments: Int) {
+    fun validateAttachment(bytes: ByteArray, totalSizeExistingAttachments: Int, filename: String) {
         logger.debug("Validating attachment.")
 
         if (bytes.isEmpty()) {
             logger.warn("Attachment is empty")
             throw AttachmentIsEmptyException()
+        }
+
+        if (filename.length > 196) {
+            logger.warn("Filename too long. Filename length: {}", filename.length)
+            throw AttachmentFilenameTooLongException()
         }
 
         //This limit could be set other places (Spring), since we only upload one at a time

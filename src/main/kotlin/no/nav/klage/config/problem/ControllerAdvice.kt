@@ -86,6 +86,12 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
 
     @ExceptionHandler
+    fun handleAttachmentFilenameTooLongException(
+        ex: AttachmentFilenameTooLongException,
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
+
+    @ExceptionHandler
     fun handleInvalidIdent(
         ex: InvalidIdentException,
     ): ProblemDetail =
