@@ -28,7 +28,14 @@ internal class AttachmentValidatorTest {
     @Test
     fun `empty file throws AttachmentIsEmptyException`() {
         assertThrows<AttachmentIsEmptyException> {
-            validator.validateAttachment(byteArrayOf(), 0)
+            validator.validateAttachment(byteArrayOf(), 0, "test.pdf")
+        }
+    }
+
+    @Test
+    fun `filename too long throws AttachmentFilenameTooLongException`() {
+        assertThrows<AttachmentFilenameTooLongException> {
+            validator.validateAttachment(byteArrayOf(1), 0, "a".repeat(193) + ".pdf")
         }
     }
 
@@ -36,7 +43,7 @@ internal class AttachmentValidatorTest {
     fun `file too large throws AttachmentTooLargeException`() {
         validator = AttachmentValidator(clamAvClient, DataSize.ofBytes(1), DataSize.ofBytes(2))
         assertThrows<AttachmentTooLargeException> {
-            validator.validateAttachment(byteArrayOf(1, 1), 0)
+            validator.validateAttachment(byteArrayOf(1, 1), 0, "test.pdf")
         }
     }
 
@@ -44,7 +51,7 @@ internal class AttachmentValidatorTest {
     fun `file too large throws AttachmentTotalTooLargeException`() {
         validator = AttachmentValidator(clamAvClient, DataSize.ofBytes(1), DataSize.ofBytes(2))
         assertThrows<AttachmentTotalTooLargeException> {
-            validator.validateAttachment(byteArrayOf(1), 2)
+            validator.validateAttachment(byteArrayOf(1), 2, "test.pdf")
         }
     }
 
@@ -52,7 +59,7 @@ internal class AttachmentValidatorTest {
     fun `file with virus throws AttachmentHasVirusException`() {
         every { clamAvClient.scan(any()) } returns false
         assertThrows<AttachmentHasVirusException> {
-            validator.validateAttachment(byteArrayOf(1), 0)
+            validator.validateAttachment(byteArrayOf(1), 0, "test.pdf")
         }
     }
 
@@ -63,7 +70,7 @@ internal class AttachmentValidatorTest {
         )
         every { clamAvClient.scan(any()) } returns true
         assertThrows<AttachmentEncryptedException> {
-            validator.validateAttachment(bytes, 0)
+            validator.validateAttachment(bytes, 0, "pdf-with-user-password.pdf")
         }
     }
 
@@ -73,7 +80,7 @@ internal class AttachmentValidatorTest {
             Path.of("src/test/resources/pdf/pdf-with-empty-user-password.pdf")
         )
         every { clamAvClient.scan(any()) } returns true
-        validator.validateAttachment(bytes, 0)
+        validator.validateAttachment(bytes, 0, "pdf-with-empty-user-password.pdf")
     }
 
     @Test
@@ -82,7 +89,7 @@ internal class AttachmentValidatorTest {
             Path.of("src/test/resources/pdf/test123.pdf")
         )
         every { clamAvClient.scan(any()) } returns true
-        validator.validateAttachment(bytes, 0)
+        validator.validateAttachment(bytes, 0, "test123.pdf")
     }
 
 }

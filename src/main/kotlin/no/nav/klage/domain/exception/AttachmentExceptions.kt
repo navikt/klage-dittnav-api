@@ -12,3 +12,4 @@ class AttachmentEncryptedException(override val message: String = "ENCRYPTED") :
 class AttachmentIsEmptyException(override val message: String = "EMPTY") : RuntimeException()
 class AttachmentHasVirusException(override val message: String = "VIRUS") : RuntimeException()
 class AttachmentCouldNotBeConvertedException(override val message: String = "FILE_COULD_NOT_BE_CONVERTED") : RuntimeException()
+class AttachmentFilenameTooLongException(override val message: String = "FILENAME_TOO_LONG") : RuntimeException()

@@ -22,11 +22,11 @@ class FileClient(
 
     //TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
 
-    fun uploadVedleggFile(vedleggFile: ByteArray, originalFilename: String): String {
+    fun uploadVedleggFile(vedleggFile: ByteArray, tittel: String): String {
         logger.debug("Uploading attachment to file store.")
 
         val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("file", vedleggFile).filename(originalFilename)
+        bodyBuilder.part("file", vedleggFile).filename(tittel)
         val response = fileWebClient
             .post()
             .uri { it.path("/attachment").build() }

@@ -18,16 +18,23 @@ class AttachmentValidator(
 ) {
 
     companion object {
+        private const val MAX_FILENAME_LENGTH = 196
+
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun validateAttachment(bytes: ByteArray, totalSizeExistingAttachments: Int) {
+    fun validateAttachment(bytes: ByteArray, totalSizeExistingAttachments: Int, filename: String) {
         logger.debug("Validating attachment.")
 
         if (bytes.isEmpty()) {
             logger.warn("Attachment is empty")
             throw AttachmentIsEmptyException()
+        }
+
+        if (filename.length > MAX_FILENAME_LENGTH) {
+            logger.warn("Filename too long. Filename length: {}", filename.length)
+            throw AttachmentFilenameTooLongException()
         }
 
         //This limit could be set other places (Spring), since we only upload one at a time
