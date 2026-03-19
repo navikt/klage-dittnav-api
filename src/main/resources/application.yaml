@@ -34,6 +34,8 @@ server:
     whitelabel:
       enabled: false
   max-http-request-header-size: 1MB
+  jetty:
+    connection-idle-timeout: 200s
 
 management:
   endpoint:
