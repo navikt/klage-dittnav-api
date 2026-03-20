@@ -7,12 +7,12 @@ val oidcSupportVersion = "0.2.18"
 val logstashVersion = "9.0"
 val pdfboxVersion = "3.0.7"
 val tikaVersion = "3.2.3"
-val resilience4jVersion = "2.3.0"
-val shedlockVersion = "7.6.0"
+val resilience4jVersion = "2.4.0"
+val shedlockVersion = "7.7.0"
 val springDocVersion = "3.0.2"
 val kodeverkVersion = "1.11.1"
 val simpleSlackPosterVersion = "1.0.0"
-val testContainersVersion = "2.0.3"
+val testContainersVersion = "2.0.4"
 val mockkVersion = "1.14.9"
 val springMockkVersion = "5.0.1"
 val otelVersion = "1.60.1"
@@ -21,9 +21,9 @@ val reactorKafkaVersion = "1.3.25"
 ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 plugins {
-    val kotlinVersion = "2.3.10"
+    val kotlinVersion = "2.3.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.4"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     idea
