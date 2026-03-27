@@ -1,6 +1,7 @@
 package no.nav.klage.clients.clamav
 
 import org.slf4j.LoggerFactory
+import org.springframework.resilience.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -10,40 +11,31 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
 
     private val logger = LoggerFactory.getLogger(ClamAvClient::class.java)
 
-    fun scan(file: ByteArray): Boolean {
-        logger.debug("Scanning document")
-        val response = try {
+    @Retryable
+    fun hasVirus(file: ByteArray): Boolean {
+        val fileSizeMB = file.size / 1_048_576.0
+        logger.debug("Scanning document of size {} MB", String.format("%.2f", fileSizeMB))
+
+        val startTime = System.currentTimeMillis()
+        val result =
             clamAvWebClient.put()
                 .bodyValue(file)
                 .retrieve()
                 .bodyToMono<List<ScanResult>>()
-                .block()
-        } catch(ex: Throwable) {
-            logger.warn("Error from clamAV", ex)
-            listOf(ScanResult("Unknown", ClamAvResult.ERROR))
-        }
+                .block()?.firstOrNull() ?: throw RuntimeException("Received empty response from ClamAV")
 
-        if (response == null) {
-            logger.warn("No response from virus scan.")
-            return false
-        }
+        val durationMs = System.currentTimeMillis() - startTime
+        logger.debug("ClamAV scan completed in {} ms for file of {} MB. Result: {}", durationMs, String.format("%.2f", fileSizeMB), result.result)
 
-        if (response.size != 1) {
-            logger.warn("Wrong size response from virus scan.")
-            return false
-        }
-
-        val (filename, result) = response[0]
-        logger.debug("$filename ${result.name}")
-        return when(result) {
-            ClamAvResult.OK -> true
+        return when (result.result) {
+            ClamAvResult.OK -> false
             ClamAvResult.FOUND -> {
-                logger.warn("$filename has virus")
-                false
+                logger.warn("Virus found in file: {}. Virus: {}", result.filename, result.virus)
+                true
             }
             ClamAvResult.ERROR -> {
-                logger.warn("Error from virus scan on file $filename")
-                false
+                logger.error("Error scanning file for virus: {}. Error: {}", result.filename, result.error)
+                throw RuntimeException("Error from ClamAV virus scan on file: ${result.filename}. Error: ${result.error}")
             }
         }
     }

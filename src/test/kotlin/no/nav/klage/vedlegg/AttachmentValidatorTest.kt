@@ -57,7 +57,7 @@ internal class AttachmentValidatorTest {
 
     @Test
     fun `file with virus throws AttachmentHasVirusException`() {
-        every { clamAvClient.scan(any()) } returns false
+        every { clamAvClient.hasVirus(any()) } returns true
         assertThrows<AttachmentHasVirusException> {
             validator.validateAttachment(byteArrayOf(1), 0, "test.pdf")
         }
@@ -68,7 +68,7 @@ internal class AttachmentValidatorTest {
         val bytes = Files.readAllBytes(
             Path.of("src/test/resources/pdf/pdf-with-user-password.pdf")
         )
-        every { clamAvClient.scan(any()) } returns true
+        every { clamAvClient.hasVirus(any()) } returns false
         assertThrows<AttachmentEncryptedException> {
             validator.validateAttachment(bytes, 0, "pdf-with-user-password.pdf")
         }
@@ -79,7 +79,7 @@ internal class AttachmentValidatorTest {
         val bytes = Files.readAllBytes(
             Path.of("src/test/resources/pdf/pdf-with-empty-user-password.pdf")
         )
-        every { clamAvClient.scan(any()) } returns true
+        every { clamAvClient.hasVirus(any()) } returns false
         validator.validateAttachment(bytes, 0, "pdf-with-empty-user-password.pdf")
     }
 
@@ -88,7 +88,7 @@ internal class AttachmentValidatorTest {
         val bytes = Files.readAllBytes(
             Path.of("src/test/resources/pdf/test123.pdf")
         )
-        every { clamAvClient.scan(any()) } returns true
+        every { clamAvClient.hasVirus(any()) } returns false
         validator.validateAttachment(bytes, 0, "test123.pdf")
     }
 

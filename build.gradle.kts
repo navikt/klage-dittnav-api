@@ -76,9 +76,6 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
 
-    implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
-    implementation("io.github.resilience4j:resilience4j-kotlin:$resilience4jVersion")
-
     implementation("no.nav.klage:klage-kodeverk:$kodeverkVersion")
 
     implementation("ch.qos.logback:logback-classic")
