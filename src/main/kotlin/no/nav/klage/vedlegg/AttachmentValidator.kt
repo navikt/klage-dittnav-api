@@ -48,7 +48,7 @@ class AttachmentValidator(
             throw AttachmentTotalTooLargeException()
         }
 
-        if (!clamAvClient.scan(bytes)) {
+        if (clamAvClient.hasVirus(bytes)) {
             logger.warn("Attachment has virus")
             throw AttachmentHasVirusException()
         }

@@ -119,7 +119,7 @@ maxTotalSize: 150MB
 
 KLAGE_FILE_API_APP_NAME: klage-file-api
 
-CLAM_AV_URL: http://clamav.nais-system/scan
+CLAM_AV_URL: http://clamav.nais-system/api/v2/scan
 
 FILE_BASE_URL: http://klage-file-api
 
