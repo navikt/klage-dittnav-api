@@ -15,7 +15,7 @@ val simpleSlackPosterVersion = "1.0.0"
 val testContainersVersion = "2.0.5"
 val mockkVersion = "1.14.9"
 val springMockkVersion = "5.0.1"
-val otelVersion = "1.61.0"
+val otelVersion = "1.62.0"
 val reactorKafkaVersion = "1.3.25"
 
 ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
