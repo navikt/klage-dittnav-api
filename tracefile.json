@@ -1,0 +1,930 @@
+{
+  "batches": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "collector.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "cpp"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": {
+              "stringValue": "1.18.0"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "nais-ingress"
+            }
+          },
+          {
+            "key": "k8s.cluster.name",
+            "value": {
+              "stringValue": "prod"
+            }
+          }
+        ],
+        "droppedAttributesCount": 0
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "spans": [
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "45f7e7077b7b7e90",
+              "parentSpanId": "bf3004c7b429ccb0",
+              "traceState": "",
+              "name": "HTTP POST klage-dittnav /api/klage-dittnav-api/api/klanker/{uuid}/vedlegg",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": 1773923344705569500,
+              "endTimeUnixNano": 1773923420242756400,
+              "attributes": [
+                {
+                  "key": "http.flavor",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/api/klage-dittnav-api/api/klanker/e6db6854-5793-458c-9ea6-500bd5d58b4d/vedlegg"
+                  }
+                },
+                {
+                  "key": "http.server_name",
+                  "value": {
+                    "stringValue": "klage.nav.no"
+                  }
+                },
+                {
+                  "key": "http.host",
+                  "value": {
+                    "stringValue": "klage.nav.no"
+                  }
+                },
+                {
+                  "key": "http.user_agent",
+                  "value": {
+                    "stringValue": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1"
+                  }
+                },
+                {
+                  "key": "http.scheme",
+                  "value": {
+                    "stringValue": "https"
+                  }
+                },
+                {
+                  "key": "net.host.port",
+                  "value": {
+                    "intValue": 443
+                  }
+                },
+                {
+                  "key": "net.peer.ip",
+                  "value": {
+                    "stringValue": "14.1.65.246"
+                  }
+                },
+                {
+                  "key": "net.peer.port",
+                  "value": {
+                    "intValue": -1
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 400
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 1,
+                "message": ""
+              }
+            }
+          ],
+          "instrumentationLibrary": {
+            "name": "nginx",
+            "version": ""
+          }
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "collector.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "service.namespace",
+            "value": {
+              "stringValue": "klage"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "2026-03-18-074307-0ca1c24"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "go"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": {
+              "stringValue": "1.42.0"
+            }
+          },
+          {
+            "key": "wonderwall.autologin",
+            "value": {
+              "boolValue": true
+            }
+          },
+          {
+            "key": "wonderwall.identity_provider.name",
+            "value": {
+              "stringValue": "idporten"
+            }
+          },
+          {
+            "key": "wonderwall.identity_provider.url",
+            "value": {
+              "stringValue": "https://idporten.no/.well-known/openid-configuration"
+            }
+          },
+          {
+            "key": "wonderwall.sso",
+            "value": {
+              "boolValue": true
+            }
+          },
+          {
+            "key": "wonderwall.sso.mode",
+            "value": {
+              "stringValue": "proxy"
+            }
+          },
+          {
+            "key": "wonderwall.upstream.name",
+            "value": {
+              "stringValue": "klage-dittnav"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "wonderwall"
+            }
+          },
+          {
+            "key": "k8s.cluster.name",
+            "value": {
+              "stringValue": "prod"
+            }
+          }
+        ],
+        "droppedAttributesCount": 0
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "spans": [
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "0dd64dea4185624e",
+              "parentSpanId": "45f7e7077b7b7e90",
+              "traceState": "",
+              "name": "POST /*",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": 1773923344706115300,
+              "endTimeUnixNano": 1773923420241691000,
+              "attributes": [
+                {
+                  "key": "http.scheme",
+                  "value": {
+                    "stringValue": "http"
+                  }
+                },
+                {
+                  "key": "net.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "net.host.name",
+                  "value": {
+                    "stringValue": "wonderwall"
+                  }
+                },
+                {
+                  "key": "net.sock.peer.addr",
+                  "value": {
+                    "stringValue": "10.7.107.105"
+                  }
+                },
+                {
+                  "key": "net.sock.peer.port",
+                  "value": {
+                    "intValue": 37584
+                  }
+                },
+                {
+                  "key": "user_agent.original",
+                  "value": {
+                    "stringValue": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1"
+                  }
+                },
+                {
+                  "key": "http.client_ip",
+                  "value": {
+                    "stringValue": "14.1.65.246"
+                  }
+                },
+                {
+                  "key": "request.host",
+                  "value": {
+                    "stringValue": "klage.nav.no"
+                  }
+                },
+                {
+                  "key": "request.sec_fetch_mode",
+                  "value": {
+                    "stringValue": "cors"
+                  }
+                },
+                {
+                  "key": "request.user_agent",
+                  "value": {
+                    "stringValue": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1"
+                  }
+                },
+                {
+                  "key": "request.cookies",
+                  "value": {
+                    "stringValue": "sso-nav.no"
+                  }
+                },
+                {
+                  "key": "request.is_navigational",
+                  "value": {
+                    "boolValue": false
+                  }
+                },
+                {
+                  "key": "request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "request.path",
+                  "value": {
+                    "stringValue": "/api/klage-dittnav-api/api/klanker/e6db6854-5793-458c-9ea6-500bd5d58b4d/vedlegg"
+                  }
+                },
+                {
+                  "key": "request.protocol",
+                  "value": {
+                    "stringValue": "HTTP/1.1"
+                  }
+                },
+                {
+                  "key": "request.referer",
+                  "value": {
+                    "stringValue": "https://klage.nav.no/nb/sak/e6db6854-5793-458c-9ea6-500bd5d58b4d/begrunnelse"
+                  }
+                },
+                {
+                  "key": "request.sec_fetch_dest",
+                  "value": {
+                    "stringValue": "empty"
+                  }
+                },
+                {
+                  "key": "request.sec_fetch_site",
+                  "value": {
+                    "stringValue": "same-origin"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/*"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 400
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 0,
+                "message": ""
+              }
+            },
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "e985169b09205deb",
+              "parentSpanId": "0dd64dea4185624e",
+              "traceState": "",
+              "name": "ReverseProxy",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": 1773923344706221300,
+              "endTimeUnixNano": 1773923420241629400,
+              "attributes": [
+                {
+                  "key": "session.authenticated",
+                  "value": {
+                    "boolValue": true
+                  }
+                },
+                {
+                  "key": "proxy.with_access_token",
+                  "value": {
+                    "boolValue": true
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 0,
+                "message": ""
+              }
+            },
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "fe0079abc008f19b",
+              "parentSpanId": "e985169b09205deb",
+              "traceState": "",
+              "name": "ReverseProxy.ServeHTTP",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": 1773923344707476200,
+              "endTimeUnixNano": 1773923420241628200,
+              "attributes": [],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 0,
+                "message": ""
+              }
+            },
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "ba556662e844fb1b",
+              "parentSpanId": "fe0079abc008f19b",
+              "traceState": "",
+              "name": "HTTP POST",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": 1773923344707502300,
+              "endTimeUnixNano": 1773923420241597200,
+              "attributes": [
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "http://10.7.91.100:8080/api/klage-dittnav-api/api/klanker/e6db6854-5793-458c-9ea6-500bd5d58b4d/vedlegg"
+                  }
+                },
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": 8080
+                  }
+                },
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 400
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "400"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "10.7.91.100"
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 2,
+                "message": ""
+              }
+            },
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "be56cd9514179add",
+              "parentSpanId": "e985169b09205deb",
+              "traceState": "",
+              "name": "Session.Get",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": 1773923344706252300,
+              "endTimeUnixNano": 1773923344707408400,
+              "attributes": [
+                {
+                  "key": "session.valid_ticket",
+                  "value": {
+                    "boolValue": true
+                  }
+                },
+                {
+                  "key": "session.valid_session",
+                  "value": {
+                    "boolValue": true
+                  }
+                },
+                {
+                  "key": "session.id",
+                  "value": {
+                    "stringValue": "-1VALx96M55KZ8PijWNyaf-YTAC6C0bzjJkfDt0mH40"
+                  }
+                },
+                {
+                  "key": "session.token_expires_at",
+                  "value": {
+                    "stringValue": "2026-03-19T13:16:03Z"
+                  }
+                },
+                {
+                  "key": "session.token_refreshed_at",
+                  "value": {
+                    "stringValue": "2026-03-19T12:16:03Z"
+                  }
+                },
+                {
+                  "key": "session.created_at",
+                  "value": {
+                    "stringValue": "2026-03-19T11:20:56Z"
+                  }
+                },
+                {
+                  "key": "session.ends_at",
+                  "value": {
+                    "stringValue": "2026-03-19T17:20:56Z"
+                  }
+                },
+                {
+                  "key": "session.timeout_at",
+                  "value": {
+                    "stringValue": "2026-03-19T13:16:03Z"
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 0,
+                "message": ""
+              }
+            },
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "73db7fea42b12890",
+              "parentSpanId": "be56cd9514179add",
+              "traceState": "",
+              "name": "RedisSessionStore.Read",
+              "kind": "SPAN_KIND_INTERNAL",
+              "startTimeUnixNano": 1773923344706316800,
+              "endTimeUnixNano": 1773923344707255600,
+              "attributes": [
+                {
+                  "key": "redis.key_exists",
+                  "value": {
+                    "boolValue": true
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 0,
+                "message": ""
+              }
+            },
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "03340ecf0060e0d3",
+              "parentSpanId": "73db7fea42b12890",
+              "traceState": "",
+              "name": "get",
+              "kind": "SPAN_KIND_CLIENT",
+              "startTimeUnixNano": 1773923344706324000,
+              "endTimeUnixNano": 1773923344707228700,
+              "attributes": [
+                {
+                  "key": "server.port",
+                  "value": {
+                    "intValue": 26483
+                  }
+                },
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "redis"
+                  }
+                },
+                {
+                  "key": "db.connection_string",
+                  "value": {
+                    "stringValue": "redis://valkey-nais-system-wonderwall-idporten-platinum-nav-prod.g.aivencloud.com:26483"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "valkey-nais-system-wonderwall-idporten-platinum-nav-prod.g.aivencloud.com"
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 0,
+                "message": ""
+              }
+            }
+          ],
+          "instrumentationLibrary": {
+            "name": "github.com/riandyrn/otelchi",
+            "version": "0.12.2"
+          }
+        }
+      ]
+    },
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "collector.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "host.arch",
+            "value": {
+              "stringValue": "amd64"
+            }
+          },
+          {
+            "key": "host.name",
+            "value": {
+              "stringValue": "klage-dittnav-api-7cc6df59c4-t8ffh"
+            }
+          },
+          {
+            "key": "k8s.deployment.name",
+            "value": {
+              "stringValue": "klage-dittnav-api"
+            }
+          },
+          {
+            "key": "k8s.node.name",
+            "value": {
+              "stringValue": "gke-nais-prod-nap-e2-standard-16-1id5-f90d4471-2djr"
+            }
+          },
+          {
+            "key": "k8s.replicaset.name",
+            "value": {
+              "stringValue": "klage-dittnav-api-7cc6df59c4"
+            }
+          },
+          {
+            "key": "os.description",
+            "value": {
+              "stringValue": "Linux 6.6.113+"
+            }
+          },
+          {
+            "key": "os.type",
+            "value": {
+              "stringValue": "linux"
+            }
+          },
+          {
+            "key": "process.command_args",
+            "value": {
+              "stringValue": "[\"/usr/lib/jvm/java-21-openjdk/bin/java\",\"-jar\",\"app.jar\"]"
+            }
+          },
+          {
+            "key": "process.executable.path",
+            "value": {
+              "stringValue": "/usr/lib/jvm/java-21-openjdk/bin/java"
+            }
+          },
+          {
+            "key": "process.pid",
+            "value": {
+              "intValue": 1
+            }
+          },
+          {
+            "key": "process.runtime.description",
+            "value": {
+              "stringValue": "wolfi OpenJDK 64-Bit Server VM 21.0.10+-wolfi-r3"
+            }
+          },
+          {
+            "key": "process.runtime.name",
+            "value": {
+              "stringValue": "OpenJDK Runtime Environment"
+            }
+          },
+          {
+            "key": "process.runtime.version",
+            "value": {
+              "stringValue": "21.0.10+-wolfi-r3"
+            }
+          },
+          {
+            "key": "service.instance.id",
+            "value": {
+              "stringValue": "klage.klage-dittnav-api-7cc6df59c4-t8ffh.klage-dittnav-api"
+            }
+          },
+          {
+            "key": "service.namespace",
+            "value": {
+              "stringValue": "klage"
+            }
+          },
+          {
+            "key": "service.version",
+            "value": {
+              "stringValue": "2026.03.17-08.22-7dded1d"
+            }
+          },
+          {
+            "key": "telemetry.distro.name",
+            "value": {
+              "stringValue": "opentelemetry-java-instrumentation"
+            }
+          },
+          {
+            "key": "telemetry.distro.version",
+            "value": {
+              "stringValue": "2.25.0"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "java"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.version",
+            "value": {
+              "stringValue": "1.59.0"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "klage-dittnav-api"
+            }
+          },
+          {
+            "key": "k8s.cluster.name",
+            "value": {
+              "stringValue": "prod"
+            }
+          },
+          {
+            "key": "k8s.namespace.name",
+            "value": {
+              "stringValue": "klage"
+            }
+          },
+          {
+            "key": "k8s.pod.name",
+            "value": {
+              "stringValue": "klage-dittnav-api-7cc6df59c4-t8ffh"
+            }
+          },
+          {
+            "key": "k8s.container.name",
+            "value": {
+              "stringValue": "klage-dittnav-api"
+            }
+          }
+        ],
+        "droppedAttributesCount": 0
+      },
+      "instrumentationLibrarySpans": [
+        {
+          "spans": [
+            {
+              "traceId": "2390474668f7e20c63fc09c460fece21",
+              "spanId": "d64681c7797728cb",
+              "parentSpanId": "ba556662e844fb1b",
+              "traceState": "",
+              "name": "POST /*",
+              "kind": "SPAN_KIND_SERVER",
+              "startTimeUnixNano": 1773923344716576000,
+              "endTimeUnixNano": 1773923404697250800,
+              "attributes": [
+                {
+                  "key": "thread.id",
+                  "value": {
+                    "intValue": 10706
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 500
+                  }
+                },
+                {
+                  "key": "url.scheme",
+                  "value": {
+                    "stringValue": "https"
+                  }
+                },
+                {
+                  "key": "thread.name",
+                  "value": {
+                    "stringValue": "qtp118441068-10706"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "500"
+                  }
+                },
+                {
+                  "key": "client.address",
+                  "value": {
+                    "stringValue": "14.1.65.246"
+                  }
+                },
+                {
+                  "key": "user_agent.original",
+                  "value": {
+                    "stringValue": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1"
+                  }
+                },
+                {
+                  "key": "network.protocol.version",
+                  "value": {
+                    "stringValue": "1.1"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/api/klanker/e6db6854-5793-458c-9ea6-500bd5d58b4d/vedlegg"
+                  }
+                },
+                {
+                  "key": "server.address",
+                  "value": {
+                    "stringValue": "klage.nav.no"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/*"
+                  }
+                }
+              ],
+              "droppedAttributesCount": 0,
+              "droppedEventsCount": 0,
+              "droppedLinksCount": 0,
+              "status": {
+                "code": 2,
+                "message": ""
+              },
+              "events": [
+                {
+                  "timeUnixNano": 1773923404697093600,
+                  "attributes": [
+                    {
+                      "key": "exception.stacktrace",
+                      "value": {
+                        "stringValue": "java.util.concurrent.TimeoutException: Idle timeout expired: 30000/30000 ms\n\tat org.eclipse.jetty.io.IdleTimeout.checkIdleTimeout(IdleTimeout.java:167)\n\tat org.eclipse.jetty.io.IdleTimeout.idleCheck(IdleTimeout.java:113)\n\tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)\n\tat java.base/java.util.concurrent.FutureTask.run(Unknown Source)\n\tat java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\n\tat java.base/java.lang.Thread.run(Unknown Source)\n"
+                      }
+                    },
+                    {
+                      "key": "exception.message",
+                      "value": {
+                        "stringValue": "Idle timeout expired: 30000/30000 ms"
+                      }
+                    },
+                    {
+                      "key": "exception.type",
+                      "value": {
+                        "stringValue": "java.util.concurrent.TimeoutException"
+                      }
+                    }
+                  ],
+                  "droppedAttributesCount": 0,
+                  "name": "exception"
+                }
+              ]
+            }
+          ],
+          "instrumentationLibrary": {
+            "name": "io.opentelemetry.jetty-12.0",
+            "version": "2.25.0-alpha"
+          }
+        }
+      ]
+    }
+  ]
+}
