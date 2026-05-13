@@ -202,4 +202,9 @@ internal class StatusOverridingSpanData(
     private val overriddenStatus: StatusData,
 ) : SpanData by delegate {
     override fun getStatus(): StatusData = overriddenStatus
+    override fun getTraceId(): String = delegate.traceId
+    override fun getSpanId(): String = delegate.spanId
+    override fun getParentSpanId(): String = delegate.parentSpanId
+    override fun getInstrumentationScopeInfo(): io.opentelemetry.sdk.common.InstrumentationScopeInfo =
+        delegate.instrumentationScopeInfo
 }
