@@ -66,6 +66,8 @@ spec:
       rules:
         - application: klage-dittnav
         - application: klage-arkiver-journalpost
+        - application: tokenx-token-generator
+          namespace: nais
     outbound:
       external:
         {{#each externalHosts as |host|}}
