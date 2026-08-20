@@ -20,6 +20,8 @@ class SafSelvbetjeningService(
 
     fun userHasDocumentForTema(tema: Tema): Boolean {
         val usersDocuments = safselvbetjeningGraphQlClient.getDokumentoversikt(tokenUtil.getSubject()).data?.dokumentoversiktSelvbetjening?.tema?.map { it.kode }
+        logger.debug("usersDocuments: $usersDocuments")
+        logger.debug("tema name: " + tema.name)
         return usersDocuments?.contains(tema.name) ?: false
     }
 }

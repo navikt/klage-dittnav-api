@@ -423,6 +423,6 @@ class CommonService(
     }
 
     private fun userHasDocumentForThisTema(innsendingsytelse: Innsendingsytelse): Boolean {
-        return safSelvbetjeningService.userHasDocumentForTema(Tema.fromNavn(innsendingsytelseToTema[innsendingsytelse]!!.name))
+        return safSelvbetjeningService.userHasDocumentForTema(innsendingsytelseToTema[innsendingsytelse]!!)
     }
 }
