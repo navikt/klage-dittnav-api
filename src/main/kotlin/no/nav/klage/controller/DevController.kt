@@ -54,6 +54,6 @@ class DevController(
     @GetMapping("/internal/tema-list")
     @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
     fun getDokumentoversikt(): GetDokumentoversiktResponse {
-        return safselvbetjeningGraphQlClient.getTemalist(ident = tokenUtil.getSubject())
+        return safselvbetjeningGraphQlClient.getDokumentoversikt(ident = tokenUtil.getSubject())
     }
 }

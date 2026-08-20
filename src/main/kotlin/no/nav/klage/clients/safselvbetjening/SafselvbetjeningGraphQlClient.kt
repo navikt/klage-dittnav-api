@@ -51,7 +51,7 @@ class SafselvbetjeningGraphQlClient(
     }
 
     @Retryable
-    fun getTemalist(
+    fun getDokumentoversikt(
         ident: String,
     ): GetDokumentoversiktResponse {
         val response = runWithTimingAndLogging {
@@ -64,7 +64,7 @@ class SafselvbetjeningGraphQlClient(
                 .bodyValue(getDokumentoversiktQuery(ident = ident))
                 .retrieve()
                 .onStatus(HttpStatusCode::isError) { response ->
-                    logErrorResponse(response, ::getTemalist.name, teamLogger)
+                    logErrorResponse(response, ::getDokumentoversikt.name, teamLogger)
                 }
                 .bodyToMono<GetDokumentoversiktResponse>()
                 .block() ?: throw RuntimeException("No connection to safselvbetjening")

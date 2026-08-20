@@ -1,5 +1,5 @@
 query($ident: String!) {
-    dokumentoversiktSelvbetjening(ident: $ident) {
+    dokumentoversiktSelvbetjening(ident: $ident, tema: []) {
         tema {
             kode
             navn
