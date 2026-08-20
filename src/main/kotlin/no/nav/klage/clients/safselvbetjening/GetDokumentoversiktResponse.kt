@@ -1,10 +1,10 @@
 package no.nav.klage.clients.safselvbetjening
 
-data class GetDokumentoversiktResponse(val data: TemaList?, val errors: List<PdlError>?)
+data class GetDokumentoversiktResponse(val data: Dokumentoversikt?, val errors: List<PdlError>?)
 
-data class TemaList(val tema: List<TemaFromSafselvbetjening>)
+data class Dokumentoversikt(val tema: List<TemaFromSafselvbetjening>?)
 
 data class TemaFromSafselvbetjening(
-    val kode: String,
-    val navn: String,
+    val kode: String?,
+    val navn: String?,
 )
