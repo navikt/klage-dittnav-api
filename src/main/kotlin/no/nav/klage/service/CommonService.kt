@@ -10,6 +10,7 @@ import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.kafka.AivenKafkaProducer
+import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.repository.KlankeRepository
@@ -34,6 +35,7 @@ class CommonService(
     private val documentService: DocumentService,
     private val klageLookupClient: KlageLookupClient,
     private val tokenUtil: TokenUtil,
+    private val safSelvbetjeningService: SafSelvbetjeningService,
 ) {
 
     companion object {
@@ -49,7 +51,7 @@ class CommonService(
         val klanke = input.toKlanke(foedselsnummer = currentUser)
         return klankeRepository.save(klanke).also {
             updateMetrics(input = klanke)
-        }.toKlankeView()
+        }.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(klanke.innsendingsytelse))
     }
 
     private fun createKlanke(input: KlankeMinimalInput, foedselsnummer: String): Klanke {
@@ -132,10 +134,10 @@ class CommonService(
             existingKlanke.caseIsAtKA = input.caseIsAtKA
         }
 
-        return existingKlanke?.toKlankeView() ?: createKlanke(
+        return existingKlanke?.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(existingKlanke.innsendingsytelse)) ?: createKlanke(
             input = input,
             foedselsnummer = currentUser,
-        ).toKlankeView()
+        ).toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(input.innsendingsytelse))
     }
 
     fun getLatestKlankeDraft(
@@ -300,7 +302,7 @@ class CommonService(
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = klanke)
-        return klanke.toKlankeView()
+        return klanke.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(klanke.innsendingsytelse))
     }
 
     fun validateAccess(klankeId: UUID) {
@@ -418,5 +420,9 @@ class CommonService(
 
         existingKlanke.pdfDownloaded = pdfDownloaded
         existingKlanke.modifiedByUser = LocalDateTime.now()
+    }
+
+    private fun userHasDocumentForThisTema(innsendingsytelse: Innsendingsytelse): Boolean {
+        return safSelvbetjeningService.userHasDocumentForTema(Tema.fromNavn(innsendingsytelseToTema[innsendingsytelse]!!.name))
     }
 }

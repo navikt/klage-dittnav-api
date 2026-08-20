@@ -37,6 +37,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     private val innsendingsytelseAndNoInternalSaksnummer = "innsendingsytelse and no internalSaksnummer"
 
     private val klageLookupClient: KlageLookupClient = mockk()
+    private val safselvbetjeningService: SafSelvbetjeningService = mockk()
 
     @Autowired
     private lateinit var klankeRepository: KlankeRepository
@@ -58,6 +59,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
             documentService = mockk(),
             klageLookupClient = klageLookupClient,
             tokenUtil = mockk(),
+            safSelvbetjeningService = safselvbetjeningService,
         )
     }
 
@@ -106,6 +108,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
 
         val klage = klankeRepository.findAll().first()
         commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2)
+        every { safselvbetjeningService.userHasDocumentForTema(any()) } returns true
         val output = commonService.getKlanke(klankeId = klage.id).fritekst
 
         assertEquals(exampleFritekst2, output)
