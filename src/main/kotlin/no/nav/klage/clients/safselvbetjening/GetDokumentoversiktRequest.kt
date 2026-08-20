@@ -8,7 +8,8 @@ data class GetDokumentoversiktGraphqlQuery(
 )
 
 data class GetDokumentoversiktVariables(
-    val ident: String
+    val ident: String,
+    val tema: String = "SYK"
 )
 
 fun getDokumentoversiktQuery(ident: String): GetDokumentoversiktGraphqlQuery {
