@@ -50,6 +50,29 @@ class SafselvbetjeningGraphQlClient(
         return response
     }
 
+    @Retryable
+    fun getTemalist(
+        ident: String,
+    ): GetDokumentoversiktResponse {
+        val response = runWithTimingAndLogging {
+            safselvbetjeningWebClient.post()
+                .uri("graphql")
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafselvbetjeningScope()}"
+                )
+                .bodyValue(getDokumentoversiktQuery(ident = ident))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError) { response ->
+                    logErrorResponse(response, ::getTemalist.name, teamLogger)
+                }
+                .bodyToMono<GetDokumentoversiktResponse>()
+                .block() ?: throw RuntimeException("No connection to safselvbetjening")
+        }
+
+        return response
+    }
+
     fun <T> runWithTimingAndLogging(block: () -> T): T {
         val start = System.currentTimeMillis()
         try {

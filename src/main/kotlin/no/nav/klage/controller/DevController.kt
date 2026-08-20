@@ -1,7 +1,10 @@
 package no.nav.klage.controller
 
+import no.nav.klage.clients.safselvbetjening.GetDokumentoversiktResponse
+import no.nav.klage.clients.safselvbetjening.SafselvbetjeningGraphQlClient
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
+import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
@@ -9,6 +12,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseBody
@@ -16,7 +20,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @Profile("dev")
 @RestController
-class DevController(private val klageDittnavPdfgenService: KlageDittnavPdfgenService) {
+class DevController(
+    private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
+    private val safselvbetjeningGraphQlClient: SafselvbetjeningGraphQlClient,
+    private val tokenUtil: TokenUtil,
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -40,5 +48,10 @@ class DevController(private val klageDittnavPdfgenService: KlageDittnavPdfgenSer
             responseHeaders,
             HttpStatus.OK
         )
+    }
+
+    @GetMapping("/internal/tema-list")
+    fun getDokumentoversikt(): GetDokumentoversiktResponse {
+        return safselvbetjeningGraphQlClient.getTemalist(ident = tokenUtil.getSubject())
     }
 }
