@@ -6,21 +6,25 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isAccessibleToUser
 import no.nav.klage.domain.jpa.isDeleted
 import no.nav.klage.domain.jpa.isFinalized
+import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Service
 
 @Service
-class ValidationService {
+class ValidationService(
+    private val tokenUtil: TokenUtil,
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun validateKlankeAccess(klanke: Klanke, foedselsnummer: String) {
+    fun validateKlankeAccess(klanke: Klanke) {
+        val currentLoggedInFnr = tokenUtil.getSubject()
         validateKlankeAccessForIdentifikasjonsnummer(
             klanke = klanke,
-            identifikasjonsnummer = foedselsnummer
+            identifikasjonsnummer = currentLoggedInFnr
         )
     }
 

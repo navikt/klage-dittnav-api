@@ -29,10 +29,10 @@ class VedleggService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile, foedselsnummer: String): Vedlegg {
+    fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile): Vedlegg {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
+        validationService.validateKlankeAccess(klanke = existingKlanke)
         val timeStart = System.currentTimeMillis()
         val bytes = multipart.bytes
         val tittel = multipart.originalFilename ?: throw RuntimeException("Filename is required")
@@ -62,10 +62,10 @@ class VedleggService(
         return vedleggToSave
     }
 
-    fun deleteVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, foedselsnummer: String): Boolean {
+    fun deleteVedleggFromKlanke(klankeId: UUID, vedleggId: UUID): Boolean {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
-        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
+        validationService.validateKlankeAccess(klanke = existingKlanke)
 
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
@@ -78,10 +78,10 @@ class VedleggService(
         }
     }
 
-    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID, foedselsnummer: String): ByteArray {
+    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID): ByteArray {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke, false)
-        validationService.validateKlankeAccess(klanke = existingKlanke, foedselsnummer = foedselsnummer)
+        validationService.validateKlankeAccess(klanke = existingKlanke)
 
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 

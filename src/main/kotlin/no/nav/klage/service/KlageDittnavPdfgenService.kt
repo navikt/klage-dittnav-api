@@ -5,9 +5,8 @@ import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
-import no.nav.klage.clients.pdl.AdressebeskyttelseGradering
-import no.nav.klage.clients.pdl.PdlClient
-import no.nav.klage.controller.view.*
+import no.nav.klage.clients.klagelookup.KlageLookupClient
+import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.exception.InvalidIdentException
@@ -26,7 +25,7 @@ import java.io.ByteArrayOutputStream
 class KlageDittnavPdfgenService(
     private val klageDittnavPdfgenClient: KlageDittnavPdfgenClient,
     private val foerstesidegeneratorClient: FoerstesidegeneratorClient,
-    private val pdlClient: PdlClient,
+    private val klageLookupClient: KlageLookupClient,
 ) {
 
     fun createKlankePdfWithFoersteside(input: OpenKlankeInput): ByteArray {
@@ -130,13 +129,9 @@ class KlageDittnavPdfgenService(
         innsendingsytelse: Innsendingsytelse,
         ettersendelseTilKa: Boolean?
     ): String? {
-        val adressebeskyttelse =
-            pdlClient.getPersonInfoAsSystemUser(foedselsnummer = foedselsnummer).data?.hentPerson?.adressebeskyttelse
+        val personInfo = klageLookupClient.getPersonAsSystemUser(fnr = foedselsnummer)
 
-        if (adressebeskyttelse?.any {
-                it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG
-                        || it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
-            } == true) {
+        if (personInfo.strengtFortrolig || personInfo.strengtFortroligUtland) {
             return null
         }
 

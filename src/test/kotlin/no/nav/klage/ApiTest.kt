@@ -46,11 +46,9 @@ class ApiTest {
 
     @BeforeEach
     fun beforeEach() {
-        every { brukerService.getBruker() } returns Bruker(
-            navn = Navn(fornavn = "", mellomnavn = null, etternavn = ""),
-            kontaktinformasjon = null,
+        every { brukerService.getCurrentBruker() } returns Bruker(
+            navn = Navn(fornavn = "", etternavn = ""),
             folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
-            tokenExpires = null,
         )
     }
 

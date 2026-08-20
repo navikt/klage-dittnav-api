@@ -18,7 +18,7 @@ data class AggregatedKlageAnke(
     val sak: Sak?,
     val klageAnkeType: KlageAnkeType,
     val innsendingsYtelseId: String,
-    val ettersendelseTilKa: Boolean?
+    val ettersendelseTilKa: Boolean?,
 ) {
     enum class KlageAnkeType {
         KLAGE, ANKE, KLAGE_ETTERSENDELSE, ANKE_ETTERSENDELSE,
