@@ -6,6 +6,7 @@ import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders
@@ -51,6 +52,7 @@ class DevController(
     }
 
     @GetMapping("/internal/tema-list")
+    @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
     fun getDokumentoversikt(): GetDokumentoversiktResponse {
         return safselvbetjeningGraphQlClient.getTemalist(ident = tokenUtil.getSubject())
     }
