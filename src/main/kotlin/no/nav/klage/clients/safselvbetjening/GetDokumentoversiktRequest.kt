@@ -9,7 +9,7 @@ data class GetDokumentoversiktGraphqlQuery(
 
 data class GetDokumentoversiktVariables(
     val ident: String,
-    val tema: List<Tema> = listOf(Tema.SYK),
+    val tema: List<Tema> = emptyList(),
 )
 
 fun getDokumentoversiktQuery(ident: String): GetDokumentoversiktGraphqlQuery {
