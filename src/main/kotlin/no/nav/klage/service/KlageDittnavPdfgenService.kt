@@ -5,9 +5,8 @@ import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
-import no.nav.klage.clients.pdl.AdressebeskyttelseGradering
-import no.nav.klage.clients.pdl.PdlClient
-import no.nav.klage.controller.view.*
+import no.nav.klage.clients.klagelookup.KlageLookupClient
+import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
 import no.nav.klage.domain.exception.InvalidIdentException
@@ -26,16 +25,22 @@ import java.io.ByteArrayOutputStream
 class KlageDittnavPdfgenService(
     private val klageDittnavPdfgenClient: KlageDittnavPdfgenClient,
     private val foerstesidegeneratorClient: FoerstesidegeneratorClient,
-    private val pdlClient: PdlClient,
+    private val klageLookupClient: KlageLookupClient,
 ) {
 
     fun createKlankePdfWithFoersteside(input: OpenKlankeInput): ByteArray {
         validateIdent(input.foedselsnummer)
+        val fullmektigNavn = if (input.fullmektigFoedselsnummer != null) {
+            klageLookupClient.getPerson(
+                fnr = input.fullmektigFoedselsnummer,
+                tema = innsendingsytelseToTema[input.innsendingsytelse]
+            ).sammensattNavn
+        } else null
 
         val klankePDF = if (input.type.name.contains("ETTERSENDELSE")) {
-            klageDittnavPdfgenClient.getEttersendelsePDF(input.toPDFInput())
+            klageDittnavPdfgenClient.getEttersendelsePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
         } else {
-            klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput())
+            klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
         }
 
         if (input.innsendingsytelse == Innsendingsytelse.LONNSGARANTI && input.type == Type.KLAGE) {
@@ -78,20 +83,25 @@ class KlageDittnavPdfgenService(
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
+
             Type.ANKE -> {
                 text = if (language == LanguageEnum.EN) "Appeal form" else "Ankeskjema"
                 arkivtittel = "Anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
+
             Type.KLAGE_ETTERSENDELSE -> {
-                text = if (language == LanguageEnum.EN) "Form for additional documentation for complaint" else "Ettersendelsesskjema"
+                text =
+                    if (language == LanguageEnum.EN) "Form for additional documentation for complaint" else "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til klage"
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
             }
+
             Type.ANKE_ETTERSENDELSE -> {
-                text = if (language == LanguageEnum.EN) "Form for additional documentation for appeal" else "Ettersendelsesskjema"
+                text =
+                    if (language == LanguageEnum.EN) "Form for additional documentation for appeal" else "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
@@ -130,13 +140,9 @@ class KlageDittnavPdfgenService(
         innsendingsytelse: Innsendingsytelse,
         ettersendelseTilKa: Boolean?
     ): String? {
-        val adressebeskyttelse =
-            pdlClient.getPersonInfoAsSystemUser(foedselsnummer = foedselsnummer).data?.hentPerson?.adressebeskyttelse
+        val personInfo = klageLookupClient.getPersonAsSystemUser(fnr = foedselsnummer)
 
-        if (adressebeskyttelse?.any {
-                it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG
-                        || it.gradering == AdressebeskyttelseGradering.STRENGT_FORTROLIG_UTLAND
-            } == true) {
+        if (personInfo.strengtFortrolig || personInfo.strengtFortroligUtland) {
             return null
         }
 

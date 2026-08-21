@@ -6,14 +6,15 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class SafSelvbetjeningClientConfiguration(private val webClientBuilder: WebClient.Builder) {
+class KlageLookupClientConfiguration(private val webClientBuilder: WebClient.Builder) {
 
-    @Value("\${SAFSELVBETJENING_BASE_URL}")
-    private lateinit var url: String
+    @Value($$"${KLAGE_LOOKUP_BASE_URL}")
+    private lateinit var klageLookupUrl: String
 
     @Bean
-    fun safselvbetjeningWebClient(): WebClient =
-        webClientBuilder
-            .baseUrl(url)
+    fun klageLookupWebClient(): WebClient {
+        return webClientBuilder
+            .baseUrl(klageLookupUrl)
             .build()
+    }
 }

@@ -63,6 +63,9 @@ class Klanke(
     /* ettersendelser klage */
     @Column(name = "case_is_at_ka")
     var caseIsAtKA: Boolean?,
+
+    @Column(name = "fullmektig_foedselsnummer")
+    var fullmektigFoedselsnummer: String?,
 ) {
 
     override fun equals(other: Any?): Boolean {

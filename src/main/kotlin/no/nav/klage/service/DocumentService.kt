@@ -1,7 +1,7 @@
 package no.nav.klage.service
 
-import no.nav.klage.clients.safselvbetjening.SafselvbetjeningGraphQlClient
-import no.nav.klage.clients.safselvbetjening.SafselvbetjeningRestClient
+import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningGraphQlClient
+import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningRestClient
 import no.nav.klage.domain.exception.FileNotFoundInSafException
 import no.nav.klage.util.getLogger
 import org.apache.pdfbox.io.MemoryUsageSetting
@@ -13,13 +13,12 @@ import reactor.core.publisher.Flux
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 
 
 @Service
 class DocumentService(
-    private val safselvbetjeningRestClient: SafselvbetjeningRestClient,
-    private val safselvbetjeningGraphQlClient: SafselvbetjeningGraphQlClient,
+    private val safSelvbetjeningRestClient: SafSelvbetjeningRestClient,
+    private val safSelvbetjeningGraphQlClient: SafSelvbetjeningGraphQlClient,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -27,7 +26,7 @@ class DocumentService(
     }
 
     fun getPathToDocumentPdfAndTitle(journalpostId: String): Pair<Path, String> {
-        val journalpostInfo = safselvbetjeningGraphQlClient.getJournalpostById(journalpostId = journalpostId)
+        val journalpostInfo = safSelvbetjeningGraphQlClient.getJournalpostById(journalpostId = journalpostId)
 
         if (journalpostInfo.data?.journalpostById?.dokumenter.isNullOrEmpty()) {
             throw FileNotFoundInSafException("Fikk ikke hentet fil fra arkivet.")
@@ -68,7 +67,7 @@ class DocumentService(
         }
 
         Flux.fromIterable(documentsWithPaths).flatMapSequential { (document, path) ->
-            safselvbetjeningRestClient.downloadDocumentAsMono(
+            safSelvbetjeningRestClient.downloadDocumentAsMono(
                 journalpostId = document.first,
                 dokumentInfoId = document.second,
                 pathToFile = path,

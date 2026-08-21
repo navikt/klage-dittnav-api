@@ -17,7 +17,6 @@ DB_HOST: localhost
 DB_USERNAME: klage
 DB_PASSWORD: klage
 
-PDL_BASE_URL: https://pdl-api.dev-fss.nais.io/graphql
 SERVICE_USER_USERNAME: srvklage-dittnav
 SERVICE_USER_PASSWORD: OVERRIDE_IN_RUNTIME
 
@@ -26,7 +25,6 @@ CLAM_AV_URL: http://clamav.nais.svc.nais.local/scan
 FILE_BASE_URL: http://localhost:7080
 
 STS_APIKEY: test
-PDL_APIKEY: test
 
 AZURE_APP_WELL_KNOWN_URL: https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0/.well-known/openid-configuration
 AZURE_APP_CLIENT_ID: 9ba0e760-d28c-44d2-8cae-8a1dc9b4584f

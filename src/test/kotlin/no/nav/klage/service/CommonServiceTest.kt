@@ -1,7 +1,9 @@
 package no.nav.klage.service
 
 
+import io.mockk.every
 import io.mockk.mockk
+import no.nav.klage.clients.klagelookup.KlageLookupClient
 import no.nav.klage.db.PostgresIntegrationTestBase
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
@@ -20,7 +22,7 @@ import java.time.LocalDateTime
 
 @ActiveProfiles("dbtest")
 @DataJpaTest
-class CommonServiceTest: PostgresIntegrationTestBase() {
+class CommonServiceTest : PostgresIntegrationTestBase() {
 
     private val exampleFritekst = "fritekst"
     private val exampleFritekst2 = "fritekst2"
@@ -33,6 +35,10 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
 
     private val innsendingsytelseAndInternalSaksnummer = "innsendingsytelse and internalSaksnummer"
     private val innsendingsytelseAndNoInternalSaksnummer = "innsendingsytelse and no internalSaksnummer"
+
+    private val representasjonService: RepresentasjonService = mockk()
+    private val klageLookupClient: KlageLookupClient = mockk()
+    private val safSelvbetjeningService: SafSelvbetjeningService = mockk()
 
     @Autowired
     private lateinit var klankeRepository: KlankeRepository
@@ -51,7 +57,11 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
             vedleggMetrics = mockk(),
             kafkaProducer = mockk(),
             klageDittnavPdfgenService = mockk(),
-            documentService = mockk()
+            documentService = mockk(),
+            representasjonService = representasjonService,
+            klageLookupClient = klageLookupClient,
+            tokenUtil = mockk(),
+            safSelvbetjeningService = safSelvbetjeningService,
         )
     }
 
@@ -96,11 +106,13 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
 
     @Test
     fun `updateFritekst works as expected`() {
+        every { representasjonService.getFullmaktsgivereForTema(any()) } returns emptyList()
         createDBEntryWithYtelse()
 
         val klage = klankeRepository.findAll().first()
-        commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2, foedselsnummer = "12345678910")
-        val output = commonService.getKlanke(klankeId = klage.id, foedselsnummer = "12345678910").fritekst
+        commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2)
+        every { safSelvbetjeningService.userHasDocumentForTema(any(), any()) } returns true
+        val output = commonService.getKlanke(klankeId = klage.id).fritekst
 
         assertEquals(exampleFritekst2, output)
     }
@@ -130,6 +142,7 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
                 modifiedByUser = exampleModifiedByUser,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
 
@@ -155,6 +168,7 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
                 modifiedByUser = exampleModifiedByUser2,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
     }
@@ -185,6 +199,7 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
                 modifiedByUser = now,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
 
@@ -209,6 +224,7 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
                 modifiedByUser = now,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
     }
@@ -233,6 +249,7 @@ class CommonServiceTest: PostgresIntegrationTestBase() {
                 modifiedByUser = now,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
     }

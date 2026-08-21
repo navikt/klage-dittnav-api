@@ -28,4 +28,8 @@ data class KlankeView(
     val hasVedlegg: Boolean,
     val type: Type,
     val caseIsAtKA: Boolean?,
+    val userHasDocumentForThisTema: Boolean,
+    val fullmaktsgivere: List<String>,
+    val foedselsnummer: String,
+    val fullmektigFoedselsnummer: String?,
 )

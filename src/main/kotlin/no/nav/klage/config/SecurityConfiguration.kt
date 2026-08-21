@@ -7,4 +7,10 @@ import org.springframework.context.annotation.Configuration
 @EnableJwtTokenValidation(ignore = ["org.springdoc", "org.springframework.boot.webmvc.autoconfigure.error.BasicErrorController"])
 @EnableOAuth2Client(cacheEnabled = true)
 @Configuration
-internal class SecurityConfiguration
+internal class SecurityConfiguration {
+
+    companion object {
+        const val ISSUER_AZUREAD = "azuread"
+        const val TOKEN_X = "tokenx"
+    }
+}

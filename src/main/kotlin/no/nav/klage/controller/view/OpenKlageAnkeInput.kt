@@ -20,4 +20,5 @@ data class OpenKlankeInput(
     val language: LanguageEnum = LanguageEnum.NB,
     val hasVedlegg: Boolean,
     val type: Type,
+    val fullmektigFoedselsnummer: String?,
 )

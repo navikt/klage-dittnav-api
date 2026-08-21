@@ -10,14 +10,13 @@ allowed.origins:
   https://klage.nav.no,
   https://www.nav.no
 
-PDL_BASE_URL: https://pdl-api.prod-fss-pub.nais.io/graphql
 FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/genererfoersteside
 SAFSELVBETJENING_BASE_URL: https://safselvbetjening.prod-fss-pub.nais.io
 
-PDL_AUDIENCE: prod-fss:pdl:pdl-api
-PDL_SCOPE: prod-fss.pdl.pdl-api
 SAFSELVBETJENING_AUDIENCE: prod-fss:teamdokumenthandtering:safselvbetjening
 FSS_CLUSTER: prod-fss
+
+KLAGE_LOOKUP_AUDIENCE: prod-gcp:klage:klage-lookup
 
 #These are read from the environment:
 #DB_HOST
@@ -25,7 +24,6 @@ FSS_CLUSTER: prod-fss
 #DB_PASSWORD
 #SERVICE_USER_PASSWORD
 #STS_APIKEY
-#PDL_APIKEY
 
 DRAFT_CLEANUP_CRON: 0 0 13 * * WED
 MAX_DRAFT_AGE_IN_DAYS: 60

@@ -4,7 +4,7 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
 
-fun Klanke.toKlankeView(): KlankeView {
+fun Klanke.toKlankeView(userHasDocumentForThisTema: Boolean, fullmaktsgivere: List<String>): KlankeView {
     return KlankeView(
         id = id,
         fritekst = fritekst ?: "",
@@ -23,6 +23,10 @@ fun Klanke.toKlankeView(): KlankeView {
         sakSakstype = sak?.sakstype,
         type = type,
         caseIsAtKA = caseIsAtKA,
+        fullmaktsgivere = fullmaktsgivere,
+        foedselsnummer = foedselsnummer,
+        fullmektigFoedselsnummer = fullmektigFoedselsnummer,
+        userHasDocumentForThisTema = userHasDocumentForThisTema,
     )
 }
 
