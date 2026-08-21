@@ -1,6 +1,6 @@
 package no.nav.klage.service
 
-import no.nav.klage.clients.safselvbetjening.SafselvbetjeningGraphQlClient
+import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningGraphQlClient
 import no.nav.klage.kodeverk.Tema
 
 import no.nav.klage.util.TokenUtil
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class SafSelvbetjeningService(
-    private val safselvbetjeningGraphQlClient: SafselvbetjeningGraphQlClient,
+    private val safselvbetjeningGraphQlClient: SafSelvbetjeningGraphQlClient,
     private val tokenUtil: TokenUtil,
 ) {
 

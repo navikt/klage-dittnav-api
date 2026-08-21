@@ -1,7 +1,7 @@
 package no.nav.klage.controller
 
 import no.nav.klage.clients.safselvbetjening.GetDokumentoversiktResponse
-import no.nav.klage.clients.safselvbetjening.SafselvbetjeningGraphQlClient
+import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningGraphQlClient
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.TokenUtil
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class DevController(
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
-    private val safselvbetjeningGraphQlClient: SafselvbetjeningGraphQlClient,
+    private val safselvbetjeningGraphQlClient: SafSelvbetjeningGraphQlClient,
     private val tokenUtil: TokenUtil,
 ) {
 

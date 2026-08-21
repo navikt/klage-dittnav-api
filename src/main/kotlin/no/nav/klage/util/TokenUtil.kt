@@ -16,7 +16,7 @@ class TokenUtil(
         return ctxHolder.getTokenValidationContext().getClaims(TOKEN_X).getStringClaim("pid")
     }
 
-    fun getOnBehalfOfTokenWithSafselvbetjeningScope(): String {
+    fun getOnBehalfOfTokenWithSafSelvbetjeningScope(): String {
         val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]!!
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.access_token!!

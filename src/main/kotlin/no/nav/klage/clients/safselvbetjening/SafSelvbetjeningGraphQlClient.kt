@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
 
 
 @Component
-class SafselvbetjeningGraphQlClient(
+class SafSelvbetjeningGraphQlClient(
     private val safselvbetjeningWebClient: WebClient,
     private val tokenUtil: TokenUtil
 ) {
@@ -36,7 +36,7 @@ class SafselvbetjeningGraphQlClient(
                 .uri("graphql")
                 .header(
                     HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafselvbetjeningScope()}"
+                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
                 )
                 .bodyValue(getJournalpostByIdQuery(journalpostId = journalpostId))
                 .retrieve()
@@ -59,7 +59,7 @@ class SafselvbetjeningGraphQlClient(
                 .uri("graphql")
                 .header(
                     HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafselvbetjeningScope()}"
+                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
                 )
                 .bodyValue(getDokumentoversiktQuery(ident = ident))
                 .retrieve()
