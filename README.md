@@ -42,49 +42,7 @@ docker-compose up --build
 Stop/delete:
 ```
 docker-compose down
-```
-
-#### Kontakt med PDL
-
-For å få kontakt med PDL er det nødvendig med et autorisasjons-token fra STS (Security Token Service). I disse kallene
-settes to headere, `Authorization` og `Nav-Consumer-Token`. Her settes token fra innlogget bruker i `Authorization`, 
-mens det er STS-tokenet som skal i den andre. 
-
-##### Windows-spesifikt
-
-For å få kontakt med STS og PDL må det gjøres noen spesifikke grep ved lokal kjøring på Windows. 
-
-###### Port Forwarding
-
-Både STS og PDL kjører i FSS-området, og får å få tilgang til disse må følgende kjøres fra kommanolinje, med kontekst 
-satt til `dev-fss`:
-```
-kubectl port-forward svc/security-token-service 8088:80
-```
-```
-kubectl port-forward svc/pdl-api 7000:80
-```
-
-Port på localhost, her `8088` og `7000`, kan være hva du ønsker, men disse skal brukes i andre innstillinger.
-
-Vi har opplevd at disse prosessene ofte avsluttes fordi man mister tilkoblingen, da er det i så fall bare å kjøre dem på
-nytt. 
-
-###### Docker Compose
-
-Containere som kjører i Docker på Windows har ikke uten videre tilgang til port forwardingen som settes opp her. For å 
-få kjørt appen med Docker Compose kan du spesifisere følgende i `docker-compose.yml`:
-
-```
-services:
-  klage-dittnav-api:
-    ...
-    environment:
-      ...
-      SECURITY_TOKEN_SERVICE_REST_URL: http://host.docker.internal:8088
-      PDL_BASE_URL: http://host.docker.internal:7000/graphql
 ``` 
-
 
 ### Endepunkter
 

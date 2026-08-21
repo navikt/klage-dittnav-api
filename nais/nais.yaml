@@ -78,6 +78,7 @@ spec:
       rules:
         - application: klage-file-api
         - application: klage-dittnav-pdfgen
+        - application: klage-lookup
         - application: clamav
           namespace: nais-system
         - application: logging
@@ -85,7 +86,6 @@ spec:
   envFrom:
     - secret: srvklage-dittnav
     - secret: sts-apikey
-    - secret: pdl-apikey
     - secret: slack-url
     - secret: slack-channel-id
   env:

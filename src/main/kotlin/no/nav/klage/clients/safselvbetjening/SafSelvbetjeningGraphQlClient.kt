@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono
 
 
 @Component
-class SafselvbetjeningGraphQlClient(
+class SafSelvbetjeningGraphQlClient(
     private val safselvbetjeningWebClient: WebClient,
     private val tokenUtil: TokenUtil
 ) {
@@ -36,7 +36,7 @@ class SafselvbetjeningGraphQlClient(
                 .uri("graphql")
                 .header(
                     HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafselvbetjeningScope()}"
+                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
                 )
                 .bodyValue(getJournalpostByIdQuery(journalpostId = journalpostId))
                 .retrieve()
@@ -44,6 +44,29 @@ class SafselvbetjeningGraphQlClient(
                     logErrorResponse(response, ::getJournalpostById.name, teamLogger)
                 }
                 .bodyToMono<GetJournalpostByIdResponse>()
+                .block() ?: throw RuntimeException("No connection to safselvbetjening")
+        }
+
+        return response
+    }
+
+    @Retryable
+    fun getDokumentoversikt(
+        ident: String,
+    ): GetDokumentoversiktResponse {
+        val response = runWithTimingAndLogging {
+            safselvbetjeningWebClient.post()
+                .uri("graphql")
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
+                )
+                .bodyValue(getDokumentoversiktQuery(ident = ident))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError) { response ->
+                    logErrorResponse(response, ::getDokumentoversikt.name, teamLogger)
+                }
+                .bodyToMono<GetDokumentoversiktResponse>()
                 .block() ?: throw RuntimeException("No connection to safselvbetjening")
         }
 

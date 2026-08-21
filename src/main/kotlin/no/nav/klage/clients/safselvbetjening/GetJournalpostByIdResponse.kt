@@ -1,6 +1,6 @@
 package no.nav.klage.clients.safselvbetjening
 
-data class GetJournalpostByIdResponse(val data: GetJournalpostById?, val errors: List<PdlError>?)
+data class GetJournalpostByIdResponse(val data: GetJournalpostById?, val errors: List<GraphQLError>?)
 
 data class GetJournalpostById(val journalpostById: JournalpostById?)
 
@@ -14,19 +14,19 @@ data class Dokument(
     val dokumentInfoId: String,
 )
 
-data class PdlError(
+data class GraphQLError(
     val message: String,
-    val locations: List<PdlErrorLocation>,
+    val locations: List<ErrorLocation>,
     val path: List<String>?,
-    val extensions: PdlErrorExtension
+    val extensions: ErrorExtension
 )
 
-data class PdlErrorLocation(
+data class ErrorLocation(
     val line: Int?,
     val column: Int?
 )
 
-data class PdlErrorExtension(
+data class ErrorExtension(
     val code: String?,
     val classification: String
 )

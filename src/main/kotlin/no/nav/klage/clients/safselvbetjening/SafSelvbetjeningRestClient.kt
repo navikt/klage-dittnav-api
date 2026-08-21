@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono
 import java.nio.file.Path
 
 @Component
-class SafselvbetjeningRestClient(
+class SafSelvbetjeningRestClient(
     private val safselvbetjeningWebClient: WebClient,
     private val tokenUtil: TokenUtil
 ) {
@@ -47,7 +47,7 @@ class SafselvbetjeningRestClient(
                     )
                     .header(
                         HttpHeaders.AUTHORIZATION,
-                        "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafselvbetjeningScope()}"
+                        "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
                     )
                     .retrieve()
                     .onStatus(HttpStatusCode::isError) { response ->

@@ -27,7 +27,7 @@ fun OpenKlankeInput.toPDFInput(): PDFInput {
         type = type.name,
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
-        mellomnavn = navn.mellomnavn,
+        mellomnavn = null,
         etternavn = navn.etternavn,
         vedtak = vedtakFromDate(vedtakDate) ?: "Ikke angitt",
         begrunnelse = sanitizeText(fritekst),
