@@ -6,12 +6,14 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isAccessibleToUser
 import no.nav.klage.domain.jpa.isDeleted
 import no.nav.klage.domain.jpa.isFinalized
+import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Service
 
 @Service
 class ValidationService(
+    private val representasjonService: RepresentasjonService,
     private val tokenUtil: TokenUtil,
 ) {
 
@@ -22,10 +24,31 @@ class ValidationService(
 
     fun validateKlankeAccess(klanke: Klanke) {
         val currentLoggedInFnr = tokenUtil.getSubject()
-        validateKlankeAccessForIdentifikasjonsnummer(
-            klanke = klanke,
-            identifikasjonsnummer = currentLoggedInFnr
-        )
+        if (klanke.fullmektigFoedselsnummer != null && currentLoggedInFnr != klanke.foedselsnummer) {
+            if (currentLoggedInFnr != klanke.fullmektigFoedselsnummer) {
+                throw InvalidFullmaktException("Innlogget bruker er en annen enn oppgitt fullmektig.")
+            }
+            validateKlankeAccessForFullmektig(
+                klanke = klanke,
+            )
+        } else {
+            validateKlankeAccessForIdentifikasjonsnummer(
+                klanke = klanke,
+                identifikasjonsnummer = currentLoggedInFnr,
+            )
+        }
+    }
+
+    private fun validateKlankeAccessForFullmektig(
+        klanke: Klanke,
+    ) {
+        if (!representasjonService.representasjonIsValid(
+                representasjonsgiverFnr = klanke.foedselsnummer,
+                tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!
+            )
+        ) {
+            throw InvalidFullmaktException("Oppgitt fullmaktsforhold er ugyldig.")
+        }
     }
 
     fun validateKlankeAccessForIdentifikasjonsnummer(klanke: Klanke, identifikasjonsnummer: String) {

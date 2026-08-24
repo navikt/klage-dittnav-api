@@ -28,6 +28,31 @@ class KlageLookupClient(
     }
 
     @Retryable
+    fun getRepresentasjonsforhold(
+    ): RepresentasjonsforholdView {
+        return runWithTimingAndLogging {
+            val token = "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageLookupScope()}"
+
+            klageLookupWebClient.get()
+                .uri("/external/representasjon/kan-representere")
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    token,
+                )
+                .retrieve()
+                .onStatus(HttpStatusCode::isError) { response ->
+                    logErrorResponse(
+                        response = response,
+                        functionName = ::getRepresentasjonsforhold.name,
+                        logger = teamLogger,
+                    )
+                }
+                .bodyToMono<RepresentasjonsforholdView>()
+                .block() ?: throw RuntimeException("Could not get representasjonsdata")
+        }
+    }
+
+    @Retryable
     fun getPerson(fnr: String, tema: Tema?): PersonResponse {
         return runWithTimingAndLogging {
             klageLookupWebClient.post()

@@ -1,7 +1,10 @@
 package no.nav.klage.controller
 
+import no.nav.klage.clients.klagelookup.KlageLookupClient
+import no.nav.klage.clients.klagelookup.RepresentasjonsforholdView
 import no.nav.klage.clients.safselvbetjening.GetDokumentoversiktResponse
 import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningGraphQlClient
+import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.TokenUtil
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class DevController(
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
+    private val klageLookupClient: KlageLookupClient,
     private val safselvbetjeningGraphQlClient: SafSelvbetjeningGraphQlClient,
     private val tokenUtil: TokenUtil,
 ) {
@@ -30,6 +34,12 @@ class DevController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+    @ProtectedWithClaims(issuer = TOKEN_X, claimMap = ["acr=Level4"])
+    @GetMapping("/api/internal/representasjon")
+    fun getRepresentasjonsdata(): RepresentasjonsforholdView {
+        return klageLookupClient.getRepresentasjonsforhold()
     }
 
     @Unprotected

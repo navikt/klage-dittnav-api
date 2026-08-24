@@ -92,6 +92,12 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
+    fun handleInvalidFullmaktException(
+        ex: InvalidFullmaktException,
+    ): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
+
+    @ExceptionHandler
     fun handleInvalidIdent(
         ex: InvalidIdentException,
     ): ProblemDetail =

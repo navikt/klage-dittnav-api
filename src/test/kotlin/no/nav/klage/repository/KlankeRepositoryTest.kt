@@ -52,6 +52,7 @@ class KlankeRepositoryTest: PostgresIntegrationTestBase(){
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
 
@@ -85,6 +86,7 @@ class KlankeRepositoryTest: PostgresIntegrationTestBase(){
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.ANKE,
                 caseIsAtKA = true,
+                fullmektigFoedselsnummer = null,
             )
         )
 
@@ -118,6 +120,7 @@ class KlankeRepositoryTest: PostgresIntegrationTestBase(){
                 modifiedByUser = LocalDateTime.now(),
                 type = Type.ANKE,
                 caseIsAtKA = true,
+                fullmektigFoedselsnummer = null,
             )
         )
 

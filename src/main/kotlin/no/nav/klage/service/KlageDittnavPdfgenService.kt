@@ -30,11 +30,20 @@ class KlageDittnavPdfgenService(
 
     fun createKlankePdfWithFoersteside(input: OpenKlankeInput): ByteArray {
         validateIdent(input.foedselsnummer)
+        if (input.fullmektigFoedselsnummer != null) {
+            validateIdent(input.fullmektigFoedselsnummer)
+        }
+        val fullmektigNavn = if (input.fullmektigFoedselsnummer != null) {
+            klageLookupClient.getPerson(
+                fnr = input.fullmektigFoedselsnummer,
+                tema = innsendingsytelseToTema[input.innsendingsytelse]
+            ).sammensattNavn
+        } else null
 
         val klankePDF = if (input.type.name.contains("ETTERSENDELSE")) {
-            klageDittnavPdfgenClient.getEttersendelsePDF(input.toPDFInput())
+            klageDittnavPdfgenClient.getEttersendelsePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
         } else {
-            klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput())
+            klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
         }
 
         if (input.innsendingsytelse == Innsendingsytelse.LONNSGARANTI && input.type == Type.KLAGE) {
@@ -77,20 +86,25 @@ class KlageDittnavPdfgenService(
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
+
             Type.ANKE -> {
                 text = if (language == LanguageEnum.EN) "Appeal form" else "Ankeskjema"
                 arkivtittel = "Anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.SKJEMA
             }
+
             Type.KLAGE_ETTERSENDELSE -> {
-                text = if (language == LanguageEnum.EN) "Form for additional documentation for complaint" else "Ettersendelsesskjema"
+                text =
+                    if (language == LanguageEnum.EN) "Form for additional documentation for complaint" else "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til klage"
                 navSkjemaId = "NAV 90-00.08 K"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
             }
+
             Type.ANKE_ETTERSENDELSE -> {
-                text = if (language == LanguageEnum.EN) "Form for additional documentation for appeal" else "Ettersendelsesskjema"
+                text =
+                    if (language == LanguageEnum.EN) "Form for additional documentation for appeal" else "Ettersendelsesskjema"
                 arkivtittel = "Ettersendelse til anke"
                 navSkjemaId = "NAV 90-00.08 A"
                 foerstesidetype = Foerstesidetype.ETTERSENDELSE
