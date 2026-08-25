@@ -20,9 +20,11 @@ data class PDFInput (
     val ytelse: String,
     val sendesIPosten: Boolean,
     val ettersendelseTilKa: Boolean,
+    val fullmektigId: String?,
+    val fullmektigNavn: String?,
 )
 
-fun OpenKlankeInput.toPDFInput(): PDFInput {
+fun OpenKlankeInput.toPDFInput(fullmektigNavn: String?): PDFInput {
     return PDFInput(
         type = type.name,
         foedselsnummer = foedselsnummer,
@@ -36,6 +38,8 @@ fun OpenKlankeInput.toPDFInput(): PDFInput {
         ytelse = innsendingsytelse.nbName.replaceFirstChar { it.lowercase(Locale.getDefault()) },
         sendesIPosten = true,
         ettersendelseTilKa = caseIsAtKA ?: false,
+        fullmektigId = fullmektigFoedselsnummer,
+        fullmektigNavn = fullmektigNavn,
     )
 }
 

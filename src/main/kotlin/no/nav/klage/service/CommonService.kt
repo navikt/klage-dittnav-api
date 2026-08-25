@@ -10,7 +10,6 @@ import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
 import no.nav.klage.kafka.AivenKafkaProducer
-import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.repository.KlankeRepository
@@ -51,7 +50,7 @@ class CommonService(
         val klanke = input.toKlanke(foedselsnummer = currentUser)
         return klankeRepository.save(klanke).also {
             updateMetrics(input = klanke)
-        }.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(klanke.innsendingsytelse))
+        }.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(innsendingsytelse = klanke.innsendingsytelse, userIdent = klanke.foedselsnummer))
     }
 
     private fun createKlanke(input: KlankeMinimalInput, foedselsnummer: String): Klanke {
@@ -61,7 +60,7 @@ class CommonService(
         }
     }
 
-    fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke {
+    private fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke {
         return Klanke(
             foedselsnummer = foedselsnummer,
             fritekst = fritekst,
@@ -82,6 +81,7 @@ class CommonService(
             pdfDownloaded = null,
             type = type,
             caseIsAtKA = caseIsAtKA,
+            fullmektigFoedselsnummer = null,
         )
     }
 
@@ -106,6 +106,7 @@ class CommonService(
             pdfDownloaded = null,
             type = type,
             caseIsAtKA = caseIsAtKA,
+            fullmektigFoedselsnummer = null,
         )
     }
 
@@ -134,10 +135,10 @@ class CommonService(
             existingKlanke.caseIsAtKA = input.caseIsAtKA
         }
 
-        return existingKlanke?.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(existingKlanke.innsendingsytelse)) ?: createKlanke(
+        return existingKlanke?.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(innsendingsytelse = existingKlanke.innsendingsytelse, existingKlanke.foedselsnummer)) ?: createKlanke(
             input = input,
             foedselsnummer = currentUser,
-        ).toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(input.innsendingsytelse))
+        ).toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(innsendingsytelse = input.innsendingsytelse, userIdent = currentUser))
     }
 
     fun getLatestKlankeDraft(
@@ -271,7 +272,8 @@ class CommonService(
                     fagsaksystem = klanke.sak?.fagsaksystem!!,
                     fagsakid = klanke.sak?.fagsakid!!,
                 )
-            } else null
+            } else null,
+            fullmektigId = klanke.fullmektigFoedselsnummer,
         )
     }
 
@@ -295,6 +297,7 @@ class CommonService(
             hasVedlegg = klanke.vedlegg.isNotEmpty() || klanke.hasVedlegg,
             caseIsAtKA = klanke.caseIsAtKA,
             type = klanke.type,
+            fullmektigFoedselsnummer = klanke.fullmektigFoedselsnummer
         )
     }
 
@@ -302,7 +305,7 @@ class CommonService(
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = klanke)
-        return klanke.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(klanke.innsendingsytelse))
+        return klanke.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(klanke.innsendingsytelse, klanke.foedselsnummer))
     }
 
     fun validateAccess(klankeId: UUID) {
@@ -422,7 +425,10 @@ class CommonService(
         existingKlanke.modifiedByUser = LocalDateTime.now()
     }
 
-    private fun userHasDocumentForThisTema(innsendingsytelse: Innsendingsytelse): Boolean {
-        return safSelvbetjeningService.userHasDocumentForTema(innsendingsytelseToTema[innsendingsytelse]!!)
+    private fun userHasDocumentForThisTema(innsendingsytelse: Innsendingsytelse, userIdent: String): Boolean {
+        return safSelvbetjeningService.userHasDocumentForTema(
+            tema = innsendingsytelseToTema[innsendingsytelse]!!,
+            userIdent = userIdent,
+        )
     }
 }

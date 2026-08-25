@@ -108,7 +108,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
 
         val klage = klankeRepository.findAll().first()
         commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2)
-        every { safselvbetjeningService.userHasDocumentForTema(any()) } returns true
+        every { safselvbetjeningService.userHasDocumentForTema(any(), any()) } returns true
         val output = commonService.getKlanke(klankeId = klage.id).fritekst
 
         assertEquals(exampleFritekst2, output)
@@ -139,6 +139,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 modifiedByUser = exampleModifiedByUser,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
 
@@ -164,6 +165,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 modifiedByUser = exampleModifiedByUser2,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
     }
@@ -194,6 +196,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 modifiedByUser = now,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
 
@@ -218,6 +221,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 modifiedByUser = now,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
     }
@@ -242,6 +246,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 modifiedByUser = now,
                 type = Type.KLAGE,
                 caseIsAtKA = null,
+                fullmektigFoedselsnummer = null,
             )
         )
     }

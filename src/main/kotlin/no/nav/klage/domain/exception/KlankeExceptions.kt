@@ -5,6 +5,7 @@ class FileNotFoundInSafException(override val message: String = "Could not find 
 class KlankeIsDeletedException(override val message: String = "Klage/anke is deleted"): RuntimeException()
 class KlankeIsFinalizedException(override val message: String = "Klage/anke is already finalized"): RuntimeException()
 class InvalidIdentException(override val message: String = "Oppgitt identifikasjonsnummer er ugyldig."): RuntimeException()
+class InvalidFullmaktException(override val message: String = "Oppgitt fullmakt er ugyldig."): RuntimeException()
 
 class SectionedValidationErrorWithDetailsException(val title: String, val sections: List<ValidationSection>) :
     RuntimeException()
