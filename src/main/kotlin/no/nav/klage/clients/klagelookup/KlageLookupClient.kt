@@ -28,8 +28,7 @@ class KlageLookupClient(
     }
 
     @Retryable
-    fun getRepresentasjonsforhold(
-    ): RepresentasjonsforholdView {
+    fun getRepresentasjonsforhold(): RepresentasjonsforholdView {
         return runWithTimingAndLogging {
             val token = "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageLookupScope()}"
 

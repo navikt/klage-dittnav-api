@@ -26,7 +26,7 @@ class ValidationService(
         val currentLoggedInFnr = tokenUtil.getSubject()
         if (klanke.fullmektigFoedselsnummer != null && currentLoggedInFnr != klanke.foedselsnummer) {
             if (currentLoggedInFnr != klanke.fullmektigFoedselsnummer) {
-throw KlankeNotFoundException()
+                throw KlankeNotFoundException()
             }
             validateKlankeAccessForFullmektig(
                 klanke = klanke,
