@@ -8,15 +8,18 @@ import org.springframework.stereotype.Service
 class RepresentasjonService(
     private val klageLookupClient: KlageLookupClient,
 ) {
-    fun representasjonIsValid(representasjonsgiverFnr: String, tema: Tema): Boolean {
+    fun representasjonIsValid(
+        representasjonsgiverFnr: String,
+        tema: Tema,
+    ): Boolean {
         val usersRepresentasjonsforhold = klageLookupClient.getRepresentasjonsforhold()
         val vergemaalExists =
             usersRepresentasjonsforhold.vergemaal.find { it.vergehaver == representasjonsgiverFnr }?.skriverettigheter?.contains(
-                tema
+                tema,
             ) ?: false
         val fullmaktExists =
             usersRepresentasjonsforhold.fullmakt.find { it.fullmaktsgiver == representasjonsgiverFnr }?.skriverettigheter?.contains(
-                tema
+                tema,
             ) ?: false
 
         return vergemaalExists || fullmaktExists
@@ -28,12 +31,12 @@ class RepresentasjonService(
             addAll(
                 usersRepresentasjonsforhold.vergemaal
                     .filter { it.skriverettigheter.contains(tema) }
-                    .map { it.vergehaver }
+                    .map { it.vergehaver },
             )
             addAll(
                 usersRepresentasjonsforhold.fullmakt
                     .filter { it.skriverettigheter.contains(tema) }
-                    .map { it.fullmaktsgiver }
+                    .map { it.fullmaktsgiver },
             )
         }.toList()
     }

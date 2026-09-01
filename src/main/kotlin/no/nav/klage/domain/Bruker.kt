@@ -7,10 +7,10 @@ data class Bruker(
 
 data class Identifikator(
     val type: String = "FNR",
-    val identifikasjonsnummer: String
+    val identifikasjonsnummer: String,
 )
 
 data class Navn(
     val fornavn: String,
-    val etternavn: String
+    val etternavn: String,
 )

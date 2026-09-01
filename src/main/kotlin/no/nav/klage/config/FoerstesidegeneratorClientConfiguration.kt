@@ -6,15 +6,15 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class FoerstesidegeneratorClientConfiguration(private val webClientBuilder: WebClient.Builder) {
-
-    @Value("\${FOERSTESIDEGENERATOR_BASE_URL}")
+class FoerstesidegeneratorClientConfiguration(
+    private val webClientBuilder: WebClient.Builder,
+) {
+    @Value($$"${FOERSTESIDEGENERATOR_BASE_URL}")
     private lateinit var url: String
 
     @Bean
-    fun foerstesidegeneratorWebClient(): WebClient {
-        return webClientBuilder
+    fun foerstesidegeneratorWebClient(): WebClient =
+        webClientBuilder
             .baseUrl(url)
             .build()
-    }
 }

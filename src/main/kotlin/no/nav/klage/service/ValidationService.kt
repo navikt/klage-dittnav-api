@@ -1,7 +1,13 @@
 package no.nav.klage.service
 
 import no.nav.klage.domain.Type
-import no.nav.klage.domain.exception.*
+import no.nav.klage.domain.exception.InvalidFullmaktException
+import no.nav.klage.domain.exception.InvalidProperty
+import no.nav.klage.domain.exception.KlankeIsDeletedException
+import no.nav.klage.domain.exception.KlankeIsFinalizedException
+import no.nav.klage.domain.exception.KlankeNotFoundException
+import no.nav.klage.domain.exception.SectionedValidationErrorWithDetailsException
+import no.nav.klage.domain.exception.ValidationSection
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isAccessibleToUser
 import no.nav.klage.domain.jpa.isDeleted
@@ -16,7 +22,6 @@ class ValidationService(
     private val representasjonService: RepresentasjonService,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -39,25 +44,29 @@ class ValidationService(
         }
     }
 
-    private fun validateKlankeAccessForFullmektig(
-        klanke: Klanke,
-    ) {
+    private fun validateKlankeAccessForFullmektig(klanke: Klanke) {
         if (!representasjonService.representasjonIsValid(
                 representasjonsgiverFnr = klanke.foedselsnummer,
-                tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!
+                tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!,
             )
         ) {
             throw InvalidFullmaktException("Oppgitt fullmaktsforhold er ugyldig.")
         }
     }
 
-    fun validateKlankeAccessForIdentifikasjonsnummer(klanke: Klanke, identifikasjonsnummer: String) {
+    fun validateKlankeAccessForIdentifikasjonsnummer(
+        klanke: Klanke,
+        identifikasjonsnummer: String,
+    ) {
         if (!klanke.isAccessibleToUser(identifikasjonsnummer)) {
             throw KlankeNotFoundException()
         }
     }
 
-    fun checkKlankeStatus(klanke: Klanke, includeFinalized: Boolean = true) {
+    fun checkKlankeStatus(
+        klanke: Klanke,
+        includeFinalized: Boolean = true,
+    ) {
         if (klanke.isDeleted()) {
             throw KlankeIsDeletedException()
         }
@@ -71,10 +80,11 @@ class ValidationService(
         val validationErrors = mutableListOf<InvalidProperty>()
 
         if (klanke.fritekst == null && klanke.vedlegg.isEmpty()) {
-            validationErrors += InvalidProperty(
-                field = "fritekst,vedlegg",
-                reason = "Fritekst og/eller vedlegg må angis."
-            )
+            validationErrors +=
+                InvalidProperty(
+                    field = "fritekst,vedlegg",
+                    reason = "Fritekst og/eller vedlegg må angis.",
+                )
         }
 
         if (klanke.type == Type.KLAGE_ETTERSENDELSE && klanke.caseIsAtKA == null) {
@@ -87,8 +97,8 @@ class ValidationService(
             sectionList.add(
                 ValidationSection(
                     section = "klankedata",
-                    properties = validationErrors
-                )
+                    properties = validationErrors,
+                ),
             )
         }
 
@@ -96,16 +106,14 @@ class ValidationService(
             logger.warn("Validation error: {}", sectionList)
             throw SectionedValidationErrorWithDetailsException(
                 title = "Validation error",
-                sections = sectionList
+                sections = sectionList,
             )
         }
-
     }
 
-    private fun createMustBeFilledValidationError(variableName: String): InvalidProperty {
-        return InvalidProperty(
+    private fun createMustBeFilledValidationError(variableName: String): InvalidProperty =
+        InvalidProperty(
             field = variableName,
-            reason = "Må fylles ut."
+            reason = "Må fylles ut.",
         )
-    }
 }

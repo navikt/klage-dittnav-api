@@ -3,8 +3,10 @@ package no.nav.klage.service
 import no.nav.klage.clients.KlageDittnavPdfgenClient
 import no.nav.klage.clients.foerstesidegenerator.FoerstesidegeneratorClient
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
-import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.*
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Bruker.Brukertype
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Foerstesidetype
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest.Spraakkode
 import no.nav.klage.clients.klagelookup.KlageLookupClient
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.domain.LanguageEnum
@@ -27,34 +29,41 @@ class KlageDittnavPdfgenService(
     private val foerstesidegeneratorClient: FoerstesidegeneratorClient,
     private val klageLookupClient: KlageLookupClient,
 ) {
-
     fun createKlankePdfWithFoersteside(input: OpenKlankeInput): ByteArray {
         validateIdent(input.foedselsnummer)
         if (input.fullmektigFoedselsnummer != null) {
             validateIdent(input.fullmektigFoedselsnummer)
         }
-        val fullmektigNavn = if (input.fullmektigFoedselsnummer != null) {
-            klageLookupClient.getPerson(
-                fnr = input.fullmektigFoedselsnummer,
-                tema = innsendingsytelseToTema[input.innsendingsytelse]
-            ).sammensattNavn
-        } else null
+        val fullmektigNavn =
+            if (input.fullmektigFoedselsnummer != null) {
+                klageLookupClient
+                    .getPerson(
+                        fnr = input.fullmektigFoedselsnummer,
+                        tema = innsendingsytelseToTema[input.innsendingsytelse],
+                    ).sammensattNavn
+            } else {
+                null
+            }
 
-        val klankePDF = if (input.type.name.contains("ETTERSENDELSE")) {
-            klageDittnavPdfgenClient.getEttersendelsePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
-        } else {
-            klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
-        }
+        val klankePDF =
+            if (input.type.name.contains("ETTERSENDELSE")) {
+                klageDittnavPdfgenClient.getEttersendelsePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
+            } else {
+                klageDittnavPdfgenClient.getKlageAnkePDF(input.toPDFInput(fullmektigNavn = fullmektigNavn))
+            }
 
         if (input.innsendingsytelse == Innsendingsytelse.LONNSGARANTI && input.type == Type.KLAGE) {
             return klankePDF
         }
 
         val foerstesidePDF = foerstesidegeneratorClient.createFoersteside(input.toFoerstesideRequest())
-        return mergeDocuments(foerstesidePDF, klankePDF)
+        return mergeDocuments(foerstesidePDF = foerstesidePDF, klageAnkePDF = klankePDF)
     }
 
-    private fun mergeDocuments(foerstesidePDF: ByteArray, klageAnkePDF: ByteArray): ByteArray {
+    private fun mergeDocuments(
+        foerstesidePDF: ByteArray,
+        klageAnkePDF: ByteArray,
+    ): ByteArray {
         val merger = PDFMergerUtility()
         val outputStream = ByteArrayOutputStream()
         merger.destinationStream = outputStream
@@ -117,23 +126,25 @@ class KlageDittnavPdfgenService(
         }
         return FoerstesideRequest(
             spraakkode = Spraakkode.valueOf(language.name),
-            netsPostboks = "1400", //always
-            bruker = Bruker(
-                brukerId = foedselsnummer,
-                brukerType = Brukertype.PERSON
-            ),
+            netsPostboks = "1400", // always
+            bruker =
+                Bruker(
+                    brukerId = foedselsnummer,
+                    brukerType = Brukertype.PERSON,
+                ),
             tema = innsendingsytelseToTema[innsendingsytelse]!!.name,
             arkivtittel = arkivtittel,
             navSkjemaId = navSkjemaId,
             overskriftstittel = "$arkivtittel $navSkjemaId",
             dokumentlisteFoersteside = documentList,
             foerstesidetype = foerstesidetype,
-            enhetsnummer = getEnhetsnummerOverride(
-                type = type,
-                foedselsnummer = foedselsnummer,
-                innsendingsytelse = innsendingsytelse,
-                ettersendelseTilKa = caseIsAtKA
-            ),
+            enhetsnummer =
+                getEnhetsnummerOverride(
+                    type = type,
+                    foedselsnummer = foedselsnummer,
+                    innsendingsytelse = innsendingsytelse,
+                    ettersendelseTilKa = caseIsAtKA,
+                ),
         )
     }
 
@@ -141,7 +152,7 @@ class KlageDittnavPdfgenService(
         type: Type,
         foedselsnummer: String,
         innsendingsytelse: Innsendingsytelse,
-        ettersendelseTilKa: Boolean?
+        ettersendelseTilKa: Boolean?,
     ): String? {
         val personInfo = klageLookupClient.getPersonAsSystemUser(fnr = foedselsnummer)
 
@@ -151,11 +162,15 @@ class KlageDittnavPdfgenService(
 
         return if (shouldBeSentToKA(klageAnkeType = type, ettersendelseToKA = ettersendelseTilKa == true)) {
             innsendingsytelseToAnkeEnhet[innsendingsytelse]!!.navn
-        } else null
+        } else {
+            null
+        }
     }
 
-    private fun shouldBeSentToKA(klageAnkeType: Type, ettersendelseToKA: Boolean): Boolean {
-        return (klageAnkeType == Type.KLAGE_ETTERSENDELSE && ettersendelseToKA) ||
-                (klageAnkeType in listOf(Type.ANKE, Type.ANKE_ETTERSENDELSE))
-    }
+    private fun shouldBeSentToKA(
+        klageAnkeType: Type,
+        ettersendelseToKA: Boolean,
+    ): Boolean =
+        (klageAnkeType == Type.KLAGE_ETTERSENDELSE && ettersendelseToKA) ||
+            (klageAnkeType in listOf(Type.ANKE, Type.ANKE_ETTERSENDELSE))
 }

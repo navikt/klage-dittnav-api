@@ -8,8 +8,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.util.unit.DataSize
 
 @Configuration
-class AttachmentValidatorConfig(private val clamAvClient: ClamAvClient) {
-
+class AttachmentValidatorConfig(
+    private val clamAvClient: ClamAvClient,
+) {
     @Value($$"${maxAttachmentSize}")
     private lateinit var maxAttachmentSizeAsString: String
 
@@ -17,12 +18,10 @@ class AttachmentValidatorConfig(private val clamAvClient: ClamAvClient) {
     private lateinit var maxTotalSizeAsString: String
 
     @Bean
-    fun attachmentValidator(): AttachmentValidator {
-        return AttachmentValidator(
-            clamAvClient,
-            DataSize.parse(maxAttachmentSizeAsString),
-            DataSize.parse(maxTotalSizeAsString)
+    fun attachmentValidator(): AttachmentValidator =
+        AttachmentValidator(
+            clamAvClient = clamAvClient,
+            maxAttachmentSize = DataSize.parse(maxAttachmentSizeAsString),
+            maxTotalSize = DataSize.parse(maxTotalSizeAsString),
         )
-    }
-
 }

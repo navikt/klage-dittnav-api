@@ -17,44 +17,44 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-
 @ActiveProfiles("dbtest")
 @DataJpaTest
-class KlankeRepositoryTest: PostgresIntegrationTestBase(){
-
+class KlankeRepositoryTest : PostgresIntegrationTestBase() {
     @Autowired
     lateinit var klankeRepository: KlankeRepository
+
     @Autowired
     lateinit var testEntityManager: TestEntityManager
 
     @Test
     fun `persist klage works`() {
-
-        val klage = testEntityManager.persistAndFlush(
-            Klanke(
-                foedselsnummer = "12345678910",
-                fritekst = "hei",
-                status = KlageAnkeStatus.DRAFT,
-                userSaksnummer = "123",
-                journalpostId = "abc",
-                vedtakDate = LocalDate.now(),
-                sak = Sak(
-                    sakstype = "FAGSAK",
-                    fagsaksystem = "FS123",
-                    fagsakid = "int123",
+        val klage =
+            testEntityManager.persistAndFlush(
+                Klanke(
+                    foedselsnummer = "12345678910",
+                    fritekst = "hei",
+                    status = KlageAnkeStatus.DRAFT,
+                    userSaksnummer = "123",
+                    journalpostId = "abc",
+                    vedtakDate = LocalDate.now(),
+                    sak =
+                        Sak(
+                            sakstype = "FAGSAK",
+                            fagsaksystem = "FS123",
+                            fagsakid = "int123",
+                        ),
+                    language = LanguageEnum.NB,
+                    innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
+                    hasVedlegg = true,
+                    pdfDownloaded = null,
+                    vedlegg = mutableSetOf(),
+                    created = LocalDateTime.now(),
+                    modifiedByUser = LocalDateTime.now(),
+                    type = Type.KLAGE,
+                    caseIsAtKA = null,
+                    fullmektigFoedselsnummer = null,
                 ),
-                language = LanguageEnum.NB,
-                innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
-                hasVedlegg = true,
-                pdfDownloaded = null,
-                vedlegg = mutableSetOf(),
-                created = LocalDateTime.now(),
-                modifiedByUser = LocalDateTime.now(),
-                type = Type.KLAGE,
-                caseIsAtKA = null,
-                fullmektigFoedselsnummer = null,
             )
-        )
 
         testEntityManager.clear()
 
@@ -63,32 +63,33 @@ class KlankeRepositoryTest: PostgresIntegrationTestBase(){
 
     @Test
     fun `persist anke works`() {
-
-        val anke = testEntityManager.persistAndFlush(
-            Klanke(
-                foedselsnummer = "12345678910",
-                fritekst = "hei",
-                status = KlageAnkeStatus.DRAFT,
-                userSaksnummer = "123",
-                journalpostId = "abc",
-                vedtakDate = LocalDate.now(),
-                sak = Sak(
-                    sakstype = "FAGSAK",
-                    fagsaksystem = "FS123",
-                    fagsakid = "int123",
+        val anke =
+            testEntityManager.persistAndFlush(
+                Klanke(
+                    foedselsnummer = "12345678910",
+                    fritekst = "hei",
+                    status = KlageAnkeStatus.DRAFT,
+                    userSaksnummer = "123",
+                    journalpostId = "abc",
+                    vedtakDate = LocalDate.now(),
+                    sak =
+                        Sak(
+                            sakstype = "FAGSAK",
+                            fagsaksystem = "FS123",
+                            fagsakid = "int123",
+                        ),
+                    language = LanguageEnum.NB,
+                    innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
+                    hasVedlegg = true,
+                    pdfDownloaded = null,
+                    vedlegg = mutableSetOf(),
+                    created = LocalDateTime.now(),
+                    modifiedByUser = LocalDateTime.now(),
+                    type = Type.ANKE,
+                    caseIsAtKA = true,
+                    fullmektigFoedselsnummer = null,
                 ),
-                language = LanguageEnum.NB,
-                innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
-                hasVedlegg = true,
-                pdfDownloaded = null,
-                vedlegg = mutableSetOf(),
-                created = LocalDateTime.now(),
-                modifiedByUser = LocalDateTime.now(),
-                type = Type.ANKE,
-                caseIsAtKA = true,
-                fullmektigFoedselsnummer = null,
             )
-        )
 
         testEntityManager.clear()
 
@@ -97,48 +98,55 @@ class KlankeRepositoryTest: PostgresIntegrationTestBase(){
 
     @Test
     fun `persist vedlegg works`() {
-
-        val klanke = testEntityManager.persistAndFlush(
-            Klanke(
-                foedselsnummer = "12345678910",
-                fritekst = "hei",
-                status = KlageAnkeStatus.DRAFT,
-                userSaksnummer = "123",
-                journalpostId = "abc",
-                vedtakDate = LocalDate.now(),
-                sak = Sak(
-                    sakstype = "FAGSAK",
-                    fagsaksystem = "FS123",
-                    fagsakid = "int123",
+        val klanke =
+            testEntityManager.persistAndFlush(
+                Klanke(
+                    foedselsnummer = "12345678910",
+                    fritekst = "hei",
+                    status = KlageAnkeStatus.DRAFT,
+                    userSaksnummer = "123",
+                    journalpostId = "abc",
+                    vedtakDate = LocalDate.now(),
+                    sak =
+                        Sak(
+                            sakstype = "FAGSAK",
+                            fagsaksystem = "FS123",
+                            fagsakid = "int123",
+                        ),
+                    language = LanguageEnum.NB,
+                    innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
+                    hasVedlegg = true,
+                    pdfDownloaded = null,
+                    vedlegg = mutableSetOf(),
+                    created = LocalDateTime.now(),
+                    modifiedByUser = LocalDateTime.now(),
+                    type = Type.ANKE,
+                    caseIsAtKA = true,
+                    fullmektigFoedselsnummer = null,
                 ),
-                language = LanguageEnum.NB,
-                innsendingsytelse = Innsendingsytelse.ALDERSPENSJON,
-                hasVedlegg = true,
-                pdfDownloaded = null,
-                vedlegg = mutableSetOf(),
-                created = LocalDateTime.now(),
-                modifiedByUser = LocalDateTime.now(),
-                type = Type.ANKE,
-                caseIsAtKA = true,
-                fullmektigFoedselsnummer = null,
             )
-        )
 
         testEntityManager.clear()
 
-        val vedlegg = Vedlegg(
-            tittel = "v1",
-            ref = "rtneioarsl",
-            contentType = "pdf",
-            sizeInBytes = 512,
-        )
+        val vedlegg =
+            Vedlegg(
+                tittel = "v1",
+                ref = "rtneioarsl",
+                contentType = "pdf",
+                sizeInBytes = 512,
+            )
         klanke.vedlegg += vedlegg
         klankeRepository.save(klanke)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(klankeRepository.findAll().first().vedlegg.first()).isEqualTo(vedlegg)
+        assertThat(
+            klankeRepository
+                .findAll()
+                .first()
+                .vedlegg
+                .first(),
+        ).isEqualTo(vedlegg)
     }
-
 }

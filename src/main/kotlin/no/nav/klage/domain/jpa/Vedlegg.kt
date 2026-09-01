@@ -4,7 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "vedlegg")
@@ -20,7 +20,6 @@ class Vedlegg(
     @Column(name = "size_in_bytes")
     var sizeInBytes: Int,
 ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -30,11 +29,7 @@ class Vedlegg(
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode(): Int = id.hashCode()
 
-    override fun toString(): String {
-        return "Vedlegg(id=$id)"
-    }
+    override fun toString(): String = "Vedlegg(id=$id)"
 }

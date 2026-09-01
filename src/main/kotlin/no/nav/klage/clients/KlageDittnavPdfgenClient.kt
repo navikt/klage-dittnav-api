@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.client.bodyToMono
 class KlageDittnavPdfgenClient(
     private val klageDittnavPdfgenWebClient: WebClient,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -19,7 +18,8 @@ class KlageDittnavPdfgenClient(
 
     fun getKlageAnkePDF(input: PDFInput): ByteArray {
         logger.debug("Creating PDF for ${input.type}.")
-        return klageDittnavPdfgenWebClient.post()
+        return klageDittnavPdfgenWebClient
+            .post()
             .uri { it.path("/klageanke").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
@@ -30,7 +30,8 @@ class KlageDittnavPdfgenClient(
 
     fun getEttersendelsePDF(input: PDFInput): ByteArray {
         logger.debug("Creating PDF for ettersendelse for ${input.type}")
-        return klageDittnavPdfgenWebClient.post()
+        return klageDittnavPdfgenWebClient
+            .post()
             .uri { it.path("/ettersendelse").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)

@@ -6,9 +6,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class FileClientConfiguration(private val webClientBuilder: WebClient.Builder) {
-
-    @Value("\${FILE_BASE_URL}")
+class FileClientConfiguration(
+    private val webClientBuilder: WebClient.Builder,
+) {
+    @Value($$"${FILE_BASE_URL}")
     private lateinit var url: String
 
     @Bean

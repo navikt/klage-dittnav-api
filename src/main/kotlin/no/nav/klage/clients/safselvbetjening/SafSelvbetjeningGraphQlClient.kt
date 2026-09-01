@@ -1,6 +1,5 @@
 package no.nav.klage.clients.safselvbetjening
 
-
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getTeamLogger
@@ -14,13 +13,11 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 
-
 @Component
 class SafSelvbetjeningGraphQlClient(
     private val safselvbetjeningWebClient: WebClient,
-    private val tokenUtil: TokenUtil
+    private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -28,47 +25,43 @@ class SafSelvbetjeningGraphQlClient(
     }
 
     @Retryable
-    fun getJournalpostById(
-        journalpostId: String,
-    ): GetJournalpostByIdResponse {
-        val response = runWithTimingAndLogging {
-            safselvbetjeningWebClient.post()
-                .uri("graphql")
-                .header(
-                    HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
-                )
-                .bodyValue(getJournalpostByIdQuery(journalpostId = journalpostId))
-                .retrieve()
-                .onStatus(HttpStatusCode::isError) { response ->
-                    logErrorResponse(response, ::getJournalpostById.name, teamLogger)
-                }
-                .bodyToMono<GetJournalpostByIdResponse>()
-                .block() ?: throw RuntimeException("No connection to safselvbetjening")
-        }
+    fun getJournalpostById(journalpostId: String): GetJournalpostByIdResponse {
+        val response =
+            runWithTimingAndLogging {
+                safselvbetjeningWebClient
+                    .post()
+                    .uri("graphql")
+                    .header(
+                        HttpHeaders.AUTHORIZATION,
+                        "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}",
+                    ).bodyValue(getJournalpostByIdQuery(journalpostId = journalpostId))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError) { response ->
+                        logErrorResponse(response = response, functionName = ::getJournalpostById.name, logger = teamLogger)
+                    }.bodyToMono<GetJournalpostByIdResponse>()
+                    .block() ?: throw RuntimeException("No connection to safselvbetjening")
+            }
 
         return response
     }
 
     @Retryable
-    fun getDokumentoversikt(
-        ident: String,
-    ): GetDokumentoversiktResponse {
-        val response = runWithTimingAndLogging {
-            safselvbetjeningWebClient.post()
-                .uri("graphql")
-                .header(
-                    HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
-                )
-                .bodyValue(getDokumentoversiktQuery(ident = ident))
-                .retrieve()
-                .onStatus(HttpStatusCode::isError) { response ->
-                    logErrorResponse(response, ::getDokumentoversikt.name, teamLogger)
-                }
-                .bodyToMono<GetDokumentoversiktResponse>()
-                .block() ?: throw RuntimeException("No connection to safselvbetjening")
-        }
+    fun getDokumentoversikt(ident: String): GetDokumentoversiktResponse {
+        val response =
+            runWithTimingAndLogging {
+                safselvbetjeningWebClient
+                    .post()
+                    .uri("graphql")
+                    .header(
+                        HttpHeaders.AUTHORIZATION,
+                        "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}",
+                    ).bodyValue(getDokumentoversiktQuery(ident = ident))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError) { response ->
+                        logErrorResponse(response = response, functionName = ::getDokumentoversikt.name, logger = teamLogger)
+                    }.bodyToMono<GetDokumentoversiktResponse>()
+                    .block() ?: throw RuntimeException("No connection to safselvbetjening")
+            }
 
         return response
     }
@@ -83,12 +76,15 @@ class SafSelvbetjeningGraphQlClient(
         }
     }
 
-    fun logErrorResponse(response: ClientResponse, functionName: String, logger: Logger): Mono<RuntimeException> {
-        return response.bodyToMono(String::class.java).map {
+    fun logErrorResponse(
+        response: ClientResponse,
+        functionName: String,
+        logger: Logger,
+    ): Mono<RuntimeException> =
+        response.bodyToMono(String::class.java).map {
             val errorString =
                 "Got ${response.statusCode()} when requesting $functionName - response body: '$it'"
             logger.error(errorString)
             RuntimeException(errorString)
         }
-    }
 }

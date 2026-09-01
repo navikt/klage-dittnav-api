@@ -14,7 +14,6 @@ class BrukerService(
     private val klageLookupClient: KlageLookupClient,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -25,22 +24,26 @@ class BrukerService(
         return mapToBruker(personinfo)
     }
 
-    fun getBruker(fnr: String, tema: Tema?): Bruker {
+    fun getBruker(
+        fnr: String,
+        tema: Tema?,
+    ): Bruker {
         val personinfo = klageLookupClient.getPerson(fnr = fnr, tema = tema)
         return mapToBruker(personinfo)
     }
 
-    fun mapToBruker(personResponse: PersonResponse): Bruker {
-        return Bruker(
+    fun mapToBruker(personResponse: PersonResponse): Bruker =
+        Bruker(
             navn = personResponse.toBrukerNavn(),
-            folkeregisteridentifikator = Identifikator(
-                identifikasjonsnummer = personResponse.foedselsnr
-            )
+            folkeregisteridentifikator =
+                Identifikator(
+                    identifikasjonsnummer = personResponse.foedselsnr,
+                ),
         )
-    }
 
-    private fun PersonResponse.toBrukerNavn() = no.nav.klage.domain.Navn(
-        fornavn = fornavn,
-        etternavn = etternavn
-    )
+    private fun PersonResponse.toBrukerNavn() =
+        no.nav.klage.domain.Navn(
+            fornavn = fornavn,
+            etternavn = etternavn,
+        )
 }

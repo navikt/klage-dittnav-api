@@ -7,8 +7,9 @@ import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
-
+class KlageAnkeMetrics(
+    private val meterRegistry: MeterRegistry,
+) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -19,7 +20,10 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         private const val COUNTER_KLAGER_FINALIZED_TITLE = "klager_finalized_title"
     }
 
-    fun incrementKlankerInitialized(ytelse: String, type: Type) {
+    fun incrementKlankerInitialized(
+        ytelse: String,
+        type: Type,
+    ) {
         try {
             meterRegistry.counter(type.name.lowercase() + "r_initialized", "ytelse", ytelse).increment()
         } catch (e: Exception) {
@@ -27,7 +31,10 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
         }
     }
 
-    fun incrementKlankerFinalized(ytelse: String, type: Type) {
+    fun incrementKlankerFinalized(
+        ytelse: String,
+        type: Type,
+    ) {
         try {
             meterRegistry.counter(type.name.lowercase() + "r_finalized", "ytelse", ytelse).increment()
         } catch (e: Exception) {
@@ -58,5 +65,4 @@ class KlageAnkeMetrics(private val meterRegistry: MeterRegistry) {
             logger.warn("incrementKlageTitle failed", e)
         }
     }
-
 }

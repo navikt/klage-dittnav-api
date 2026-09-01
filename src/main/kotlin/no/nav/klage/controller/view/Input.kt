@@ -13,19 +13,19 @@ data class GetPersonInput(
 )
 
 data class StringInput(
-    val value: String
+    val value: String,
 )
 
 data class StringInputNullable(
-    val value: String?
+    val value: String?,
 )
 
 data class DateInput(
-    val value: LocalDate?
+    val value: LocalDate?,
 )
 
 data class BooleanInput(
-    val value: Boolean
+    val value: Boolean,
 )
 
 /**

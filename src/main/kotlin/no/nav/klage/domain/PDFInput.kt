@@ -5,9 +5,9 @@ import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
 
-data class PDFInput (
+data class PDFInput(
     val type: String,
     val foedselsnummer: String,
     val fornavn: String,
@@ -24,8 +24,8 @@ data class PDFInput (
     val fullmektigNavn: String?,
 )
 
-fun OpenKlankeInput.toPDFInput(fullmektigNavn: String?): PDFInput {
-    return PDFInput(
+fun OpenKlankeInput.toPDFInput(fullmektigNavn: String?): PDFInput =
+    PDFInput(
         type = type.name,
         foedselsnummer = foedselsnummer,
         fornavn = navn.fornavn,
@@ -41,16 +41,21 @@ fun OpenKlankeInput.toPDFInput(fullmektigNavn: String?): PDFInput {
         fullmektigId = fullmektigFoedselsnummer,
         fullmektigNavn = fullmektigNavn,
     )
-}
 
-private fun getSaksnummerString(userSaksnummer: String? = null, internalSaksnummer: String? = null): String {
-    return when {
+private fun getSaksnummerString(
+    userSaksnummer: String? = null,
+    internalSaksnummer: String? = null,
+): String =
+    when {
         userSaksnummer != null -> {
             "$userSaksnummer - Oppgitt av bruker"
         }
+
         internalSaksnummer != null -> {
             "$internalSaksnummer - Hentet fra internt system"
         }
-        else -> "Ikke angitt"
+
+        else -> {
+            "Ikke angitt"
+        }
     }
-}

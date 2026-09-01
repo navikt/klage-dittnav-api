@@ -6,7 +6,7 @@ import no.nav.klage.domain.Type
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class KlankeView(
     val id: UUID,
@@ -17,7 +17,7 @@ data class KlankeView(
     val journalpostId: String?,
     val finalizedDate: LocalDate?,
     val vedtakDate: LocalDate?,
-    //For compability
+    // For compability
     val enhetsnummer: String? = null,
     val userSaksnummer: String?,
     val internalSaksnummer: String?,

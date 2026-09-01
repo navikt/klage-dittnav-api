@@ -14,13 +14,11 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 
-
 @Component
 class KlageLookupClient(
     private val klageLookupWebClient: WebClient,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -28,83 +26,78 @@ class KlageLookupClient(
     }
 
     @Retryable
-    fun getRepresentasjonsforhold(): RepresentasjonsforholdView {
-        return runWithTimingAndLogging {
+    fun getRepresentasjonsforhold(): RepresentasjonsforholdView =
+        runWithTimingAndLogging {
             val token = "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageLookupScope()}"
 
-            klageLookupWebClient.get()
+            klageLookupWebClient
+                .get()
                 .uri("/external/representasjon/kan-representere")
                 .header(
                     HttpHeaders.AUTHORIZATION,
                     token,
-                )
-                .retrieve()
+                ).retrieve()
                 .onStatus(HttpStatusCode::isError) { response ->
                     logErrorResponse(
                         response = response,
                         functionName = ::getRepresentasjonsforhold.name,
                         logger = teamLogger,
                     )
-                }
-                .bodyToMono<RepresentasjonsforholdView>()
+                }.bodyToMono<RepresentasjonsforholdView>()
                 .block() ?: throw RuntimeException("Could not get representasjonsdata")
         }
-    }
 
     @Retryable
-    fun getPerson(fnr: String, tema: Tema?): PersonResponse {
-        return runWithTimingAndLogging {
-            klageLookupWebClient.post()
+    fun getPerson(
+        fnr: String,
+        tema: Tema?,
+    ): PersonResponse =
+        runWithTimingAndLogging {
+            klageLookupWebClient
+                .post()
                 .uri("/external/person")
                 .bodyValue(
                     GetPersonRequest(
                         fnr = fnr,
                         tema = tema,
-                    )
-                )
-                .header(
+                    ),
+                ).header(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageLookupScope()}",
-                )
-                .retrieve()
+                ).retrieve()
                 .onStatus(HttpStatusCode::isError) { response ->
                     logErrorResponse(
                         response = response,
                         functionName = ::getPerson.name,
                         logger = teamLogger,
                     )
-                }
-                .bodyToMono<PersonResponse>()
+                }.bodyToMono<PersonResponse>()
                 .block() ?: throw RuntimeException("Could not get person. Response was null.")
         }
-    }
 
     @Retryable
-    fun getPersonAsSystemUser(fnr: String): PersonWithAllInfoResponse {
-        return runWithTimingAndLogging {
-            klageLookupWebClient.post()
+    fun getPersonAsSystemUser(fnr: String): PersonWithAllInfoResponse =
+        runWithTimingAndLogging {
+            klageLookupWebClient
+                .post()
                 .uri("/person")
                 .bodyValue(
                     GetPersonAsSystemUserRequest(
                         fnr = fnr,
-                    )
-                )
-                .header(
+                    ),
+                ).header(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer ${tokenUtil.getAppAccessTokenWithKlageLookupScope()}",
-                )
-                .retrieve()
+                ).retrieve()
                 .onStatus(HttpStatusCode::isError) { response ->
                     logErrorResponse(
                         response = response,
                         functionName = ::getPersonAsSystemUser.name,
                         logger = teamLogger,
                     )
-                }
-                .bodyToMono<PersonWithAllInfoResponse>()
+                }.bodyToMono<PersonWithAllInfoResponse>()
                 .block() ?: throw RuntimeException("Could not get person as system user. Response was null.")
         }
-    }
 
     private fun <T> runWithTimingAndLogging(block: () -> T): T {
         val start = System.currentTimeMillis()
@@ -116,12 +109,15 @@ class KlageLookupClient(
         }
     }
 
-    fun logErrorResponse(response: ClientResponse, functionName: String, logger: Logger): Mono<RuntimeException> {
-        return response.bodyToMono(String::class.java).map {
+    fun logErrorResponse(
+        response: ClientResponse,
+        functionName: String,
+        logger: Logger,
+    ): Mono<RuntimeException> =
+        response.bodyToMono(String::class.java).map {
             val errorString =
                 "Got ${response.statusCode()} when requesting $functionName - response body: '$it'"
             logger.error(errorString)
             RuntimeException(errorString)
         }
-    }
 }

@@ -11,10 +11,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class AivenKafkaProducer(
-    private val aivenKafkaTemplate: KafkaTemplate<String, String>
+    private val aivenKafkaTemplate: KafkaTemplate<String, String>,
 ) {
-
-    @Value("\${KAFKA_TOPIC}")
+    @Value($$"${KAFKA_TOPIC}")
     lateinit var topic: String
 
     companion object {

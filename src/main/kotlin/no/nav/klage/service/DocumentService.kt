@@ -14,7 +14,6 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
-
 @Service
 class DocumentService(
     private val safSelvbetjeningRestClient: SafSelvbetjeningRestClient,
@@ -28,23 +27,28 @@ class DocumentService(
     fun getPathToDocumentPdfAndTitle(journalpostId: String): Pair<Path, String> {
         val journalpostInfo = safSelvbetjeningGraphQlClient.getJournalpostById(journalpostId = journalpostId)
 
-        if (journalpostInfo.data?.journalpostById?.dokumenter.isNullOrEmpty()) {
+        if (journalpostInfo.data
+                ?.journalpostById
+                ?.dokumenter
+                .isNullOrEmpty()
+        ) {
             throw FileNotFoundInSafException("Fikk ikke hentet fil fra arkivet.")
         }
 
-        val journalpostIdAndDokumentInfoIdList = journalpostInfo.data!!.journalpostById!!.dokumenter.map {
-            journalpostId to it.dokumentInfoId
-        }
+        val journalpostIdAndDokumentInfoIdList =
+            journalpostInfo.data!!.journalpostById!!.dokumenter.map {
+                journalpostId to it.dokumentInfoId
+            }
 
         return mergeJournalfoerteDocuments(
             documentsToMerge = journalpostIdAndDokumentInfoIdList,
-            title = journalpostInfo.data.journalpostById!!.tittel
+            title = journalpostInfo.data.journalpostById!!.tittel,
         )
     }
 
     private fun mergeJournalfoerteDocuments(
         documentsToMerge: List<Pair<String, String>>,
-        title: String = "merged document"
+        title: String = "merged document",
     ): Pair<Path, String> {
         if (documentsToMerge.isEmpty()) {
             throw RuntimeException("No documents to merge")
@@ -61,27 +65,31 @@ class DocumentService(
 
         merger.destinationFileName = pathToMergedDocument.toString()
 
-        val documentsWithPaths = documentsToMerge.map {
-            val tmpFile = Files.createTempFile("", "")
-            it to tmpFile
-        }
+        val documentsWithPaths =
+            documentsToMerge.map {
+                val tmpFile = Files.createTempFile("", "")
+                it to tmpFile
+            }
 
-        Flux.fromIterable(documentsWithPaths).flatMapSequential { (document, path) ->
-            safSelvbetjeningRestClient.downloadDocumentAsMono(
-                journalpostId = document.first,
-                dokumentInfoId = document.second,
-                pathToFile = path,
-            )
-        }.collectList().block()
+        Flux
+            .fromIterable(documentsWithPaths)
+            .flatMapSequential { (document, path) ->
+                safSelvbetjeningRestClient.downloadDocumentAsMono(
+                    journalpostId = document.first,
+                    dokumentInfoId = document.second,
+                    pathToFile = path,
+                )
+            }.collectList()
+            .block()
 
         documentsWithPaths.forEach { (_, path) ->
             merger.addSource(path.toFile())
         }
 
-        //just under 256 MB before using file system
+        // just under 256 MB before using file system
         merger.mergeDocuments(getMixedMemorySettingsForPDFBox(250_000_000))
 
-        //clean tmp files that were downloaded from SAF
+        // clean tmp files that were downloaded from SAF
         try {
             documentsWithPaths.forEach { (_, pathToTmpFile) ->
                 pathToTmpFile.toFile().delete()
@@ -94,7 +102,6 @@ class DocumentService(
     }
 
     @Throws(IOException::class)
-    private fun getMixedMemorySettingsForPDFBox(bytes: Long): RandomAccessStreamCache.StreamCacheCreateFunction {
-        return MemoryUsageSetting.setupMixed(bytes).streamCache
-    }
+    private fun getMixedMemorySettingsForPDFBox(bytes: Long): RandomAccessStreamCache.StreamCacheCreateFunction =
+        MemoryUsageSetting.setupMixed(bytes).streamCache
 }
