@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class IgnoreController {
-
     /*
     Handle request for favicon without token support throwing error.
     Maybe we shouldn't expose the BE API to the internet at all? Could be that the new rewrite of FE will use

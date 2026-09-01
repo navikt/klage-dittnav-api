@@ -21,28 +21,29 @@ class ClamAvClientTest {
         assertTrue(clamClient.hasVirus(ByteArray(0)))
     }
 
-
     @Language("json")
-    private val okResponse = """
-            [
-              {
-                "filename": "testfile",
-                "result": "OK",
-                "virus": "",
-                "error": ""
-              }
-            ]
+    private val okResponse =
+        """
+        [
+          {
+            "filename": "testfile",
+            "result": "OK",
+            "virus": "",
+            "error": ""
+          }
+        ]
         """.trimIndent()
 
     @Language("json")
-    private val foundResponse = """
-            [
-              {
-                "filename": "testfile",
-                "result": "FOUND",
-                "virus": "Eicar-Test-Signature",
-                "error": ""
-              }
-            ]
+    private val foundResponse =
+        """
+        [
+          {
+            "filename": "testfile",
+            "result": "FOUND",
+            "virus": "Eicar-Test-Signature",
+            "error": ""
+          }
+        ]
         """.trimIndent()
 }

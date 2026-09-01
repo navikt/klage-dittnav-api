@@ -23,14 +23,13 @@ import org.springframework.http.ProblemDetail
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.util.*
+import java.util.UUID
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableMockOAuth2Server
 @SpringBootTest(classes = [Application::class])
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE, printOnlyOnFailure = false)
 class ApiTest {
-
     @Autowired
     lateinit var mockMvc: MockMvc
 
@@ -40,73 +39,87 @@ class ApiTest {
     @MockkBean
     lateinit var brukerService: BrukerService
 
-    private val FNR = "12345678910"
+    private val fnr = "12345678910"
 
     val mapper = jacksonObjectMapper()
 
     @BeforeEach
     fun beforeEach() {
-        every { brukerService.getCurrentBruker() } returns Bruker(
-            navn = Navn(fornavn = "", etternavn = ""),
-            folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
-        )
+        every { brukerService.getCurrentBruker() } returns
+            Bruker(
+                navn = Navn(fornavn = "", etternavn = ""),
+                folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
+            )
     }
 
     @Test
     fun `kall på GET bruker med gyldig token gir forventet resultat`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
-                .header("Authorization", "Bearer ${tokenxToken(fnr = FNR)}")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isOk)
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/api/bruker")
+                    .header("Authorization", "Bearer ${tokenxToken(fnr = fnr)}")
+                    .contentType(MediaType.APPLICATION_JSON),
+            ).andExpect(MockMvcResultMatchers.status().isOk)
     }
 
     @Test
     fun `kall på GET bruker uten token gir forventet resultat`() {
-        val response = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val response =
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .get("/api/bruker")
+                        .contentType(MediaType.APPLICATION_JSON),
+                ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
         assertEquals("No authorization header in request", problemOutput.detail)
     }
 
     @Test
     fun `kall på GET bruker med utgått token gir forventet resultat`() {
-        val token = tokenxToken(fnr = FNR, expiry = -100)
+        val token = tokenxToken(fnr = fnr, expiry = -100)
 
-        val response = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
-                .header("Authorization", "Bearer $token")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val response =
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .get("/api/bruker")
+                        .header("Authorization", "Bearer $token")
+                        .contentType(MediaType.APPLICATION_JSON),
+                ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
         assertEquals("No valid token found in validation context", problemOutput.detail)
     }
 
     @Test
     fun `kall på GET bruker med feil audience i token gir forventet resultat`() {
-        val token = tokenxToken(fnr = FNR, audience = "noeheltannet")
+        val token = tokenxToken(fnr = fnr, audience = "noeheltannet")
 
-        val response = mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/bruker")
-                .header("Authorization", "Bearer $token")
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
+        val response =
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .get("/api/bruker")
+                        .header("Authorization", "Bearer $token")
+                        .contentType(MediaType.APPLICATION_JSON),
+                ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
         val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
         assertEquals("No valid token found in validation context", problemOutput.detail)
     }
 
     @Test
     fun contextLoads() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/internal/health"))
+        mockMvc
+            .perform(MockMvcRequestBuilders.get("/internal/health"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("UP"))
     }
 
     @Test
     fun apiDocsLoads() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs?group=internal"))
+        mockMvc
+            .perform(MockMvcRequestBuilders.get("/v3/api-docs?group=internal"))
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
 
@@ -115,25 +128,26 @@ class ApiTest {
         audience: String = "klage-dittnav-api-client-id",
         issuerId: String = "tokenx",
         clientId: String = "klage-dittnav-client-id",
-        claims: Map<String, Any> = mapOf(
-            "acr" to "Level4",
-            "idp" to "idporten",
-            "client_id" to clientId,
-            "pid" to fnr,
-        ),
+        claims: Map<String, Any> =
+            mapOf(
+                "acr" to "Level4",
+                "idp" to "idporten",
+                "client_id" to clientId,
+                "pid" to fnr,
+            ),
         expiry: Long = 3600,
-    ): String {
-
-        return server.issueToken(
-            issuerId,
-            clientId,
-            DefaultOAuth2TokenCallback(
+    ): String =
+        server
+            .issueToken(
                 issuerId = issuerId,
-                subject = UUID.randomUUID().toString(),
-                audience = listOf(audience),
-                claims = claims,
-                expiry = expiry,
-            )
-        ).serialize()
-    }
+                clientId = clientId,
+                tokenCallback =
+                    DefaultOAuth2TokenCallback(
+                        issuerId = issuerId,
+                        subject = UUID.randomUUID().toString(),
+                        audience = listOf(audience),
+                        claims = claims,
+                        expiry = expiry,
+                    ),
+            ).serialize()
 }

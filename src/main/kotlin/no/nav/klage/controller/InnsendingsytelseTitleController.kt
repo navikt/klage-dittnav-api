@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "titles")
 @RequestMapping("/api/innsendingsytelser")
 class InnsendingsytelseTitleController {
-
     @GetMapping("/{language}")
-    fun getTitlesForLanguage(@PathVariable language: LanguageEnum): Map<String, String> {
+    fun getTitlesForLanguage(
+        @PathVariable language: LanguageEnum,
+    ): Map<String, String> {
         val output = mutableMapOf<String, String>()
 
         Innsendingsytelse.entries.forEach {

@@ -12,8 +12,7 @@ import org.springframework.web.filter.CorsFilter
 
 @Configuration
 class CorsGlobalConfiguration {
-
-    @Value("\${allowed.origins}")
+    @Value($$"${allowed.origins}")
     private lateinit var allowedOrigins: List<String>
 
     @Bean

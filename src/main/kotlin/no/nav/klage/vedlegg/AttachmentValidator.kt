@@ -1,7 +1,12 @@
 package no.nav.klage.vedlegg
 
 import no.nav.klage.clients.clamav.ClamAvClient
-import no.nav.klage.domain.exception.*
+import no.nav.klage.domain.exception.AttachmentEncryptedException
+import no.nav.klage.domain.exception.AttachmentFilenameTooLongException
+import no.nav.klage.domain.exception.AttachmentHasVirusException
+import no.nav.klage.domain.exception.AttachmentIsEmptyException
+import no.nav.klage.domain.exception.AttachmentTooLargeException
+import no.nav.klage.domain.exception.AttachmentTotalTooLargeException
 import no.nav.klage.util.getLogger
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
@@ -14,9 +19,8 @@ import org.springframework.util.unit.DataSize
 class AttachmentValidator(
     private val clamAvClient: ClamAvClient,
     private val maxAttachmentSize: DataSize,
-    private val maxTotalSize: DataSize
+    private val maxTotalSize: DataSize,
 ) {
-
     companion object {
         private const val MAX_FILENAME_LENGTH = 196
 
@@ -24,7 +28,11 @@ class AttachmentValidator(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun validateAttachment(bytes: ByteArray, totalSizeExistingAttachments: Int, filename: String) {
+    fun validateAttachment(
+        bytes: ByteArray,
+        totalSizeExistingAttachments: Int,
+        filename: String,
+    ) {
         logger.debug("Validating attachment.")
 
         if (bytes.isEmpty()) {
@@ -37,7 +45,7 @@ class AttachmentValidator(
             throw AttachmentFilenameTooLongException()
         }
 
-        //This limit could be set other places (Spring), since we only upload one at a time
+        // This limit could be set other places (Spring), since we only upload one at a time
         if (bytes.size > maxAttachmentSize.toBytes()) {
             logger.warn("Attachment too large")
             throw AttachmentTooLargeException()
@@ -62,15 +70,12 @@ class AttachmentValidator(
         logger.debug("Validation successful.")
     }
 
-    private fun isEncrypted(bytes: ByteArray): Boolean {
-        return try {
+    private fun isEncrypted(bytes: ByteArray): Boolean =
+        try {
             val temp: PDDocument = Loader.loadPDF(RandomAccessReadBuffer(bytes))
             temp.close()
             false
         } catch (ipe: InvalidPasswordException) {
             true
         }
-    }
-
-
 }

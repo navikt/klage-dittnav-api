@@ -12,29 +12,32 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class FileClient(
     private val fileWebClient: WebClient,
-    private val tokenUtil: TokenUtil
+    private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    //TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
+    // TODO: Rydd i fillageret nå som vi ikke lenger trenger det.
 
-    fun uploadVedleggFile(vedleggFile: ByteArray, tittel: String): String {
+    fun uploadVedleggFile(
+        vedleggFile: ByteArray,
+        tittel: String,
+    ): String {
         logger.debug("Uploading attachment to file store.")
 
         val bodyBuilder = MultipartBodyBuilder()
         bodyBuilder.part("file", vedleggFile).filename(tittel)
-        val response = fileWebClient
-            .post()
-            .uri { it.path("/attachment").build() }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
-            .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
-            .retrieve()
-            .bodyToMono<VedleggResponse>()
-            .block()
+        val response =
+            fileWebClient
+                .post()
+                .uri { it.path("/attachment").build() }
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
+                .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                .retrieve()
+                .bodyToMono<VedleggResponse>()
+                .block()
 
         requireNotNull(response)
 
@@ -42,10 +45,10 @@ class FileClient(
         return response.id
     }
 
-
     fun getVedleggFile(vedleggRef: String): ByteArray {
         logger.debug("Fetching vedlegg file with vedlegg ref {}", vedleggRef)
-        return fileWebClient.get()
+        return fileWebClient
+            .get()
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .retrieve()
@@ -55,12 +58,14 @@ class FileClient(
 
     fun deleteVedleggFile(vedleggRef: String): Boolean {
         logger.debug("Deleting vedlegg file with vedlegg ref {}", vedleggRef)
-        val deletedInFileStore = fileWebClient.delete()
-            .uri { it.path("/attachment/{id}").build(vedleggRef) }
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
-            .retrieve()
-            .bodyToMono<Boolean>()
-            .block()!!
+        val deletedInFileStore =
+            fileWebClient
+                .delete()
+                .uri { it.path("/attachment/{id}").build(vedleggRef) }
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
+                .retrieve()
+                .bodyToMono<Boolean>()
+                .block()!!
 
         if (deletedInFileStore) {
             logger.debug("Attachment successfully deleted in file store.")
@@ -72,4 +77,6 @@ class FileClient(
     }
 }
 
-data class VedleggResponse(val id: String)
+data class VedleggResponse(
+    val id: String,
+)

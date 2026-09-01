@@ -3,8 +3,16 @@ package no.nav.klage.service
 import no.nav.klage.clients.klagelookup.KlageLookupClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
-import no.nav.klage.controller.view.*
-import no.nav.klage.domain.*
+import no.nav.klage.controller.view.KlankeFullInput
+import no.nav.klage.controller.view.KlankeMinimalInput
+import no.nav.klage.controller.view.KlankeView
+import no.nav.klage.controller.view.OpenKlankeInput
+import no.nav.klage.controller.view.toKlankeView
+import no.nav.klage.domain.Event
+import no.nav.klage.domain.KlageAnkeStatus
+import no.nav.klage.domain.LanguageEnum
+import no.nav.klage.domain.Navn
+import no.nav.klage.domain.Type
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
@@ -13,13 +21,17 @@ import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.repository.KlankeRepository
-import no.nav.klage.util.*
+import no.nav.klage.util.TokenUtil
+import no.nav.klage.util.getLogger
+import no.nav.klage.util.klageAnkeIsLonnskompensasjon
+import no.nav.klage.util.sanitizeText
+import no.nav.klage.util.vedtakFromDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 @Transactional
@@ -36,9 +48,7 @@ class CommonService(
     private val tokenUtil: TokenUtil,
     private val safSelvbetjeningService: SafSelvbetjeningService,
 ) {
-
     companion object {
-
         private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -48,31 +58,43 @@ class CommonService(
     fun createKlanke(input: KlankeFullInput): KlankeView {
         val currentUser = tokenUtil.getSubject()
         val klanke = input.toKlanke(foedselsnummer = currentUser)
-        return klankeRepository.save(klanke).also {
-            updateMetrics(input = klanke)
-        }.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(innsendingsytelse = klanke.innsendingsytelse, userIdent = klanke.foedselsnummer))
+        return klankeRepository
+            .save(klanke)
+            .also {
+                updateMetrics(input = klanke)
+            }.toKlankeView(
+                userHasDocumentForThisTema =
+                    userHasDocumentForThisTema(
+                        innsendingsytelse = klanke.innsendingsytelse,
+                        userIdent = klanke.foedselsnummer,
+                    ),
+            )
     }
 
-    private fun createKlanke(input: KlankeMinimalInput, foedselsnummer: String): Klanke {
+    private fun createKlanke(
+        input: KlankeMinimalInput,
+        foedselsnummer: String,
+    ): Klanke {
         val klanke = input.toKlanke(foedselsnummer = foedselsnummer)
         return klankeRepository.save(klanke).also {
             updateMetrics(input = klanke)
         }
     }
 
-    private fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke {
-        return Klanke(
+    private fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke =
+        Klanke(
             foedselsnummer = foedselsnummer,
             fritekst = fritekst,
             status = KlageAnkeStatus.DRAFT,
             userSaksnummer = userSaksnummer,
             journalpostId = null,
             vedtakDate = vedtakDate,
-            sak = Sak(
-                fagsakid = internalSaksnummer,
-                sakstype = sakSakstype,
-                fagsaksystem = sakFagsaksystem,
-            ),
+            sak =
+                Sak(
+                    fagsakid = internalSaksnummer,
+                    sakstype = sakSakstype,
+                    fagsaksystem = sakFagsaksystem,
+                ),
             language = language,
             innsendingsytelse = innsendingsytelse,
             hasVedlegg = hasVedlegg,
@@ -83,21 +105,21 @@ class CommonService(
             caseIsAtKA = caseIsAtKA,
             fullmektigFoedselsnummer = null,
         )
-    }
 
-    private fun KlankeMinimalInput.toKlanke(foedselsnummer: String): Klanke {
-        return Klanke(
+    private fun KlankeMinimalInput.toKlanke(foedselsnummer: String): Klanke =
+        Klanke(
             foedselsnummer = foedselsnummer,
             fritekst = null,
             status = KlageAnkeStatus.DRAFT,
             userSaksnummer = null,
             journalpostId = null,
             vedtakDate = null,
-            sak = Sak(
-                fagsakid = internalSaksnummer,
-                sakstype = sakSakstype,
-                fagsaksystem = sakFagsaksystem,
-            ),
+            sak =
+                Sak(
+                    fagsakid = internalSaksnummer,
+                    sakstype = sakSakstype,
+                    fagsaksystem = sakFagsaksystem,
+                ),
             language = LanguageEnum.NB,
             innsendingsytelse = innsendingsytelse,
             hasVedlegg = false,
@@ -108,37 +130,51 @@ class CommonService(
             caseIsAtKA = caseIsAtKA,
             fullmektigFoedselsnummer = null,
         )
-    }
 
     private fun updateMetrics(input: Klanke) {
-        val temaReport = if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
-            LOENNSKOMPENSASJON_GRAFANA_TEMA
-        } else {
-            innsendingsytelseToTema[input.innsendingsytelse]!!.name
-        }
+        val temaReport =
+            if (klageAnkeIsLonnskompensasjon(innsendingsytelse = input.innsendingsytelse)) {
+                LOENNSKOMPENSASJON_GRAFANA_TEMA
+            } else {
+                innsendingsytelseToTema[input.innsendingsytelse]!!.name
+            }
         klageAnkeMetrics.incrementKlankerInitialized(
             ytelse = temaReport,
-            type = input.type
+            type = input.type,
         )
     }
 
     fun getDraftOrCreateKlanke(input: KlankeMinimalInput): KlankeView {
         val currentUser = tokenUtil.getSubject()
-        val existingKlanke = getLatestKlankeDraft(
-            foedselsnummer = currentUser,
-            internalSaksnummer = input.internalSaksnummer,
-            innsendingsytelse = input.innsendingsytelse,
-            type = input.type,
-        )
+        val existingKlanke =
+            getLatestKlankeDraft(
+                foedselsnummer = currentUser,
+                internalSaksnummer = input.internalSaksnummer,
+                innsendingsytelse = input.innsendingsytelse,
+                type = input.type,
+            )
 
         if (existingKlanke != null && input.caseIsAtKA != null) {
             existingKlanke.caseIsAtKA = input.caseIsAtKA
         }
 
-        return existingKlanke?.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(innsendingsytelse = existingKlanke.innsendingsytelse, existingKlanke.foedselsnummer)) ?: createKlanke(
-            input = input,
-            foedselsnummer = currentUser,
-        ).toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(innsendingsytelse = input.innsendingsytelse, userIdent = currentUser))
+        return existingKlanke?.toKlankeView(
+            userHasDocumentForThisTema =
+                userHasDocumentForThisTema(
+                    innsendingsytelse = existingKlanke.innsendingsytelse,
+                    userIdent = existingKlanke.foedselsnummer,
+                ),
+        )
+            ?: createKlanke(
+                input = input,
+                foedselsnummer = currentUser,
+            ).toKlankeView(
+                userHasDocumentForThisTema =
+                    userHasDocumentForThisTema(
+                        innsendingsytelse = input.innsendingsytelse,
+                        userIdent = currentUser,
+                    ),
+            )
     }
 
     fun getLatestKlankeDraft(
@@ -146,21 +182,19 @@ class CommonService(
         internalSaksnummer: String?,
         innsendingsytelse: Innsendingsytelse,
         type: Type,
-    ): Klanke? {
-
-        return klankeRepository.findByFoedselsnummerAndStatusAndType(
-            fnr = foedselsnummer,
-            status = KlageAnkeStatus.DRAFT,
-            type = type
-        )
-            .filter {
+    ): Klanke? =
+        klankeRepository
+            .findByFoedselsnummerAndStatusAndType(
+                fnr = foedselsnummer,
+                status = KlageAnkeStatus.DRAFT,
+                type = type,
+            ).filter {
                 if (internalSaksnummer != null) {
                     it.innsendingsytelse == innsendingsytelse && it.sak?.fagsakid == internalSaksnummer
                 } else {
                     it.innsendingsytelse == innsendingsytelse
                 }
             }.maxByOrNull { it.modifiedByUser }
-    }
 
     fun finalizeKlanke(klankeId: UUID): LocalDateTime {
         val existingKlanke = klankeRepository.findById(klankeId).get()
@@ -191,11 +225,12 @@ class CommonService(
     }
 
     private fun registerFinalizedMetrics(klanke: Klanke) {
-        val temaReport = if (klageAnkeIsLonnskompensasjon(klanke.innsendingsytelse)) {
-            LOENNSKOMPENSASJON_GRAFANA_TEMA
-        } else {
-            innsendingsytelseToTema[klanke.innsendingsytelse]!!.name
-        }
+        val temaReport =
+            if (klageAnkeIsLonnskompensasjon(klanke.innsendingsytelse)) {
+                LOENNSKOMPENSASJON_GRAFANA_TEMA
+            } else {
+                innsendingsytelseToTema[klanke.innsendingsytelse]!!.name
+            }
 
         if (klanke.type == Type.KLAGE) {
             klageAnkeMetrics.incrementKlagerFinalizedTitle(klanke.innsendingsytelse)
@@ -230,25 +265,25 @@ class CommonService(
 
         validationService.validateKlanke(klanke = existingKlanke)
 
-        klageDittnavPdfgenService.createKlankePdfWithFoersteside(
-            createPdfWithFoerstesideInput(klanke = existingKlanke)
-        ).also {
-            setPdfDownloadedWithoutAccessValidation(
-                klankeId = klankeId,
-                pdfDownloaded = LocalDateTime.now()
-            )
-            return it
-        }
+        klageDittnavPdfgenService
+            .createKlankePdfWithFoersteside(
+                createPdfWithFoerstesideInput(klanke = existingKlanke),
+            ).also {
+                setPdfDownloadedWithoutAccessValidation(
+                    klankeId = klankeId,
+                    pdfDownloaded = LocalDateTime.now(),
+                )
+                return it
+            }
     }
 
-    private fun createAggregatedKlanke(
-        klanke: Klanke
-    ): AggregatedKlageAnke {
+    private fun createAggregatedKlanke(klanke: Klanke): AggregatedKlageAnke {
         val vedtak = vedtakFromDate(klanke.vedtakDate) ?: "Ikke angitt"
-        val userInKlanke = klageLookupClient.getPerson(
-            fnr = klanke.foedselsnummer,
-            tema = innsendingsytelseToTema[klanke.innsendingsytelse]
-        )
+        val userInKlanke =
+            klageLookupClient.getPerson(
+                fnr = klanke.foedselsnummer,
+                tema = innsendingsytelseToTema[klanke.innsendingsytelse],
+            )
 
         return AggregatedKlageAnke(
             id = klanke.id.toString(),
@@ -266,28 +301,33 @@ class CommonService(
             klageAnkeType = AggregatedKlageAnke.KlageAnkeType.valueOf(klanke.type.name),
             ettersendelseTilKa = klanke.caseIsAtKA,
             innsendingsYtelseId = klanke.innsendingsytelse.id,
-            sak = if (klanke.sak?.fagsakid != null && klanke.sak?.sakstype != null && klanke.sak?.fagsaksystem != null) {
-                AggregatedKlageAnke.Sak(
-                    sakstype = klanke.sak?.sakstype!!,
-                    fagsaksystem = klanke.sak?.fagsaksystem!!,
-                    fagsakid = klanke.sak?.fagsakid!!,
-                )
-            } else null,
+            sak =
+                if (klanke.sak?.fagsakid != null && klanke.sak?.sakstype != null && klanke.sak?.fagsaksystem != null) {
+                    AggregatedKlageAnke.Sak(
+                        sakstype = klanke.sak?.sakstype!!,
+                        fagsaksystem = klanke.sak?.fagsaksystem!!,
+                        fagsakid = klanke.sak?.fagsakid!!,
+                    )
+                } else {
+                    null
+                },
             fullmektigId = klanke.fullmektigFoedselsnummer,
         )
     }
 
     fun createPdfWithFoerstesideInput(klanke: Klanke): OpenKlankeInput {
-        val brukerInKlanke = klageLookupClient.getPerson(
-            fnr = klanke.foedselsnummer,
-            tema = innsendingsytelseToTema[klanke.innsendingsytelse]
-        )
+        val brukerInKlanke =
+            klageLookupClient.getPerson(
+                fnr = klanke.foedselsnummer,
+                tema = innsendingsytelseToTema[klanke.innsendingsytelse],
+            )
         return OpenKlankeInput(
             foedselsnummer = klanke.foedselsnummer,
-            navn = Navn(
-                fornavn = brukerInKlanke.fornavn,
-                etternavn = brukerInKlanke.etternavn,
-            ),
+            navn =
+                Navn(
+                    fornavn = brukerInKlanke.fornavn,
+                    etternavn = brukerInKlanke.etternavn,
+                ),
             fritekst = klanke.fritekst ?: "",
             userSaksnummer = klanke.userSaksnummer,
             internalSaksnummer = klanke.sak?.fagsakid,
@@ -297,7 +337,7 @@ class CommonService(
             hasVedlegg = klanke.vedlegg.isNotEmpty() || klanke.hasVedlegg,
             caseIsAtKA = klanke.caseIsAtKA,
             type = klanke.type,
-            fullmektigFoedselsnummer = klanke.fullmektigFoedselsnummer
+            fullmektigFoedselsnummer = klanke.fullmektigFoedselsnummer,
         )
     }
 
@@ -305,7 +345,13 @@ class CommonService(
         val klanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = klanke)
-        return klanke.toKlankeView(userHasDocumentForThisTema = userHasDocumentForThisTema(klanke.innsendingsytelse, klanke.foedselsnummer))
+        return klanke.toKlankeView(
+            userHasDocumentForThisTema =
+                userHasDocumentForThisTema(
+                    innsendingsytelse = klanke.innsendingsytelse,
+                    userIdent = klanke.foedselsnummer,
+                ),
+        )
     }
 
     fun validateAccess(klankeId: UUID) {
@@ -315,12 +361,15 @@ class CommonService(
 
     fun getJournalpostId(klankeId: UUID): String? {
         val klanke = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(klanke, false)
+        validationService.checkKlankeStatus(klanke = klanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = klanke)
         return klanke.journalpostId
     }
 
-    fun updateFritekst(klankeId: UUID, fritekst: String): LocalDateTime {
+    fun updateFritekst(
+        klankeId: UUID,
+        fritekst: String,
+    ): LocalDateTime {
         val existingKlanke = getAndValidateAccess(klankeId = klankeId)
 
         existingKlanke.fritekst = fritekst
@@ -329,7 +378,10 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun updateUserSaksnummer(klankeId: UUID, userSaksnummer: String?): LocalDateTime {
+    fun updateUserSaksnummer(
+        klankeId: UUID,
+        userSaksnummer: String?,
+    ): LocalDateTime {
         val existingKlanke = getAndValidateAccess(klankeId = klankeId)
 
         existingKlanke.userSaksnummer = userSaksnummer
@@ -338,7 +390,10 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun updateVedtakDate(klankeId: UUID, vedtakDate: LocalDate?): LocalDateTime {
+    fun updateVedtakDate(
+        klankeId: UUID,
+        vedtakDate: LocalDate?,
+    ): LocalDateTime {
         val existingKlanke = getAndValidateAccess(klankeId = klankeId)
 
         existingKlanke.vedtakDate = vedtakDate
@@ -359,7 +414,10 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun updateJournalpostIdWithoutValidation(klankeId: UUID, journalpostId: String): LocalDateTime {
+    fun updateJournalpostIdWithoutValidation(
+        klankeId: UUID,
+        journalpostId: String,
+    ): LocalDateTime {
         val existingKlanke = klankeRepository.findById(klankeId).get()
 
         existingKlanke.journalpostId = journalpostId
@@ -375,7 +433,10 @@ class CommonService(
         return existingKlanke
     }
 
-    fun updateHasVedlegg(klankeId: UUID, hasVedlegg: Boolean): LocalDateTime {
+    fun updateHasVedlegg(
+        klankeId: UUID,
+        hasVedlegg: Boolean,
+    ): LocalDateTime {
         val existingKlanke = getAndValidateAccess(klankeId = klankeId)
 
         existingKlanke.hasVedlegg = hasVedlegg
@@ -384,7 +445,10 @@ class CommonService(
         return existingKlanke.modifiedByUser
     }
 
-    fun updateStatusWithoutValidation(klankeId: UUID, status: KlageAnkeStatus): LocalDateTime {
+    fun updateStatusWithoutValidation(
+        klankeId: UUID,
+        status: KlageAnkeStatus,
+    ): LocalDateTime {
         val existingKlanke = klankeRepository.findById(klankeId).get()
 
         existingKlanke.status = status
@@ -405,7 +469,10 @@ class CommonService(
         return klanke.journalpostId
     }
 
-    fun setJournalpostIdWithoutValidation(klankeId: UUID, journalpostId: String) {
+    fun setJournalpostIdWithoutValidation(
+        klankeId: UUID,
+        journalpostId: String,
+    ) {
         updateJournalpostIdWithoutValidation(klankeId, journalpostId)
         kafkaInternalEventService.publishEvent(
             Event(
@@ -413,11 +480,14 @@ class CommonService(
                 name = "journalpostId",
                 id = klankeId.toString(),
                 data = journalpostId,
-            )
+            ),
         )
     }
 
-    fun setPdfDownloadedWithoutAccessValidation(klankeId: UUID, pdfDownloaded: LocalDateTime?) {
+    fun setPdfDownloadedWithoutAccessValidation(
+        klankeId: UUID,
+        pdfDownloaded: LocalDateTime?,
+    ) {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
 
@@ -425,10 +495,12 @@ class CommonService(
         existingKlanke.modifiedByUser = LocalDateTime.now()
     }
 
-    private fun userHasDocumentForThisTema(innsendingsytelse: Innsendingsytelse, userIdent: String): Boolean {
-        return safSelvbetjeningService.userHasDocumentForTema(
+    private fun userHasDocumentForThisTema(
+        innsendingsytelse: Innsendingsytelse,
+        userIdent: String,
+    ): Boolean =
+        safSelvbetjeningService.userHasDocumentForTema(
             tema = innsendingsytelseToTema[innsendingsytelse]!!,
             userIdent = userIdent,
         )
-    }
 }

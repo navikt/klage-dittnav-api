@@ -13,24 +13,25 @@ class FoerstesidegeneratorClient(
     private val foerstesidegeneratorWebClient: WebClient,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val teamLogger = getTeamLogger()
     }
 
     fun createFoersteside(foerstesideRequest: FoerstesideRequest): ByteArray {
-        val result = runCatching {
-            foerstesidegeneratorWebClient.post()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()}")
-                .bodyValue(foerstesideRequest)
-                .retrieve()
-                .bodyToMono<ByteArray>()
-                .block()
-        }.onFailure {
-            teamLogger.error("Could not fetch foersteside", it)
-            throw RuntimeException("Could not fetch foersteside. See team-logs for more information.")
-        }
+        val result =
+            runCatching {
+                foerstesidegeneratorWebClient
+                    .post()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()}")
+                    .bodyValue(foerstesideRequest)
+                    .retrieve()
+                    .bodyToMono<ByteArray>()
+                    .block()
+            }.onFailure {
+                teamLogger.error("Could not fetch foersteside", it)
+                throw RuntimeException("Could not fetch foersteside. See team-logs for more information.")
+            }
         return result.getOrNull() ?: throw RuntimeException("Null response when getting foersteside")
     }
 }

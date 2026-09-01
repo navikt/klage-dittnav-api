@@ -30,7 +30,6 @@ class DevController(
     private val safselvbetjeningGraphQlClient: SafSelvbetjeningGraphQlClient,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -38,15 +37,13 @@ class DevController(
 
     @ProtectedWithClaims(issuer = TOKEN_X, claimMap = ["acr=Level4"])
     @GetMapping("/api/internal/representasjon")
-    fun getRepresentasjonsdata(): RepresentasjonsforholdView {
-        return klageLookupClient.getRepresentasjonsforhold()
-    }
+    fun getRepresentasjonsdata(): RepresentasjonsforholdView = klageLookupClient.getRepresentasjonsforhold()
 
     @Unprotected
     @ResponseBody
     @PostMapping("/internal/uinnloggetklage")
     fun generateFoersteside(
-        @RequestBody input: OpenKlankeInput
+        @RequestBody input: OpenKlankeInput,
     ): ResponseEntity<ByteArray> {
         logger.debug("Test create foersteside with input: {}", input)
         val data = klageDittnavPdfgenService.createKlankePdfWithFoersteside(input)
@@ -57,13 +54,12 @@ class DevController(
         return ResponseEntity(
             data,
             responseHeaders,
-            HttpStatus.OK
+            HttpStatus.OK,
         )
     }
 
     @GetMapping("/internal/tema-list")
     @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
-    fun getDokumentoversikt(): GetDokumentoversiktResponse {
-        return safselvbetjeningGraphQlClient.getDokumentoversikt(ident = tokenUtil.getSubject())
-    }
+    fun getDokumentoversikt(): GetDokumentoversiktResponse =
+        safselvbetjeningGraphQlClient.getDokumentoversikt(ident = tokenUtil.getSubject())
 }

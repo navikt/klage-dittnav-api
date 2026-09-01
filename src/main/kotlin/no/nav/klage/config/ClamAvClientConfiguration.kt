@@ -6,15 +6,15 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class ClamAvClientConfiguration(private val webClientBuilder: WebClient.Builder) {
-
-    @Value("\${CLAM_AV_URL}")
+class ClamAvClientConfiguration(
+    private val webClientBuilder: WebClient.Builder,
+) {
+    @Value($$"${CLAM_AV_URL}")
     private lateinit var url: String
 
     @Bean
-    fun clamAvWebClient(): WebClient {
-        return webClientBuilder
+    fun clamAvWebClient(): WebClient =
+        webClientBuilder
             .baseUrl(url)
             .build()
-    }
 }

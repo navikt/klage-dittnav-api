@@ -6,7 +6,11 @@ import no.nav.klage.controller.view.GetPersonInput
 import no.nav.klage.domain.Bruker
 import no.nav.klage.service.BrukerService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "bruker")
@@ -16,12 +20,10 @@ class BrukerController(
     private val brukerService: BrukerService,
 ) {
     @GetMapping("/bruker")
-    fun getBruker(): Bruker {
-        return brukerService.getCurrentBruker()
-    }
+    fun getBruker(): Bruker = brukerService.getCurrentBruker()
 
     @PostMapping("/bruker")
-    fun getPerson(@RequestBody input: GetPersonInput): Bruker {
-        return brukerService.getBruker(fnr = input.fnr, tema = input.tema)
-    }
+    fun getPerson(
+        @RequestBody input: GetPersonInput,
+    ): Bruker = brukerService.getBruker(fnr = input.fnr, tema = input.tema)
 }

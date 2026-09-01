@@ -11,7 +11,7 @@ import no.nav.klage.vedlegg.Image2PDF
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
+import java.util.UUID
 
 @Service
 @Transactional
@@ -23,13 +23,15 @@ class VedleggService(
     private val fileClient: FileClient,
     private val validationService: ValidationService,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun addKlankevedlegg(klankeId: UUID, multipart: MultipartFile): Vedlegg {
+    fun addKlankevedlegg(
+        klankeId: UUID,
+        multipart: MultipartFile,
+    ): Vedlegg {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
         validationService.validateKlankeAccess(klanke = existingKlanke)
@@ -43,26 +45,31 @@ class VedleggService(
             totalSizeExistingAttachments = existingKlanke.attachmentsTotalSize(),
             filename = tittel,
         )
-        //Convert attachment (if not already pdf)
+        // Convert attachment (if not already pdf)
         val convertedBytes = image2PDF.convert(bytes)
 
         val vedleggIdInFileStore = fileClient.uploadVedleggFile(vedleggFile = convertedBytes, tittel = tittel)
 
-        val vedleggToSave = Vedlegg(
-            tittel = tittel,
-            ref = vedleggIdInFileStore,
-            contentType = multipart.contentType.toString(),
-            sizeInBytes = bytes.size,
-        )
-        existingKlanke.vedlegg.add(
-            vedleggToSave
-        ).also {
-            vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
-        }
+        val vedleggToSave =
+            Vedlegg(
+                tittel = tittel,
+                ref = vedleggIdInFileStore,
+                contentType = multipart.contentType.toString(),
+                sizeInBytes = bytes.size,
+            )
+        existingKlanke.vedlegg
+            .add(
+                vedleggToSave,
+            ).also {
+                vedleggMetrics.registerTimeUsed(System.currentTimeMillis() - timeStart)
+            }
         return vedleggToSave
     }
 
-    fun deleteVedleggFromKlanke(klankeId: UUID, vedleggId: UUID): Boolean {
+    fun deleteVedleggFromKlanke(
+        klankeId: UUID,
+        vedleggId: UUID,
+    ): Boolean {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(existingKlanke)
         validationService.validateKlankeAccess(klanke = existingKlanke)
@@ -78,9 +85,12 @@ class VedleggService(
         }
     }
 
-    fun getVedleggFromKlanke(klankeId: UUID, vedleggId: UUID): ByteArray {
+    fun getVedleggFromKlanke(
+        klankeId: UUID,
+        vedleggId: UUID,
+    ): ByteArray {
         val existingKlanke = klankeRepository.findById(klankeId).get()
-        validationService.checkKlankeStatus(existingKlanke, false)
+        validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = existingKlanke)
 
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
@@ -91,7 +101,6 @@ class VedleggService(
             throw RuntimeException("No vedlegg found with this id: $vedleggId")
         }
     }
-
 
     private fun Klanke.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
 }

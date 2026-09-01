@@ -1,6 +1,5 @@
 package no.nav.klage.service
 
-
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.clients.klagelookup.KlageLookupClient
@@ -23,7 +22,6 @@ import java.time.LocalDateTime
 @ActiveProfiles("dbtest")
 @DataJpaTest
 class CommonServiceTest : PostgresIntegrationTestBase() {
-
     private val exampleFritekst = "fritekst"
     private val exampleFritekst2 = "fritekst2"
     private val fnr = "12345678910"
@@ -48,31 +46,33 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     fun cleanup() {
         klankeRepository.deleteAll()
 
-        commonService = CommonService(
-            klankeRepository = klankeRepository,
-            validationService = mockk(relaxed = true),
-            kafkaInternalEventService = mockk(),
-            klageAnkeMetrics = mockk(),
-            vedleggMetrics = mockk(),
-            kafkaProducer = mockk(),
-            klageDittnavPdfgenService = mockk(),
-            documentService = mockk(),
-            klageLookupClient = klageLookupClient,
-            tokenUtil = mockk(),
-            safSelvbetjeningService = safselvbetjeningService,
-        )
+        commonService =
+            CommonService(
+                klankeRepository = klankeRepository,
+                validationService = mockk(relaxed = true),
+                kafkaInternalEventService = mockk(),
+                klageAnkeMetrics = mockk(),
+                vedleggMetrics = mockk(),
+                kafkaProducer = mockk(),
+                klageDittnavPdfgenService = mockk(),
+                documentService = mockk(),
+                klageLookupClient = klageLookupClient,
+                tokenUtil = mockk(),
+                safSelvbetjeningService = safselvbetjeningService,
+            )
     }
 
     @Test
     fun `should get correct klage based on internalSaksnummer and innsendingsytelse`() {
         createDBEntries()
 
-        val hentetKlage = commonService.getLatestKlankeDraft(
-            foedselsnummer = "12345678910",
-            internalSaksnummer = exampleInternalSaksnummer,
-            innsendingsytelse = exampleInnsendingsytelse,
-            type = Type.KLAGE,
-        )
+        val hentetKlage =
+            commonService.getLatestKlankeDraft(
+                foedselsnummer = "12345678910",
+                internalSaksnummer = exampleInternalSaksnummer,
+                innsendingsytelse = exampleInnsendingsytelse,
+                type = Type.KLAGE,
+            )
         assertEquals(innsendingsytelseAndInternalSaksnummer, hentetKlage?.fritekst)
     }
 
@@ -80,12 +80,13 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     fun `should get correct klage based on no internalSaksnummer and innsendingsytelse`() {
         createDBEntries()
 
-        val hentetKlage = commonService.getLatestKlankeDraft(
-            foedselsnummer = "12345678910",
-            internalSaksnummer = null,
-            innsendingsytelse = exampleInnsendingsytelse,
-            type = Type.KLAGE,
-        )
+        val hentetKlage =
+            commonService.getLatestKlankeDraft(
+                foedselsnummer = "12345678910",
+                internalSaksnummer = null,
+                innsendingsytelse = exampleInnsendingsytelse,
+                type = Type.KLAGE,
+            )
         assertEquals(innsendingsytelseAndNoInternalSaksnummer, hentetKlage?.fritekst)
     }
 
@@ -93,12 +94,13 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     fun `should get latest klage`() {
         createTwoSimilarEntries()
 
-        val hentetKlage = commonService.getLatestKlankeDraft(
-            foedselsnummer = "12345678910",
-            internalSaksnummer = exampleInternalSaksnummer,
-            innsendingsytelse = exampleInnsendingsytelse,
-            type = Type.KLAGE,
-        )
+        val hentetKlage =
+            commonService.getLatestKlankeDraft(
+                foedselsnummer = "12345678910",
+                internalSaksnummer = exampleInternalSaksnummer,
+                innsendingsytelse = exampleInnsendingsytelse,
+                type = Type.KLAGE,
+            )
         assertEquals(exampleFritekst2, hentetKlage?.fritekst)
     }
 
@@ -108,7 +110,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
 
         val klage = klankeRepository.findAll().first()
         commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2)
-        every { safselvbetjeningService.userHasDocumentForTema(any(), any()) } returns true
+        every { safselvbetjeningService.userHasDocumentForTema(tema = any(), userIdent = any()) } returns true
         val output = commonService.getKlanke(klankeId = klage.id).fritekst
 
         assertEquals(exampleFritekst2, output)
@@ -125,11 +127,12 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                sak = Sak(
-                    sakstype = "FAGSAK",
-                    fagsaksystem = "FS123",
-                    fagsakid = exampleInternalSaksnummer,
-                ),
+                sak =
+                    Sak(
+                        sakstype = "FAGSAK",
+                        fagsaksystem = "FS123",
+                        fagsakid = exampleInternalSaksnummer,
+                    ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -140,7 +143,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 type = Type.KLAGE,
                 caseIsAtKA = null,
                 fullmektigFoedselsnummer = null,
-            )
+            ),
         )
 
         klankeRepository.save(
@@ -151,11 +154,12 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                sak = Sak(
-                    sakstype = "FAGSAK",
-                    fagsaksystem = "FS123",
-                    fagsakid = exampleInternalSaksnummer,
-                ),
+                sak =
+                    Sak(
+                        sakstype = "FAGSAK",
+                        fagsaksystem = "FS123",
+                        fagsakid = exampleInternalSaksnummer,
+                    ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -166,14 +170,14 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 type = Type.KLAGE,
                 caseIsAtKA = null,
                 fullmektigFoedselsnummer = null,
-            )
+            ),
         )
     }
 
     private fun createDBEntries() {
         var now = LocalDateTime.now()
 
-        //innsendingsytelse and internalSaksnummer
+        // innsendingsytelse and internalSaksnummer
         klankeRepository.save(
             Klanke(
                 foedselsnummer = fnr,
@@ -182,11 +186,12 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 userSaksnummer = null,
                 journalpostId = null,
                 vedtakDate = null,
-                sak = Sak(
-                    sakstype = "FAGSAK",
-                    fagsaksystem = "FS123",
-                    fagsakid = exampleInternalSaksnummer,
-                ),
+                sak =
+                    Sak(
+                        sakstype = "FAGSAK",
+                        fagsaksystem = "FS123",
+                        fagsakid = exampleInternalSaksnummer,
+                    ),
                 language = LanguageEnum.NB,
                 innsendingsytelse = exampleInnsendingsytelse,
                 hasVedlegg = false,
@@ -197,12 +202,12 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 type = Type.KLAGE,
                 caseIsAtKA = null,
                 fullmektigFoedselsnummer = null,
-            )
+            ),
         )
 
         now = LocalDateTime.now()
 
-        //innsendingsytelse and no internalSaksnummer
+        // innsendingsytelse and no internalSaksnummer
         klankeRepository.save(
             Klanke(
                 foedselsnummer = fnr,
@@ -222,7 +227,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 type = Type.KLAGE,
                 caseIsAtKA = null,
                 fullmektigFoedselsnummer = null,
-            )
+            ),
         )
     }
 
@@ -247,8 +252,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 type = Type.KLAGE,
                 caseIsAtKA = null,
                 fullmektigFoedselsnummer = null,
-            )
+            ),
         )
     }
-
 }

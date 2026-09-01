@@ -20,9 +20,8 @@ import java.nio.file.Path
 @Component
 class SafSelvbetjeningRestClient(
     private val safselvbetjeningWebClient: WebClient,
-    private val tokenUtil: TokenUtil
+    private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -35,42 +34,47 @@ class SafSelvbetjeningRestClient(
         dokumentInfoId: String,
         variantFormat: String = "ARKIV",
         pathToFile: Path,
-    ): Mono<Void> {
-        return try {
+    ): Mono<Void> =
+        try {
             runWithTimingAndLogging {
-                val flux: Flux<DataBuffer> = safselvbetjeningWebClient.get()
-                    .uri(
-                        "/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}",
-                        journalpostId,
-                        dokumentInfoId,
-                        variantFormat
-                    )
-                    .header(
-                        HttpHeaders.AUTHORIZATION,
-                        "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}"
-                    )
-                    .retrieve()
-                    .onStatus(HttpStatusCode::isError) { response ->
-                        logErrorResponse(response, ::downloadDocumentAsMono.name, teamLogger)
-                    }
-                    .bodyToFlux(DataBuffer::class.java)
+                val flux: Flux<DataBuffer> =
+                    safselvbetjeningWebClient
+                        .get()
+                        .uri(
+                            "/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}",
+                            journalpostId,
+                            dokumentInfoId,
+                            variantFormat,
+                        ).header(
+                            HttpHeaders.AUTHORIZATION,
+                            "Bearer ${tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()}",
+                        ).retrieve()
+                        .onStatus(HttpStatusCode::isError) { response ->
+                            logErrorResponse(response = response, functionName = ::downloadDocumentAsMono.name, logger = teamLogger)
+                        }.bodyToFlux(DataBuffer::class.java)
                 DataBufferUtils.write(flux, pathToFile)
             }
         } catch (badRequest: WebClientResponseException.BadRequest) {
-            logger.warn("Got a 400 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
+            logger.warn(
+                "Got a 400 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat",
+            )
             throw badRequest
         } catch (unauthorized: WebClientResponseException.Unauthorized) {
-            logger.warn("Got a 401 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
+            logger.warn(
+                "Got a 401 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat",
+            )
             throw unauthorized
         } catch (forbidden: WebClientResponseException.Forbidden) {
-            logger.warn("Got a 403 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
+            logger.warn(
+                "Got a 403 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat",
+            )
             throw forbidden
         } catch (notFound: WebClientResponseException.NotFound) {
-            logger.warn("Got a 404 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
+            logger.warn(
+                "Got a 404 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat",
+            )
             throw notFound
         }
-    }
-
 
     fun <T> runWithTimingAndLogging(block: () -> T): T {
         val start = System.currentTimeMillis()
@@ -82,12 +86,15 @@ class SafSelvbetjeningRestClient(
         }
     }
 
-    fun logErrorResponse(response: ClientResponse, functionName: String, logger: Logger): Mono<RuntimeException> {
-        return response.bodyToMono(String::class.java).map {
+    fun logErrorResponse(
+        response: ClientResponse,
+        functionName: String,
+        logger: Logger,
+    ): Mono<RuntimeException> =
+        response.bodyToMono(String::class.java).map {
             val errorString =
                 "Got ${response.statusCode()} when requesting $functionName - response body: '$it'"
             logger.error(errorString)
             RuntimeException(errorString)
         }
-    }
 }

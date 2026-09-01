@@ -3,29 +3,27 @@ package no.nav.klage.domain
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.codec.ServerSentEvent
 
-data class Event (
+data class Event(
     val klageAnkeId: String,
     val name: String,
     val id: String,
     val data: String,
 )
 
-fun jsonToEvent(json: String?): Event =
-    jacksonObjectMapper().readValue(json, Event::class.java)
+fun jsonToEvent(json: String?): Event = jacksonObjectMapper().readValue(json, Event::class.java)
 
-fun Event.toServerSentEvent(): ServerSentEvent<String> {
-    return ServerSentEvent.builder<String>()
+fun Event.toServerSentEvent(): ServerSentEvent<String> =
+    ServerSentEvent
+        .builder<String>()
         .id(id)
         .event(name)
         .data(data)
         .build()
-}
 
-fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> {
-    return Event(
+fun Long.toHeartBeatServerSentEvent(): ServerSentEvent<String> =
+    Event(
         klageAnkeId = "",
         name = "heartbeat-event",
         id = this.toString(),
-        data = ""
+        data = "",
     ).toServerSentEvent()
-}

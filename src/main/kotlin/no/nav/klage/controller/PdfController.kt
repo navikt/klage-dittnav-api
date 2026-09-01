@@ -10,16 +10,19 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "pdf")
 @Unprotected
 @RequestMapping("/api/pdf")
 class PdfController(
-    private val klageDittnavPdfgenService: KlageDittnavPdfgenService
+    private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -29,7 +32,7 @@ class PdfController(
     @ResponseBody
     @PostMapping("/klanke")
     fun createPdfForKlanke(
-        @RequestBody input: OpenKlankeInput
+        @RequestBody input: OpenKlankeInput,
     ): ResponseEntity<ByteArray> {
         logger.debug("Create klanke pdf is requested.")
         teamLogger.debug(
@@ -45,8 +48,7 @@ class PdfController(
         return ResponseEntity(
             content,
             responseHeaders,
-            HttpStatus.OK
+            HttpStatus.OK,
         )
     }
-
 }

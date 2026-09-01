@@ -7,8 +7,9 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
-class ClamAvClient(private val clamAvWebClient: WebClient) {
-
+class ClamAvClient(
+    private val clamAvWebClient: WebClient,
+) {
     private val logger = LoggerFactory.getLogger(ClamAvClient::class.java)
 
     @Retryable
@@ -18,21 +19,32 @@ class ClamAvClient(private val clamAvWebClient: WebClient) {
 
         val startTime = System.currentTimeMillis()
         val result =
-            clamAvWebClient.put()
+            clamAvWebClient
+                .put()
                 .bodyValue(file)
                 .retrieve()
                 .bodyToMono<List<ScanResult>>()
-                .block()?.firstOrNull() ?: throw RuntimeException("Received empty response from ClamAV")
+                .block()
+                ?.firstOrNull() ?: throw RuntimeException("Received empty response from ClamAV")
 
         val durationMs = System.currentTimeMillis() - startTime
-        logger.debug("ClamAV scan completed in {} ms for file of {} MB. Result: {}", durationMs, String.format("%.2f", fileSizeMB), result.result)
+        logger.debug(
+            "ClamAV scan completed in {} ms for file of {} MB. Result: {}",
+            durationMs,
+            String.format("%.2f", fileSizeMB),
+            result.result,
+        )
 
         return when (result.result) {
-            ClamAvResult.OK -> false
+            ClamAvResult.OK -> {
+                false
+            }
+
             ClamAvResult.FOUND -> {
                 logger.warn("Virus found in file: {}. Virus: {}", result.filename, result.virus)
                 true
             }
+
             ClamAvResult.ERROR -> {
                 logger.error("Error scanning file for virus: {}. Error: {}", result.filename, result.error)
                 throw RuntimeException("Error from ClamAV virus scan on file: ${result.filename}. Error: ${result.error}")

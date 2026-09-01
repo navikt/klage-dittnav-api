@@ -4,8 +4,8 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
 
-fun Klanke.toKlankeView(userHasDocumentForThisTema: Boolean): KlankeView {
-    return KlankeView(
+fun Klanke.toKlankeView(userHasDocumentForThisTema: Boolean): KlankeView =
+    KlankeView(
         id = id,
         fritekst = fritekst ?: "",
         status = status,
@@ -25,11 +25,11 @@ fun Klanke.toKlankeView(userHasDocumentForThisTema: Boolean): KlankeView {
         caseIsAtKA = caseIsAtKA,
         userHasDocumentForThisTema = userHasDocumentForThisTema,
     )
-}
 
-fun Vedlegg.toVedleggView() = VedleggView(
-    tittel = tittel,
-    contentType = contentType,
-    id = id,
-    sizeInBytes = sizeInBytes,
-)
+fun Vedlegg.toVedleggView() =
+    VedleggView(
+        tittel = tittel,
+        contentType = contentType,
+        id = id,
+        sizeInBytes = sizeInBytes,
+    )

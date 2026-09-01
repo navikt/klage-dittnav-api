@@ -12,9 +12,7 @@ class TokenUtil(
     private val clientConfigurationProperties: ClientConfigurationProperties,
     private val oAuth2AccessTokenService: OAuth2AccessTokenService,
 ) {
-    fun getSubject(): String {
-        return ctxHolder.getTokenValidationContext().getClaims(TOKEN_X).getStringClaim("pid")
-    }
+    fun getSubject(): String = ctxHolder.getTokenValidationContext().getClaims(TOKEN_X).getStringClaim("pid")
 
     fun getOnBehalfOfTokenWithSafSelvbetjeningScope(): String {
         val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]!!
@@ -46,4 +44,3 @@ class TokenUtil(
         return response.access_token!!
     }
 }
-

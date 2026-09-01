@@ -22,7 +22,10 @@ data class AggregatedKlageAnke(
     val ettersendelseTilKa: Boolean?,
 ) {
     enum class KlageAnkeType {
-        KLAGE, ANKE, KLAGE_ETTERSENDELSE, ANKE_ETTERSENDELSE,
+        KLAGE,
+        ANKE,
+        KLAGE_ETTERSENDELSE,
+        ANKE_ETTERSENDELSE,
     }
 
     data class Vedlegg(

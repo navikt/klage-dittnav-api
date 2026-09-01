@@ -9,14 +9,15 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.tika.Tika
 import org.springframework.http.MediaType
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_PDF
+import org.springframework.http.MediaType.IMAGE_JPEG
+import org.springframework.http.MediaType.IMAGE_PNG
+import org.springframework.http.MediaType.valueOf
 import org.springframework.stereotype.Component
 import java.io.ByteArrayOutputStream
 
-
 @Component
 class Image2PDF {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -24,7 +25,7 @@ class Image2PDF {
 
     private var supportedMediaTypes: List<MediaType>? = listOf(IMAGE_JPEG, IMAGE_PNG)
 
-    private val A4: PDRectangle = PDRectangle.A4
+    private val a4: PDRectangle = PDRectangle.A4
 
     fun convert(bytes: ByteArray): ByteArray {
         val mediaType = valueOf(Tika().detect(bytes))
@@ -32,26 +33,21 @@ class Image2PDF {
             return bytes
         }
         if (validImageTypes(mediaType)) {
-            return embedImageInPDF(mediaType.subtype, bytes)
+            return embedImageInPDF(imgType = mediaType.subtype, image = bytes)
         }
         val exception = AttachmentCouldNotBeConvertedException()
         logger.warn("User tried to upload an unsupported file type: $mediaType", exception)
         throw exception
     }
 
-    private fun embedImageInPDF(imgType: String, image: ByteArray): ByteArray {
-        return embedImageInPDF(image, imgType)
-    }
-
-    private fun embedImageInPDF(image: ByteArray, imgType: String): ByteArray {
+    private fun embedImageInPDF(
+        image: ByteArray,
+        imgType: String,
+    ): ByteArray {
         try {
             PDDocument().use { doc ->
                 ByteArrayOutputStream().use { outputStream ->
-                    addPDFPageFromImage(
-                        doc,
-                        image,
-                        imgType
-                    )
+                    addPDFPageFromImage(doc = doc, origImg = image, imgFormat = imgType)
                     doc.save(outputStream)
                     doc.close()
                     return outputStream.toByteArray()
@@ -68,14 +64,18 @@ class Image2PDF {
         return validImageTypes
     }
 
-    private fun addPDFPageFromImage(doc: PDDocument, origImg: ByteArray, imgFormat: String) {
-        val page = PDPage(A4)
+    private fun addPDFPageFromImage(
+        doc: PDDocument,
+        origImg: ByteArray,
+        imgFormat: String,
+    ) {
+        val page = PDPage(a4)
         doc.addPage(page)
-        val scaledImg = ImageUtils.downToA4(origImg, imgFormat)
+        val scaledImg = ImageUtils.downToA4(origImage = origImg, format = imgFormat)
         try {
             PDPageContentStream(doc, page).use { contentStream ->
                 val xImage: PDImageXObject = PDImageXObject.createFromByteArray(doc, scaledImg, "img")
-                contentStream.drawImage(xImage, A4.lowerLeftX, A4.lowerLeftY)
+                contentStream.drawImage(xImage, a4.lowerLeftX, a4.lowerLeftY)
                 contentStream.close()
             }
         } catch (ex: Exception) {

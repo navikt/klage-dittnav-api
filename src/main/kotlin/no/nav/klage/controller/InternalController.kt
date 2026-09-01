@@ -6,8 +6,13 @@ import no.nav.klage.domain.Journalpost
 import no.nav.klage.service.CommonService
 import no.nav.klage.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AZUREAD)
@@ -16,7 +21,6 @@ import java.util.*
 class InternalController(
     private val commonService: CommonService,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -25,19 +29,21 @@ class InternalController(
     @PostMapping("/klanker/{klankeId}/journalpostid")
     fun setJournalpostIdInternalOnKlanke(
         @PathVariable klankeId: UUID,
-        @RequestBody journalpost: Journalpost
+        @RequestBody journalpost: Journalpost,
     ) {
         logger.debug("Set journalpostId on klanke is requested. KlankeId: {}, journalpostId: {}", klankeId, journalpost.id)
-        commonService.setJournalpostIdWithoutValidation(klankeId, journalpost.id)
+        commonService.setJournalpostIdWithoutValidation(klankeId = klankeId, journalpostId = journalpost.id)
     }
 
     @GetMapping("/klanker/{klankeId}/journalpostid")
     fun getJournalpostIdKlanke(
-        @PathVariable klankeId: UUID
+        @PathVariable klankeId: UUID,
     ): JournalpostIdResponse {
         logger.debug("Get journalpostId on klanke is requested from an internal service. KlankeId: {}", klankeId)
         return JournalpostIdResponse(journalpostId = commonService.getJournalpostIdWithoutValidation(klankeId))
     }
 
-    data class JournalpostIdResponse(val journalpostId: String?)
+    data class JournalpostIdResponse(
+        val journalpostId: String?,
+    )
 }

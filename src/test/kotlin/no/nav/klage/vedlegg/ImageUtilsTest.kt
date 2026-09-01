@@ -8,18 +8,17 @@ import javax.imageio.ImageIO
 import kotlin.experimental.and
 
 internal class ImageUtilsTest {
-
     @Test
     fun imgSmallerThanA4RemainsUnchanged() {
         val orig = this::class.java.getResource("/pdf/jks.jpg").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
+        val scaled: ByteArray = ImageUtils.downToA4(origImage = orig, format = "jpg")
         assertThat(scaled.size).isEqualTo(orig.size)
     }
 
     @Test
     fun imgBiggerThanA4IsScaledDown() {
         val orig = javaClass.getResource("/pdf/rdd.png").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
+        val scaled: ByteArray = ImageUtils.downToA4(origImage = orig, format = "jpg")
         val origImg = fromBytes(orig)
         val scaledImg = fromBytes(scaled)
         assertThat(scaledImg.width).isLessThan(origImg.width)
@@ -29,25 +28,24 @@ internal class ImageUtilsTest {
     @Test
     fun scaledImgHasRetainedFormat() {
         val orig = javaClass.getResource("/pdf/rdd.png").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
+        val scaled: ByteArray = ImageUtils.downToA4(origImage = orig, format = "jpg")
         assertThat(hasJpgSignature(scaled)).isTrue()
     }
 
     @Test
     fun rotateLandscapeToPortrait() {
         val orig = javaClass.getResource("/pdf/landscape.jpg").readBytes()
-        val scaled: ByteArray = ImageUtils.downToA4(orig, "jpg")
+        val scaled: ByteArray = ImageUtils.downToA4(origImage = orig, format = "jpg")
         val origImg = fromBytes(orig)
         val scaledImg = fromBytes(scaled)
         assertThat(origImg.width).isGreaterThan(origImg.height)
         assertThat(scaledImg.height).isGreaterThan(scaledImg.width)
     }
 
-    fun hasJpgSignature(bytes: ByteArray): Boolean {
-        return (bytes[0] and 0XFF.toByte()) == 0xFF.toByte() &&
-                (bytes[1] and 0XFF.toByte()) == 0xD8.toByte() &&
-                (bytes[0] and 0XFF.toByte()) == 0xFF.toByte()
-    }
+    fun hasJpgSignature(bytes: ByteArray): Boolean =
+        (bytes[0] and 0XFF.toByte()) == 0xFF.toByte() &&
+            (bytes[1] and 0XFF.toByte()) == 0xD8.toByte() &&
+            (bytes[0] and 0XFF.toByte()) == 0xFF.toByte()
 
     private fun fromBytes(bytes: ByteArray): BufferedImage {
         try {

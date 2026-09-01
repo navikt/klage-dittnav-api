@@ -111,3 +111,7 @@ Eksempel på Klageobjektet:
   "modifiedByUser": "2020-05-05T15:18:12.686588Z"
 }
 ```
+
+# Linting and verification
+
+This project uses ktlint and detekt for linting and static code analysis. See internal Confluence page for Team Klage for more info.
