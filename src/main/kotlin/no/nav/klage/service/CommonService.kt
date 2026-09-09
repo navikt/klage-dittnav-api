@@ -535,6 +535,6 @@ class CommonService(
             )
         }
 
-        return true
+        return userHasDocumentsForTema
     }
 }
