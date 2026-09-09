@@ -209,6 +209,13 @@ class CommonService(
         )
         validationService.validateKlanke(klanke = existingKlanke)
 
+        if (!userHasDocumentForThisTema(existingKlanke.innsendingsytelse, existingKlanke.foedselsnummer)) {
+            logger.info(
+                "Bruker fullfører klanke på innsendingsytelse {} uten å ha dokumenter i arkivet på tilknyttet tema.",
+                existingKlanke.innsendingsytelse,
+            )
+        }
+
         existingKlanke.status = KlageAnkeStatus.DONE
         existingKlanke.modifiedByUser = LocalDateTime.now()
 

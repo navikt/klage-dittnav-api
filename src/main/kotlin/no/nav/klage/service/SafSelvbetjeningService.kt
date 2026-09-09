@@ -18,7 +18,7 @@ class SafSelvbetjeningService(
         tema: Tema,
         userIdent: String,
     ): Boolean {
-        val usersDocuments =
+        val usersDocumentTemas =
             safselvbetjeningGraphQlClient
                 .getDokumentoversikt(
                     ident = userIdent,
@@ -28,6 +28,14 @@ class SafSelvbetjeningService(
                 ?.map {
                     it.kode
                 }
-        return usersDocuments?.contains(tema.name) ?: false
+        val userHasDocumentsForTema = usersDocumentTemas?.contains(tema.name) ?: false
+
+        if (!userHasDocumentsForTema) {
+            logger.info(
+                "Bruker har ikke dokumenter i arkivet på tema ${tema.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+            )
+        }
+
+        return userHasDocumentsForTema
     }
 }
