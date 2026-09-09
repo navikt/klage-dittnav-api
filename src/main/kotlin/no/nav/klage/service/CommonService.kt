@@ -212,8 +212,8 @@ class CommonService(
         val userHasDocumentForThisTema =
             try {
                 userHasDocumentForThisTema(
-                    existingKlanke.innsendingsytelse,
-                    existingKlanke.foedselsnummer,
+                    innsendingsytelse = existingKlanke.innsendingsytelse,
+                    userIdent = existingKlanke.foedselsnummer,
                 )
             } catch (exception: Exception) {
                 logger.warn(
@@ -520,9 +520,22 @@ class CommonService(
     private fun userHasDocumentForThisTema(
         innsendingsytelse: Innsendingsytelse,
         userIdent: String,
-    ): Boolean =
-        safSelvbetjeningService.userHasDocumentForTema(
-            tema = innsendingsytelseToTema[innsendingsytelse]!!,
-            userIdent = userIdent,
-        )
+    ): Boolean {
+        val temaForInnsendingsytelse = innsendingsytelseToTema[innsendingsytelse]!!
+
+        val usersDocumentTemas =
+            safSelvbetjeningService.getUsersDocumentTemas(
+                userIdent = userIdent,
+            )
+
+        val userHasDocumentsForTema = usersDocumentTemas.contains(temaForInnsendingsytelse.name)
+
+        if (!userHasDocumentsForTema) {
+            logger.info(
+                "Bruker har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema $temaForInnsendingsytelse. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+            )
+        }
+
+        return true
+    }
 }
