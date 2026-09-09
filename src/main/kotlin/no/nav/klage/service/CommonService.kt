@@ -523,13 +523,13 @@ class CommonService(
             when (documentCheckAction) {
                 DocumentCheckAction.CREATE -> {
                     logger.info(
-                        "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet.  har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                        "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
                     )
                 }
 
                 DocumentCheckAction.FINALIZE -> {
                     logger.info(
-                        "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet.  har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                        "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
                     )
                 }
 
