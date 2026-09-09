@@ -209,7 +209,7 @@ class CommonService(
         )
         validationService.validateKlanke(klanke = existingKlanke)
 
-        if (!userHasDocumentForThisTema(existingKlanke.innsendingsytelse, existingKlanke.foedselsnummer)) {
+        if (!userHasDocumentForThisTema(innsendingsytelse = existingKlanke.innsendingsytelse, userIdent = existingKlanke.foedselsnummer)) {
             logger.info(
                 "Bruker fullfører klanke på innsendingsytelse {} uten å ha dokumenter i arkivet på tilknyttet tema.",
                 existingKlanke.innsendingsytelse,
