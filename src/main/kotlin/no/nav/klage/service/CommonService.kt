@@ -67,6 +67,7 @@ class CommonService(
                     userHasDocumentForThisTema(
                         innsendingsytelse = klanke.innsendingsytelse,
                         userIdent = klanke.foedselsnummer,
+                        documentCheckAction = DocumentCheckAction.CREATE,
                     ),
             )
     }
@@ -163,6 +164,7 @@ class CommonService(
                 userHasDocumentForThisTema(
                     innsendingsytelse = existingKlanke.innsendingsytelse,
                     userIdent = existingKlanke.foedselsnummer,
+                    documentCheckAction = DocumentCheckAction.OTHER,
                 ),
         )
             ?: createKlanke(
@@ -173,6 +175,7 @@ class CommonService(
                     userHasDocumentForThisTema(
                         innsendingsytelse = input.innsendingsytelse,
                         userIdent = currentUser,
+                        documentCheckAction = DocumentCheckAction.CREATE,
                     ),
             )
     }
@@ -209,26 +212,11 @@ class CommonService(
         )
         validationService.validateKlanke(klanke = existingKlanke)
 
-        try {
-            val foundDocumentForThisTema =
-                userHasDocumentForThisTema(
-                    innsendingsytelse = existingKlanke.innsendingsytelse,
-                    userIdent = existingKlanke.foedselsnummer,
-                )
-
-            if (!foundDocumentForThisTema) {
-                logger.info(
-                    "Bruker fullfører klanke på innsendingsytelse {} uten å ha dokumenter i arkivet på tilknyttet tema.",
-                    existingKlanke.innsendingsytelse,
-                )
-            }
-        } catch (exception: Exception) {
-            logger.warn(
-                "Kunne ikke kontrollere dokumenttema ved fullføring av klanke på innsendingsytelse {}.",
-                existingKlanke.innsendingsytelse,
-                exception,
-            )
-        }
+        userHasDocumentForThisTema(
+            innsendingsytelse = existingKlanke.innsendingsytelse,
+            userIdent = existingKlanke.foedselsnummer,
+            documentCheckAction = DocumentCheckAction.FINALIZE,
+        )
 
         existingKlanke.status = KlageAnkeStatus.DONE
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -371,6 +359,7 @@ class CommonService(
                 userHasDocumentForThisTema(
                     innsendingsytelse = klanke.innsendingsytelse,
                     userIdent = klanke.foedselsnummer,
+                    documentCheckAction = DocumentCheckAction.OTHER,
                 ),
         )
     }
@@ -519,6 +508,7 @@ class CommonService(
     private fun userHasDocumentForThisTema(
         innsendingsytelse: Innsendingsytelse,
         userIdent: String,
+        documentCheckAction: DocumentCheckAction,
     ): Boolean {
         val temaForInnsendingsytelse = innsendingsytelseToTema[innsendingsytelse]!!
 
@@ -530,11 +520,29 @@ class CommonService(
         val userHasDocumentsForTema = usersDocumentTemas.contains(temaForInnsendingsytelse.name)
 
         if (!userHasDocumentsForTema) {
-            logger.info(
-                "Bruker har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
-            )
+            when (documentCheckAction) {
+                DocumentCheckAction.CREATE -> {
+                    logger.info(
+                        "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet.  har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                    )
+                }
+
+                DocumentCheckAction.FINALIZE -> {
+                    logger.info(
+                        "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet.  har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                    )
+                }
+
+                else -> {}
+            }
         }
 
         return userHasDocumentsForTema
+    }
+
+    enum class DocumentCheckAction {
+        CREATE,
+        FINALIZE,
+        OTHER,
     }
 }
