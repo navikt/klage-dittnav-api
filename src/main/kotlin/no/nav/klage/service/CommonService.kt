@@ -532,7 +532,7 @@ class CommonService(
 
         if (!userHasDocumentsForTema) {
             logger.info(
-                "Bruker har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema $temaForInnsendingsytelse. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                "Bruker har ikke dokumenter i arkivet på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name}. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
             )
         }
 
