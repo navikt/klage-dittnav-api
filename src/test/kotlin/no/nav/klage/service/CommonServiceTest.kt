@@ -110,7 +110,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
 
         val klage = klankeRepository.findAll().first()
         commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2)
-        every { safselvbetjeningService.userHasDocumentForTema(tema = any(), userIdent = any()) } returns true
+        every { safselvbetjeningService.getUsersDocumentTemas(userIdent = any()) } returns emptyList()
         val output = commonService.getKlanke(klankeId = klage.id).fritekst
 
         assertEquals(exampleFritekst2, output)

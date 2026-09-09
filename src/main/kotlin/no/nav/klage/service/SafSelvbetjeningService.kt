@@ -1,7 +1,6 @@
 package no.nav.klage.service
 
 import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningGraphQlClient
-import no.nav.klage.kodeverk.Tema
 import no.nav.klage.util.getLogger
 import org.springframework.stereotype.Service
 
@@ -14,11 +13,8 @@ class SafSelvbetjeningService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun userHasDocumentForTema(
-        tema: Tema,
-        userIdent: String,
-    ): Boolean {
-        val usersDocuments =
+    fun getUsersDocumentTemas(userIdent: String): List<String?> {
+        val usersDocumentTemas =
             safselvbetjeningGraphQlClient
                 .getDokumentoversikt(
                     ident = userIdent,
@@ -28,6 +24,12 @@ class SafSelvbetjeningService(
                 ?.map {
                     it.kode
                 }
-        return usersDocuments?.contains(tema.name) ?: false
+
+        if (usersDocumentTemas.isNullOrEmpty()) {
+            logger.error("Fikk ikke hentet dokument-temaer i arkivet for bruker.")
+            return emptyList()
+        } else {
+            return usersDocumentTemas
+        }
     }
 }

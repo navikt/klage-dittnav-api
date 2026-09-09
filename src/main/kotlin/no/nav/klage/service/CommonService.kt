@@ -67,6 +67,7 @@ class CommonService(
                     userHasDocumentForThisTema(
                         innsendingsytelse = klanke.innsendingsytelse,
                         userIdent = klanke.foedselsnummer,
+                        documentCheckAction = DocumentCheckAction.CREATE,
                     ),
             )
     }
@@ -163,6 +164,7 @@ class CommonService(
                 userHasDocumentForThisTema(
                     innsendingsytelse = existingKlanke.innsendingsytelse,
                     userIdent = existingKlanke.foedselsnummer,
+                    documentCheckAction = DocumentCheckAction.OTHER,
                 ),
         )
             ?: createKlanke(
@@ -173,6 +175,7 @@ class CommonService(
                     userHasDocumentForThisTema(
                         innsendingsytelse = input.innsendingsytelse,
                         userIdent = currentUser,
+                        documentCheckAction = DocumentCheckAction.CREATE,
                     ),
             )
     }
@@ -208,6 +211,12 @@ class CommonService(
             klanke = existingKlanke,
         )
         validationService.validateKlanke(klanke = existingKlanke)
+
+        userHasDocumentForThisTema(
+            innsendingsytelse = existingKlanke.innsendingsytelse,
+            userIdent = existingKlanke.foedselsnummer,
+            documentCheckAction = DocumentCheckAction.FINALIZE,
+        )
 
         existingKlanke.status = KlageAnkeStatus.DONE
         existingKlanke.modifiedByUser = LocalDateTime.now()
@@ -350,6 +359,7 @@ class CommonService(
                 userHasDocumentForThisTema(
                     innsendingsytelse = klanke.innsendingsytelse,
                     userIdent = klanke.foedselsnummer,
+                    documentCheckAction = DocumentCheckAction.OTHER,
                 ),
         )
     }
@@ -498,9 +508,41 @@ class CommonService(
     private fun userHasDocumentForThisTema(
         innsendingsytelse: Innsendingsytelse,
         userIdent: String,
-    ): Boolean =
-        safSelvbetjeningService.userHasDocumentForTema(
-            tema = innsendingsytelseToTema[innsendingsytelse]!!,
-            userIdent = userIdent,
-        )
+        documentCheckAction: DocumentCheckAction,
+    ): Boolean {
+        val temaForInnsendingsytelse = innsendingsytelseToTema[innsendingsytelse]!!
+
+        val usersDocumentTemas =
+            safSelvbetjeningService.getUsersDocumentTemas(
+                userIdent = userIdent,
+            )
+
+        val userHasDocumentsForTema = usersDocumentTemas.contains(temaForInnsendingsytelse.name)
+
+        if (!userHasDocumentsForTema) {
+            when (documentCheckAction) {
+                DocumentCheckAction.CREATE -> {
+                    logger.info(
+                        "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                    )
+                }
+
+                DocumentCheckAction.FINALIZE -> {
+                    logger.info(
+                        "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                    )
+                }
+
+                else -> {}
+            }
+        }
+
+        return userHasDocumentsForTema
+    }
+
+    enum class DocumentCheckAction {
+        CREATE,
+        FINALIZE,
+        OTHER,
+    }
 }
