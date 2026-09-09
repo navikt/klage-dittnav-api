@@ -209,25 +209,24 @@ class CommonService(
         )
         validationService.validateKlanke(klanke = existingKlanke)
 
-        val userHasDocumentForThisTema =
-            try {
+        try {
+            val foundDocumentForThisTema =
                 userHasDocumentForThisTema(
                     innsendingsytelse = existingKlanke.innsendingsytelse,
                     userIdent = existingKlanke.foedselsnummer,
                 )
-            } catch (exception: Exception) {
-                logger.warn(
-                    "Kunne ikke kontrollere dokumenttema ved fullføring av klanke på innsendingsytelse {}.",
-                    existingKlanke.innsendingsytelse,
-                    exception,
-                )
-                null
-            }
 
-        if (userHasDocumentForThisTema == false) {
-            logger.info(
-                "Bruker fullfører klanke på innsendingsytelse {} uten å ha dokumenter i arkivet på tilknyttet tema.",
+            if (!foundDocumentForThisTema) {
+                logger.info(
+                    "Bruker fullfører klanke på innsendingsytelse {} uten å ha dokumenter i arkivet på tilknyttet tema.",
+                    existingKlanke.innsendingsytelse,
+                )
+            }
+        } catch (exception: Exception) {
+            logger.warn(
+                "Kunne ikke kontrollere dokumenttema ved fullføring av klanke på innsendingsytelse {}.",
                 existingKlanke.innsendingsytelse,
+                exception,
             )
         }
 
