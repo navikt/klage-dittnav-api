@@ -515,13 +515,13 @@ class CommonService(
         userIdent: String,
         documentCheckAction: DocumentCheckAction,
         type: Type,
-    ): Boolean {
+    ): Boolean? {
         val temaForInnsendingsytelse = innsendingsytelseToTema[innsendingsytelse]!!
 
         val usersDocumentTemas =
             safSelvbetjeningService.getUsersDocumentTemas(
                 userIdent = userIdent,
-            )
+            ) ?: return null
 
         val userHasDocumentsForTema = usersDocumentTemas.contains(temaForInnsendingsytelse.name)
 
