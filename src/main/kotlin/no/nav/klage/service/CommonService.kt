@@ -531,7 +531,7 @@ class CommonService(
             when (documentCheckAction) {
                 DocumentCheckAction.CREATE -> {
                     logger.info(
-                        "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                        "Bruker opprettet ${type.name.lowercase()} på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
                     )
                     klageAnkeMetrics.incrementKlankerInitializedWithoutMatchingDocument(
                         innsendingsytelse = innsendingsytelse,
@@ -541,7 +541,7 @@ class CommonService(
 
                 DocumentCheckAction.FINALIZE -> {
                     logger.info(
-                        "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                        "Bruker fullførte ${type.name.lowercase()} på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
                     )
                     klageAnkeMetrics.incrementKlankerFinalizedWithoutMatchingDocument(
                         innsendingsytelse = innsendingsytelse,
