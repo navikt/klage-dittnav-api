@@ -68,6 +68,7 @@ class CommonService(
                         innsendingsytelse = klanke.innsendingsytelse,
                         userIdent = klanke.foedselsnummer,
                         documentCheckAction = DocumentCheckAction.CREATE,
+                        type = klanke.type,
                     ),
             )
     }
@@ -165,6 +166,7 @@ class CommonService(
                     innsendingsytelse = existingKlanke.innsendingsytelse,
                     userIdent = existingKlanke.foedselsnummer,
                     documentCheckAction = DocumentCheckAction.OTHER,
+                    type = existingKlanke.type,
                 ),
         )
             ?: createKlanke(
@@ -176,6 +178,7 @@ class CommonService(
                         innsendingsytelse = input.innsendingsytelse,
                         userIdent = currentUser,
                         documentCheckAction = DocumentCheckAction.CREATE,
+                        type = input.type,
                     ),
             )
     }
@@ -216,6 +219,7 @@ class CommonService(
             innsendingsytelse = existingKlanke.innsendingsytelse,
             userIdent = existingKlanke.foedselsnummer,
             documentCheckAction = DocumentCheckAction.FINALIZE,
+            type = existingKlanke.type,
         )
 
         existingKlanke.status = KlageAnkeStatus.DONE
@@ -360,6 +364,7 @@ class CommonService(
                     innsendingsytelse = klanke.innsendingsytelse,
                     userIdent = klanke.foedselsnummer,
                     documentCheckAction = DocumentCheckAction.OTHER,
+                    type = klanke.type,
                 ),
         )
     }
@@ -509,6 +514,7 @@ class CommonService(
         innsendingsytelse: Innsendingsytelse,
         userIdent: String,
         documentCheckAction: DocumentCheckAction,
+        type: Type,
     ): Boolean {
         val temaForInnsendingsytelse = innsendingsytelseToTema[innsendingsytelse]!!
 
@@ -525,11 +531,19 @@ class CommonService(
                     logger.info(
                         "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
                     )
+                    klageAnkeMetrics.incrementKlankerInitializedWithoutMatchingDocument(
+                        innsendingsytelse = innsendingsytelse,
+                        type = type,
+                    )
                 }
 
                 DocumentCheckAction.FINALIZE -> {
                     logger.info(
                         "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                    )
+                    klageAnkeMetrics.incrementKlankerFinalizedWithoutMatchingDocument(
+                        innsendingsytelse = innsendingsytelse,
+                        type = type,
                     )
                 }
 
