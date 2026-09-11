@@ -68,6 +68,7 @@ class CommonService(
                         innsendingsytelse = klanke.innsendingsytelse,
                         userIdent = klanke.foedselsnummer,
                         documentCheckAction = DocumentCheckAction.CREATE,
+                        type = klanke.type,
                     ),
             )
     }
@@ -165,6 +166,7 @@ class CommonService(
                     innsendingsytelse = existingKlanke.innsendingsytelse,
                     userIdent = existingKlanke.foedselsnummer,
                     documentCheckAction = DocumentCheckAction.OTHER,
+                    type = existingKlanke.type,
                 ),
         )
             ?: createKlanke(
@@ -176,6 +178,7 @@ class CommonService(
                         innsendingsytelse = input.innsendingsytelse,
                         userIdent = currentUser,
                         documentCheckAction = DocumentCheckAction.CREATE,
+                        type = input.type,
                     ),
             )
     }
@@ -212,12 +215,6 @@ class CommonService(
         )
         validationService.validateKlanke(klanke = existingKlanke)
 
-        userHasDocumentForThisTema(
-            innsendingsytelse = existingKlanke.innsendingsytelse,
-            userIdent = existingKlanke.foedselsnummer,
-            documentCheckAction = DocumentCheckAction.FINALIZE,
-        )
-
         existingKlanke.status = KlageAnkeStatus.DONE
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
@@ -253,7 +250,16 @@ class CommonService(
         if (klanke.vedtakDate != null) {
             klageAnkeMetrics.incrementOptionalVedtaksdato(temaReport)
         }
+
         vedleggMetrics.registerNumberOfVedleggPerUser(klanke.vedlegg.size.toDouble())
+
+        // Log missing document in archive if relevant
+        userHasDocumentForThisTema(
+            innsendingsytelse = klanke.innsendingsytelse,
+            userIdent = klanke.foedselsnummer,
+            documentCheckAction = DocumentCheckAction.FINALIZE,
+            type = klanke.type,
+        )
     }
 
     fun getKlankePdf(klankeId: UUID): Pair<Path, String> {
@@ -360,6 +366,7 @@ class CommonService(
                     innsendingsytelse = klanke.innsendingsytelse,
                     userIdent = klanke.foedselsnummer,
                     documentCheckAction = DocumentCheckAction.OTHER,
+                    type = klanke.type,
                 ),
         )
     }
@@ -509,13 +516,14 @@ class CommonService(
         innsendingsytelse: Innsendingsytelse,
         userIdent: String,
         documentCheckAction: DocumentCheckAction,
-    ): Boolean {
+        type: Type,
+    ): Boolean? {
         val temaForInnsendingsytelse = innsendingsytelseToTema[innsendingsytelse]!!
 
         val usersDocumentTemas =
             safSelvbetjeningService.getUsersDocumentTemas(
                 userIdent = userIdent,
-            )
+            ) ?: return null
 
         val userHasDocumentsForTema = usersDocumentTemas.contains(temaForInnsendingsytelse.name)
 
@@ -525,11 +533,19 @@ class CommonService(
                     logger.info(
                         "Bruker opprettet klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
                     )
+                    klageAnkeMetrics.incrementKlankerInitializedWithoutMatchingDocument(
+                        innsendingsytelse = innsendingsytelse,
+                        type = type,
+                    )
                 }
 
                 DocumentCheckAction.FINALIZE -> {
                     logger.info(
                         "Bruker fullførte klanke på innsendingsytelse $innsendingsytelse, tema ${temaForInnsendingsytelse.name} uten å ha dokumenter i arkivet på temaet. Bruker har dokumenter på disse temaene: $usersDocumentTemas",
+                    )
+                    klageAnkeMetrics.incrementKlankerFinalizedWithoutMatchingDocument(
+                        innsendingsytelse = innsendingsytelse,
+                        type = type,
                     )
                 }
 

@@ -13,23 +13,38 @@ class SafSelvbetjeningService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun getUsersDocumentTemas(userIdent: String): List<String?> {
-        val usersDocumentTemas =
-            safselvbetjeningGraphQlClient
-                .getDokumentoversikt(
+    /**
+     * Returnerer null hvis oppslaget mot safselvbetjening feiler, og en (potensielt tom) liste hvis oppslaget gikk bra.
+     */
+    fun getUsersDocumentTemas(userIdent: String): List<String?>? {
+        val response =
+            try {
+                safselvbetjeningGraphQlClient.getDokumentoversikt(
                     ident = userIdent,
-                ).data
-                ?.dokumentoversiktSelvbetjening
-                ?.tema
-                ?.map {
-                    it.kode
-                }
+                )
+            } catch (e: Exception) {
+                logger.error("Fikk ikke hentet dokument-temaer i arkivet for bruker.", e)
+                return null
+            }
 
-        if (usersDocumentTemas.isNullOrEmpty()) {
-            logger.error("Fikk ikke hentet dokument-temaer i arkivet for bruker.")
-            return emptyList()
-        } else {
-            return usersDocumentTemas
+        val errors = response.errors
+        if (!errors.isNullOrEmpty()) {
+            logger.error(
+                "Fikk feil fra safselvbetjening ved henting av dokument-temaer i arkivet for bruker: ${
+                    errors.map {
+                        it.extensions.classification
+                    }
+                }",
+            )
+            return null
         }
+
+        val data = response.data
+        if (data == null) {
+            logger.error("Fikk ikke hentet dokument-temaer i arkivet for bruker. Data manglet i responsen fra safselvbetjening.")
+            return null
+        }
+
+        return data.dokumentoversiktSelvbetjening.tema.map { it.kode }
     }
 }

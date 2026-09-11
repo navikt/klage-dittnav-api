@@ -42,6 +42,38 @@ class KlageAnkeMetrics(
         }
     }
 
+    fun incrementKlankerInitializedWithoutMatchingDocument(
+        innsendingsytelse: Innsendingsytelse,
+        type: Type,
+    ) {
+        try {
+            meterRegistry
+                .counter(
+                    type.name.lowercase() + "r_initialized_without_matching_document",
+                    "innsendingsytelse",
+                    innsendingsytelse.name,
+                ).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementKlankerInitializedWithoutMatchingDocument failed", e)
+        }
+    }
+
+    fun incrementKlankerFinalizedWithoutMatchingDocument(
+        innsendingsytelse: Innsendingsytelse,
+        type: Type,
+    ) {
+        try {
+            meterRegistry
+                .counter(
+                    type.name.lowercase() + "r_finalized_without_matching_document",
+                    "innsendingsytelse",
+                    innsendingsytelse.name,
+                ).increment()
+        } catch (e: Exception) {
+            logger.warn("incrementKlankerFinalizedWithoutMatchingDocument failed", e)
+        }
+    }
+
     fun incrementOptionalSaksnummer(ytelse: String) {
         try {
             meterRegistry.counter(COUNTER_KLAGER_OPTIONAL_SAKSNUMMER, "ytelse", ytelse).increment()
