@@ -215,13 +215,6 @@ class CommonService(
         )
         validationService.validateKlanke(klanke = existingKlanke)
 
-        userHasDocumentForThisTema(
-            innsendingsytelse = existingKlanke.innsendingsytelse,
-            userIdent = existingKlanke.foedselsnummer,
-            documentCheckAction = DocumentCheckAction.FINALIZE,
-            type = existingKlanke.type,
-        )
-
         existingKlanke.status = KlageAnkeStatus.DONE
         existingKlanke.modifiedByUser = LocalDateTime.now()
 
@@ -257,7 +250,16 @@ class CommonService(
         if (klanke.vedtakDate != null) {
             klageAnkeMetrics.incrementOptionalVedtaksdato(temaReport)
         }
+
         vedleggMetrics.registerNumberOfVedleggPerUser(klanke.vedlegg.size.toDouble())
+
+        // Log missing document in archive if relevant
+        userHasDocumentForThisTema(
+            innsendingsytelse = klanke.innsendingsytelse,
+            userIdent = klanke.foedselsnummer,
+            documentCheckAction = DocumentCheckAction.FINALIZE,
+            type = klanke.type,
+        )
     }
 
     fun getKlankePdf(klankeId: UUID): Pair<Path, String> {
