@@ -46,6 +46,7 @@ spec:
   gcp:
     sqlInstances:
       - tier: {{db_tier}}
+        name: {{db_instance_name}}
         diskAutoresize: true
         highAvailability: {{db_high_availability}}
         type: {{db_type}}

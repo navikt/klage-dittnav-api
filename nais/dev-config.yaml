@@ -15,5 +15,6 @@ kafka_pool: nav-dev
 db_tier: db-f1-micro
 db_type: POSTGRES_18
 db_high_availability: false
+db_instance_name: klage-dittnav-api
 
 max_replicas: 2
