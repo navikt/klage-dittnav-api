@@ -27,9 +27,7 @@ TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:5432/klage
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_JDBC_URL}
     hikari:
       maximum-pool-size: 5
 
