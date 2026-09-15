@@ -27,7 +27,7 @@ TENANT_ID: 966ac572-f5b7-4bbe-aa88-c76419c0f851
 
 spring:
   datasource:
-    url: ${DB_KLAGE_DITTNAV_API_PRIV_KLAGE_DITTNAV_API_JDBC_URL}
+    url: ${DB_JDBC_URL}
     hikari:
       maximum-pool-size: 5
 
