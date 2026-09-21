@@ -3,27 +3,27 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 val ktlintVersion = "1.8.0"
-val h2Version = "2.4.240"
-val tokenSupportVersion = "6.0.1"
+val h2Version = "2.5.250"
+val tokenSupportVersion = "6.0.12"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "9.0"
 val pdfboxVersion = "3.0.8"
 val tikaVersion = "4.0.0"
 val resilience4jVersion = "2.3.0"
-val shedlockVersion = "7.9.0"
-val springDocVersion = "3.1.0"
-val kodeverkVersion = "3.2.13"
-val simpleSlackPosterVersion = "1.0.0"
+val shedlockVersion = "7.10.1"
+val springDocVersion = "3.1.1"
+val kodeverkVersion = "3.3.34"
+val simpleSlackPosterVersion = "1.1.1"
 val testContainersVersion = "2.0.5"
 val mockkVersion = "1.14.11"
 val springMockkVersion = "5.0.1"
-val otelVersion = "1.65.0"
+val otelVersion = "1.66.0"
 val reactorKafkaVersion = "1.3.25"
 
 ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 plugins {
-    val kotlinVersion = "2.4.10"
+    val kotlinVersion = "2.4.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.springframework.boot") version "4.1.1"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
