@@ -10,6 +10,6 @@ kafka_pool: nav-prod
 db_tier: db-custom-1-3840
 db_type: POSTGRES_18
 db_high_availability: true
-db_instance_name: klage-dittnav-api
+db_instance_name: klage-dittnav-api-priv
 
 max_replicas: 4
