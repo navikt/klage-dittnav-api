@@ -26,7 +26,7 @@ class AivenKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         val json = klageAnkeToKafka.toJson()
         runCatching {
-            handleStuff(topic, json)
+            handleStuff(topic1 = topic, json = json)
 //            aivenKafkaTemplate.send(topic, json).get()
             logger.debug("Payload sent to Kafka.")
         }.onFailure {
