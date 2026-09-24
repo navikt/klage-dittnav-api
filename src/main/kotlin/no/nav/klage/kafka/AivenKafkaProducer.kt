@@ -26,7 +26,8 @@ class AivenKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         val json = klageAnkeToKafka.toJson()
         runCatching {
-            aivenKafkaTemplate.send(topic, json).get()
+            handleStuff(topic, json)
+//            aivenKafkaTemplate.send(topic, json).get()
             logger.debug("Payload sent to Kafka.")
         }.onFailure {
             val errorMessage =
@@ -37,4 +38,12 @@ class AivenKafkaProducer(
     }
 
     fun AggregatedKlageAnke.toJson(): String = jacksonObjectMapper().registerModule(JavaTimeModule()).writeValueAsString(this)
+
+    fun handleStuff(
+        topic1: String,
+        json: String,
+    ) {
+        throw Exception("Testing exceptions")
+//        aivenKafkaTemplate.send(topic, json).get()
+    }
 }
