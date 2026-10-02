@@ -30,3 +30,8 @@ data class KlankeView(
     val caseIsAtKA: Boolean?,
     val userHasDocumentForThisTema: Boolean?,
 )
+
+data class KlankeFinalizedView(
+    val modifiedByUser: LocalDateTime,
+    val finalizedDate: LocalDate,
+)

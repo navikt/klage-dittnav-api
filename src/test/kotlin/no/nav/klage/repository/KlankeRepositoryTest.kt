@@ -1,5 +1,6 @@
 package no.nav.klage.repository
 
+import no.nav.klage.createTestKlanke
 import no.nav.klage.db.PostgresIntegrationTestBase
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
@@ -16,6 +17,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @ActiveProfiles("dbtest")
 @DataJpaTest
@@ -148,5 +150,22 @@ class KlankeRepositoryTest : PostgresIntegrationTestBase() {
                 .vedlegg
                 .first(),
         ).isEqualTo(vedlegg)
+    }
+
+    @Test
+    fun `persist marked_completed and find by status SENDING works`() {
+        val markedCompleted = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
+        val sending =
+            testEntityManager.persistAndFlush(
+                createTestKlanke(status = KlageAnkeStatus.SENDING, markedCompleted = markedCompleted),
+            )
+        testEntityManager.persistAndFlush(createTestKlanke(status = KlageAnkeStatus.DONE))
+        testEntityManager.persistAndFlush(createTestKlanke(status = KlageAnkeStatus.DRAFT))
+        testEntityManager.clear()
+
+        val found = klankeRepository.findByStatus(KlageAnkeStatus.SENDING)
+
+        assertThat(found).containsExactly(sending)
+        assertThat(found.first().markedCompleted).isEqualTo(markedCompleted)
     }
 }

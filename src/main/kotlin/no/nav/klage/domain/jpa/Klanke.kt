@@ -76,6 +76,9 @@ class Klanke(
     var caseIsAtKA: Boolean?,
     @Column(name = "fullmektig_foedselsnummer")
     var fullmektigFoedselsnummer: String?,
+    // When the user finalized the klanke. Set once, never updated.
+    @Column(name = "marked_completed")
+    var markedCompleted: LocalDateTime? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
