@@ -325,7 +325,7 @@ class CommonService(
             mellomnavn = userInKlanke.mellomnavn ?: "",
             etternavn = userInKlanke.etternavn,
             vedtak = vedtak,
-            dato = klanke.modifiedByUser.toLocalDate(),
+            dato = klanke.markedCompleted?.toLocalDate() ?: klanke.modifiedByUser.toLocalDate(),
             begrunnelse = sanitizeText(klanke.fritekst ?: ""),
             identifikasjonsnummer = klanke.foedselsnummer,
             ytelse = klanke.innsendingsytelse.nbName,
