@@ -3,13 +3,16 @@ package no.nav.klage.service
 import no.nav.klage.clients.klagelookup.KlageLookupClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
+import no.nav.klage.controller.view.KlankeFinalizedView
 import no.nav.klage.controller.view.KlankeFullInput
 import no.nav.klage.controller.view.KlankeMinimalInput
 import no.nav.klage.controller.view.KlankeView
 import no.nav.klage.controller.view.OpenKlankeInput
+import no.nav.klage.controller.view.toKlankeFinalizedView
 import no.nav.klage.controller.view.toKlankeView
 import no.nav.klage.domain.Event
 import no.nav.klage.domain.KlageAnkeStatus
+import no.nav.klage.domain.KlankeMarkedCompletedEvent
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Navn
 import no.nav.klage.domain.Type
@@ -17,7 +20,6 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.domain.klage.AggregatedKlageAnke
-import no.nav.klage.kafka.AivenKafkaProducer
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.repository.KlankeRepository
@@ -26,6 +28,7 @@ import no.nav.klage.util.getLogger
 import no.nav.klage.util.klageAnkeIsLonnskompensasjon
 import no.nav.klage.util.sanitizeText
 import no.nav.klage.util.vedtakFromDate
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Path
@@ -41,12 +44,12 @@ class CommonService(
     private val kafkaInternalEventService: KafkaInternalEventService,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
-    private val kafkaProducer: AivenKafkaProducer,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
     private val documentService: DocumentService,
     private val klageLookupClient: KlageLookupClient,
     private val tokenUtil: TokenUtil,
     private val safSelvbetjeningService: SafSelvbetjeningService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
     companion object {
         private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
@@ -202,32 +205,59 @@ class CommonService(
                 }
             }.maxByOrNull { it.modifiedByUser }
 
-    fun finalizeKlanke(klankeId: UUID): LocalDateTime {
+    /**
+     * Marks the klanke as completed by the user. Does not send to Kafka; KlankeSenderService does that after commit.
+     */
+    fun finalizeKlanke(klankeId: UUID): KlankeFinalizedView {
         val existingKlanke = klankeRepository.findById(klankeId).get()
+        validationService.validateKlankeAccess(klanke = existingKlanke)
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
-
         if (existingKlanke.isFinalized()) {
-            return existingKlanke.modifiedByUser
+            logger.debug("Klanke is already finalized, returning.")
+            return existingKlanke.toKlankeFinalizedView()
         }
-
-        validationService.validateKlankeAccess(
-            klanke = existingKlanke,
-        )
         validationService.validateKlanke(klanke = existingKlanke)
+        val now = LocalDateTime.now()
+        existingKlanke.status = KlageAnkeStatus.SENDING
+        existingKlanke.modifiedByUser = now
+        existingKlanke.markedCompleted = now
 
-        existingKlanke.status = KlageAnkeStatus.DONE
-        existingKlanke.modifiedByUser = LocalDateTime.now()
+        applicationEventPublisher.publishEvent(KlankeMarkedCompletedEvent(klankeId = existingKlanke.id))
+        registerFinalizedDocumentCheck(klanke = existingKlanke)
+        return existingKlanke.toKlankeFinalizedView()
+    }
 
-        kafkaProducer.sendToKafka(createAggregatedKlanke(klanke = existingKlanke))
-        registerFinalizedMetrics(klanke = existingKlanke)
+    fun getKlankeWithoutValidation(klankeId: UUID): Klanke = klankeRepository.findById(klankeId).get()
+
+    fun findKlankeIdsToSend(): List<UUID> = klankeRepository.findByStatus(KlageAnkeStatus.SENDING).map { it.id }
+
+    /**
+     * Sets status DONE for a klanke confirmed sent to Kafka. markedCompleted and modifiedByUser are left unchanged.
+     */
+    fun markKlankeAsDone(klankeId: UUID) {
+        val klanke = klankeRepository.findById(klankeId).get()
+        if (klanke.status != KlageAnkeStatus.SENDING) {
+            logger.warn("Klanke {} has status {}, expected SENDING. Not marking as DONE.", klankeId, klanke.status)
+            return
+        }
+        klanke.status = KlageAnkeStatus.DONE
+        registerFinalizedMetrics(klanke = klanke)
 
         logger.debug(
             "Klanke {} med innsendingsytelse {} er sendt inn.",
             klankeId,
-            existingKlanke.innsendingsytelse.name,
+            klanke.innsendingsytelse.name,
         )
+    }
 
-        return existingKlanke.modifiedByUser
+    // Requires user token (SAF selvbetjening OBO). Must run in the user's request.
+    private fun registerFinalizedDocumentCheck(klanke: Klanke) {
+        userHasDocumentForThisTema(
+            innsendingsytelse = klanke.innsendingsytelse,
+            userIdent = klanke.foedselsnummer,
+            documentCheckAction = DocumentCheckAction.FINALIZE,
+            type = klanke.type,
+        )
     }
 
     private fun registerFinalizedMetrics(klanke: Klanke) {
@@ -252,14 +282,6 @@ class CommonService(
         }
 
         vedleggMetrics.registerNumberOfVedleggPerUser(klanke.vedlegg.size.toDouble())
-
-        // Log missing document in archive if relevant
-        userHasDocumentForThisTema(
-            innsendingsytelse = klanke.innsendingsytelse,
-            userIdent = klanke.foedselsnummer,
-            documentCheckAction = DocumentCheckAction.FINALIZE,
-            type = klanke.type,
-        )
     }
 
     fun getKlankePdf(klankeId: UUID): Pair<Path, String> {
@@ -292,13 +314,10 @@ class CommonService(
             }
     }
 
-    private fun createAggregatedKlanke(klanke: Klanke): AggregatedKlageAnke {
+    // Uses system user token, so it works outside a user request (async listener and scheduler).
+    fun createAggregatedKlankeAsSystemUser(klanke: Klanke): AggregatedKlageAnke {
         val vedtak = vedtakFromDate(klanke.vedtakDate) ?: "Ikke angitt"
-        val userInKlanke =
-            klageLookupClient.getPerson(
-                fnr = klanke.foedselsnummer,
-                tema = innsendingsytelseToTema[klanke.innsendingsytelse],
-            )
+        val userInKlanke = klageLookupClient.getPersonAsSystemUser(fnr = klanke.foedselsnummer)
 
         return AggregatedKlageAnke(
             id = klanke.id.toString(),
@@ -306,7 +325,7 @@ class CommonService(
             mellomnavn = userInKlanke.mellomnavn ?: "",
             etternavn = userInKlanke.etternavn,
             vedtak = vedtak,
-            dato = klanke.modifiedByUser.toLocalDate(),
+            dato = klanke.markedCompleted?.toLocalDate() ?: klanke.modifiedByUser.toLocalDate(),
             begrunnelse = sanitizeText(klanke.fritekst ?: ""),
             identifikasjonsnummer = klanke.foedselsnummer,
             ytelse = klanke.innsendingsytelse.nbName,

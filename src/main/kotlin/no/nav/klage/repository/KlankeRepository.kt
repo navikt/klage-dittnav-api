@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 interface KlankeRepository : JpaRepository<Klanke, UUID> {
+    fun findByStatus(status: KlageAnkeStatus): List<Klanke>
+
     fun findByStatusAndModifiedByUserLessThan(
         status: KlageAnkeStatus,
         modifiedByUser: LocalDateTime,

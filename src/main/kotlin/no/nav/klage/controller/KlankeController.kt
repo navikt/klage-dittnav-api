@@ -214,10 +214,10 @@ class KlankeController(
         @PathVariable klankeId: UUID,
     ): Map<String, String> {
         logger.debug("Finalize klanke is requested. Id: {}", klankeId)
-        val finalizedLocalDateTime = commonService.finalizeKlanke(klankeId = klankeId)
+        val finalizedKlanke = commonService.finalizeKlanke(klankeId = klankeId)
         return mapOf(
-            "finalizedDate" to finalizedLocalDateTime.toLocalDate().toString(),
-            "modifiedByUser" to finalizedLocalDateTime.toString(),
+            "finalizedDate" to finalizedKlanke.finalizedDate.toString(),
+            "modifiedByUser" to finalizedKlanke.modifiedByUser.toString(),
         )
     }
 
