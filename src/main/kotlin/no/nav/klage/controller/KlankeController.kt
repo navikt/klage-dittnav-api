@@ -13,7 +13,9 @@ import no.nav.klage.controller.view.StringInput
 import no.nav.klage.controller.view.StringInputNullable
 import no.nav.klage.controller.view.VedleggView
 import no.nav.klage.controller.view.toVedleggView
+import no.nav.klage.domain.JOURNALPOST_ID_EVENT_NAME
 import no.nav.klage.domain.exception.KlankeNotFoundException
+import no.nav.klage.domain.journalpostIdEvent
 import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
@@ -41,6 +43,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import java.io.FileInputStream
 import java.io.InputStream
 import java.nio.file.Files
@@ -92,15 +96,31 @@ class KlankeController(
         val heartbeatStream: Flux<ServerSentEvent<String>> =
             Flux
                 .interval(Duration.ofSeconds(10))
-                .takeWhile { true }
                 .map { tick -> tick.toHeartBeatServerSentEvent() }
 
-        return kafkaEventClient
-            .getEventPublisher()
-            .mapNotNull { event -> jsonToEvent(event.data()) }
-            .filter { it.klageAnkeId == klankeId.toString() }
-            .mapNotNull { it.toServerSentEvent() }
-            .mergeWith(heartbeatStream)
+        val publishedJournalpostIdEvent: Flux<ServerSentEvent<String>> =
+            kafkaEventClient
+                .getEventPublisher()
+                .mapNotNull { event -> jsonToEvent(event.data()) }
+                .filter {
+                    it.klageAnkeId == klankeId.toString() &&
+                        it.name == JOURNALPOST_ID_EVENT_NAME &&
+                        it.data.isNotBlank()
+                }.map { it.toServerSentEvent() }
+
+        // Covers the case where the journalpost was created before the client connected.
+        val existingJournalpostIdEvent: Mono<ServerSentEvent<String>> =
+            Mono
+                .fromCallable { commonService.getJournalpostIdWithoutValidation(klankeId = klankeId) }
+                .filter { it.isNotBlank() }
+                .subscribeOn(Schedulers.boundedElastic())
+                .map { journalpostId -> journalpostIdEvent(klankeId = klankeId, journalpostId = journalpostId).toServerSentEvent() }
+
+        // Merge subscribes in order, so the live subscription is active before the database is checked.
+        // The stream completes after the journalpostId event.
+        return Flux
+            .merge(publishedJournalpostIdEvent, existingJournalpostIdEvent, heartbeatStream)
+            .takeUntil { it.event() == JOURNALPOST_ID_EVENT_NAME }
     }
 
     @PostMapping

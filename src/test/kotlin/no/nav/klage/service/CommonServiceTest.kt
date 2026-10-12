@@ -10,7 +10,9 @@ import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.KlankeMarkedCompletedEvent
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
+import no.nav.klage.domain.exception.KlankeNotFoundException
 import no.nav.klage.domain.exception.SectionedValidationErrorWithDetailsException
+import no.nav.klage.domain.journalpostIdEvent
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
@@ -26,6 +28,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
+import java.util.UUID
 
 @ActiveProfiles("dbtest")
 @DataJpaTest
@@ -60,7 +63,6 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
             CommonService(
                 klankeRepository = klankeRepository,
                 validationService = validationService,
-                kafkaInternalEventService = mockk(),
                 klageAnkeMetrics = mockk(relaxed = true),
                 vedleggMetrics = mockk(relaxed = true),
                 klageDittnavPdfgenService = mockk(),
@@ -151,6 +153,32 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         commonService.markKlankeAsDone(klankeId = klanke.id)
 
         assertEquals(KlageAnkeStatus.DELETED, klankeRepository.findById(klanke.id).get().status)
+    }
+
+    @Test
+    fun `getJournalpostIdWithoutValidation returns stored journalpostId or null`() {
+        val withJournalpost = klankeRepository.save(createTestKlanke(status = KlageAnkeStatus.DONE).apply { journalpostId = "123" })
+        val withoutJournalpost = klankeRepository.save(createTestKlanke(status = KlageAnkeStatus.DRAFT))
+
+        assertEquals("123", commonService.getJournalpostIdWithoutValidation(klankeId = withJournalpost.id))
+        assertNull(commonService.getJournalpostIdWithoutValidation(klankeId = withoutJournalpost.id))
+    }
+
+    @Test
+    fun `getJournalpostIdWithoutValidation throws when klanke does not exist`() {
+        assertThrows<KlankeNotFoundException> {
+            commonService.getJournalpostIdWithoutValidation(klankeId = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"))
+        }
+    }
+
+    @Test
+    fun `setJournalpostIdWithoutValidation stores journalpostId and publishes event for after-commit delivery`() {
+        val klanke = klankeRepository.save(createTestKlanke(status = KlageAnkeStatus.DONE))
+
+        commonService.setJournalpostIdWithoutValidation(klankeId = klanke.id, journalpostId = "123")
+
+        assertEquals("123", klankeRepository.findById(klanke.id).get().journalpostId)
+        verify(exactly = 1) { applicationEventPublisher.publishEvent(journalpostIdEvent(klankeId = klanke.id, journalpostId = "123")) }
     }
 
     @Test

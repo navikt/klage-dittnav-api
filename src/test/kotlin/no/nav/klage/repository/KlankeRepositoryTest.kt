@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 @ActiveProfiles("dbtest")
 @DataJpaTest
@@ -167,5 +168,20 @@ class KlankeRepositoryTest : PostgresIntegrationTestBase() {
 
         assertThat(found).containsExactly(sending)
         assertThat(found.first().markedCompleted).isEqualTo(markedCompleted)
+    }
+
+    @Test
+    fun `findJournalpostIdById returns a projection with the journalpostId`() {
+        val withJournalpost =
+            testEntityManager.persistAndFlush(
+                createTestKlanke(status = KlageAnkeStatus.DONE).apply { journalpostId = "123" },
+            )
+        val withoutJournalpost = testEntityManager.persistAndFlush(createTestKlanke(status = KlageAnkeStatus.DRAFT))
+        testEntityManager.clear()
+
+        assertThat(klankeRepository.findJournalpostIdById(withJournalpost.id)?.journalpostId).isEqualTo("123")
+        assertThat(klankeRepository.findJournalpostIdById(withoutJournalpost.id)).isNotNull()
+        assertThat(klankeRepository.findJournalpostIdById(withoutJournalpost.id)?.journalpostId).isNull()
+        assertThat(klankeRepository.findJournalpostIdById(UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"))).isNull()
     }
 }
