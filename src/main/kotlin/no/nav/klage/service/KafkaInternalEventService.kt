@@ -6,6 +6,8 @@ import no.nav.klage.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Service
 class KafkaInternalEventService(
@@ -18,6 +20,8 @@ class KafkaInternalEventService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    // Publish after DB commit.
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun publishEvent(event: Event) {
         runCatching {
             logger.debug("Publishing internal event to Kafka for subscribers: {}", event)

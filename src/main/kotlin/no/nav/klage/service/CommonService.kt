@@ -10,12 +10,13 @@ import no.nav.klage.controller.view.KlankeView
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.controller.view.toKlankeFinalizedView
 import no.nav.klage.controller.view.toKlankeView
-import no.nav.klage.domain.Event
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.KlankeMarkedCompletedEvent
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Navn
 import no.nav.klage.domain.Type
+import no.nav.klage.domain.exception.KlankeNotFoundException
+import no.nav.klage.domain.journalpostIdEvent
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Sak
 import no.nav.klage.domain.jpa.isFinalized
@@ -41,7 +42,6 @@ import java.util.UUID
 class CommonService(
     private val klankeRepository: KlankeRepository,
     private val validationService: ValidationService,
-    private val kafkaInternalEventService: KafkaInternalEventService,
     private val klageAnkeMetrics: KlageAnkeMetrics,
     private val vedleggMetrics: VedleggMetrics,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
@@ -501,7 +501,7 @@ class CommonService(
     }
 
     fun getJournalpostIdWithoutValidation(klankeId: UUID): String? {
-        val klanke = klankeRepository.findById(klankeId).get()
+        val klanke = klankeRepository.findJournalpostIdById(id = klankeId) ?: throw KlankeNotFoundException()
         return klanke.journalpostId
     }
 
@@ -510,14 +510,7 @@ class CommonService(
         journalpostId: String,
     ) {
         updateJournalpostIdWithoutValidation(klankeId, journalpostId)
-        kafkaInternalEventService.publishEvent(
-            Event(
-                klageAnkeId = klankeId.toString(),
-                name = "journalpostId",
-                id = klankeId.toString(),
-                data = journalpostId,
-            ),
-        )
+        applicationEventPublisher.publishEvent(journalpostIdEvent(klankeId = klankeId, journalpostId = journalpostId))
     }
 
     fun setPdfDownloadedWithoutAccessValidation(
