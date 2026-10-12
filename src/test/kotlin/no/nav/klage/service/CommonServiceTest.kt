@@ -261,7 +261,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         verify(exactly = 1) {
             safselvbetjeningService.getUsersDocumentTemas(userIdent = BRUKER_FNR)
         }
-        verify(exactly = 0) { validationService.validateFullmakt(any(), any()) }
+        verify(exactly = 0) { validationService.validateFullmakt(fullmaktsGiverId = any(), tema = any()) }
     }
 
     @Test
@@ -282,7 +282,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         verify(exactly = 1) {
             safselvbetjeningService.getUsersDocumentTemas(userIdent = BRUKER_FNR)
         }
-        verify(exactly = 0) { validationService.validateFullmakt(any(), any()) }
+        verify(exactly = 0) { validationService.validateFullmakt(fullmaktsGiverId = any(), tema = any()) }
     }
 
     @Test
