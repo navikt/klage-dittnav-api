@@ -132,6 +132,7 @@ class KlageDittnavPdfgenService(
                     brukerId = foedselsnummer,
                     brukerType = Brukertype.PERSON,
                 ),
+            avsender = fullmektigFoedselsnummer?.let { FoerstesideRequest.Avsender(avsenderId = it) },
             tema = innsendingsytelseToTema[innsendingsytelse]!!.name,
             arkivtittel = arkivtittel,
             navSkjemaId = navSkjemaId,

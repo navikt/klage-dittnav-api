@@ -6,8 +6,7 @@ import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
 import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
 import no.nav.klage.controller.view.EditedView
-import no.nav.klage.controller.view.KlankeFullInput
-import no.nav.klage.controller.view.KlankeMinimalInput
+import no.nav.klage.controller.view.KlankeInput
 import no.nav.klage.controller.view.KlankeView
 import no.nav.klage.controller.view.StringInput
 import no.nav.klage.controller.view.StringInputNullable
@@ -123,21 +122,12 @@ class KlankeController(
             .takeUntil { it.event() == JOURNALPOST_ID_EVENT_NAME }
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createKlanke(
-        @RequestBody klankeFullInput: KlankeFullInput,
-    ): KlankeView {
-        logger.debug("Create klanke is requested.")
-        return commonService.createKlanke(input = klankeFullInput)
-    }
-
     @PutMapping
     fun createOrGetKlanke(
-        @RequestBody klankeMinimalInput: KlankeMinimalInput,
+        @RequestBody klankeInput: KlankeInput,
     ): KlankeView {
         logger.debug("Create or update klanke for user is requested.")
-        return commonService.getDraftOrCreateKlanke(input = klankeMinimalInput)
+        return commonService.getDraftOrCreateKlanke(input = klankeInput)
     }
 
     @PutMapping("/{klankeId}/fritekst")

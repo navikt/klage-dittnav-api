@@ -4,8 +4,7 @@ import no.nav.klage.clients.klagelookup.KlageLookupClient
 import no.nav.klage.common.KlageAnkeMetrics
 import no.nav.klage.common.VedleggMetrics
 import no.nav.klage.controller.view.KlankeFinalizedView
-import no.nav.klage.controller.view.KlankeFullInput
-import no.nav.klage.controller.view.KlankeMinimalInput
+import no.nav.klage.controller.view.KlankeInput
 import no.nav.klage.controller.view.KlankeView
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.controller.view.toKlankeFinalizedView
@@ -58,60 +57,21 @@ class CommonService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun createKlanke(input: KlankeFullInput): KlankeView {
-        val currentUser = tokenUtil.getSubject()
-        val klanke = input.toKlanke(foedselsnummer = currentUser)
-        return klankeRepository
-            .save(klanke)
-            .also {
-                updateMetrics(input = klanke)
-            }.toKlankeView(
-                userHasDocumentForThisTema =
-                    userHasDocumentForThisTema(
-                        innsendingsytelse = klanke.innsendingsytelse,
-                        userIdent = klanke.foedselsnummer,
-                        documentCheckAction = DocumentCheckAction.CREATE,
-                        type = klanke.type,
-                    ),
-            )
-    }
-
     private fun createKlanke(
-        input: KlankeMinimalInput,
+        input: KlankeInput,
         foedselsnummer: String,
+        fullmektigFoedselsnummer: String?,
     ): Klanke {
-        val klanke = input.toKlanke(foedselsnummer = foedselsnummer)
+        val klanke = input.toKlanke(foedselsnummer = foedselsnummer, fullmektigFoedselsnummer = fullmektigFoedselsnummer)
         return klankeRepository.save(klanke).also {
             updateMetrics(input = klanke)
         }
     }
 
-    private fun KlankeFullInput.toKlanke(foedselsnummer: String): Klanke =
-        Klanke(
-            foedselsnummer = foedselsnummer,
-            fritekst = fritekst,
-            status = KlageAnkeStatus.DRAFT,
-            userSaksnummer = userSaksnummer,
-            journalpostId = null,
-            vedtakDate = vedtakDate,
-            sak =
-                Sak(
-                    fagsakid = internalSaksnummer,
-                    sakstype = sakSakstype,
-                    fagsaksystem = sakFagsaksystem,
-                ),
-            language = language,
-            innsendingsytelse = innsendingsytelse,
-            hasVedlegg = hasVedlegg,
-            created = LocalDateTime.now(),
-            modifiedByUser = LocalDateTime.now(),
-            pdfDownloaded = null,
-            type = type,
-            caseIsAtKA = caseIsAtKA,
-            fullmektigFoedselsnummer = null,
-        )
-
-    private fun KlankeMinimalInput.toKlanke(foedselsnummer: String): Klanke =
+    private fun KlankeInput.toKlanke(
+        foedselsnummer: String,
+        fullmektigFoedselsnummer: String?,
+    ): Klanke =
         Klanke(
             foedselsnummer = foedselsnummer,
             fritekst = null,
@@ -133,7 +93,7 @@ class CommonService(
             pdfDownloaded = null,
             type = type,
             caseIsAtKA = caseIsAtKA,
-            fullmektigFoedselsnummer = null,
+            fullmektigFoedselsnummer = fullmektigFoedselsnummer,
         )
 
     private fun updateMetrics(input: Klanke) {
@@ -149,14 +109,23 @@ class CommonService(
         )
     }
 
-    fun getDraftOrCreateKlanke(input: KlankeMinimalInput): KlankeView {
+    fun getDraftOrCreateKlanke(input: KlankeInput): KlankeView {
         val currentUser = tokenUtil.getSubject()
+        val currentSakenGjelder = input.sakenGjelder ?: tokenUtil.getSubject()
+        val currentFullmektig = (if (currentSakenGjelder != currentUser) currentUser else null)
+        if (currentFullmektig != null) {
+            validationService.validateFullmakt(
+                fullmaktsGiverId = currentSakenGjelder,
+                tema = innsendingsytelseToTema[input.innsendingsytelse]!!,
+            )
+        }
         val existingKlanke =
             getLatestKlankeDraft(
-                foedselsnummer = currentUser,
+                foedselsnummer = currentSakenGjelder,
                 internalSaksnummer = input.internalSaksnummer,
                 innsendingsytelse = input.innsendingsytelse,
                 type = input.type,
+                fullmektigFoedselsnummer = currentFullmektig,
             )
 
         if (existingKlanke != null && input.caseIsAtKA != null) {
@@ -174,12 +143,13 @@ class CommonService(
         )
             ?: createKlanke(
                 input = input,
-                foedselsnummer = currentUser,
+                foedselsnummer = currentSakenGjelder,
+                fullmektigFoedselsnummer = currentFullmektig,
             ).toKlankeView(
                 userHasDocumentForThisTema =
                     userHasDocumentForThisTema(
                         innsendingsytelse = input.innsendingsytelse,
-                        userIdent = currentUser,
+                        userIdent = currentSakenGjelder,
                         documentCheckAction = DocumentCheckAction.CREATE,
                         type = input.type,
                     ),
@@ -191,12 +161,14 @@ class CommonService(
         internalSaksnummer: String?,
         innsendingsytelse: Innsendingsytelse,
         type: Type,
+        fullmektigFoedselsnummer: String?,
     ): Klanke? =
         klankeRepository
-            .findByFoedselsnummerAndStatusAndType(
+            .findByFoedselsnummerAndStatusAndTypeAndFullmektigFoedselsnummer(
                 fnr = foedselsnummer,
                 status = KlageAnkeStatus.DRAFT,
                 type = type,
+                fullmektigFoedselsnummer = fullmektigFoedselsnummer,
             ).filter {
                 if (internalSaksnummer != null) {
                     it.innsendingsytelse == innsendingsytelse && it.sak?.fagsakid == internalSaksnummer

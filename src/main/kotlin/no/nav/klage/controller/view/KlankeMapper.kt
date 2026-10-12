@@ -25,6 +25,7 @@ fun Klanke.toKlankeView(userHasDocumentForThisTema: Boolean?): KlankeView =
         type = type,
         caseIsAtKA = caseIsAtKA,
         userHasDocumentForThisTema = userHasDocumentForThisTema,
+        sakenGjelder = foedselsnummer,
     )
 
 fun Klanke.toKlankeFinalizedView(): KlankeFinalizedView =

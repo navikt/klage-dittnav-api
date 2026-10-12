@@ -29,6 +29,7 @@ data class KlankeView(
     val type: Type,
     val caseIsAtKA: Boolean?,
     val userHasDocumentForThisTema: Boolean?,
+    val sakenGjelder: String,
 )
 
 data class KlankeFinalizedView(

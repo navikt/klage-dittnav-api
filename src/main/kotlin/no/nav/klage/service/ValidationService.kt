@@ -12,6 +12,7 @@ import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.isAccessibleToUser
 import no.nav.klage.domain.jpa.isDeleted
 import no.nav.klage.domain.jpa.isFinalized
+import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
@@ -44,14 +45,24 @@ class ValidationService(
         }
     }
 
-    private fun validateKlankeAccessForFullmektig(klanke: Klanke) {
+    fun validateFullmakt(
+        fullmaktsGiverId: String,
+        tema: Tema,
+    ) {
         if (!representasjonService.representasjonIsValid(
-                representasjonsgiverFnr = klanke.foedselsnummer,
-                tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!,
+                representasjonsgiverFnr = fullmaktsGiverId,
+                tema = tema,
             )
         ) {
             throw InvalidFullmaktException("Oppgitt fullmaktsforhold er ugyldig.")
         }
+    }
+
+    private fun validateKlankeAccessForFullmektig(klanke: Klanke) {
+        validateFullmakt(
+            fullmaktsGiverId = klanke.foedselsnummer,
+            tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!,
+        )
     }
 
     fun validateKlankeAccessForIdentifikasjonsnummer(
