@@ -45,6 +45,7 @@ class CommonService(
     private val vedleggMetrics: VedleggMetrics,
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,
     private val documentService: DocumentService,
+    private val representasjonService: RepresentasjonService,
     private val klageLookupClient: KlageLookupClient,
     private val tokenUtil: TokenUtil,
     private val safSelvbetjeningService: SafSelvbetjeningService,
@@ -140,6 +141,12 @@ class CommonService(
                     documentCheckAction = DocumentCheckAction.OTHER,
                     type = existingKlanke.type,
                 ),
+            fullmaktsgivere =
+                innsendingsytelseToTema[existingKlanke.innsendingsytelse]?.let {
+                    representasjonService.getFullmaktsgivereForTema(
+                        it,
+                    )
+                } ?: emptyList(),
         )
             ?: createKlanke(
                 input = input,
@@ -153,6 +160,12 @@ class CommonService(
                         documentCheckAction = DocumentCheckAction.CREATE,
                         type = input.type,
                     ),
+                fullmaktsgivere =
+                    innsendingsytelseToTema[input.innsendingsytelse]?.let {
+                        representasjonService.getFullmaktsgivereForTema(
+                            it,
+                        )
+                    } ?: emptyList(),
             )
     }
 
@@ -359,6 +372,12 @@ class CommonService(
                     documentCheckAction = DocumentCheckAction.OTHER,
                     type = klanke.type,
                 ),
+            fullmaktsgivere =
+                innsendingsytelseToTema[klanke.innsendingsytelse]?.let {
+                    representasjonService.getFullmaktsgivereForTema(
+                        it,
+                    )
+                } ?: emptyList(),
         )
     }
 

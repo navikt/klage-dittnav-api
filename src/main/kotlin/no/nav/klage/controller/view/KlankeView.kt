@@ -30,6 +30,7 @@ data class KlankeView(
     val caseIsAtKA: Boolean?,
     val userHasDocumentForThisTema: Boolean?,
     val sakenGjelder: String,
+    val fullmaktsgivere: List<String>,
 )
 
 data class KlankeFinalizedView(

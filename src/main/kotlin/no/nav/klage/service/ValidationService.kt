@@ -30,7 +30,7 @@ class ValidationService(
 
     fun validateKlankeAccess(klanke: Klanke) {
         val currentLoggedInFnr = tokenUtil.getSubject()
-        if (klanke.fullmektigFoedselsnummer != null && currentLoggedInFnr != klanke.foedselsnummer) {
+        if (klanke.fullmektigFoedselsnummer != null) {
             if (currentLoggedInFnr != klanke.fullmektigFoedselsnummer) {
                 throw KlankeNotFoundException()
             }

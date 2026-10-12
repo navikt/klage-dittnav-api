@@ -55,6 +55,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     private val applicationEventPublisher: ApplicationEventPublisher = mockk(relaxed = true)
     private val validationService: ValidationService = mockk(relaxed = true)
     private val tokenUtil: TokenUtil = mockk()
+    private val representasjonService: RepresentasjonService = mockk()
 
     @Autowired
     private lateinit var klankeRepository: KlankeRepository
@@ -73,6 +74,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 vedleggMetrics = mockk(relaxed = true),
                 klageDittnavPdfgenService = mockk(),
                 documentService = mockk(),
+                representasjonService = representasjonService,
                 klageLookupClient = klageLookupClient,
                 tokenUtil = tokenUtil,
                 safSelvbetjeningService = safselvbetjeningService,
@@ -245,6 +247,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     fun `getDraftOrCreateKlanke creates draft without fullmektig when sakenGjelder is omitted`() {
         every { tokenUtil.getSubject() } returns BRUKER_FNR
         every { safselvbetjeningService.getUsersDocumentTemas(userIdent = BRUKER_FNR) } returns emptyList()
+        every { representasjonService.getFullmaktsgivereForTema(any()) } returns emptyList()
 
         val result = commonService.getDraftOrCreateKlanke(input = createKlankeInput(sakenGjelder = null))
         val storedKlanke = klankeRepository.findAll().single()
@@ -265,6 +268,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     fun `getDraftOrCreateKlanke creates draft without fullmektig when sakenGjelder is current user`() {
         every { tokenUtil.getSubject() } returns BRUKER_FNR
         every { safselvbetjeningService.getUsersDocumentTemas(userIdent = BRUKER_FNR) } returns emptyList()
+        every { representasjonService.getFullmaktsgivereForTema(any()) } returns emptyList()
 
         val result = commonService.getDraftOrCreateKlanke(input = createKlankeInput(sakenGjelder = BRUKER_FNR))
         val storedKlanke = klankeRepository.findAll().single()
@@ -285,6 +289,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     fun `getDraftOrCreateKlanke creates represented draft when fullmakt is valid`() {
         every { tokenUtil.getSubject() } returns BRUKER_FNR
         every { safselvbetjeningService.getUsersDocumentTemas(userIdent = FULLMAKTSGIVER_FNR) } returns emptyList()
+        every { representasjonService.getFullmaktsgivereForTema(any()) } returns emptyList()
 
         val result = commonService.getDraftOrCreateKlanke(input = createKlankeInput(sakenGjelder = FULLMAKTSGIVER_FNR))
         val storedKlanke = klankeRepository.findAll().single()
@@ -350,6 +355,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
     @Test
     fun `updateFritekst works as expected`() {
         createDBEntryWithYtelse()
+        every { representasjonService.getFullmaktsgivereForTema(any()) } returns emptyList()
 
         val klage = klankeRepository.findAll().first()
         commonService.updateFritekst(klankeId = klage.id, fritekst = exampleFritekst2)
