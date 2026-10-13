@@ -9,6 +9,8 @@ import no.nav.klage.controller.view.KlankeView
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.controller.view.toKlankeFinalizedView
 import no.nav.klage.controller.view.toKlankeView
+import no.nav.klage.domain.Bruker
+import no.nav.klage.domain.Event
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.KlankeMarkedCompletedEvent
 import no.nav.klage.domain.LanguageEnum
@@ -50,6 +52,7 @@ class CommonService(
     private val tokenUtil: TokenUtil,
     private val safSelvbetjeningService: SafSelvbetjeningService,
     private val applicationEventPublisher: ApplicationEventPublisher,
+    private val brukerService: BrukerService,
 ) {
     companion object {
         private const val LOENNSKOMPENSASJON_GRAFANA_TEMA = "LOK"
@@ -141,12 +144,7 @@ class CommonService(
                     documentCheckAction = DocumentCheckAction.OTHER,
                     type = existingKlanke.type,
                 ),
-            fullmaktsgivere =
-                innsendingsytelseToTema[existingKlanke.innsendingsytelse]?.let {
-                    representasjonService.getFullmaktsgivereForTema(
-                        it,
-                    )
-                } ?: emptyList(),
+            fullmaktsgivere = getFullmaktsgivere(existingKlanke.innsendingsytelse),
         )
             ?: createKlanke(
                 input = input,
@@ -160,14 +158,19 @@ class CommonService(
                         documentCheckAction = DocumentCheckAction.CREATE,
                         type = input.type,
                     ),
-                fullmaktsgivere =
-                    innsendingsytelseToTema[input.innsendingsytelse]?.let {
-                        representasjonService.getFullmaktsgivereForTema(
-                            it,
-                        )
-                    } ?: emptyList(),
+                fullmaktsgivere = getFullmaktsgivere(input.innsendingsytelse),
             )
     }
+
+    private fun getFullmaktsgivere(innsendingsytelse: Innsendingsytelse): List<Bruker> =
+        innsendingsytelseToTema[innsendingsytelse]?.let {
+            representasjonService
+                .getFullmaktsgivereForTema(
+                    it,
+                ).map {
+                    brukerService.getBruker(fnr = it, tema = innsendingsytelseToTema[innsendingsytelse])
+                }
+        } ?: emptyList()
 
     fun getLatestKlankeDraft(
         foedselsnummer: String,
@@ -376,12 +379,7 @@ class CommonService(
                     documentCheckAction = DocumentCheckAction.OTHER,
                     type = klanke.type,
                 ),
-            fullmaktsgivere =
-                innsendingsytelseToTema[klanke.innsendingsytelse]?.let {
-                    representasjonService.getFullmaktsgivereForTema(
-                        it,
-                    )
-                } ?: emptyList(),
+            fullmaktsgivere = getFullmaktsgivere(klanke.innsendingsytelse),
         )
     }
 

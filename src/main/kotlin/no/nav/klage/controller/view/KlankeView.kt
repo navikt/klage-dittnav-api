@@ -1,5 +1,6 @@
 package no.nav.klage.controller.view
 
+import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.LanguageEnum
 import no.nav.klage.domain.Type
@@ -30,7 +31,7 @@ data class KlankeView(
     val caseIsAtKA: Boolean?,
     val userHasDocumentForThisTema: Boolean?,
     val sakenGjelder: String,
-    val fullmaktsgivere: List<String>,
+    val fullmaktsgivere: List<Bruker>,
 )
 
 data class KlankeFinalizedView(

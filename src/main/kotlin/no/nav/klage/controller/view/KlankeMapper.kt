@@ -1,5 +1,6 @@
 package no.nav.klage.controller.view
 
+import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.isFinalized
 import no.nav.klage.domain.jpa.Klanke
@@ -7,7 +8,7 @@ import no.nav.klage.domain.jpa.Vedlegg
 
 fun Klanke.toKlankeView(
     userHasDocumentForThisTema: Boolean?,
-    fullmaktsgivere: List<String>,
+    fullmaktsgivere: List<Bruker>,
 ): KlankeView =
     KlankeView(
         id = id,
