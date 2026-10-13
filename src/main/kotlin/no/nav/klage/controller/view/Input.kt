@@ -2,13 +2,12 @@ package no.nav.klage.controller.view
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.klage.domain.Type
-import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.innsendingsytelse.Innsendingsytelse
 import java.time.LocalDate
 
 data class GetPersonInput(
     val fnr: String,
-    val tema: Tema?,
+    val innsendingsytelse: Innsendingsytelse?,
 )
 
 data class StringInput(
