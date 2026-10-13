@@ -271,6 +271,10 @@ class CommonService(
 
     fun getKlankePdf(klankeId: UUID): Pair<Path, String> {
         val existingKlanke = klankeRepository.findById(klankeId).get()
+        val currentUser = tokenUtil.getSubject()
+        if (currentUser != existingKlanke.foedselsnummer) {
+            throw RuntimeException("Dokumentet er kun tilgjengelig for den saken gjelder.")
+        }
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = existingKlanke)
         requireNotNull(existingKlanke.journalpostId)
