@@ -2,6 +2,7 @@ package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.clients.events.KafkaEventClient
+import no.nav.klage.clients.events.SseShutdownSignal
 import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
 import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
@@ -58,6 +59,7 @@ class KlankeController(
     private val vedleggService: VedleggService,
     private val kafkaEventClient: KafkaEventClient,
     private val commonService: CommonService,
+    private val sseShutdownSignal: SseShutdownSignal,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -116,10 +118,12 @@ class KlankeController(
                 .map { journalpostId -> journalpostIdEvent(klankeId = klankeId, journalpostId = journalpostId).toServerSentEvent() }
 
         // Merge subscribes in order, so the live subscription is active before the database is checked.
-        // The stream completes after the journalpostId event.
+        // The stream completes after the journalpostId event, or when the application shuts down
+        // (the client then reconnects and gets the journalpostId from the database).
         return Flux
             .merge(publishedJournalpostIdEvent, existingJournalpostIdEvent, heartbeatStream)
             .takeUntil { it.event() == JOURNALPOST_ID_EVENT_NAME }
+            .takeUntilOther(sseShutdownSignal.asMono())
     }
 
     @PutMapping

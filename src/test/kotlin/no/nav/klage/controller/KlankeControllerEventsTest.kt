@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import no.nav.klage.clients.events.KafkaEventClient
+import no.nav.klage.clients.events.SseShutdownSignal
 import no.nav.klage.domain.Event
 import no.nav.klage.domain.JOURNALPOST_ID_EVENT_NAME
 import no.nav.klage.domain.exception.KlankeNotFoundException
@@ -19,19 +20,23 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.codec.ServerSentEvent
 import reactor.core.publisher.Sinks
+import reactor.core.scheduler.Schedulers
 import java.time.Duration
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class KlankeControllerEventsTest {
     private val klankeId = UUID.fromString("00000000-0000-0000-0000-000000000000")
     private val otherKlankeId = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff")
     private val commonService = mockk<CommonService>()
     private val kafkaEventClient = mockk<KafkaEventClient>()
+    private val sseShutdownSignal = SseShutdownSignal()
     private val controller =
         KlankeController(
             vedleggService = mockk(),
             kafkaEventClient = kafkaEventClient,
             commonService = commonService,
+            sseShutdownSignal = sseShutdownSignal,
         )
 
     // Hot like production: KafkaEventClient uses a connected publish(), which drops events nobody is subscribed to.
@@ -121,6 +126,31 @@ class KlankeControllerEventsTest {
 
         assertEquals(1, events.size)
         assertEquals("from-kafka", events.first().data())
+    }
+
+    @Test
+    fun `completes open stream when the application shuts down`() {
+        every { commonService.getJournalpostIdWithoutValidation(klankeId) } returns null
+
+        val events =
+            controller
+                .getEvents(klankeId)
+                .doOnSubscribe {
+                    Schedulers.parallel().schedule({ sseShutdownSignal.onShutdown() }, 200, TimeUnit.MILLISECONDS)
+                }.collectList()
+                .block(Duration.ofSeconds(5))!!
+
+        assertTrue(events.isEmpty())
+    }
+
+    @Test
+    fun `completes immediately when connecting after shutdown has started`() {
+        every { commonService.getJournalpostIdWithoutValidation(klankeId) } returns null
+        sseShutdownSignal.onShutdown()
+
+        val events = collectEvents()
+
+        assertTrue(events.isEmpty())
     }
 
     @Test
