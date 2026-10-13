@@ -74,6 +74,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
                 vedleggMetrics = mockk(relaxed = true),
                 klageDittnavPdfgenService = mockk(),
                 documentService = mockk(),
+                brukerService = mockk(),
                 representasjonService = representasjonService,
                 klageLookupClient = klageLookupClient,
                 tokenUtil = tokenUtil,
