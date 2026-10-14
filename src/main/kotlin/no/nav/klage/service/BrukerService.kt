@@ -43,7 +43,7 @@ class BrukerService(
 
     private fun PersonResponse.toBrukerNavn() =
         no.nav.klage.domain.Navn(
-            fornavn = fornavn,
+            fornavn = fornavn + if (mellomnavn != null) " $mellomnavn" else "",
             etternavn = etternavn,
         )
 }

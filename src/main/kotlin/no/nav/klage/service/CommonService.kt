@@ -10,7 +10,6 @@ import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.controller.view.toKlankeFinalizedView
 import no.nav.klage.controller.view.toKlankeView
 import no.nav.klage.domain.Bruker
-import no.nav.klage.domain.Event
 import no.nav.klage.domain.KlageAnkeStatus
 import no.nav.klage.domain.KlankeMarkedCompletedEvent
 import no.nav.klage.domain.LanguageEnum
@@ -351,7 +350,7 @@ class CommonService(
             foedselsnummer = klanke.foedselsnummer,
             navn =
                 Navn(
-                    fornavn = brukerInKlanke.fornavn,
+                    fornavn = brukerInKlanke.fornavn + if (brukerInKlanke.mellomnavn != null) " ${brukerInKlanke.mellomnavn}" else "",
                     etternavn = brukerInKlanke.etternavn,
                 ),
             fritekst = klanke.fritekst ?: "",
