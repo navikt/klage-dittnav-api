@@ -15,10 +15,11 @@ interface KlankeRepository : JpaRepository<Klanke, UUID> {
         modifiedByUser: LocalDateTime,
     ): List<Klanke>
 
-    fun findByFoedselsnummerAndStatusAndType(
+    fun findByFoedselsnummerAndStatusAndTypeAndFullmektigFoedselsnummer(
         fnr: String,
         status: KlageAnkeStatus,
         type: Type,
+        fullmektigFoedselsnummer: String?,
     ): List<Klanke>
 
     // Returns a projection rather than the entity, so only journalpostId is selected and the eager vedlegg are not loaded.

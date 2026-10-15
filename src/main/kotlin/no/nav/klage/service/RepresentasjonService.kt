@@ -9,16 +9,16 @@ class RepresentasjonService(
     private val klageLookupClient: KlageLookupClient,
 ) {
     fun representasjonIsValid(
-        representasjonsgiverFnr: String,
+        fullmaktsgiverId: String,
         tema: Tema,
     ): Boolean {
         val usersRepresentasjonsforhold = klageLookupClient.getRepresentasjonsforhold()
         val vergemaalExists =
-            usersRepresentasjonsforhold.vergemaal.find { it.vergehaver == representasjonsgiverFnr }?.skriverettigheter?.contains(
+            usersRepresentasjonsforhold.vergemaal.find { it.vergehaver == fullmaktsgiverId }?.skriverettigheter?.contains(
                 tema,
             ) ?: false
         val fullmaktExists =
-            usersRepresentasjonsforhold.fullmakt.find { it.fullmaktsgiver == representasjonsgiverFnr }?.skriverettigheter?.contains(
+            usersRepresentasjonsforhold.fullmakt.find { it.fullmaktsgiver == fullmaktsgiverId }?.skriverettigheter?.contains(
                 tema,
             ) ?: false
 

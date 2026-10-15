@@ -13,7 +13,7 @@ class KlankeMapperTest {
     fun `SENDING is shown to the user as DONE with finalizedDate`() {
         val klanke = createTestKlanke(status = KlageAnkeStatus.SENDING, markedCompleted = LocalDateTime.now())
 
-        val view = klanke.toKlankeView(userHasDocumentForThisTema = null)
+        val view = klanke.toKlankeView(userHasDocumentForThisTema = null, fullmaktsgivere = emptyList())
 
         assertEquals(KlageAnkeStatus.DONE, view.status)
         assertEquals(klanke.modifiedByUser.toLocalDate(), view.finalizedDate)
@@ -21,7 +21,10 @@ class KlankeMapperTest {
 
     @Test
     fun `DRAFT has no finalizedDate`() {
-        val view = createTestKlanke(status = KlageAnkeStatus.DRAFT).toKlankeView(userHasDocumentForThisTema = null)
+        val view =
+            createTestKlanke(
+                status = KlageAnkeStatus.DRAFT,
+            ).toKlankeView(userHasDocumentForThisTema = null, fullmaktsgivere = emptyList())
 
         assertEquals(KlageAnkeStatus.DRAFT, view.status)
         assertNull(view.finalizedDate)
