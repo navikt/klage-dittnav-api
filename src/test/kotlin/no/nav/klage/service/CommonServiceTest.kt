@@ -262,7 +262,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         verify(exactly = 1) {
             safselvbetjeningService.getUsersDocumentTemas(userIdent = BRUKER_FNR)
         }
-        verify(exactly = 0) { validationService.validateFullmakt(fullmaktsGiverId = any(), tema = any()) }
+        verify(exactly = 0) { validationService.validateFullmakt(fullmaktsgiverId = any(), tema = any()) }
     }
 
     @Test
@@ -283,7 +283,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         verify(exactly = 1) {
             safselvbetjeningService.getUsersDocumentTemas(userIdent = BRUKER_FNR)
         }
-        verify(exactly = 0) { validationService.validateFullmakt(fullmaktsGiverId = any(), tema = any()) }
+        verify(exactly = 0) { validationService.validateFullmakt(fullmaktsgiverId = any(), tema = any()) }
     }
 
     @Test
@@ -304,7 +304,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         verify(exactly = 1) {
             safselvbetjeningService.getUsersDocumentTemas(userIdent = FULLMAKTSGIVER_FNR)
         }
-        verify(exactly = 1) { validationService.validateFullmakt(fullmaktsGiverId = FULLMAKTSGIVER_FNR, tema = Tema.AAP) }
+        verify(exactly = 1) { validationService.validateFullmakt(fullmaktsgiverId = FULLMAKTSGIVER_FNR, tema = Tema.AAP) }
     }
 
     @Test
@@ -323,7 +323,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
         every { tokenUtil.getSubject() } returns BRUKER_FNR
         every {
             validationService.validateFullmakt(
-                fullmaktsGiverId = FULLMAKTSGIVER_FNR,
+                fullmaktsgiverId = FULLMAKTSGIVER_FNR,
                 tema = Tema.AAP,
             )
         } throws InvalidFullmaktException()
@@ -344,7 +344,7 @@ class CommonServiceTest : PostgresIntegrationTestBase() {
 
         verify(exactly = 1) {
             validationService.validateFullmakt(
-                fullmaktsGiverId = FULLMAKTSGIVER_FNR,
+                fullmaktsgiverId = FULLMAKTSGIVER_FNR,
                 tema = Tema.AAP,
             )
         }

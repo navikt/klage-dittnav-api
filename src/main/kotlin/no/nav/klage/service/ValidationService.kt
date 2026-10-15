@@ -46,11 +46,11 @@ class ValidationService(
     }
 
     fun validateFullmakt(
-        fullmaktsGiverId: String,
+        fullmaktsgiverId: String,
         tema: Tema,
     ) {
         if (!representasjonService.representasjonIsValid(
-                representasjonsgiverFnr = fullmaktsGiverId,
+                representasjonsgiverFnr = fullmaktsgiverId,
                 tema = tema,
             )
         ) {
@@ -60,7 +60,7 @@ class ValidationService(
 
     private fun validateKlankeAccessForFullmektig(klanke: Klanke) {
         validateFullmakt(
-            fullmaktsGiverId = klanke.foedselsnummer,
+            fullmaktsgiverId = klanke.foedselsnummer,
             tema = innsendingsytelseToTema[klanke.innsendingsytelse]!!,
         )
     }

@@ -118,7 +118,7 @@ class CommonService(
         val currentFullmektig = (if (currentSakenGjelder != currentUser) currentUser else null)
         if (currentFullmektig != null) {
             validationService.validateFullmakt(
-                fullmaktsGiverId = currentSakenGjelder,
+                fullmaktsgiverId = currentSakenGjelder,
                 tema = innsendingsytelseToTema[input.innsendingsytelse]!!,
             )
         }
