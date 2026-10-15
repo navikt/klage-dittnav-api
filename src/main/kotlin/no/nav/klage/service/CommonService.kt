@@ -113,9 +113,9 @@ class CommonService(
     }
 
     fun getDraftOrCreateKlanke(input: KlankeInput): KlankeView {
-        val currentUser = tokenUtil.getSubject()
-        val currentSakenGjelder = input.sakenGjelder ?: tokenUtil.getSubject()
-        val currentFullmektig = (if (currentSakenGjelder != currentUser) currentUser else null)
+        val loggedInUser = tokenUtil.getSubject()
+        val currentSakenGjelder = input.sakenGjelder ?: loggedInUser
+        val currentFullmektig = if (currentSakenGjelder != loggedInUser) loggedInUser else null
         if (currentFullmektig != null) {
             validationService.validateFullmakt(
                 fullmaktsgiverId = currentSakenGjelder,
@@ -273,9 +273,9 @@ class CommonService(
 
     fun getKlankePdf(klankeId: UUID): Pair<Path, String> {
         val existingKlanke = klankeRepository.findById(klankeId).get()
-        val currentUser = tokenUtil.getSubject()
-        if (currentUser != existingKlanke.foedselsnummer) {
-            throw RuntimeException("Dokumentet er kun tilgjengelig for den saken gjelder.")
+        val loggedInUser = tokenUtil.getSubject()
+        if (loggedInUser != existingKlanke.foedselsnummer) {
+            throw KlankeNotFoundException()
         }
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = existingKlanke)
