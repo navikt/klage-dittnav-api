@@ -50,7 +50,7 @@ class ValidationService(
         tema: Tema,
     ) {
         if (!representasjonService.representasjonIsValid(
-                representasjonsgiverFnr = fullmaktsgiverId,
+                fullmaktsgiverId = fullmaktsgiverId,
                 tema = tema,
             )
         ) {
