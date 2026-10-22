@@ -23,7 +23,7 @@ class KlankeControllerTimingTest {
         val klankeId = UUID.randomUUID()
         val vedlegg = MockMultipartFile("vedlegg", "test.pdf", "application/pdf", byteArrayOf(1))
         val request = MockHttpServletRequest()
-        every { vedleggService.addKlankevedlegg(klankeId, vedlegg) } returns
+        every { vedleggService.addKlankevedlegg(klankeId = klankeId, multipart = vedlegg) } returns
             Vedlegg(tittel = "test.pdf", ref = "ref", contentType = "application/pdf", sizeInBytes = 1)
         val controller =
             KlankeController(
@@ -43,7 +43,7 @@ class KlankeControllerTimingTest {
         val commonService = mockk<CommonService>()
         val klankeId = UUID.randomUUID()
         val request = MockHttpServletRequest()
-        every { commonService.updateFritekst(klankeId, "private text") } returns LocalDateTime.now()
+        every { commonService.updateFritekst(klankeId = klankeId, fritekst = "private text") } returns LocalDateTime.now()
         val controller =
             KlankeController(
                 vedleggService = mockk<VedleggService>(),
@@ -52,7 +52,7 @@ class KlankeControllerTimingTest {
                 sseShutdownSignal = SseShutdownSignal(),
             )
 
-        controller.updateFritekst(klankeId, StringInput("private text"), request)
+        controller.updateFritekst(klankeId = klankeId, input = StringInput("private text"), request = request)
 
         assertTrue(request.getAttribute(TIMED_REQUEST_CONTROLLER_ENTRY_NANOS) is Long)
     }

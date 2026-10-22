@@ -33,7 +33,7 @@ class KlankeRequestTimingFilter : OncePerRequestFilter() {
                 request.method == "PUT" && endpoint == "fritekst" -> "fritekst_update"
                 else -> null
             }
-        return operation?.let { TimedRequest(klankeId, it) }
+        return operation?.let { TimedRequest(klankeId = klankeId, operation = it) }
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean = timedRequest(request) == null
@@ -57,7 +57,7 @@ class KlankeRequestTimingFilter : OncePerRequestFilter() {
         } finally {
             val finished = System.nanoTime()
             val elapsedNanos = finished - started
-            if (shouldLogTiming(timedRequest.operation, elapsedNanos)) {
+            if (shouldLogTiming(operation = timedRequest.operation, elapsedNanos = elapsedNanos)) {
                 val controllerEntry = request.getAttribute(TIMED_REQUEST_CONTROLLER_ENTRY_NANOS) as? Long
                 timingLogger.info(
                     "Klanke request timing: operation={}, klankeId={}, contentLengthBytes={}, beforeControllerMs={}, afterControllerMs={}, totalMs={}, status={}",

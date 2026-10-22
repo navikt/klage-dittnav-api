@@ -84,10 +84,10 @@ class KlankeRequestTimingFilterTest {
     fun `logs fritekst only above five seconds while keeping all uploads`() {
         val fiveSeconds = TimeUnit.SECONDS.toNanos(5)
 
-        assertFalse(filter.shouldLogTiming("fritekst_update", fiveSeconds - 1))
-        assertFalse(filter.shouldLogTiming("fritekst_update", fiveSeconds))
-        assertTrue(filter.shouldLogTiming("fritekst_update", fiveSeconds + 1))
-        assertTrue(filter.shouldLogTiming("attachment_upload", 0))
+        assertFalse(filter.shouldLogTiming(operation = "fritekst_update", elapsedNanos = fiveSeconds - 1))
+        assertFalse(filter.shouldLogTiming(operation = "fritekst_update", elapsedNanos = fiveSeconds))
+        assertTrue(filter.shouldLogTiming(operation = "fritekst_update", elapsedNanos = fiveSeconds + 1))
+        assertTrue(filter.shouldLogTiming(operation = "attachment_upload", elapsedNanos = 0))
     }
 
     @Test
