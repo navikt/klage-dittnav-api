@@ -3,8 +3,8 @@ package no.nav.klage.controller
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.clients.events.KafkaEventClient
-import no.nav.klage.clients.events.SseShutdownSignal
 import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
+import no.nav.klage.config.SseShutdownSignal
 import no.nav.klage.config.TIMED_REQUEST_CONTROLLER_ENTRY_NANOS
 import no.nav.klage.controller.view.BooleanInput
 import no.nav.klage.controller.view.DateInput
