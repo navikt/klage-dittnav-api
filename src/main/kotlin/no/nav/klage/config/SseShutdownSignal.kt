@@ -1,4 +1,4 @@
-package no.nav.klage.clients.events
+package no.nav.klage.config
 
 import no.nav.klage.util.getLogger
 import org.springframework.context.event.ContextClosedEvent

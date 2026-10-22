@@ -3,7 +3,7 @@ package no.nav.klage.controller
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.clients.events.KafkaEventClient
-import no.nav.klage.clients.events.SseShutdownSignal
+import no.nav.klage.config.SseShutdownSignal
 import no.nav.klage.config.TIMED_REQUEST_CONTROLLER_ENTRY_NANOS
 import no.nav.klage.controller.view.StringInput
 import no.nav.klage.domain.jpa.Vedlegg

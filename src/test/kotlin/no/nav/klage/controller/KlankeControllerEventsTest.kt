@@ -7,7 +7,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import no.nav.klage.clients.events.KafkaEventClient
-import no.nav.klage.clients.events.SseShutdownSignal
+import no.nav.klage.config.SseShutdownSignal
 import no.nav.klage.domain.Event
 import no.nav.klage.domain.JOURNALPOST_ID_EVENT_NAME
 import no.nav.klage.domain.exception.KlankeNotFoundException
