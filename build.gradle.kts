@@ -26,7 +26,7 @@ ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 plugins {
     val kotlinVersion = "2.4.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "4.1.1"
+    id("org.springframework.boot") version "4.1.2"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
