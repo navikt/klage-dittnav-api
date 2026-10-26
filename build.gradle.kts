@@ -5,7 +5,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 val ktlintVersion = "1.8.0"
 val h2Version = "2.5.252"
-val tokenSupportVersion = "6.0.1"
+val tokenSupportVersion = "6.0.14"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "9.0"
 val pdfboxVersion = "3.0.8"
