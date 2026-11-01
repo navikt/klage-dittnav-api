@@ -1,11 +1,9 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.config.SecurityConfiguration
 import no.nav.klage.domain.Journalpost
 import no.nav.klage.service.CommonService
 import no.nav.klage.util.getLogger
-import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AZUREAD)
 @RequestMapping("internal")
 @Tag(name = "internal")
 class InternalController(

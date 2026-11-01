@@ -14,8 +14,6 @@ class SseBrokenPipeLogFilter : TurboFilter() {
 
         private const val EXCEPTION_HANDLER_RESOLVER =
             "org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver"
-        private const val JWT_TOKEN_UNAUTHORIZED_EXCEPTION =
-            "no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException"
     }
 
     override fun decide(
@@ -36,29 +34,6 @@ class SseBrokenPipeLogFilter : TurboFilter() {
         }
 
         if (throwable != null) {
-            val rootCause = getRootCause(throwable)
-            if (
-                throwable.javaClass.name == "jakarta.servlet.ServletException" &&
-                rootCause.javaClass.name == "no.nav.security.token.support.core.exceptions.JwtTokenMissingException" &&
-                rootCause.message == "No valid token found in validation context"
-            ) {
-                ourLogger.debug(
-                    "Suppressing error log message for JwtTokenMissingException wrapped in ServletException. This is probably due to expired token during async/SSE operations.",
-                )
-                return FilterReply.DENY
-            }
-            if (
-                throwable.javaClass.name == "jakarta.servlet.ServletException" &&
-                (
-                    rootCause.javaClass.name == JWT_TOKEN_UNAUTHORIZED_EXCEPTION ||
-                        throwable.cause?.javaClass?.name == JWT_TOKEN_UNAUTHORIZED_EXCEPTION
-                )
-            ) {
-                ourLogger.debug(
-                    "Suppressing error log message for JwtTokenUnauthorizedException wrapped in ServletException. This is probably due to expired token during async/SSE operations.",
-                )
-                return FilterReply.DENY
-            }
             if (
                 throwable.javaClass.name == "java.lang.IllegalStateException" &&
                 throwable.message == "Committed"
@@ -71,13 +46,5 @@ class SseBrokenPipeLogFilter : TurboFilter() {
         }
 
         return FilterReply.NEUTRAL
-    }
-
-    private fun getRootCause(throwable: Throwable): Throwable {
-        var rootCause = throwable
-        while (rootCause.cause != null && rootCause.cause != rootCause) {
-            rootCause = rootCause.cause!!
-        }
-        return rootCause
     }
 }

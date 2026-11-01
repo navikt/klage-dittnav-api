@@ -5,7 +5,6 @@ import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.getLogger
 import no.nav.klage.util.getTeamLogger
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "pdf")
-@Unprotected
 @RequestMapping("/api/pdf")
 class PdfController(
     private val klageDittnavPdfgenService: KlageDittnavPdfgenService,

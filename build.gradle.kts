@@ -5,8 +5,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 val ktlintVersion = "1.8.0"
 val h2Version = "2.5.252"
-val tokenSupportVersion = "6.0.14"
-val oidcSupportVersion = "0.2.18"
+val klageAuthVersion = "0.4.0"
 val logstashVersion = "9.0"
 val pdfboxVersion = "3.0.8"
 val tikaVersion = "4.1.0"
@@ -20,8 +19,6 @@ val mockkVersion = "1.14.11"
 val springMockkVersion = "5.0.1"
 val otelVersion = "1.67.0"
 val reactorKafkaVersion = "1.3.25"
-
-ext["okhttp3.version"] = "4.9.0" // For at token support testen kjører
 
 plugins {
     val kotlinVersion = "2.4.21"
@@ -79,9 +76,9 @@ dependencies {
     implementation("io.projectreactor.kafka:reactor-kafka:$reactorKafkaVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
-    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
-    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
+    implementation("no.nav.klage:klage-auth:$klageAuthVersion")
+    implementation("tools.jackson.module:jackson-module-kotlin")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
@@ -107,8 +104,7 @@ dependencies {
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
-
-    testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
+    testImplementation("no.nav.klage:klage-auth-test:$klageAuthVersion")
 }
 
 idea {

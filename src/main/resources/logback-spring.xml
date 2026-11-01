@@ -3,7 +3,6 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
     <turboFilter class="no.nav.klage.config.SseBrokenPipeLogFilter" />
-    <turboFilter class="no.nav.klage.config.AuthorizationLogFilter" />
     <turboFilter class="no.nav.klage.config.InternalLogFilter" />
 
     <springProfile name="local">

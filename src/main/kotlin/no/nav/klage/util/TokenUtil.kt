@@ -1,46 +1,35 @@
 package no.nav.klage.util
 
-import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
-import no.nav.security.token.support.client.spring.ClientConfigurationProperties
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
+import no.nav.klage.auth.TexasClient
+import no.nav.klage.auth.currentTokenXToken
+import no.nav.klage.auth.pid
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
 class TokenUtil(
-    private val ctxHolder: TokenValidationContextHolder,
-    private val clientConfigurationProperties: ClientConfigurationProperties,
-    private val oAuth2AccessTokenService: OAuth2AccessTokenService,
+    private val texasClient: TexasClient,
+    @Value($$"${SAFSELVBETJENING_AUDIENCE}")
+    private val safSelvbetjeningAudience: String,
+    @Value($$"${KLAGE_LOOKUP_AUDIENCE}")
+    private val klageLookupAudience: String,
+    @Value($$"api://${NAIS_CLUSTER_NAME}.${NAIS_NAMESPACE}.${KLAGE_FILE_API_APP_NAME}/.default")
+    private val klageFileApiScope: String,
+    @Value($$"api://${FSS_CLUSTER}.klage.klage-fss-proxy/.default")
+    private val klageFssProxyScope: String,
+    @Value($$"api://${NAIS_CLUSTER_NAME}.${NAIS_NAMESPACE}.${KLAGE_LOOKUP_APP_NAME}/.default")
+    private val klageLookupScope: String,
 ) {
-    fun getSubject(): String = ctxHolder.getTokenValidationContext().getClaims(TOKEN_X).getStringClaim("pid")
+    /** The fødselsnummer of the logged in citizen. Only on the request thread of a TokenX request. */
+    fun getSubject(): String = currentTokenXToken()?.pid ?: throw IllegalStateException("No logged in citizen in this request.")
 
-    fun getOnBehalfOfTokenWithSafSelvbetjeningScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["safselvbetjening-onbehalfof"]!!
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.access_token!!
-    }
+    fun getOnBehalfOfTokenWithSafSelvbetjeningScope(): String = texasClient.tokenXExchangeForCurrentUser(safSelvbetjeningAudience)
 
-    fun getAppAccessTokenWithKlageFileApiScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["klage-file-api-maskintilmaskin"]!!
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.access_token!!
-    }
+    fun getAppAccessTokenWithKlageFileApiScope(): String = texasClient.machineToMachineToken(klageFileApiScope)
 
-    fun getAppAccessTokenWithKlageFSSProxyScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["klage-fss-proxy-maskintilmaskin"]!!
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.access_token!!
-    }
+    fun getAppAccessTokenWithKlageFSSProxyScope(): String = texasClient.machineToMachineToken(klageFssProxyScope)
 
-    fun getOnBehalfOfTokenWithKlageLookupScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["klage-lookup-onbehalfof"]!!
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.access_token!!
-    }
+    fun getOnBehalfOfTokenWithKlageLookupScope(): String = texasClient.tokenXExchangeForCurrentUser(klageLookupAudience)
 
-    fun getAppAccessTokenWithKlageLookupScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["klage-lookup-maskintilmaskin"]!!
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.access_token!!
-    }
+    fun getAppAccessTokenWithKlageLookupScope(): String = texasClient.machineToMachineToken(klageLookupScope)
 }
