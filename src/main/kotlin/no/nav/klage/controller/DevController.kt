@@ -4,13 +4,10 @@ import no.nav.klage.clients.klagelookup.KlageLookupClient
 import no.nav.klage.clients.klagelookup.RepresentasjonsforholdView
 import no.nav.klage.clients.safselvbetjening.GetDokumentoversiktResponse
 import no.nav.klage.clients.safselvbetjening.SafSelvbetjeningGraphQlClient
-import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
 import no.nav.klage.controller.view.OpenKlankeInput
 import no.nav.klage.service.KlageDittnavPdfgenService
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
-import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -35,11 +32,9 @@ class DevController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @ProtectedWithClaims(issuer = TOKEN_X, claimMap = ["acr=Level4"])
     @GetMapping("/api/internal/representasjon")
     fun getRepresentasjonsdata(): RepresentasjonsforholdView = klageLookupClient.getRepresentasjonsforhold()
 
-    @Unprotected
     @ResponseBody
     @PostMapping("/internal/uinnloggetklage")
     fun generateFoersteside(
@@ -59,7 +54,6 @@ class DevController(
     }
 
     @GetMapping("/internal/tema-list")
-    @ProtectedWithClaims(issuer = "tokenx", claimMap = ["acr=Level4"])
     fun getDokumentoversikt(): GetDokumentoversiktResponse =
         safselvbetjeningGraphQlClient.getDokumentoversikt(ident = tokenUtil.getSubject())
 }

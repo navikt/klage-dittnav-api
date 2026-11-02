@@ -7,12 +7,6 @@ allowed.origins:
 #  level:
 #    root: DEBUG
 
-#Token validation
-no.nav.security.jwt:
-  issuer.azuread:
-    discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
-    accepted_audience: ${AZURE_APP_CLIENT_ID}
-
 DB_HOST: localhost
 DB_USERNAME: klage
 DB_PASSWORD: klage

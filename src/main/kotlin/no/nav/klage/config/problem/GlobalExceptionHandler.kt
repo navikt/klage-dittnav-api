@@ -12,12 +12,10 @@ import no.nav.klage.domain.exception.KlankeIsDeletedException
 import no.nav.klage.domain.exception.KlankeIsFinalizedException
 import no.nav.klage.domain.exception.KlankeNotFoundException
 import no.nav.klage.util.getLogger
-import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @RestControllerAdvice
@@ -25,27 +23,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val ourLogger = getLogger(javaClass.enclosingClass)
-    }
-
-    @ExceptionHandler
-    fun handleJwtTokenUnauthorizedException(
-        ex: JwtTokenUnauthorizedException,
-        request: NativeWebRequest,
-    ): ProblemDetail {
-        val detail =
-            if (ex.message == null) {
-                if (request.getHeader("Authorization") == null) {
-                    "No authorization header in request"
-                } else {
-                    ex.cause?.message ?: "No error message available"
-                }
-            } else {
-                ex.message ?: error("Message can't be null")
-            }
-
-        ourLogger.error("Exception thrown to client: ${HttpStatus.UNAUTHORIZED.reasonPhrase}, $detail", ex)
-
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail)
     }
 
     @ExceptionHandler

@@ -1,47 +1,65 @@
 package no.nav.klage
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import no.nav.klage.auth.test.MockAzure
+import no.nav.klage.auth.test.TokenXSecurityContractTest
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.klage.domain.Navn
 import no.nav.klage.service.BrukerService
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import org.junit.jupiter.api.Assertions.assertEquals
+import no.nav.klage.service.CommonService
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.webmvc.test.autoconfigure.MockMvcPrint
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.http.ProblemDetail
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@EnableMockOAuth2Server
 @SpringBootTest(classes = [Application::class])
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE, printOnlyOnFailure = false)
-class ApiTest {
-    @Autowired
-    lateinit var mockMvc: MockMvc
+class ApiTest : TokenXSecurityContractTest() {
+    companion object {
+        private val mockAzure = MockAzure()
 
-    @Autowired
-    lateinit var server: MockOAuth2Server
+        @JvmStatic
+        @DynamicPropertySource
+        fun azureProperties(registry: DynamicPropertyRegistry) {
+            mockAzure.registerProperties(registry)
+        }
+
+        private const val ALLOWED_ORIGIN = "http://localhost:3000"
+    }
 
     @MockkBean
     lateinit var brukerService: BrukerService
 
-    private val fnr = "12345678910"
+    @MockkBean(relaxed = true)
+    lateinit var commonService: CommonService
 
-    val mapper = jacksonObjectMapper()
+    private val azurePath = "/internal/klanker/${UUID.randomUUID()}/journalpostid"
+
+    override fun protectedRequest(): MockHttpServletRequestBuilder = get("/api/bruker")
+
+    override fun unauthenticatedPaths() =
+        listOf(
+            "/internal/health",
+            "/api/innsendingsytelser/NB",
+            "/favicon.ico",
+            "/v3/api-docs",
+        )
 
     @BeforeEach
     fun beforeEach() {
@@ -50,104 +68,85 @@ class ApiTest {
                 navn = Navn(fornavn = "", etternavn = ""),
                 folkeregisteridentifikator = Identifikator(type = "", identifikasjonsnummer = ""),
             )
+        every { commonService.getJournalpostIdWithoutValidation(any()) } returns "journalpost-id"
     }
 
     @Test
-    fun `kall på GET bruker med gyldig token gir forventet resultat`() {
+    fun `internal klanke endpoints accept Azure token from pre-authorized app`() {
+        mockMvc
+            .perform(get(azurePath).bearer(mockAzure.token()))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.journalpostId").value("journalpost-id"))
+    }
+
+    @Test
+    fun `internal klanke endpoints reject request without token`() {
+        mockMvc.perform(get(azurePath)).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `internal klanke endpoints reject Azure token from app that is not pre-authorized`() {
+        mockMvc.perform(get(azurePath).bearer(mockAzure.token(azp = "unknown-client"))).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `internal klanke endpoints reject TokenX token`() {
+        mockMvc.perform(get(azurePath).bearer(mockTokenX.token())).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `citizen endpoints reject Azure token`() {
+        mockMvc.perform(get("/api/bruker").bearer(mockAzure.token())).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `pdf for citizens who are not logged in needs no token`() {
+        val result =
+            mockMvc
+                .perform(post("/api/pdf/klanke").contentType(MediaType.APPLICATION_JSON).content("not json"))
+                .andReturn()
+        assertNotEquals(401, result.response.status)
+    }
+
+    @Test
+    fun `dev only endpoint for klage without login requires token outside dev`() {
+        mockMvc.perform(post("/internal/uinnloggetklage")).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `CORS preflight from allowed origin succeeds without token`() {
         mockMvc
             .perform(
-                MockMvcRequestBuilders
-                    .get("/api/bruker")
-                    .header("Authorization", "Bearer ${tokenxToken(fnr = fnr)}")
-                    .contentType(MediaType.APPLICATION_JSON),
-            ).andExpect(MockMvcResultMatchers.status().isOk)
+                options("/api/bruker")
+                    .header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN)
+                    .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"),
+            ).andExpect(status().isOk)
+            .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN))
     }
 
     @Test
-    fun `kall på GET bruker uten token gir forventet resultat`() {
-        val response =
-            mockMvc
-                .perform(
-                    MockMvcRequestBuilders
-                        .get("/api/bruker")
-                        .contentType(MediaType.APPLICATION_JSON),
-                ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
-        assertEquals("No authorization header in request", problemOutput.detail)
-    }
-
-    @Test
-    fun `kall på GET bruker med utgått token gir forventet resultat`() {
-        val token = tokenxToken(fnr = fnr, expiry = -100)
-
-        val response =
-            mockMvc
-                .perform(
-                    MockMvcRequestBuilders
-                        .get("/api/bruker")
-                        .header("Authorization", "Bearer $token")
-                        .contentType(MediaType.APPLICATION_JSON),
-                ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
-        assertEquals("No valid token found in validation context", problemOutput.detail)
-    }
-
-    @Test
-    fun `kall på GET bruker med feil audience i token gir forventet resultat`() {
-        val token = tokenxToken(fnr = fnr, audience = "noeheltannet")
-
-        val response =
-            mockMvc
-                .perform(
-                    MockMvcRequestBuilders
-                        .get("/api/bruker")
-                        .header("Authorization", "Bearer $token")
-                        .contentType(MediaType.APPLICATION_JSON),
-                ).andExpect(MockMvcResultMatchers.status().isUnauthorized)
-        val problemOutput = mapper.readValue(response.andReturn().response.contentAsString, ProblemDetail::class.java)
-        assertEquals("No valid token found in validation context", problemOutput.detail)
-    }
-
-    @Test
-    fun contextLoads() {
+    fun `401 has CORS headers so the frontend can read it`() {
         mockMvc
-            .perform(MockMvcRequestBuilders.get("/internal/health"))
-            .andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("UP"))
+            .perform(get("/api/bruker").header(HttpHeaders.ORIGIN, ALLOWED_ORIGIN))
+            .andExpect(status().isUnauthorized)
+            .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, ALLOWED_ORIGIN))
+    }
+
+    @Test
+    fun `health shows no details`() {
+        mockMvc
+            .perform(get("/internal/health"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.status").value("UP"))
+            .andExpect(jsonPath("$.components").doesNotExist())
     }
 
     @Test
     fun apiDocsLoads() {
         mockMvc
-            .perform(MockMvcRequestBuilders.get("/v3/api-docs?group=internal"))
-            .andExpect(MockMvcResultMatchers.status().isOk)
+            .perform(get("/v3/api-docs?group=internal"))
+            .andExpect(status().isOk)
     }
 
-    fun tokenxToken(
-        fnr: String,
-        audience: String = "klage-dittnav-api-client-id",
-        issuerId: String = "tokenx",
-        clientId: String = "klage-dittnav-client-id",
-        claims: Map<String, Any> =
-            mapOf(
-                "acr" to "Level4",
-                "idp" to "idporten",
-                "client_id" to clientId,
-                "pid" to fnr,
-            ),
-        expiry: Long = 3600,
-    ): String =
-        server
-            .issueToken(
-                issuerId = issuerId,
-                clientId = clientId,
-                tokenCallback =
-                    DefaultOAuth2TokenCallback(
-                        issuerId = issuerId,
-                        subject = UUID.randomUUID().toString(),
-                        audience = listOf(audience),
-                        claims = claims,
-                        expiry = expiry,
-                    ),
-            ).serialize()
+    private fun MockHttpServletRequestBuilder.bearer(token: String) = header(HttpHeaders.AUTHORIZATION, "Bearer $token")
 }

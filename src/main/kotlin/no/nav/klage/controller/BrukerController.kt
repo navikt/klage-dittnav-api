@@ -1,12 +1,10 @@
 package no.nav.klage.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.config.SecurityConfiguration.Companion.TOKEN_X
 import no.nav.klage.controller.view.GetPersonInput
 import no.nav.klage.domain.Bruker
 import no.nav.klage.kodeverk.innsendingsytelse.innsendingsytelseToTema
 import no.nav.klage.service.BrukerService
-import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Tag(name = "bruker")
-@ProtectedWithClaims(issuer = TOKEN_X, claimMap = ["acr=Level4"])
 @RequestMapping("/api")
 class BrukerController(
     private val brukerService: BrukerService,
