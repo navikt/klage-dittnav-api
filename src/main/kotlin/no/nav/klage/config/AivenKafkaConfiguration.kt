@@ -10,12 +10,10 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
-import reactor.kafka.receiver.KafkaReceiver
-import reactor.kafka.receiver.ReceiverOptions
-import reactor.kafka.receiver.internals.ConsumerFactory
-import reactor.kafka.receiver.internals.DefaultKafkaReceiver
 import java.util.UUID
 
 @Configuration
@@ -28,8 +26,6 @@ class AivenKafkaConfiguration(
     private val kafkaCredstorePassword: String,
     @Value($$"${KAFKA_KEYSTORE_PATH}")
     private val kafkaKeystorePath: String,
-    @Value($$"${INTERNAL_EVENT_TOPIC}")
-    private val internalEventTopic: String,
 ) {
     // Producer bean
     @Bean
@@ -46,21 +42,19 @@ class AivenKafkaConfiguration(
     }
 
     @Bean
-    fun kafkaEventReceiver(): KafkaReceiver<String, String> {
+    fun internalEventConsumerFactory(): ConsumerFactory<String, String> {
+        // Unique group id per pod, so every pod receives every event.
         val uniqueIdPerInstance = UUID.randomUUID().toString()
         val config =
             mapOf(
                 ConsumerConfig.GROUP_ID_CONFIG to "klage-dittnav-event-consumer-$uniqueIdPerInstance",
                 ConsumerConfig.CLIENT_ID_CONFIG to "klage-dittnav-event-client-$uniqueIdPerInstance",
-                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to true,
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             ) + commonConfig()
 
-        return DefaultKafkaReceiver(
-            ConsumerFactory.INSTANCE,
-            ReceiverOptions.create<String, String>(config).subscription(listOf(internalEventTopic)),
-        )
+        return DefaultKafkaConsumerFactory(config)
     }
 
     // Common

@@ -17,7 +17,6 @@ import no.nav.klage.controller.view.toVedleggView
 import no.nav.klage.domain.JOURNALPOST_ID_EVENT_NAME
 import no.nav.klage.domain.exception.KlankeNotFoundException
 import no.nav.klage.domain.journalpostIdEvent
-import no.nav.klage.domain.jsonToEvent
 import no.nav.klage.domain.toHeartBeatServerSentEvent
 import no.nav.klage.domain.toServerSentEvent
 import no.nav.klage.service.CommonService
@@ -63,6 +62,10 @@ class KlankeController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        // The sink drops events for subscribers without demand. This per-client buffer queues events and errors on
+        // overflow, so the client reconnects.
+        private const val SSE_CLIENT_BUFFER_SIZE = 256
     }
 
     @GetMapping("/{klankeId}")
@@ -100,8 +103,8 @@ class KlankeController(
 
         val publishedJournalpostIdEvent: Flux<ServerSentEvent<String>> =
             kafkaEventClient
-                .getEventPublisher()
-                .mapNotNull { event -> jsonToEvent(event.data()) }
+                .events()
+                .onBackpressureBuffer(SSE_CLIENT_BUFFER_SIZE)
                 .filter {
                     it.klageAnkeId == klankeId.toString() &&
                         it.name == JOURNALPOST_ID_EVENT_NAME &&
