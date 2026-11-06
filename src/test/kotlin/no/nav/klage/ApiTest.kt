@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import no.nav.klage.auth.test.MockAzure
 import no.nav.klage.auth.test.TokenXSecurityContractTest
+import no.nav.klage.clients.events.KafkaEventClient
 import no.nav.klage.domain.Bruker
 import no.nav.klage.domain.Identifikator
 import no.nav.klage.domain.Navn
@@ -48,6 +49,10 @@ class ApiTest : TokenXSecurityContractTest() {
 
     @MockkBean(relaxed = true)
     lateinit var commonService: CommonService
+
+    // The real client starts a Kafka consumer, which fails without a broker.
+    @MockkBean(relaxed = true)
+    lateinit var kafkaEventClient: KafkaEventClient
 
     private val azurePath = "/internal/klanker/${UUID.randomUUID()}/journalpostid"
 

@@ -18,7 +18,6 @@ val testContainersVersion = "2.0.5"
 val mockkVersion = "1.14.11"
 val springMockkVersion = "5.0.1"
 val otelVersion = "1.67.0"
-val reactorKafkaVersion = "1.3.25"
 
 plugins {
     val kotlinVersion = "2.4.21"
@@ -73,7 +72,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
     implementation("org.apache.tika:tika-core:$tikaVersion")
-    implementation("io.projectreactor.kafka:reactor-kafka:$reactorKafkaVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")

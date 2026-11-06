@@ -1,6 +1,5 @@
 package no.nav.klage.controller
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -39,13 +38,13 @@ class KlankeControllerEventsTest {
             sseShutdownSignal = sseShutdownSignal,
         )
 
-    // Hot like production: KafkaEventClient uses a connected publish(), which drops events nobody is subscribed to.
-    private val kafkaSink = Sinks.many().multicast().directBestEffort<ServerSentEvent<String>>()
+    // Hot like production: KafkaEventClient drops events nobody is subscribed to.
+    private val kafkaSink = Sinks.many().multicast().directBestEffort<Event>()
 
     @BeforeEach
     fun setup() {
         every { commonService.validateAccess(klankeId) } just runs
-        every { kafkaEventClient.getEventPublisher() } returns kafkaSink.asFlux().publish().also { it.connect() }
+        every { kafkaEventClient.events() } returns kafkaSink.asFlux()
     }
 
     @Test
@@ -159,7 +158,7 @@ class KlankeControllerEventsTest {
 
         assertThrows<KlankeNotFoundException> { controller.getEvents(klankeId) }
 
-        verify(exactly = 0) { kafkaEventClient.getEventPublisher() }
+        verify(exactly = 0) { kafkaEventClient.events() }
         verify(exactly = 0) { commonService.getJournalpostIdWithoutValidation(any()) }
     }
 
@@ -170,7 +169,6 @@ class KlankeControllerEventsTest {
             .block(Duration.ofSeconds(5))!!
 
     private fun publishToKafka(event: Event) {
-        val json = jacksonObjectMapper().writeValueAsString(event)
-        kafkaSink.tryEmitNext(ServerSentEvent.builder(json).build()).orThrow()
+        kafkaSink.tryEmitNext(event).orThrow()
     }
 }
