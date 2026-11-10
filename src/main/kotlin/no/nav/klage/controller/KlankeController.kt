@@ -226,6 +226,15 @@ class KlankeController(
         commonService.deleteKlanke(klankeId = klankeId)
     }
 
+    @PostMapping("/{klankeId}/validate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun validateKlanke(
+        @PathVariable klankeId: UUID,
+    ) {
+        logger.debug("Validate klanke is requested. Id: {}", klankeId)
+        commonService.validateKlanke(klankeId = klankeId)
+    }
+
     @PostMapping("/{klankeId}/finalize")
     @ResponseStatus(HttpStatus.OK)
     fun finalizeKlanke(

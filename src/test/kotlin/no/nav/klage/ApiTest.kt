@@ -119,6 +119,25 @@ class ApiTest : TokenXSecurityContractTest() {
     }
 
     @Test
+    fun `validate klanke requires token`() {
+        mockMvc.perform(post("/api/klanker/${UUID.randomUUID()}/validate")).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `validate klanke accepts TokenX token`() {
+        mockMvc
+            .perform(post("/api/klanker/${UUID.randomUUID()}/validate").bearer(mockTokenX.token()))
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    fun `validate klanke rejects Azure token`() {
+        mockMvc
+            .perform(post("/api/klanker/${UUID.randomUUID()}/validate").bearer(mockAzure.token()))
+            .andExpect(status().isUnauthorized)
+    }
+
+    @Test
     fun `CORS preflight from allowed origin succeeds without token`() {
         mockMvc
             .perform(

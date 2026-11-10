@@ -33,3 +33,7 @@ class AttachmentCouldNotBeConvertedException(
 class AttachmentFilenameTooLongException(
     override val message: String = "FILENAME_TOO_LONG",
 ) : RuntimeException()
+
+class AttachmentMissingFilenameException(
+    override val message: String = "MISSING_FILENAME",
+) : RuntimeException()
