@@ -2,6 +2,7 @@ package no.nav.klage.service
 
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
+import no.nav.klage.domain.exception.AttachmentMissingFilenameException
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.repository.KlankeRepository
@@ -36,8 +37,8 @@ class VedleggService(
         validationService.checkKlankeStatus(existingKlanke)
         validationService.validateKlankeAccess(klanke = existingKlanke)
         val timeStart = System.currentTimeMillis()
+        val tittel = multipart.originalFilename ?: throw AttachmentMissingFilenameException()
         val bytes = multipart.bytes
-        val tittel = multipart.originalFilename ?: throw RuntimeException("Filename is required")
         vedleggMetrics.registerVedleggSize(bytes.size.toDouble())
         vedleggMetrics.incrementVedleggType(multipart.contentType ?: "unknown")
         attachmentValidator.validateAttachment(

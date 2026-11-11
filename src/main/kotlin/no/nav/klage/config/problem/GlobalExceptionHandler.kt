@@ -5,12 +5,15 @@ import no.nav.klage.domain.exception.AttachmentEncryptedException
 import no.nav.klage.domain.exception.AttachmentFilenameTooLongException
 import no.nav.klage.domain.exception.AttachmentHasVirusException
 import no.nav.klage.domain.exception.AttachmentIsEmptyException
+import no.nav.klage.domain.exception.AttachmentMissingFilenameException
+import no.nav.klage.domain.exception.AttachmentTooLargeException
 import no.nav.klage.domain.exception.AttachmentTotalTooLargeException
 import no.nav.klage.domain.exception.InvalidFullmaktException
 import no.nav.klage.domain.exception.InvalidIdentException
 import no.nav.klage.domain.exception.KlankeIsDeletedException
 import no.nav.klage.domain.exception.KlankeIsFinalizedException
 import no.nav.klage.domain.exception.KlankeNotFoundException
+import no.nav.klage.domain.exception.SectionedValidationErrorWithDetailsException
 import no.nav.klage.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -51,8 +54,16 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         create(httpStatus = HttpStatus.BAD_REQUEST, ex = ex)
 
     @ExceptionHandler
+    fun handleAttachmentTooLargeException(ex: AttachmentTooLargeException): ProblemDetail =
+        create(httpStatus = HttpStatus.CONTENT_TOO_LARGE, ex = ex)
+
+    @ExceptionHandler
+    fun handleAttachmentMissingFilenameException(ex: AttachmentMissingFilenameException): ProblemDetail =
+        create(httpStatus = HttpStatus.BAD_REQUEST, ex = ex)
+
+    @ExceptionHandler
     fun handleAttachmentTotalTooLargeException(ex: AttachmentTotalTooLargeException): ProblemDetail =
-        create(httpStatus = HttpStatus.PAYLOAD_TOO_LARGE, ex = ex)
+        create(httpStatus = HttpStatus.CONTENT_TOO_LARGE, ex = ex)
 
     @ExceptionHandler
     fun handleAttachmentFilenameTooLongException(ex: AttachmentFilenameTooLongException): ProblemDetail =
@@ -64,12 +75,17 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     fun handleInvalidIdent(ex: InvalidIdentException): ProblemDetail = create(httpStatus = HttpStatus.BAD_REQUEST, ex = ex)
 
+    @ExceptionHandler
+    fun handleSectionedValidationErrorWithDetails(ex: SectionedValidationErrorWithDetailsException): ProblemDetail =
+        create(httpStatus = HttpStatus.BAD_REQUEST, ex = ex, errorMessage = ex.title).apply {
+            setProperty("sections", ex.sections)
+        }
+
     private fun create(
         httpStatus: HttpStatus,
         ex: Exception,
+        errorMessage: String = ex.message ?: "No error message available",
     ): ProblemDetail {
-        val errorMessage = ex.message ?: "No error message available"
-
         logError(
             httpStatus = httpStatus,
             errorMessage = errorMessage,

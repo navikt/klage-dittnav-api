@@ -192,6 +192,14 @@ class CommonService(
                 }
             }.maxByOrNull { it.modifiedByUser }
 
+    @Transactional(readOnly = true)
+    fun validateKlanke(klankeId: UUID) {
+        val klanke = klankeRepository.findById(klankeId).orElseThrow { KlankeNotFoundException() }
+        validationService.validateKlankeAccess(klanke = klanke)
+        validationService.checkKlankeStatus(klanke = klanke)
+        validationService.validateKlanke(klanke = klanke)
+    }
+
     /**
      * Marks the klanke as completed by the user. Does not send to Kafka; KlankeSenderService does that after commit.
      */
