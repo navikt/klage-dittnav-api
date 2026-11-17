@@ -52,7 +52,8 @@ class TokenUtilTest {
         every { texasClient.tokenXExchangeForCurrentUser(target = "dev-fss:teamdokumenthandtering:safselvbetjening") } returns "saf"
         every { texasClient.tokenXExchangeForCurrentUser(target = "dev-gcp:klage:klage-lookup") } returns "lookup-tokenx"
         every { texasClient.machineToMachineToken(target = "api://dev-gcp.klage.klage-file-api/.default") } returns "file"
-        every { texasClient.machineToMachineToken(target = "api://dev-fss.teamdokumenthandtering.foerstesidegenerator/.default") } returns "foersteside"
+        every { texasClient.machineToMachineToken(target = "api://dev-fss.teamdokumenthandtering.foerstesidegenerator/.default") } returns
+            "foersteside"
         every { texasClient.machineToMachineToken(target = "api://dev-gcp.klage.klage-lookup/.default") } returns "lookup-m2m"
 
         assertThat(tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()).isEqualTo("saf")
