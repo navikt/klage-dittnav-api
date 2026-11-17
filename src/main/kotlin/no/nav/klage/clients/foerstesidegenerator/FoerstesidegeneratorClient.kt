@@ -1,6 +1,7 @@
 package no.nav.klage.clients.foerstesidegenerator
 
 import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideRequest
+import no.nav.klage.clients.foerstesidegenerator.domain.FoerstesideResponse
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getTeamLogger
 import org.springframework.http.HttpHeaders
@@ -23,11 +24,12 @@ class FoerstesidegeneratorClient(
             runCatching {
                 foerstesidegeneratorWebClient
                     .post()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()}")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithFoerstesidegeneratorScope()}")
                     .bodyValue(foerstesideRequest)
                     .retrieve()
-                    .bodyToMono<ByteArray>()
+                    .bodyToMono<FoerstesideResponse>()
                     .block()
+                    ?.foersteside
             }.onFailure {
                 teamLogger.error("Could not fetch foersteside", it)
                 throw RuntimeException("Could not fetch foersteside. See team-logs for more information.")
