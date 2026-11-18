@@ -62,6 +62,10 @@ KAFKA_TOPIC: atopic
 KLAGE_DITTNAV_PDF_SERVICE_URL: http://localhost
 
 FOERSTESIDEGENERATOR_BASE_URL: http://localhost/api/foerstesidegenerator/v1/foersteside
+KLAGE_FSS_PROXY_FOERSTESIDE_URL: http://localhost/genererfoersteside
+KLAGE_UNLEASH_PROXY_URL: http://localhost
+NAIS_APP_NAME: klage-dittnav-api
+NAIS_POD_NAME: klage-dittnav-api-test
 INTERNAL_EVENT_TOPIC: atopic
 
 KLAGE_LOOKUP_BASE_URL: http://klage-lookup
