@@ -2,7 +2,6 @@ ingresses:
   - https://klage-dittnav-api.intern.dev.nav.no
 externalHosts:
   - foerstesidegenerator.dev-fss-pub.nais.io
-  - klage-fss-proxy.dev-fss-pub.nais.io
   - safselvbetjening.dev-fss-pub.nais.io
 springProfile: dev
 

@@ -17,8 +17,6 @@ class TokenUtil(
     private val klageFileApiScope: String,
     @Value($$"api://${FSS_CLUSTER}.teamdokumenthandtering.foerstesidegenerator/.default")
     private val foerstesidegeneratorScope: String,
-    @Value($$"api://${FSS_CLUSTER}.klage.klage-fss-proxy/.default")
-    private val klageFssProxyScope: String,
     @Value($$"api://${NAIS_CLUSTER_NAME}.${NAIS_NAMESPACE}.${KLAGE_LOOKUP_APP_NAME}/.default")
     private val klageLookupScope: String,
 ) {
@@ -30,8 +28,6 @@ class TokenUtil(
     fun getAppAccessTokenWithKlageFileApiScope(): String = texasClient.machineToMachineToken(klageFileApiScope)
 
     fun getAppAccessTokenWithFoerstesidegeneratorScope(): String = texasClient.machineToMachineToken(foerstesidegeneratorScope)
-
-    fun getAppAccessTokenWithKlageFssProxyScope(): String = texasClient.machineToMachineToken(klageFssProxyScope)
 
     fun getOnBehalfOfTokenWithKlageLookupScope(): String = texasClient.tokenXExchangeForCurrentUser(klageLookupAudience)
 
