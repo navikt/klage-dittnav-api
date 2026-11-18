@@ -16,5 +16,6 @@ class FoerstesidegeneratorClientConfiguration(
     fun foerstesidegeneratorWebClient(): WebClient =
         webClientBuilder
             .baseUrl(url)
+            .defaultHeader("Nav-Consumer-Id", "klage-dittnav-api")
             .build()
 }

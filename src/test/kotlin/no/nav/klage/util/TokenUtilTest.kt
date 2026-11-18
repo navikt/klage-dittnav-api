@@ -19,7 +19,7 @@ class TokenUtilTest {
             safSelvbetjeningAudience = "dev-fss:teamdokumenthandtering:safselvbetjening",
             klageLookupAudience = "dev-gcp:klage:klage-lookup",
             klageFileApiScope = "api://dev-gcp.klage.klage-file-api/.default",
-            klageFssProxyScope = "api://dev-fss.klage.klage-fss-proxy/.default",
+            foerstesidegeneratorScope = "api://dev-fss.teamdokumenthandtering.foerstesidegenerator/.default",
             klageLookupScope = "api://dev-gcp.klage.klage-lookup/.default",
         )
 
@@ -52,13 +52,14 @@ class TokenUtilTest {
         every { texasClient.tokenXExchangeForCurrentUser(target = "dev-fss:teamdokumenthandtering:safselvbetjening") } returns "saf"
         every { texasClient.tokenXExchangeForCurrentUser(target = "dev-gcp:klage:klage-lookup") } returns "lookup-tokenx"
         every { texasClient.machineToMachineToken(target = "api://dev-gcp.klage.klage-file-api/.default") } returns "file"
-        every { texasClient.machineToMachineToken(target = "api://dev-fss.klage.klage-fss-proxy/.default") } returns "fss-proxy"
+        every { texasClient.machineToMachineToken(target = "api://dev-fss.teamdokumenthandtering.foerstesidegenerator/.default") } returns
+            "foersteside"
         every { texasClient.machineToMachineToken(target = "api://dev-gcp.klage.klage-lookup/.default") } returns "lookup-m2m"
 
         assertThat(tokenUtil.getOnBehalfOfTokenWithSafSelvbetjeningScope()).isEqualTo("saf")
         assertThat(tokenUtil.getOnBehalfOfTokenWithKlageLookupScope()).isEqualTo("lookup-tokenx")
         assertThat(tokenUtil.getAppAccessTokenWithKlageFileApiScope()).isEqualTo("file")
-        assertThat(tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()).isEqualTo("fss-proxy")
+        assertThat(tokenUtil.getAppAccessTokenWithFoerstesidegeneratorScope()).isEqualTo("foersteside")
         assertThat(tokenUtil.getAppAccessTokenWithKlageLookupScope()).isEqualTo("lookup-m2m")
     }
 

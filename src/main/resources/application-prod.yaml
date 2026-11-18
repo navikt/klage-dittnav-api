@@ -11,7 +11,7 @@ allowed.origins:
   https://klage.nav.no,
   https://www.nav.no
 
-FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.prod-fss-pub.nais.io/genererfoersteside
+FOERSTESIDEGENERATOR_BASE_URL: https://foerstesidegenerator.prod-fss-pub.nais.io/api/foerstesidegenerator/v1/foersteside
 SAFSELVBETJENING_BASE_URL: https://safselvbetjening.prod-fss-pub.nais.io
 
 SAFSELVBETJENING_AUDIENCE: prod-fss:teamdokumenthandtering:safselvbetjening

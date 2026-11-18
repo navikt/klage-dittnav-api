@@ -5,7 +5,7 @@ allowed.origins:
   http://localhost:8080,
   http://localhost:3000
 
-FOERSTESIDEGENERATOR_BASE_URL: https://klage-fss-proxy.dev-fss-pub.nais.io/genererfoersteside
+FOERSTESIDEGENERATOR_BASE_URL: https://foerstesidegenerator.dev-fss-pub.nais.io/api/foerstesidegenerator/v1/foersteside
 SAFSELVBETJENING_BASE_URL: https://safselvbetjening.dev-fss-pub.nais.io
 
 SAFSELVBETJENING_AUDIENCE: dev-fss:teamdokumenthandtering:safselvbetjening

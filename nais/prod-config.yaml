@@ -1,5 +1,5 @@
 externalHosts:
-  - klage-fss-proxy.dev-fss-pub.nais.io
+  - foerstesidegenerator.prod-fss-pub.nais.io
   - safselvbetjening.prod-fss-pub.nais.io
 springProfile: prod
 envs:
