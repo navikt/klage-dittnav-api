@@ -8,21 +8,21 @@ val h2Version = "2.5.252"
 val klageAuthVersion = "0.4.0"
 val logstashVersion = "9.0"
 val pdfboxVersion = "3.0.8"
-val tikaVersion = "4.1.0"
+val tikaVersion = "4.2.0"
 val resilience4jVersion = "2.3.0"
-val shedlockVersion = "7.10.1"
-val springDocVersion = "3.1.1"
+val shedlockVersion = "7.11.0"
+val springDocVersion = "3.2.0"
 val kodeverkVersion = "3.4.2"
 val simpleSlackPosterVersion = "1.0.0"
 val testContainersVersion = "2.0.5"
-val mockkVersion = "1.14.11"
+val mockkVersion = "1.14.12"
 val springMockkVersion = "5.0.1"
-val otelVersion = "1.67.0"
+val otelVersion = "1.68.0"
 
 plugins {
     val kotlinVersion = "2.4.21"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
-    id("org.springframework.boot") version "4.1.2"
+    id("org.springframework.boot") version "4.2.0"
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
