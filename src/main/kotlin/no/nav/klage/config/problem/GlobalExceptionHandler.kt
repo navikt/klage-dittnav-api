@@ -1,5 +1,7 @@
 package no.nav.klage.config.problem
 
+import io.opentelemetry.api.common.AttributeKey
+import io.opentelemetry.api.trace.Span
 import no.nav.klage.domain.exception.AttachmentCouldNotBeConvertedException
 import no.nav.klage.domain.exception.AttachmentEncryptedException
 import no.nav.klage.domain.exception.AttachmentFilenameTooLongException
@@ -15,10 +17,14 @@ import no.nav.klage.domain.exception.KlankeIsFinalizedException
 import no.nav.klage.domain.exception.KlankeNotFoundException
 import no.nav.klage.domain.exception.SectionedValidationErrorWithDetailsException
 import no.nav.klage.util.getLogger
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @RestControllerAdvice
@@ -26,6 +32,20 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val ourLogger = getLogger(javaClass.enclosingClass)
+
+        private val CLIENT_ERROR = AttributeKey.stringKey("request.client_error")
+    }
+
+    // Spring's built-in exceptions only get a generic title like "Bad Request", so the exception type is used instead.
+    override fun handleExceptionInternal(
+        ex: Exception,
+        body: Any?,
+        headers: HttpHeaders,
+        statusCode: HttpStatusCode,
+        request: WebRequest,
+    ): ResponseEntity<Any>? {
+        setClientErrorOnSpan(statusCode = statusCode, title = ex.javaClass.simpleName)
+        return super.handleExceptionInternal(ex, body, headers, statusCode, request)
     }
 
     @ExceptionHandler
@@ -91,9 +111,20 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             errorMessage = errorMessage,
             exception = ex,
         )
+        setClientErrorOnSpan(statusCode = httpStatus, title = errorMessage)
 
         return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
             title = errorMessage
+        }
+    }
+
+    // Handled exceptions are invisible to the OTel agent, so the reason for a 4xx is added to the server span explicitly.
+    private fun setClientErrorOnSpan(
+        statusCode: HttpStatusCode,
+        title: String,
+    ) {
+        if (statusCode.is4xxClientError) {
+            Span.current().setAttribute(CLIENT_ERROR, title)
         }
     }
 
