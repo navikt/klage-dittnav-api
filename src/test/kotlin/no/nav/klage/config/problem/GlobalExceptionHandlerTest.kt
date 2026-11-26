@@ -8,7 +8,9 @@ import io.mockk.verify
 import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.Span
 import no.nav.klage.domain.exception.AttachmentEncryptedException
+import no.nav.klage.domain.exception.AttachmentGoneException
 import no.nav.klage.domain.exception.AttachmentMissingFilenameException
+import no.nav.klage.domain.exception.AttachmentNotFoundException
 import no.nav.klage.domain.exception.AttachmentTooLargeException
 import no.nav.klage.domain.exception.InvalidProperty
 import no.nav.klage.domain.exception.KlankeNotFoundException
@@ -100,6 +102,24 @@ class GlobalExceptionHandlerTest {
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.title").value("MISSING_FILENAME"))
+    }
+
+    @Test
+    fun `attachment gone returns gone`() {
+        mockMvc(AttachmentGoneException())
+            .perform(post("/validation"))
+            .andExpect(status().isGone)
+            .andExpect(jsonPath("$.status").value(410))
+            .andExpect(jsonPath("$.title").value("ATTACHMENT_GONE"))
+    }
+
+    @Test
+    fun `attachment not found returns not found`() {
+        mockMvc(AttachmentNotFoundException())
+            .perform(post("/validation"))
+            .andExpect(status().isNotFound)
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.title").value("ATTACHMENT_NOT_FOUND"))
     }
 
     @Test

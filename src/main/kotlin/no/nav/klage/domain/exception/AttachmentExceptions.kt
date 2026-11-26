@@ -34,6 +34,14 @@ class AttachmentFilenameTooLongException(
     override val message: String = "FILENAME_TOO_LONG",
 ) : RuntimeException()
 
+class AttachmentGoneException(
+    override val message: String = "ATTACHMENT_GONE",
+) : RuntimeException()
+
+class AttachmentNotFoundException(
+    override val message: String = "ATTACHMENT_NOT_FOUND",
+) : RuntimeException()
+
 class AttachmentMissingFilenameException(
     override val message: String = "MISSING_FILENAME",
 ) : RuntimeException()

@@ -5,9 +5,11 @@ import io.opentelemetry.api.trace.Span
 import no.nav.klage.domain.exception.AttachmentCouldNotBeConvertedException
 import no.nav.klage.domain.exception.AttachmentEncryptedException
 import no.nav.klage.domain.exception.AttachmentFilenameTooLongException
+import no.nav.klage.domain.exception.AttachmentGoneException
 import no.nav.klage.domain.exception.AttachmentHasVirusException
 import no.nav.klage.domain.exception.AttachmentIsEmptyException
 import no.nav.klage.domain.exception.AttachmentMissingFilenameException
+import no.nav.klage.domain.exception.AttachmentNotFoundException
 import no.nav.klage.domain.exception.AttachmentTooLargeException
 import no.nav.klage.domain.exception.AttachmentTotalTooLargeException
 import no.nav.klage.domain.exception.InvalidFullmaktException
@@ -76,6 +78,13 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     fun handleAttachmentTooLargeException(ex: AttachmentTooLargeException): ProblemDetail =
         create(httpStatus = HttpStatus.CONTENT_TOO_LARGE, ex = ex)
+
+    @ExceptionHandler
+    fun handleAttachmentGoneException(ex: AttachmentGoneException): ProblemDetail = create(httpStatus = HttpStatus.GONE, ex = ex)
+
+    @ExceptionHandler
+    fun handleAttachmentNotFoundException(ex: AttachmentNotFoundException): ProblemDetail =
+        create(httpStatus = HttpStatus.NOT_FOUND, ex = ex)
 
     @ExceptionHandler
     fun handleAttachmentMissingFilenameException(ex: AttachmentMissingFilenameException): ProblemDetail =
