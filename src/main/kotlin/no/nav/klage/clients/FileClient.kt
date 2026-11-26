@@ -1,13 +1,16 @@
 package no.nav.klage.clients
 
+import no.nav.klage.domain.exception.AttachmentNotFoundException
 import no.nav.klage.util.TokenUtil
 import no.nav.klage.util.getLogger
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Mono
 
 @Component
 class FileClient(
@@ -52,6 +55,7 @@ class FileClient(
             .uri { it.path("/attachment/{id}").build(vedleggRef) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getAppAccessTokenWithKlageFileApiScope()}")
             .retrieve()
+            .onStatus({ it == HttpStatus.NOT_FOUND }) { Mono.error(AttachmentNotFoundException()) }
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Attachment could not be fetched")
     }

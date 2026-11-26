@@ -2,9 +2,12 @@ package no.nav.klage.service
 
 import no.nav.klage.clients.FileClient
 import no.nav.klage.common.VedleggMetrics
+import no.nav.klage.domain.exception.AttachmentGoneException
 import no.nav.klage.domain.exception.AttachmentMissingFilenameException
+import no.nav.klage.domain.exception.AttachmentNotFoundException
 import no.nav.klage.domain.jpa.Klanke
 import no.nav.klage.domain.jpa.Vedlegg
+import no.nav.klage.domain.jpa.isFinalized
 import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.util.getLogger
 import no.nav.klage.vedlegg.AttachmentValidator
@@ -94,10 +97,25 @@ class VedleggService(
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = existingKlanke)
 
+        // klage-arkiver-journalpost deletes the files after archiving, so they are gone once the klanke is finalized.
+        if (existingKlanke.isFinalized()) {
+            throw AttachmentGoneException()
+        }
+
         val vedlegg = existingKlanke.vedlegg.find { it.id == vedleggId }
 
         if (vedlegg != null) {
-            return fileClient.getVedleggFile(vedlegg.ref)
+            return try {
+                fileClient.getVedleggFile(vedlegg.ref)
+            } catch (e: AttachmentNotFoundException) {
+                logger.error(
+                    "File missing in file store for vedlegg {} in draft klanke {} (ref {}).",
+                    vedlegg.id,
+                    existingKlanke.id,
+                    vedlegg.ref,
+                )
+                throw e
+            }
         } else {
             throw RuntimeException("No vedlegg found with this id: $vedleggId")
         }
