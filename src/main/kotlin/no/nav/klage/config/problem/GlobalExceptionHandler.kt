@@ -54,7 +54,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     fun handleKlankeNotFound(ex: KlankeNotFoundException): ProblemDetail = create(httpStatus = HttpStatus.NOT_FOUND, ex = ex)
 
     @ExceptionHandler
-    fun handleKlankeIsDeleted(ex: KlankeIsDeletedException): ProblemDetail = create(httpStatus = HttpStatus.CONFLICT, ex = ex)
+    fun handleKlankeIsDeleted(ex: KlankeIsDeletedException): ProblemDetail = create(httpStatus = HttpStatus.NOT_FOUND, ex = ex)
 
     @ExceptionHandler
     fun handleKlankeIsFinalized(ex: KlankeIsFinalizedException): ProblemDetail = create(httpStatus = HttpStatus.CONFLICT, ex = ex)
