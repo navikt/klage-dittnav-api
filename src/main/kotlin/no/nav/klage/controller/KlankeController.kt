@@ -24,6 +24,7 @@ import no.nav.klage.service.VedleggService
 import no.nav.klage.util.getLogger
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
+import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -46,6 +47,7 @@ import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import java.io.FileInputStream
 import java.io.InputStream
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.time.Duration
 import java.util.UUID
@@ -285,17 +287,21 @@ class KlankeController(
         @PathVariable vedleggId: UUID,
     ): ResponseEntity<ByteArray> {
         logger.debug("Get vedlegg to klanke is requested. KlankeId: {} - VedleggId: {}", klankeId, vedleggId)
-        val content =
+        val vedleggFile =
             vedleggService.getVedleggFromKlanke(
                 klankeId = klankeId,
                 vedleggId = vedleggId,
             )
 
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.contentDisposition =
+            ContentDisposition
+                .inline()
+                .filename(vedleggFile.filename, StandardCharsets.UTF_8)
+                .build()
         return ResponseEntity(
-            content,
+            vedleggFile.content,
             responseHeaders,
             HttpStatus.OK,
         )
