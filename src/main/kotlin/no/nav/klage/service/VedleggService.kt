@@ -117,7 +117,12 @@ class VedleggService(
                 throw e
             }
         } else {
-            throw RuntimeException("No vedlegg found with this id: $vedleggId")
+            logger.error(
+                "Vedlegg not found in db for vedlegg {} in draft klanke {}.",
+                vedleggId,
+                existingKlanke.id,
+            )
+            throw AttachmentNotFoundException()
         }
     }
 
