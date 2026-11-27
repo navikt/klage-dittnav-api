@@ -152,8 +152,8 @@ class KlankeValidationTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = KlageAnkeStatus::class, names = ["DELETED", "SENDING", "DONE"])
-    fun `deleted and finalized klanker are rejected before content validation`(klankeStatus: KlageAnkeStatus) {
+    @EnumSource(value = KlageAnkeStatus::class, names = ["SENDING", "DONE"])
+    fun `finalized klanker are rejected before content validation`(klankeStatus: KlageAnkeStatus) {
         klanke.status = klankeStatus
         klanke.fritekst = null
 
@@ -163,6 +163,19 @@ class KlankeValidationTest {
             .andExpect(jsonPath("$.sections").doesNotExist())
 
         assertEquals(klankeStatus, klanke.status)
+    }
+
+    @Test
+    fun `deleted klanker are rejected before content validation`() {
+        klanke.status = KlageAnkeStatus.DELETED
+        klanke.fritekst = null
+
+        mockMvc
+            .perform(post(validationPath))
+            .andExpect(status().isNotFound)
+            .andExpect(jsonPath("$.sections").doesNotExist())
+
+        assertEquals(KlageAnkeStatus.DELETED, klanke.status)
     }
 
     @Test

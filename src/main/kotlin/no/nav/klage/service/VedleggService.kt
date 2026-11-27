@@ -92,7 +92,7 @@ class VedleggService(
     fun getVedleggFromKlanke(
         klankeId: UUID,
         vedleggId: UUID,
-    ): ByteArray {
+    ): VedleggFile {
         val existingKlanke = klankeRepository.findById(klankeId).get()
         validationService.checkKlankeStatus(klanke = existingKlanke, includeFinalized = false)
         validationService.validateKlankeAccess(klanke = existingKlanke)
@@ -106,7 +106,10 @@ class VedleggService(
 
         if (vedlegg != null) {
             return try {
-                fileClient.getVedleggFile(vedlegg.ref)
+                VedleggFile(
+                    content = fileClient.getVedleggFile(vedlegg.ref),
+                    filename = vedlegg.pdfFilename(),
+                )
             } catch (e: AttachmentNotFoundException) {
                 logger.error(
                     "File missing in file store for vedlegg {} in draft klanke {} (ref {}).",
@@ -117,9 +120,25 @@ class VedleggService(
                 throw e
             }
         } else {
-            throw RuntimeException("No vedlegg found with this id: $vedleggId")
+            logger.error(
+                "Vedlegg not found in db for vedlegg {} in draft klanke {}.",
+                vedleggId,
+                existingKlanke.id,
+            )
+            throw AttachmentNotFoundException()
         }
     }
 
     private fun Klanke.attachmentsTotalSize() = this.vedlegg.sumOf { it.sizeInBytes }
+
+    // Stored files are always converted to PDF, so the original extension is replaced.
+    private fun Vedlegg.pdfFilename(): String {
+        val baseName = tittel.substringBeforeLast('.').ifBlank { "vedlegg" }
+        return "$baseName.pdf"
+    }
 }
+
+class VedleggFile(
+    val content: ByteArray,
+    val filename: String,
+)

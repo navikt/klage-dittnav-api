@@ -19,12 +19,11 @@ import no.nav.klage.domain.jpa.Vedlegg
 import no.nav.klage.repository.KlankeRepository
 import no.nav.klage.vedlegg.AttachmentValidator
 import no.nav.klage.vedlegg.Image2PDF
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
 import org.slf4j.LoggerFactory
 import org.springframework.web.multipart.MultipartFile
@@ -60,7 +59,7 @@ class VedleggServiceTest {
                 vedleggService.addKlankevedlegg(klankeId = klanke.id, multipart = multipart)
             }
 
-        assertEquals("MISSING_FILENAME", exception.message)
+        assertThat(exception.message).isEqualTo("MISSING_FILENAME")
         verify(exactly = 1) { validationService.checkKlankeStatus(klanke) }
         verify(exactly = 1) { validationService.validateKlankeAccess(klanke) }
         verify(exactly = 0) { multipart.bytes }
@@ -68,7 +67,7 @@ class VedleggServiceTest {
         verify { attachmentValidator wasNot Called }
         verify { image2PDF wasNot Called }
         verify { fileClient wasNot Called }
-        assertTrue(klanke.vedlegg.isEmpty())
+        assertThat(klanke.vedlegg).isEmpty()
     }
 
     @ParameterizedTest
@@ -100,7 +99,30 @@ class VedleggServiceTest {
 
         val result = vedleggService.getVedleggFromKlanke(klankeId = klanke.id, vedleggId = vedlegg.id)
 
-        assertArrayEquals(bytes, result)
+        assertThat(result.content).isEqualTo(bytes)
+        assertThat(result.filename).isEqualTo("vedlegg.pdf")
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "bilde.jpg, bilde.pdf",
+        "min.klage.png, min.klage.pdf",
+        "uten_endelse, uten_endelse.pdf",
+        ".png, vedlegg.pdf",
+    )
+    fun `getVedleggFromKlanke returns filename based on tittel with pdf extension`(
+        tittel: String,
+        expectedFilename: String,
+    ) {
+        val klanke = createTestKlanke(status = KlageAnkeStatus.DRAFT)
+        val vedlegg = Vedlegg(tittel = tittel, ref = "ref", contentType = "image/png", sizeInBytes = 1)
+        klanke.vedlegg.add(vedlegg)
+        every { klankeRepository.findById(klanke.id) } returns Optional.of(klanke)
+        every { fileClient.getVedleggFile("ref") } returns byteArrayOf(1)
+
+        val result = vedleggService.getVedleggFromKlanke(klankeId = klanke.id, vedleggId = vedlegg.id)
+
+        assertThat(result.filename).isEqualTo(expectedFilename)
     }
 
     @Test
@@ -123,8 +145,9 @@ class VedleggServiceTest {
         }
 
         val errors = appender.list.filter { it.level == Level.ERROR }
-        assertEquals(1, errors.size)
-        assertTrue(errors.single().formattedMessage.contains(vedlegg.id.toString()))
-        assertTrue(errors.single().formattedMessage.contains(klanke.id.toString()))
+        assertThat(errors).hasSize(1)
+        assertThat(errors.single().formattedMessage)
+            .contains(vedlegg.id.toString())
+            .contains(klanke.id.toString())
     }
 }
